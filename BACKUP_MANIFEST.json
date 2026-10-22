@@ -1,0 +1,280 @@
+﻿{
+    "total_archivos":  45,
+    "tipo_respaldo":  "RESPALDO MAESTRO INTEGRAL DE SISTEMA, BASE DE DATOS Y CODIGO FUENTE",
+    "sistema":  "VIASA System (Panadería y Pastelería Nueva Viasa, C.A.)",
+    "rif":  "J-31163165-8",
+    "ubicacion":  "La Sabanita, Ciudad Bolívar, Venezuela",
+    "fecha_respaldo":  "2026-09-14 02:12:32",
+    "archivos":  [
+                     {
+                         "sha256":  "9521552cd8cf5eb947795e943a0acb368aae5945fa3a4af3e93660710bf25ef0",
+                         "archivo":  "BACKUP_MANIFEST.json",
+                         "fecha_modificacion":  "2026-09-14 02:12:14",
+                         "tamano_bytes":  15491
+                     },
+                     {
+                         "sha256":  "5d7c868dcb111bbd6c9637baccfb062b80812ce07c86c144594582749e7cfa41",
+                         "archivo":  "DESPLIEGUE_NUBE_GRATIS.html",
+                         "fecha_modificacion":  "2026-09-07 01:30:04",
+                         "tamano_bytes":  7615
+                     },
+                     {
+                         "sha256":  "b378e2046e6bdee102afc4c907437a4839963858d08ebd15503861cb4df6451c",
+                         "archivo":  "favicon.png",
+                         "fecha_modificacion":  "2026-09-04 08:22:31",
+                         "tamano_bytes":  2418
+                     },
+                     {
+                         "sha256":  "61d339252cbb5aa8ccf2f51400ff87f81e0b0ba2390fd147ae459eed4aeb106c",
+                         "archivo":  "FORMATO NOTA DE COMPRA.png",
+                         "fecha_modificacion":  "2026-09-04 21:45:10",
+                         "tamano_bytes":  1296280
+                     },
+                     {
+                         "sha256":  "7dc53d297fd44190950494113138ed903e19f958b4326bade074300bc41a08fa",
+                         "archivo":  "FORMATO NOTA DE CREDITO.png",
+                         "fecha_modificacion":  "2026-09-04 22:29:26",
+                         "tamano_bytes":  1099808
+                     },
+                     {
+                         "sha256":  "0bca8ac3b0b7eda90a7aeee07da33d8542ef53efac1c2edac641934ef2d5bbed",
+                         "archivo":  "FORMATO NOTA DE DESPACHO.png",
+                         "fecha_modificacion":  "2026-09-04 22:08:13",
+                         "tamano_bytes":  637428
+                     },
+                     {
+                         "sha256":  "09dd12174eacc5364afd29249d14028e1527fe8c90f007ab7f861785023acf6a",
+                         "archivo":  "FORMATO NOTA DE ENTREGA.png",
+                         "fecha_modificacion":  "2026-09-04 22:34:19",
+                         "tamano_bytes":  892157
+                     },
+                     {
+                         "sha256":  "87f516cf0aa2b0ee0d6a3c81093fa304f6b895f8aaee6c32065f48a1c2baf3c7",
+                         "archivo":  "FORMATO NOTA DE VENTA.png",
+                         "fecha_modificacion":  "2026-09-04 21:51:30",
+                         "tamano_bytes":  1294037
+                     },
+                     {
+                         "sha256":  "3de225aca5bb15aa48f34655b7e6687626df2256e298d9c7c4fa27f95fb7c967",
+                         "archivo":  "index.html",
+                         "fecha_modificacion":  "2026-09-13 21:49:51",
+                         "tamano_bytes":  486062
+                     },
+                     {
+                         "sha256":  "a431bb16125c886d276cd15d5dd3ef8556ce32050acccc9a8244fb9d5757f76a",
+                         "archivo":  "INTRO PRESENTACION VIASA SYSTEM mejorado_light.mp4",
+                         "fecha_modificacion":  "2026-09-04 08:00:34",
+                         "tamano_bytes":  4162284
+                     },
+                     {
+                         "sha256":  "a036ecd5cd1a7a8f9fe0d3b9429c5fdbb19ee3898c01b17355b0e9c789b709cf",
+                         "archivo":  "INTRO PRESENTACION VIASA SYSTEM_light.mp4",
+                         "fecha_modificacion":  "2026-09-03 09:41:40",
+                         "tamano_bytes":  4205152
+                     },
+                     {
+                         "sha256":  "c140903a75b13fef70347ef3e78af94b8aca32decb6dd44cf3646fb6627751ca",
+                         "archivo":  "LOGO CIRCULAR FB - PNV - SMALL.png",
+                         "fecha_modificacion":  "2026-02-23 18:15:44",
+                         "tamano_bytes":  2059483
+                     },
+                     {
+                         "sha256":  "a4ef6a2f6333ea8139a087450740da9d435f88dead2414c9b6c0e1457eb71c26",
+                         "archivo":  "LOGO CIRCULAR FN - PNV - SMALL.png",
+                         "fecha_modificacion":  "2026-02-16 20:22:47",
+                         "tamano_bytes":  1163301
+                     },
+                     {
+                         "sha256":  "7caac45dd13b7d647b67e08bb31657959718dc3c997b513a9e3bf52fa1751660",
+                         "archivo":  "manifest.json",
+                         "fecha_modificacion":  "2026-09-03 09:36:09",
+                         "tamano_bytes":  747
+                     },
+                     {
+                         "sha256":  "bdefe99db79c417e22e9729feaf6b1d065870ece0d73b7d1dd7a97dcb7e348d3",
+                         "archivo":  "mobile_app.html",
+                         "fecha_modificacion":  "2026-09-08 22:19:53",
+                         "tamano_bytes":  27418
+                     },
+                     {
+                         "sha256":  "bead497f46193e7244458f9e0b9838151393dc667f6e9350299136a5539f68f7",
+                         "archivo":  "README.md",
+                         "fecha_modificacion":  "2026-09-03 09:36:04",
+                         "tamano_bytes":  2766
+                     },
+                     {
+                         "sha256":  "a9388cd6b80747a289e6f8de549632e76760adb19f1c464ac0c6cc27e000f5a1",
+                         "archivo":  "sw.js",
+                         "fecha_modificacion":  "2026-09-03 09:36:13",
+                         "tamano_bytes":  1710
+                     },
+                     {
+                         "sha256":  "ff41bcac1ea5291fcdb1df9aa17888947ed5d7f3c79517b5b0f89c75c4da7ec3",
+                         "archivo":  "test_inline.html",
+                         "fecha_modificacion":  "2026-09-07 22:59:27",
+                         "tamano_bytes":  230371
+                     },
+                     {
+                         "sha256":  "edd9315868bb02432dce2f22022de265bea463f29c3e2b2f31620b0be6fc42a3",
+                         "archivo":  "test_syntax.html",
+                         "fecha_modificacion":  "2026-09-07 22:33:42",
+                         "tamano_bytes":  830
+                     },
+                     {
+                         "sha256":  "412d9c6b4cf58cdfe1a5126b6f0828ff1a316a852d9614ab7e3bb4acd6e0a714",
+                         "archivo":  "viasa_app.bat",
+                         "fecha_modificacion":  "2026-09-04 07:59:33",
+                         "tamano_bytes":  542
+                     },
+                     {
+                         "sha256":  "cd8c1da0bfc32638a33327822624c9293d978f4ed51531a204c91794b4bee4bf",
+                         "archivo":  "viasa_setup.bat",
+                         "fecha_modificacion":  "2026-09-04 07:59:27",
+                         "tamano_bytes":  1445
+                     },
+                     {
+                         "sha256":  "118ac9568d122753f72f23bee4d04ac6dedf791600b8540f7160fe53b2629840",
+                         "archivo":  "viasa_setup.ps1",
+                         "fecha_modificacion":  "2026-09-04 07:59:30",
+                         "tamano_bytes":  2330
+                     },
+                     {
+                         "sha256":  "ef60c8997b5f1995020f64a73227d891f5e02ded0047213f2a5fc09543708b90",
+                         "archivo":  "assets\\audio\\intro_viasa.wav",
+                         "fecha_modificacion":  "2026-09-04 07:47:45",
+                         "tamano_bytes":  1499444
+                     },
+                     {
+                         "sha256":  "83c607e7e17b59a5b1b5c1962daa53d91226550f4977200ed276b6673d5677e8",
+                         "archivo":  "assets\\css\\main.css",
+                         "fecha_modificacion":  "2026-09-09 01:35:50",
+                         "tamano_bytes":  170540
+                     },
+                     {
+                         "sha256":  "1e3e22aa5dba3e26497430e239b8fe960303b66acecbda8eb9e93c6d34704ada",
+                         "archivo":  "assets\\icons\\apple-touch-icon.png",
+                         "fecha_modificacion":  "2026-09-04 08:22:32",
+                         "tamano_bytes":  53850
+                     },
+                     {
+                         "sha256":  "7a971cf898a96cbb767ec1b31983a4695de367805957a28529edf9f1883ab94c",
+                         "archivo":  "assets\\icons\\favicon-16x16.png",
+                         "fecha_modificacion":  "2026-09-04 08:22:31",
+                         "tamano_bytes":  799
+                     },
+                     {
+                         "sha256":  "b378e2046e6bdee102afc4c907437a4839963858d08ebd15503861cb4df6451c",
+                         "archivo":  "assets\\icons\\favicon-32x32.png",
+                         "fecha_modificacion":  "2026-09-04 08:22:31",
+                         "tamano_bytes":  2418
+                     },
+                     {
+                         "sha256":  "a8f9832e095da4db0b2d4683171406274c9c3442edf0329998ff711fa7bc95ac",
+                         "archivo":  "assets\\icons\\favicon-48x48.png",
+                         "fecha_modificacion":  "2026-09-04 08:22:32",
+                         "tamano_bytes":  4840
+                     },
+                     {
+                         "sha256":  "6ca1e44187a33729eaf144282c73c34eb9d30556c7e9720f898e2c14d351ea1c",
+                         "archivo":  "assets\\icons\\icon-192.png",
+                         "fecha_modificacion":  "2026-09-04 08:22:32",
+                         "tamano_bytes":  60697
+                     },
+                     {
+                         "sha256":  "fed6977beee42c8e8587ce32dcbc5265b72733762924c7a81cfbdd12ab2d8284",
+                         "archivo":  "assets\\icons\\icon-512.png",
+                         "fecha_modificacion":  "2026-09-04 08:22:33",
+                         "tamano_bytes":  370399
+                     },
+                     {
+                         "sha256":  "0fcfb5b14146684745c9f13475f4bbb2cd79739250af5f440abcd8141a7e6763",
+                         "archivo":  "assets\\icons\\viasa_icon.ico",
+                         "fecha_modificacion":  "2026-09-04 07:59:42",
+                         "tamano_bytes":  41086
+                     },
+                     {
+                         "sha256":  "35ac0890d0aeee0a3eb16f400ca60dfb24730c0f6b9b2fbd59f2976019bff7f2",
+                         "archivo":  "assets\\img\\viasa_isotipo.png",
+                         "fecha_modificacion":  "2026-09-05 03:33:39",
+                         "tamano_bytes":  1031150
+                     },
+                     {
+                         "sha256":  "35ac0890d0aeee0a3eb16f400ca60dfb24730c0f6b9b2fbd59f2976019bff7f2",
+                         "archivo":  "assets\\img\\viasa_isotipo_clean.png",
+                         "fecha_modificacion":  "2026-09-05 03:33:39",
+                         "tamano_bytes":  1031150
+                     },
+                     {
+                         "sha256":  "c140903a75b13fef70347ef3e78af94b8aca32decb6dd44cf3646fb6627751ca",
+                         "archivo":  "assets\\img\\viasa_logo_circular.png",
+                         "fecha_modificacion":  "2026-02-23 18:15:44",
+                         "tamano_bytes":  2059483
+                     },
+                     {
+                         "sha256":  "35ac0890d0aeee0a3eb16f400ca60dfb24730c0f6b9b2fbd59f2976019bff7f2",
+                         "archivo":  "assets\\img\\viasa_logo_oficial.png",
+                         "fecha_modificacion":  "2026-09-05 03:33:39",
+                         "tamano_bytes":  1031150
+                     },
+                     {
+                         "sha256":  "c795819d99123950226f43b736fdd5348d7352556c29c7bbe7e46e8a8ca3a4bf",
+                         "archivo":  "assets\\js\\app.js",
+                         "fecha_modificacion":  "2026-09-14 00:18:16",
+                         "tamano_bytes":  1616919
+                     },
+                     {
+                         "sha256":  "0e4611ff18e0aaff67302c047b1e14d66e15569db30857697f80ec69f516bd8d",
+                         "archivo":  "assets\\js\\audio-engine.js",
+                         "fecha_modificacion":  "2026-09-03 09:36:41",
+                         "tamano_bytes":  4692
+                     },
+                     {
+                         "sha256":  "23c50d062552a6abaddc0288d35429ff64640735ee5997d9e526a6f32e6b5421",
+                         "archivo":  "assets\\js\\auth.js",
+                         "fecha_modificacion":  "2026-09-08 23:53:37",
+                         "tamano_bytes":  32520
+                     },
+                     {
+                         "sha256":  "e1f0ba330a061f291e5f098d6c4b2ed5c015ec9d263af4f80a6f766d2d62d3bb",
+                         "archivo":  "assets\\js\\barcode-qr-engine.js",
+                         "fecha_modificacion":  "2026-09-06 12:08:56",
+                         "tamano_bytes":  35856
+                     },
+                     {
+                         "sha256":  "1974ef1e44446fa725aa229724edc828dc4291c94b2654cf0e625d5651f20b98",
+                         "archivo":  "assets\\js\\database.js",
+                         "fecha_modificacion":  "2026-09-13 21:46:49",
+                         "tamano_bytes":  244604
+                     },
+                     {
+                         "sha256":  "8b8987614afb8bcfe4af7d01464bbe5f7ad6684575544b9dec1ec07c168c0309",
+                         "archivo":  "assets\\js\\driver-aclas-cr2050.js",
+                         "fecha_modificacion":  "2026-09-04 14:01:13",
+                         "tamano_bytes":  24216
+                     },
+                     {
+                         "sha256":  "0d53a7be4947218250debca11f6047f21cd40557d1c179a60bba6062944b767b",
+                         "archivo":  "assets\\js\\driver-fiscal-multi.js",
+                         "fecha_modificacion":  "2026-09-04 14:18:08",
+                         "tamano_bytes":  35390
+                     },
+                     {
+                         "sha256":  "73f60c4a7f05e87d3d687313d832fbcabb0366cbff30de06f5e49c10b897bbc7",
+                         "archivo":  "assets\\js\\guardias-engine.js",
+                         "fecha_modificacion":  "2026-09-08 22:19:17",
+                         "tamano_bytes":  75745
+                     },
+                     {
+                         "sha256":  "bb6b5aef6bd459f3d5f553d30d31f62145d29f69ef83ccd744033e7cbfce677c",
+                         "archivo":  "assets\\js\\storage-engine.js",
+                         "fecha_modificacion":  "2026-09-13 21:46:28",
+                         "tamano_bytes":  16767
+                     },
+                     {
+                         "sha256":  "a036ecd5cd1a7a8f9fe0d3b9429c5fdbb19ee3898c01b17355b0e9c789b709cf",
+                         "archivo":  "assets\\video\\intro_viasa.mp4",
+                         "fecha_modificacion":  "2026-09-03 09:41:40",
+                         "tamano_bytes":  4205152
+                     }
+                 ]
+}

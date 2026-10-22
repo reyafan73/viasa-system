@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VIASA System - Guía de Despliegue en la Nube Gratuito</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
+        body { background: #0f172a; color: #f8fafc; padding: 30px 20px; line-height: 1.6; }
+        .container { max-width: 900px; margin: 0 auto; background: #1e293b; border-radius: 16px; border: 1.5px solid #334155; padding: 36px; box-shadow: 0 20px 40px rgba(0,0,0,0.5); }
+        .header { text-align: center; margin-bottom: 30px; border-bottom: 1px solid #334155; padding-bottom: 24px; }
+        .logo-title { font-size: 1.8rem; font-weight: 900; color: #f59e0b; display: flex; align-items: center; justify-content: center; gap: 12px; }
+        .subtitle { color: #94a3b8; font-size: 0.95rem; margin-top: 6px; }
+        .grid-options { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; margin-top: 24px; }
+        .card { background: #0f172a; border: 1.5px solid #334155; border-radius: 12px; padding: 22px; transition: transform 0.2s, border-color 0.2s; }
+        .card:hover { transform: translateY(-4px); border-color: #f59e0b; }
+        .card-icon { font-size: 2.2rem; margin-bottom: 14px; }
+        .card-title { font-size: 1.15rem; font-weight: 800; color: #fff; margin-bottom: 8px; }
+        .card-desc { font-size: 0.85rem; color: #94a3b8; margin-bottom: 18px; line-height: 1.5; }
+        .btn-action { display: inline-flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 10px 16px; border-radius: 8px; font-weight: 700; font-size: 0.88rem; text-decoration: none; color: #000; background: #f59e0b; transition: opacity 0.2s; }
+        .btn-action:hover { opacity: 0.9; }
+        .btn-secondary { background: #3b82f6; color: #fff; }
+        .btn-green { background: #10b981; color: #fff; }
+        .alert-box { background: rgba(245, 158, 11, 0.1); border: 1px solid #f59e0b; border-radius: 10px; padding: 16px; margin-top: 28px; font-size: 0.88rem; color: #fde68a; }
+        .local-info { background: #0b1120; border: 1px solid #1e293b; border-radius: 10px; padding: 18px; margin-top: 24px; }
+        .local-info h4 { color: #38bdf8; font-size: 0.95rem; margin-bottom: 8px; }
+        .local-info ul { list-style: none; font-size: 0.84rem; color: #cbd5e1; }
+        .local-info li { margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo-title">
+                <i class="fa-solid fa-cloud-arrow-up"></i> VIASA SYSTEM • DESPLIEGUE EN LA NUBE GRATUITO
+            </div>
+            <div class="subtitle">
+                Panadería y Pastelería Nueva Viasa, C.A. (RIF: J-31163165-8) • La Sabanita, Ciudad Bolívar
+            </div>
+        </div>
+
+        <p style="font-size: 0.95rem; color: #cbd5e1; margin-bottom: 10px;">
+            El <strong>VIASA System</strong> es una aplicación web autónoma (HTML5, JavaScript, CSS3, IndexedDB y PWA) que puede funcionar tanto de forma local (100% offline) como alojada en servidores de nube gratuitos, rápidos y confiables con cifrado SSL (HTTPS).
+        </p>
+
+        <div class="grid-options">
+            <!-- Opción 1: Netlify Drop -->
+            <div class="card">
+                <div class="card-icon" style="color: #00c7b7;">
+                    <i class="fa-solid fa-bolt"></i>
+                </div>
+                <div class="card-title">1. Netlify Drop (Recomendado)</div>
+                <div class="card-desc">
+                    El método más rápido. Solo arrastras la carpeta o el archivo ZIP de <strong>VIASA System</strong> y en 10 segundos obtendrás un enlace web permanente y gratuito (ej. <em>https://viasa-panaderia.netlify.app</em>).
+                </div>
+                <a href="https://app.netlify.com/drop" target="_blank" class="btn-action">
+                    <i class="fa-solid fa-arrow-up-right-from-square"></i> Abrir Netlify Drop
+                </a>
+            </div>
+
+            <!-- Opción 2: Vercel -->
+            <div class="card">
+                <div class="card-icon" style="color: #ffffff;">
+                    <i class="fa-solid fa-triangle"></i>
+                </div>
+                <div class="card-title">2. Vercel Hosting</div>
+                <div class="card-desc">
+                    Servidor en la nube de nivel industrial con red CDN global ultrarrápida. Permite desplegar aplicaciones web completas de forma gratuita y con soporte para PWA en móviles y tablets.
+                </div>
+                <a href="https://vercel.com" target="_blank" class="btn-action btn-secondary">
+                    <i class="fa-solid fa-globe"></i> Abrir Vercel
+                </a>
+            </div>
+
+            <!-- Opción 3: Microsoft OneDrive -->
+            <div class="card">
+                <div class="card-icon" style="color: #0078d4;">
+                    <i class="fa-brands fa-microsoft"></i>
+                </div>
+                <div class="card-title">3. Microsoft OneDrive Cloud</div>
+                <div class="card-desc">
+                    Ya está guardado y respaldado en tu carpeta de <strong>OneDrive</strong> local, sincronizándose automáticamente con los servidores seguros de Microsoft en la nube.
+                </div>
+                <a href="https://onedrive.live.com" target="_blank" class="btn-action btn-green">
+                    <i class="fa-solid fa-cloud"></i> Ver en OneDrive Nube
+                </a>
+            </div>
+        </div>
+
+        <div class="local-info">
+            <h4><i class="fa-solid fa-folder-tree" style="color: #38bdf8;"></i> Ubicaciones de Respaldo en tu Laptop:</h4>
+            <ul>
+                <li><i class="fa-solid fa-check" style="color: #10b981;"></i> <strong>Pestaña Projects / Workspace:</strong> <code>C:\Users\USUARIO\Projects\VIASA_System\</code></li>
+                <li><i class="fa-solid fa-check" style="color: #10b981;"></i> <strong>Escritorio de la Laptop:</strong> <code>C:\Users\USUARIO\Desktop\VIASA_System\</code></li>
+                <li><i class="fa-solid fa-check" style="color: #10b981;"></i> <strong>Documentos de la Laptop:</strong> <code>C:\Users\USUARIO\Documents\VIASA_System\</code></li>
+                <li><i class="fa-solid fa-check" style="color: #10b981;"></i> <strong>Nube Microsoft OneDrive:</strong> <code>C:\Users\USUARIO\OneDrive\VIASA_System\</code></li>
+                <li><i class="fa-solid fa-file-zipper" style="color: #f59e0b;"></i> <strong>Paquete Comprimido Portable (.ZIP):</strong> <code>VIASA_System_RESPALDO_COMPLETO.zip</code> (28.3 MB)</li>
+            </ul>
+        </div>
+
+        <div class="alert-box">
+            <i class="fa-solid fa-shield-halved"></i> <strong>Garantía de Seguridad y Privacidad:</strong> La base de datos (IndexedDB) del VIASA System almacena la información directamente en el dispositivo cliente con encriptación local y hashes SHA-256 inalterables.
+        </div>
+
+        <div style="text-align: center; margin-top: 24px;">
+            <a href="index.html" class="btn-action" style="max-width: 280px; margin: 0 auto; background: #3b82f6; color: #fff;">
+                <i class="fa-solid fa-house"></i> Abrir VIASA System Local
+            </a>
+        </div>
+    </div>
+</body>
+</html>

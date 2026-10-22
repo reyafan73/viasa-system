@@ -1,0 +1,7448 @@
+/**
+ * ==============================================================================
+ * VIASA SYSTEM - MAIN STYLESHEET
+ * Panadería y Pastelería Nueva Viasa, C.A.
+ * ==============================================================================
+ */
+
+:root {
+    --bg-main: #0b0f19;
+    --bg-card: #111827;
+    --bg-card-hover: #1f2937;
+    --bg-sidebar: #070a10;
+    --bg-input: #050811;
+    
+    --accent-gold: #d97706;
+    --accent-gold-light: #f59e0b;
+    --accent-wheat: #fbbf24;
+    --accent-wheat-light: #fef3c7;
+    
+    --text-primary: #f8fafc;
+    --text-secondary: #94a3b8;
+    --text-muted: #64748b;
+    
+    --success: #10b981;
+    --danger: #ef4444;
+    --warning: #f59e0b;
+    --info: #0284c7;
+    
+    --border-color: #1e293b;
+    --border-gold: rgba(217, 119, 6, 0.4);
+    
+    --font-main: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    --font-heading: 'Outfit', 'Segoe UI', sans-serif;
+    --font-ticket: 'Courier New', Courier, monospace;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    user-select: none;
+}
+
+body {
+    background-color: var(--bg-main);
+    color: var(--text-primary);
+    font-family: var(--font-main);
+    overflow: hidden;
+    height: 100vh;
+    width: 100vw;
+    display: flex;
+}
+
+/* ==============================================================================
+   1. PANTALLA DE CARGA / INTRO EN VIDEO (SPLASH SCREEN)
+   ============================================================================== */
+.viasa-splash-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: #000000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    overflow: hidden;
+    transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.viasa-splash-screen.hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.viasa-video-container {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #000000;
+}
+
+.viasa-intro-video-el {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    max-width: 100vw;
+    max-height: 100vh;
+    box-shadow: 0 0 50px rgba(0, 0, 0, 0.9);
+}
+
+.video-floating-controls {
+    position: absolute;
+    bottom: 24px;
+    right: 28px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    z-index: 10;
+}
+
+.btn-video-ctrl {
+    background: rgba(15, 23, 42, 0.75);
+    backdrop-filter: blur(8px);
+    border: 1.5px solid rgba(217, 119, 6, 0.5);
+    color: #ffffff;
+    padding: 8px 14px;
+    border-radius: 30px;
+    font-size: 0.82rem;
+    font-weight: 800;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.25s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
+}
+
+.btn-video-ctrl:hover {
+    background: var(--accent-gold);
+    border-color: var(--accent-wheat);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(217, 119, 6, 0.5);
+}
+
+.btn-skip-intro {
+    padding: 8px 18px;
+    letter-spacing: 0.5px;
+}
+
+/* Pantalla Previa de Bienvenida / Gate Anti-Bloqueo de Audio */
+.viasa-welcome-gate {
+    position: absolute;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    background: radial-gradient(circle at center, #111b2f 0%, #05070c 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 50;
+    transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.viasa-welcome-gate.hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.viasa-welcome-card {
+    background: rgba(17, 24, 39, 0.95);
+    backdrop-filter: blur(16px);
+    border: 2px solid var(--accent-gold);
+    border-radius: 24px;
+    padding: 38px 32px;
+    width: 90%;
+    max-width: 520px;
+    text-align: center;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.9), 0 0 35px rgba(217, 119, 6, 0.3);
+    animation: viasaCardPop 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.viasa-welcome-logo {
+    width: 110px;
+    height: 110px;
+    margin: 0 auto 16px auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.viasa-welcome-logo img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    filter: drop-shadow(0 6px 18px rgba(217, 119, 6, 0.5));
+}
+
+.viasa-welcome-title {
+    font-family: var(--font-heading);
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: #f8fafc;
+    letter-spacing: 0.5px;
+    margin-bottom: 6px;
+}
+
+.viasa-welcome-subtitle {
+    font-family: var(--font-heading);
+    font-size: 0.76rem;
+    font-weight: 600;
+    color: #fef08a;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    line-height: 1.4;
+    margin-bottom: 28px;
+}
+
+.btn-iniciar-viasa-hero {
+    background: linear-gradient(135deg, #d97706 0%, #f59e0b 50%, #fbbf24 100%);
+    color: #0b0f19;
+    border: none;
+    padding: 16px 36px;
+    border-radius: 40px;
+    font-size: 1.05rem;
+    font-weight: 900;
+    letter-spacing: 1px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    box-shadow: 0 8px 30px rgba(217, 119, 6, 0.6), 0 0 20px rgba(245, 158, 11, 0.4);
+    transition: all 0.25s ease;
+    animation: viasaHeroPulse 2s infinite ease-in-out;
+}
+
+.btn-iniciar-viasa-hero:hover {
+    transform: translateY(-3px) scale(1.03);
+    box-shadow: 0 12px 40px rgba(217, 119, 6, 0.85), 0 0 30px rgba(245, 158, 11, 0.6);
+    color: #000;
+}
+
+.btn-iniciar-viasa-hero:active {
+    transform: translateY(1px) scale(0.98);
+}
+
+.viasa-welcome-badge {
+    margin-top: 20px;
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    font-weight: 600;
+}
+
+.viasa-video-container.hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+@keyframes viasaHeroPulse {
+    0%, 100% {
+        box-shadow: 0 8px 30px rgba(217, 119, 6, 0.6), 0 0 20px rgba(245, 158, 11, 0.4);
+        transform: scale(1);
+    }
+    50% {
+        box-shadow: 0 12px 45px rgba(245, 158, 11, 0.9), 0 0 35px rgba(251, 191, 36, 0.7);
+        transform: scale(1.025);
+    }
+}
+
+@keyframes viasaCardPop {
+    from {
+        opacity: 0;
+        transform: scale(0.92) translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+/* ==============================================================================
+   2. PANTALLA DE AUTENTICACIÓN / LOGIN
+   ============================================================================== */
+.viasa-login-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: radial-gradient(circle at center, #111b2f 0%, #05070c 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 5000;
+    transition: opacity 0.4s ease, visibility 0.4s ease;
+}
+
+.viasa-login-screen.hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.login-card {
+    background: rgba(17, 24, 39, 0.95);
+    backdrop-filter: blur(14px);
+    border: 2px solid var(--accent-gold);
+    border-radius: 18px;
+    width: 90%;
+    max-width: 480px;
+    padding: 32px 28px;
+    box-shadow: 0 16px 50px rgba(0, 0, 0, 0.85);
+    text-align: center;
+}
+
+.login-header-logo {
+    width: 110px;
+    height: 110px;
+    margin: 0 auto 10px auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.login-title {
+    font-family: var(--font-heading);
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--accent-wheat);
+    margin-bottom: 4px;
+}
+
+.login-desc {
+    font-family: 'Outfit', 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif;
+    font-size: 0.80rem;
+    color: #fef08a;
+    font-weight: 600;
+    letter-spacing: 0.75px;
+    line-height: 1.45;
+    text-transform: uppercase;
+    text-align: center;
+    max-width: 440px;
+    margin: 0 auto 22px auto;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* Selector de Roles Rápidos */
+.role-picker-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.role-pill-btn {
+    background: var(--bg-main);
+    border: 1.5px solid var(--border-color);
+    border-radius: 10px;
+    padding: 12px 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+}
+
+.role-pill-btn i {
+    font-size: 1.3rem;
+    color: var(--text-secondary);
+}
+
+.role-pill-btn span {
+    font-size: 0.72rem;
+    font-weight: 800;
+    color: var(--text-secondary);
+    text-align: center;
+    line-height: 1.2;
+}
+
+.role-pill-btn:hover,
+.role-pill-btn.active {
+    border-color: var(--accent-wheat);
+    background: rgba(217, 119, 6, 0.15);
+    transform: translateY(-2px);
+}
+
+.role-pill-btn.active i {
+    color: var(--accent-wheat);
+}
+
+.role-pill-btn.active span {
+    color: #fff;
+}
+
+.login-input-group {
+    margin-bottom: 16px;
+    text-align: left;
+}
+
+.login-input-group label {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--text-secondary);
+    margin-bottom: 6px;
+    display: block;
+}
+
+.login-input {
+    width: 100%;
+    background: var(--bg-input);
+    border: 1.5px solid var(--border-color);
+    border-radius: 10px;
+    padding: 12px 16px;
+    color: #fff;
+    font-size: 1rem;
+    font-weight: 700;
+    outline: none;
+    transition: all 0.2s ease;
+}
+
+.login-input:focus {
+    border-color: var(--accent-gold);
+    box-shadow: 0 0 14px rgba(217, 119, 6, 0.35);
+}
+
+.btn-login-submit {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+    border: 1.5px solid var(--accent-wheat);
+    border-radius: 10px;
+    color: #fff;
+    font-size: 1rem;
+    font-weight: 900;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    box-shadow: 0 6px 18px rgba(217, 119, 6, 0.4);
+}
+
+.btn-login-submit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(217, 119, 6, 0.6);
+}
+
+/* ==============================================================================
+   3. LAYOUT PRINCIPAL Y NAVEGACIÓN
+   ============================================================================== */
+.app-container {
+    display: flex;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+}
+
+/* SIDEBAR DE NAVEGACIÓN */
+.app-sidebar {
+    width: 250px;
+    background-color: var(--bg-sidebar);
+    border-right: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 16px 12px;
+    z-index: 100;
+    overflow-y: auto;
+}
+
+.brand-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 6px 6px 16px 6px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.brand-logo-badge {
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.brand-title {
+    font-family: var(--font-heading);
+    font-size: 1.15rem;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    color: var(--accent-wheat);
+    line-height: 1.2;
+}
+
+.brand-subtitle {
+    font-size: 0.65rem;
+    color: var(--text-muted);
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.nav-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 14px;
+    flex: 1;
+    overflow-y: auto;
+    max-height: calc(100vh - 150px);
+    padding-right: 4px;
+}
+
+.nav-menu::-webkit-scrollbar {
+    width: 5px;
+}
+.nav-menu::-webkit-scrollbar-thumb {
+    background: #334155;
+    border-radius: 4px;
+}
+.nav-menu::-webkit-scrollbar-thumb:hover {
+    background: #d97706;
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 11px 14px;
+    border-radius: 8px;
+    color: var(--text-secondary);
+    font-weight: 700;
+    font-size: 0.88rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
+}
+
+.nav-item i {
+    font-size: 1.05rem;
+    width: 22px;
+    text-align: center;
+}
+
+.nav-item:hover {
+    background-color: var(--bg-card);
+    color: var(--text-primary);
+}
+
+.nav-item.active {
+    background: linear-gradient(135deg, rgba(217, 119, 6, 0.2) 0%, rgba(120, 53, 15, 0.1) 100%);
+    border-color: var(--accent-gold);
+    color: var(--accent-wheat);
+}
+
+.nav-item.disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+/* ÁREA DE CONTENIDO PRINCIPAL */
+.app-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow: hidden;
+    background: radial-gradient(circle at top right, #131d31 0%, #0b0f19 70%);
+}
+
+/* CABECERA SUPERIOR */
+.app-header {
+    height: 64px;
+    background-color: rgba(17, 24, 39, 0.85);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
+}
+
+.header-rates-bar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.rate-badge {
+    background: var(--bg-input);
+    border: 1px solid var(--border-color);
+    padding: 6px 12px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.rate-badge:hover {
+    border-color: var(--accent-gold);
+    background: #111827;
+}
+
+.rate-badge.bcv {
+    border-color: rgba(2, 132, 199, 0.4);
+    color: #38bdf8;
+}
+
+.rate-badge.paralelo {
+    border-color: rgba(245, 158, 11, 0.4);
+    color: var(--accent-wheat);
+}
+
+.header-user-section {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.user-badge-box {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    padding: 5px 12px 5px 6px;
+    border-radius: 30px;
+}
+
+.user-avatar-circle {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--accent-gold);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem;
+    font-weight: 800;
+}
+
+.user-info-text {
+    display: flex;
+    flex-direction: column;
+}
+
+.user-name-title {
+    font-size: 0.8rem;
+    font-weight: 800;
+    color: #fff;
+}
+
+.user-role-tag {
+    font-size: 0.65rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    color: var(--accent-wheat);
+}
+
+.btn-logout {
+    background: rgba(239, 68, 68, 0.15);
+    border: 1px solid #ef4444;
+    color: #f87171;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: 800;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.btn-logout:hover {
+    background: #ef4444;
+    color: #fff;
+}
+
+/* ==============================================================================
+   4. PANEL PRINCIPAL (DASHBOARD)
+   ============================================================================== */
+.dashboard-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.welcome-banner {
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    border: 1.5px solid var(--accent-gold);
+    border-radius: 14px;
+    padding: 22px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+}
+
+.welcome-title {
+    font-family: var(--font-heading);
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: var(--accent-wheat);
+    margin-bottom: 4px;
+}
+
+.welcome-subtitle {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+.kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+}
+
+.kpi-card {
+    background: var(--bg-card);
+    border: 1.5px solid var(--border-color);
+    border-radius: 12px;
+    padding: 16px 18px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    transition: all 0.2s ease;
+}
+
+.kpi-card:hover {
+    border-color: var(--accent-wheat);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.3);
+}
+
+.kpi-icon-box {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+}
+
+.kpi-icon-box.gold { background: rgba(217, 119, 6, 0.2); color: var(--accent-wheat); border: 1px solid var(--accent-gold); }
+.kpi-icon-box.green { background: rgba(16, 185, 129, 0.2); color: var(--success); border: 1px solid var(--success); }
+.kpi-icon-box.blue { background: rgba(2, 132, 199, 0.2); color: #38bdf8; border: 1px solid #0284c7; }
+.kpi-icon-box.purple { background: rgba(168, 85, 247, 0.2); color: #c084fc; border: 1px solid #a855f7; }
+
+.kpi-info-val {
+    font-size: 1.4rem;
+    font-weight: 900;
+    color: #fff;
+    line-height: 1.1;
+}
+
+.kpi-info-lbl {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    margin-top: 3px;
+}
+
+/* Accesos Rápidos del Dashboard */
+.shortcuts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 16px;
+}
+
+.shortcut-card {
+    background: var(--bg-card);
+    border: 1.5px solid var(--border-color);
+    border-radius: 12px;
+    padding: 18px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.shortcut-card:hover {
+    border-color: var(--accent-gold);
+    background: var(--bg-card-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+}
+
+.shortcut-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.05);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    color: var(--accent-wheat);
+}
+
+.shortcut-title {
+    font-weight: 800;
+    font-size: 0.95rem;
+    color: #fff;
+}
+
+.shortcut-desc {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+/* ==============================================================================
+   5. MÓDULO: PUNTO DE VENTA (POS) TÁCTIL Y DE ALTA VELOCIDAD
+   ============================================================================== */
+.view-container {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px 20px;
+    display: none;
+}
+
+.view-container.active {
+    display: flex;
+    flex-direction: column;
+}
+
+.pos-layout {
+    display: grid;
+    grid-template-columns: 1fr 400px;
+    gap: 16px;
+    height: 100%;
+    overflow: hidden;
+}
+
+.pos-catalog-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    overflow: hidden;
+}
+
+.pos-top-toolbar {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.pos-search-input {
+    flex: 1;
+    background: var(--bg-card);
+    border: 1.5px solid var(--border-color);
+    border-radius: 10px;
+    padding: 11px 16px;
+    color: var(--text-primary);
+    font-size: 0.95rem;
+    outline: none;
+    transition: all 0.2s ease;
+}
+
+.pos-search-input:focus {
+    border-color: var(--accent-gold);
+    box-shadow: 0 0 12px rgba(217, 119, 6, 0.25);
+}
+
+.pos-currency-mode-selector {
+    display: flex;
+    background: var(--bg-card);
+    border: 1.5px solid var(--border-color);
+    border-radius: 10px;
+    padding: 3px;
+    gap: 4px;
+}
+
+.curr-pill-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 0.78rem;
+    font-weight: 800;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.curr-pill-btn.active {
+    background: var(--accent-gold);
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+/* Categorías del POS */
+.pos-categories-scroll {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+}
+
+.pos-cat-pill {
+    padding: 8px 14px;
+    border-radius: 20px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+    font-weight: 700;
+    cursor: pointer;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+}
+
+.pos-cat-pill:hover,
+.pos-cat-pill.active {
+    background: var(--accent-gold);
+    color: #fff;
+    border-color: var(--accent-wheat);
+}
+
+/* Grilla de Productos Táctil */
+.pos-products-grid {
+    flex: 1;
+    overflow-y: auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(185px, 1fr));
+    gap: 12px;
+    padding-right: 4px;
+}
+
+.pos-product-card {
+    background: var(--bg-card);
+    border: 1.5px solid var(--border-color);
+    border-radius: 12px;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.pos-product-card:hover {
+    border-color: var(--accent-wheat);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+}
+
+.pos-product-card:active {
+    transform: scale(0.98);
+}
+
+.pos-tax-tag {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 0.65rem;
+    font-weight: 800;
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+.pos-tax-tag.exento {
+    background: rgba(16, 185, 129, 0.2);
+    color: #34d399;
+    border: 1px solid rgba(16, 185, 129, 0.4);
+}
+
+.pos-tax-tag.iva {
+    background: rgba(245, 158, 11, 0.2);
+    color: #fbbf24;
+    border: 1px solid rgba(245, 158, 11, 0.4);
+}
+
+.pos-product-name {
+    font-size: 0.92rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    line-height: 1.3;
+    margin-bottom: 4px;
+    padding-right: 28px;
+}
+
+.pos-product-stock {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+}
+
+.pos-product-price-box {
+    margin-top: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+}
+
+.pos-price-usd {
+    font-size: 1.2rem;
+    font-weight: 900;
+    color: var(--accent-wheat);
+}
+
+.pos-price-bs {
+    font-size: 0.78rem;
+    color: #38bdf8;
+    font-weight: 800;
+}
+
+/* PANEL DERECHO: TICKET Y CARRITO DE VENTA */
+.pos-cart-panel {
+    background: var(--bg-card);
+    border: 1.5px solid var(--border-color);
+    border-radius: 14px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+.pos-cart-header {
+    padding: 12px 16px;
+    background: rgba(0, 0, 0, 0.25);
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.pos-cart-items-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.pos-cart-item-row {
+    background: var(--bg-main);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 10px 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+}
+
+.pos-cart-item-details {
+    flex: 1;
+}
+
+.pos-cart-item-title {
+    font-weight: 800;
+    font-size: 0.85rem;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.pos-cart-item-sub {
+    font-size: 0.74rem;
+    color: var(--text-secondary);
+    margin-top: 2px;
+}
+
+.pos-qty-controls {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.btn-qty-pos {
+    background: #334155;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    width: 26px;
+    height: 26px;
+    cursor: pointer;
+    font-weight: 900;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s ease;
+}
+
+.btn-qty-pos:hover {
+    background: var(--accent-gold);
+}
+
+.pos-cart-totals {
+    padding: 14px 16px;
+    background: rgba(0, 0, 0, 0.35);
+    border-top: 1px solid var(--border-color);
+}
+
+.pos-breakdown-box {
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 8px 12px;
+    margin-bottom: 10px;
+}
+
+.pos-total-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 4px;
+    font-size: 0.82rem;
+    color: var(--text-secondary);
+}
+
+.pos-total-row.grand-total {
+    margin-top: 6px;
+    padding-top: 6px;
+    border-top: 1px dashed var(--border-color);
+    font-size: 1.25rem;
+    font-weight: 900;
+    color: var(--accent-wheat);
+}
+
+.pos-total-row.grand-total-bs {
+    font-size: 1rem;
+    font-weight: 900;
+    color: #38bdf8;
+    margin-top: 2px;
+}
+
+.btn-checkout-pos {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+    border: 1.5px solid var(--accent-wheat);
+    border-radius: 10px;
+    color: #fff;
+    font-size: 1.05rem;
+    font-weight: 900;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    box-shadow: 0 4px 14px rgba(217, 119, 6, 0.4);
+}
+
+.btn-checkout-pos:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(217, 119, 6, 0.6);
+}
+
+.btn-checkout-pos:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+/* ==============================================================================
+   6. MODAL DE COBRO / PAGOS MIXTOS Y TASA BCV
+   ============================================================================== */
+.checkout-modal-card {
+    max-width: 680px;
+}
+
+.checkout-dual-banner {
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    border: 1.5px solid var(--accent-gold);
+    border-radius: 12px;
+    padding: 14px 18px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 16px;
+}
+
+.checkout-pay-methods-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(135px, 1fr));
+    gap: 8px;
+    margin-bottom: 14px;
+}
+
+.btn-pay-method-pill {
+    background: var(--bg-main);
+    border: 1.5px solid var(--border-color);
+    border-radius: 10px;
+    padding: 10px 8px;
+    color: var(--text-primary);
+    font-size: 0.8rem;
+    font-weight: 800;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s ease;
+}
+
+.btn-pay-method-pill:hover,
+.btn-pay-method-pill.active {
+    border-color: var(--accent-wheat);
+    background: rgba(217, 119, 6, 0.2);
+    transform: translateY(-2px);
+}
+
+.split-payments-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.84rem;
+    margin-top: 8px;
+}
+
+.split-payments-table th {
+    text-align: left;
+    padding: 6px 8px;
+    color: var(--text-muted);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.split-payments-table td {
+    padding: 6px 8px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+.checkout-balance-box {
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 10px;
+    border: 1px solid var(--border-color);
+    padding: 12px 16px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-top: 12px;
+}
+
+/* ==============================================================================
+   7. SIMULADOR DE TICKET / FACTURA FISCAL TÉRMICA (SENIAT)
+   ============================================================================== */
+.ticket-modal-card {
+    max-width: 480px;
+    background: #f8fafc;
+    color: #0f172a;
+    border: 2px solid #334155;
+}
+
+.ticket-paper {
+    background: #ffffff;
+    padding: 24px 20px;
+    font-family: var(--font-ticket);
+    font-size: 0.82rem;
+    color: #000000;
+    line-height: 1.35;
+    border: 1px dashed #94a3b8;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    max-height: 70vh;
+    overflow-y: auto;
+}
+
+.ticket-header-block {
+    text-align: center;
+    border-bottom: 1px dashed #000;
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+}
+
+.ticket-biz-name {
+    font-weight: 900;
+    font-size: 1rem;
+    text-transform: uppercase;
+}
+
+.ticket-info-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 2px;
+}
+
+.ticket-items-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 10px 0;
+}
+
+.ticket-items-table th {
+    border-bottom: 1px dashed #000;
+    border-top: 1px dashed #000;
+    padding: 4px 0;
+    text-align: left;
+    font-size: 0.78rem;
+}
+
+.ticket-items-table td {
+    padding: 4px 0;
+    font-size: 0.78rem;
+}
+
+.ticket-totals-box {
+    border-top: 1px dashed #000;
+    padding-top: 8px;
+    margin-top: 8px;
+}
+
+.ticket-grand-total {
+    font-size: 1.05rem;
+    font-weight: 900;
+    display: flex;
+    justify-content: space-between;
+    margin: 4px 0;
+}
+
+.ticket-qr-simulation {
+    text-align: center;
+    margin-top: 14px;
+    padding-top: 10px;
+    border-top: 1px dashed #000;
+}
+
+.ticket-actions-bar {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+    margin-top: 14px;
+}
+
+/* ==============================================================================
+   8. ESTILOS DE IMPRESIÓN FISCAL TÉRMICA (@media print)
+   ============================================================================== */
+@media print {
+    body * {
+        visibility: hidden;
+    }
+    
+    #modal-ticket-preview,
+    #modal-ticket-preview .ticket-paper,
+    #modal-ticket-preview .ticket-paper * {
+        visibility: visible;
+    }
+
+    #modal-ticket-preview {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 80mm;
+        margin: 0;
+        padding: 0;
+        background: transparent;
+    }
+
+    .ticket-paper {
+        border: none;
+        box-shadow: none;
+        width: 80mm;
+        padding: 0;
+        font-size: 11px;
+    }
+
+    .ticket-actions-bar,
+    .viasa-modal-header {
+        display: none !important;
+    }
+}
+
+/* Modales y utilidades */
+.viasa-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(6px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+}
+
+.viasa-modal.active {
+    display: flex;
+}
+
+.viasa-modal-card {
+    background: var(--bg-card);
+    border: 2px solid var(--accent-gold);
+    border-radius: 14px;
+    width: 100%;
+    max-width: 550px;
+    box-shadow: 0 0 35px rgba(0, 0, 0, 0.85);
+    overflow: hidden;
+}
+
+.viasa-modal-header {
+    padding: 14px 18px;
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.viasa-modal-body {
+    padding: 18px;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+/* Botones Generales */
+.btn-gold {
+    background: var(--accent-gold);
+    color: #fff;
+    border: 1px solid var(--accent-wheat);
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-gold:hover {
+    background: var(--accent-gold-light);
+}
+
+.btn-secondary {
+    background: var(--bg-input);
+    color: var(--text-secondary);
+    border: 1px solid var(--border-color);
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+/* ==============================================================================
+   MÓDULO 3: ESTILOS DE INVENTARIO GOURMET, MASTER BAKER Y MERMAS
+   ============================================================================== */
+.module-header-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.module-title-box {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.module-title-box h2 {
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: var(--accent-wheat);
+}
+
+.module-title-box span {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+
+/* Barra de pestañas para sub-módulos (Master Baker) */
+.baker-tab-bar {
+    display: flex;
+    gap: 8px;
+    background: var(--bg-main);
+    padding: 4px;
+    border-radius: 10px;
+    border: 1px solid var(--border-color);
+    margin-bottom: 16px;
+}
+
+.baker-tab-btn {
+    flex: 1;
+    padding: 10px 14px;
+    background: transparent;
+    border: none;
+    border-radius: 8px;
+    color: var(--text-secondary);
+    font-weight: 800;
+    font-size: 0.85rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+}
+
+.baker-tab-btn:hover {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.baker-tab-btn.active {
+    background: var(--accent-gold);
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(217, 119, 6, 0.35);
+}
+
+/* Grilla de Tarjetas de Materia Prima */
+.mp-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 14px;
+}
+
+.mp-card {
+    background: var(--bg-card);
+    border: 1.5px solid var(--border-color);
+    border-radius: 12px;
+    padding: 14px;
+    transition: all 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.mp-card:hover {
+    border-color: var(--accent-wheat);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5);
+}
+
+.mp-card.critical {
+    border-color: var(--danger);
+    background: linear-gradient(180deg, rgba(239, 68, 68, 0.08) 0%, var(--bg-card) 100%);
+}
+
+.mp-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 10px;
+}
+
+.mp-icon-circle {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    background: rgba(217, 119, 6, 0.15);
+    color: var(--accent-wheat);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+}
+
+.mp-badge-tag {
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-size: 0.7rem;
+    font-weight: 800;
+    text-transform: uppercase;
+}
+
+.mp-badge-tag.ok {
+    background: rgba(16, 185, 129, 0.15);
+    color: #34d399;
+    border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.mp-badge-tag.low {
+    background: rgba(239, 68, 68, 0.15);
+    color: #f87171;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.mp-stock-bar-bg {
+    width: 100%;
+    height: 6px;
+    background: var(--bg-main);
+    border-radius: 4px;
+    overflow: hidden;
+    margin: 8px 0 10px 0;
+}
+
+.mp-stock-bar-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.3s ease;
+}
+
+/* Tarjetas de Fórmulas Panaderas (Master Baker) */
+.recipe-card {
+    background: var(--bg-card);
+    border: 1.5px solid var(--border-color);
+    border-radius: 12px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: all 0.2s ease;
+}
+
+.recipe-card:hover {
+    border-color: var(--accent-gold);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+}
+
+.recipe-header-title {
+    font-size: 1.05rem;
+    font-weight: 800;
+    color: var(--accent-wheat);
+    margin-bottom: 4px;
+}
+
+.bakers-math-mini-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.78rem;
+    margin: 10px 0;
+}
+
+.bakers-math-mini-table th {
+    color: var(--text-secondary);
+    padding: 4px;
+    border-bottom: 1px solid var(--border-color);
+    text-align: left;
+}
+
+.bakers-math-mini-table td {
+    padding: 4px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.escandallo-breakdown {
+    background: var(--bg-main);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 10px;
+    margin: 10px 0;
+}
+
+.escandallo-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.8rem;
+    margin-bottom: 4px;
+}
+
+.margin-pill {
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 800;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.margin-pill.high {
+    background: rgba(16, 185, 129, 0.2);
+    color: #34d399;
+    border: 1px solid rgba(16, 185, 129, 0.4);
+}
+
+.margin-pill.med {
+    background: rgba(245, 158, 11, 0.2);
+    color: #fbbf24;
+    border: 1px solid rgba(245, 158, 11, 0.4);
+}
+
+.escandallo-live-card {
+    background: #064e3b;
+    border: 1.5px solid #059669;
+    border-radius: 10px;
+    padding: 12px;
+    color: #fff;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    text-align: center;
+}
+
+/* Indicadores de Horneado */
+.horn-banner-ok {
+    background: rgba(16, 185, 129, 0.15);
+    border: 1.5px solid #10b981;
+    border-radius: 8px;
+    padding: 10px;
+    color: #34d399;
+    font-weight: 800;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.horn-banner-err {
+    background: rgba(239, 68, 68, 0.15);
+    border: 1.5px solid #ef4444;
+    border-radius: 8px;
+    padding: 10px;
+    color: #f87171;
+    font-weight: 800;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* ==============================================================
+   MÓDULO 4: PROVEEDORES, ÓRDENES DE COMPRA Y CUENTAS POR PAGAR (CxP)
+   ============================================================== */
+
+/* Barra de Sub-pestañas de Proveedores */
+.prv-tab-bar {
+    display: flex;
+    gap: 8px;
+    background: var(--bg-main);
+    padding: 4px;
+    border-radius: 10px;
+    border: 1px solid var(--border-color);
+    margin-bottom: 16px;
+}
+
+.prv-tab-btn {
+    flex: 1;
+    padding: 10px 14px;
+    background: transparent;
+    border: none;
+    border-radius: 8px;
+    color: var(--text-secondary);
+    font-weight: 800;
+    font-size: 0.85rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+}
+
+.prv-tab-btn:hover {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.prv-tab-btn.active {
+    background: var(--accent-gold);
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(217, 119, 6, 0.35);
+}
+
+/* Grilla de Tarjetas de Proveedores */
+.prv-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 16px;
+}
+
+.prv-card {
+    background: var(--bg-card);
+    border: 1.5px solid var(--border-color);
+    border-radius: 12px;
+    padding: 16px;
+    transition: all 0.25s ease;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.prv-card:hover {
+    border-color: var(--accent-wheat);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+}
+
+.prv-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 12px;
+}
+
+.prv-title {
+    font-size: 1.05rem;
+    font-weight: 800;
+    color: var(--accent-wheat);
+    line-height: 1.2;
+}
+
+.prv-rif {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    font-weight: 700;
+    font-family: monospace;
+}
+
+.prv-stars {
+    color: #fbbf24;
+    font-size: 0.85rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    background: rgba(251, 191, 36, 0.12);
+    padding: 3px 8px;
+    border-radius: 6px;
+    border: 1px solid rgba(251, 191, 36, 0.25);
+}
+
+.prv-info-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    margin: 10px 0;
+}
+
+.prv-info-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.prv-info-item i {
+    width: 16px;
+    color: var(--accent-wheat);
+    text-align: center;
+}
+
+.prv-badge-credit {
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-size: 0.72rem;
+    font-weight: 800;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.prv-badge-credit.has-credit {
+    background: rgba(16, 185, 129, 0.15);
+    color: #34d399;
+    border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.prv-badge-credit.no-credit {
+    background: rgba(148, 163, 184, 0.15);
+    color: #94a3b8;
+    border: 1px solid rgba(148, 163, 184, 0.3);
+}
+
+.prv-tag-currency {
+    padding: 2px 6px;
+    background: rgba(255, 255, 255, 0.06);
+    border-radius: 4px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #cbd5e1;
+    margin-right: 4px;
+}
+
+/* Banner Asistente de Reabastecimiento Crítico */
+.oc-reabast-banner {
+    background: linear-gradient(135deg, rgba(217, 119, 6, 0.2) 0%, rgba(239, 68, 68, 0.15) 100%);
+    border: 1.5px solid var(--accent-gold);
+    border-radius: 12px;
+    padding: 14px 18px;
+    margin-bottom: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+}
+
+.oc-reabast-text h4 {
+    font-size: 0.95rem;
+    font-weight: 800;
+    color: var(--accent-wheat);
+    margin-bottom: 2px;
+}
+
+.oc-reabast-text p {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+/* Tablas de Órdenes y CxP */
+.viasa-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.84rem;
+}
+
+.viasa-table th {
+    background: var(--bg-main);
+    color: var(--text-secondary);
+    padding: 10px 12px;
+    text-align: left;
+    font-weight: 700;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.viasa-table td {
+    padding: 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    vertical-align: middle;
+}
+
+.viasa-table tr:hover td {
+    background: rgba(255, 255, 255, 0.02);
+}
+
+/* Pills de Estado de Órdenes de Compra */
+.oc-pill {
+    padding: 3px 9px;
+    border-radius: 6px;
+    font-size: 0.72rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.oc-pill.emitida {
+    background: rgba(59, 130, 246, 0.15);
+    color: #60a5fa;
+    border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+.oc-pill.recibida {
+    background: rgba(16, 185, 129, 0.15);
+    color: #34d399;
+    border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.oc-pill.anulada {
+    background: rgba(239, 68, 68, 0.15);
+    color: #f87171;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+/* Semáforo de Cuentas por Pagar (CxP) */
+.cxp-kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.cxp-kpi-card {
+    background: var(--bg-card);
+    border: 1.5px solid var(--border-color);
+    border-radius: 10px;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.cxp-pill {
+    padding: 3px 9px;
+    border-radius: 6px;
+    font-size: 0.72rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.cxp-pill.vencida {
+    background: rgba(239, 68, 68, 0.2);
+    color: #f87171;
+    border: 1px solid rgba(239, 68, 68, 0.4);
+    animation: pulse 2s infinite;
+}
+
+.cxp-pill.urgente {
+    background: rgba(245, 158, 11, 0.2);
+    color: #fbbf24;
+    border: 1px solid rgba(245, 158, 11, 0.4);
+}
+
+.cxp-pill.parcial {
+    background: rgba(59, 130, 246, 0.2);
+    color: #60a5fa;
+    border: 1px solid rgba(59, 130, 246, 0.4);
+}
+
+.cxp-pill.pagada {
+    background: rgba(16, 185, 129, 0.2);
+    color: #34d399;
+    border: 1px solid rgba(16, 185, 129, 0.4);
+}
+
+/* Barra de progreso de pago de factura CxP */
+.cxp-progress-bar-bg {
+    width: 100%;
+    height: 6px;
+    background: var(--bg-main);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-top: 4px;
+}
+
+.cxp-progress-bar-fill {
+    height: 100%;
+    background: #10b981;
+    border-radius: 3px;
+    transition: width 0.3s ease;
+}
+
+/* Comprobante de Pago Térmico / Digital */
+.cxp-comprobante-paper {
+    background: #fff;
+    color: #111827;
+    font-family: 'Courier New', Courier, monospace;
+    padding: 16px;
+    border-radius: 6px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    font-size: 0.85rem;
+    line-height: 1.4;
+}
+
+/* ==============================================================
+   MÓDULO 5: CRM, FIDELIZACIÓN (CLUB VIASA) Y ENCARGOS ESPECIALES
+   ============================================================== */
+
+/* Barra de Sub-pestañas de CRM */
+.crm-tab-bar {
+    display: flex;
+    gap: 8px;
+    background: var(--bg-main);
+    padding: 4px;
+    border-radius: 10px;
+    border: 1px solid var(--border-color);
+    margin-bottom: 16px;
+}
+
+.crm-tab-btn {
+    flex: 1;
+    padding: 10px 14px;
+    background: transparent;
+    border: none;
+    border-radius: 8px;
+    color: var(--text-secondary);
+    font-weight: 800;
+    font-size: 0.85rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+}
+
+.crm-tab-btn:hover {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.crm-tab-btn.active {
+    background: var(--accent-gold);
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(217, 119, 6, 0.35);
+}
+
+/* Grilla de Tarjetas de Clientes CRM */
+.crm-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 16px;
+}
+
+.crm-card {
+    background: var(--bg-card);
+    border: 1.5px solid var(--border-color);
+    border-radius: 12px;
+    padding: 16px;
+    transition: all 0.25s ease;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.crm-card:hover {
+    border-color: var(--accent-wheat);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+}
+
+.crm-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 10px;
+}
+
+.crm-title {
+    font-size: 1.05rem;
+    font-weight: 800;
+    color: var(--accent-wheat);
+    line-height: 1.2;
+}
+
+.crm-doc {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    font-weight: 700;
+    font-family: monospace;
+}
+
+/* Insignias de Categoría de Cliente */
+.crm-badge-tipo {
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-size: 0.7rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.crm-badge-tipo.frecuente {
+    background: rgba(59, 130, 246, 0.15);
+    color: #60a5fa;
+    border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+.crm-badge-tipo.corporativo {
+    background: rgba(168, 85, 247, 0.15);
+    color: #c084fc;
+    border: 1px solid rgba(168, 85, 247, 0.3);
+}
+
+.crm-badge-tipo.mayorista {
+    background: rgba(245, 158, 11, 0.15);
+    color: #fbbf24;
+    border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.crm-badge-tipo.vip {
+    background: linear-gradient(135deg, rgba(234, 179, 8, 0.25) 0%, rgba(217, 119, 6, 0.35) 100%);
+    color: #fde047;
+    border: 1px solid #eab308;
+    box-shadow: 0 0 10px rgba(234, 179, 8, 0.2);
+}
+
+/* Fichas de Wallet y Puntos en la tarjeta */
+.crm-stats-row {
+    display: flex;
+    gap: 8px;
+    margin: 10px 0;
+}
+
+.crm-wallet-chip {
+    flex: 1;
+    background: rgba(16, 185, 129, 0.12);
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    border-radius: 8px;
+    padding: 8px;
+    text-align: center;
+}
+
+.crm-wallet-val {
+    font-size: 1.1rem;
+    font-weight: 900;
+    color: #34d399;
+}
+
+.crm-points-chip {
+    flex: 1;
+    background: rgba(217, 119, 6, 0.12);
+    border: 1px solid rgba(217, 119, 6, 0.3);
+    border-radius: 8px;
+    padding: 8px;
+    text-align: center;
+}
+
+.crm-points-val {
+    font-size: 1.1rem;
+    font-weight: 900;
+    color: #fbbf24;
+}
+
+/* Catálogo de Premios Club Viasa */
+.reward-card {
+    background: var(--bg-card);
+    border: 1.5px solid var(--border-color);
+    border-radius: 12px;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: all 0.2s ease;
+}
+
+.reward-card:hover {
+    border-color: #d97706;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(217, 119, 6, 0.25);
+}
+
+.reward-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+}
+
+.reward-icon-box {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    background: rgba(217, 119, 6, 0.15);
+    color: #fbbf24;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+}
+
+.reward-cost-badge {
+    background: #78350f;
+    color: #fef08a;
+    font-weight: 800;
+    font-size: 0.78rem;
+    padding: 3px 8px;
+    border-radius: 6px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+/* Tarjetas de Encargos Especiales */
+.encargo-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 16px;
+}
+
+.encargo-card {
+    background: var(--bg-card);
+    border: 1.5px solid var(--border-color);
+    border-radius: 12px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: all 0.25s ease;
+}
+
+.encargo-card:hover {
+    border-color: #ec4899;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+}
+
+.encargo-pill {
+    padding: 3px 9px;
+    border-radius: 6px;
+    font-size: 0.72rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.encargo-pill.pendiente {
+    background: rgba(245, 158, 11, 0.15);
+    color: #fbbf24;
+    border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.encargo-pill.preparacion {
+    background: rgba(168, 85, 247, 0.15);
+    color: #c084fc;
+    border: 1px solid rgba(168, 85, 247, 0.3);
+}
+
+.encargo-pill.listo {
+    background: rgba(16, 185, 129, 0.15);
+    color: #34d399;
+    border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.encargo-pill.entregado {
+    background: rgba(100, 116, 139, 0.15);
+    color: #94a3b8;
+    border: 1px solid rgba(100, 116, 139, 0.3);
+}
+
+/* ==========================================================================
+   MÓDULO 6: CONTABILIDAD, IMPUESTOS SENIAT Y CIERRE DE CAJA
+   ========================================================================== */
+
+/* Subnavegadores y filtros de Contabilidad */
+.contabilidad-subnav, .caja-subnav {
+    display: flex;
+    gap: 8px;
+    background: var(--bg-card);
+    padding: 6px;
+    border-radius: 10px;
+    border: 1px solid var(--border-color);
+    margin-bottom: 20px;
+    overflow-x: auto;
+}
+
+.contabilidad-subnav-btn, .caja-subnav-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
+}
+
+.contabilidad-subnav-btn.active, .caja-subnav-btn.active {
+    background: var(--primary-gold);
+    color: #0f172a;
+    box-shadow: 0 2px 8px rgba(217, 119, 6, 0.3);
+}
+
+.contabilidad-subnav-btn:hover:not(.active), .caja-subnav-btn:hover:not(.active) {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-primary);
+}
+
+/* Tarjetas y Tablas de Asientos Contables */
+.asiento-card {
+    background: var(--bg-card);
+    border: 1.5px solid var(--border-color);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 14px;
+    transition: all 0.2s ease;
+}
+
+.asiento-card:hover {
+    border-color: #f59e0b;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
+}
+
+.asiento-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 10px;
+    margin-bottom: 12px;
+}
+
+.asiento-correlativo {
+    font-size: 1rem;
+    font-weight: 900;
+    color: var(--accent-wheat);
+    font-family: monospace;
+}
+
+.asiento-tipo-badge {
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-size: 0.72rem;
+    font-weight: 800;
+    text-transform: uppercase;
+}
+
+.asiento-tipo-badge.venta {
+    background: rgba(16, 185, 129, 0.15);
+    color: #34d399;
+    border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.asiento-tipo-badge.compra {
+    background: rgba(59, 130, 246, 0.15);
+    color: #60a5fa;
+    border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+.asiento-tipo-badge.merma {
+    background: rgba(239, 68, 68, 0.15);
+    color: #f87171;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.asiento-tipo-badge.ajuste {
+    background: rgba(168, 85, 247, 0.15);
+    color: #c084fc;
+    border: 1px solid rgba(168, 85, 247, 0.3);
+}
+
+.asiento-tipo-badge.apertura {
+    background: rgba(245, 158, 11, 0.15);
+    color: #fbbf24;
+    border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.asiento-partidas-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.84rem;
+}
+
+.asiento-partidas-table th {
+    background: rgba(255, 255, 255, 0.03);
+    padding: 8px 12px;
+    text-align: left;
+    color: var(--text-secondary);
+    font-size: 0.75rem;
+    font-weight: 700;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.asiento-partidas-table td {
+    padding: 8px 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.debe-col {
+    text-align: right;
+    font-family: monospace;
+    font-weight: 800;
+    color: #60a5fa;
+}
+
+.haber-col {
+    text-align: right;
+    font-family: monospace;
+    font-weight: 800;
+    color: #34d399;
+}
+
+.asiento-total-row td {
+    border-top: 1.5px solid var(--border-color);
+    font-weight: 900;
+    background: rgba(255, 255, 255, 0.02);
+}
+
+/* Libros Fiscales SENIAT */
+.seniat-header-box {
+    background: linear-gradient(135deg, rgba(30, 41, 59, 0.7) 0%, rgba(15, 23, 42, 0.9) 100%);
+    border: 1.5px solid #3b82f6;
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.seniat-logo-title {
+    font-size: 1.15rem;
+    font-weight: 900;
+    color: #93c5fd;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.seniat-rif-tag {
+    font-family: monospace;
+    font-size: 0.85rem;
+    color: #cbd5e1;
+    font-weight: 700;
+}
+
+.libro-fiscal-table-wrapper {
+    overflow-x: auto;
+    border-radius: 10px;
+    border: 1.5px solid var(--border-color);
+    background: var(--bg-card);
+}
+
+.libro-fiscal-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.8rem;
+    min-width: 950px;
+}
+
+.libro-fiscal-table th {
+    background: rgba(30, 41, 59, 0.8);
+    color: #e2e8f0;
+    padding: 10px 8px;
+    font-size: 0.72rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border: 1px solid var(--border-color);
+    text-align: center;
+    vertical-align: middle;
+}
+
+.libro-fiscal-table td {
+    padding: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    vertical-align: middle;
+}
+
+.libro-fiscal-table tr:hover td {
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.num-col {
+    text-align: right;
+    font-family: monospace;
+    font-weight: 700;
+}
+
+/* Estados Financieros (Balance y P&L) */
+.financial-statement-container {
+    background: var(--bg-card);
+    border: 1.5px solid var(--border-color);
+    border-radius: 14px;
+    padding: 24px;
+}
+
+.statement-section-title {
+    font-size: 1.05rem;
+    font-weight: 800;
+    color: var(--accent-wheat);
+    border-bottom: 2px solid var(--primary-gold);
+    padding-bottom: 6px;
+    margin: 18px 0 12px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.statement-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 7px 10px;
+    border-bottom: 1px dashed rgba(255, 255, 255, 0.06);
+    font-size: 0.88rem;
+}
+
+.statement-row:hover {
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.statement-total-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 14px;
+    margin-top: 8px;
+    background: rgba(217, 119, 6, 0.12);
+    border: 1.5px solid #d97706;
+    border-radius: 8px;
+    font-weight: 900;
+    font-size: 1rem;
+    color: #fef08a;
+}
+
+/* Conciliación Bancaria */
+.banco-tab-btn {
+    padding: 8px 14px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    background: var(--bg-card);
+    color: var(--text-secondary);
+    font-weight: 700;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.banco-tab-btn.active {
+    background: #1e3a8a;
+    color: #93c5fd;
+    border-color: #3b82f6;
+}
+
+.banco-tab-btn:hover:not(.active) {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-primary);
+}
+
+.status-conciliado {
+    background: rgba(16, 185, 129, 0.15);
+    color: #34d399;
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-size: 0.72rem;
+    font-weight: 800;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.status-pendiente {
+    background: rgba(245, 158, 11, 0.15);
+    color: #fbbf24;
+    border: 1px solid rgba(245, 158, 11, 0.3);
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-size: 0.72rem;
+    font-weight: 800;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.status-discrepancia {
+    background: rgba(239, 68, 68, 0.15);
+    color: #f87171;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-size: 0.72rem;
+    font-weight: 800;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+/* Asistente de Arqueo y Cierre de Caja */
+.cash-count-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.denom-box {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 8px 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.denom-box span {
+    font-weight: 800;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+.denom-input {
+    width: 65px;
+    background: var(--bg-dark);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    color: #fff;
+    padding: 4px 8px;
+    font-size: 0.9rem;
+    font-weight: 800;
+    text-align: right;
+}
+
+.denom-subtotal {
+    font-family: monospace;
+    font-weight: 800;
+    color: #34d399;
+    font-size: 0.85rem;
+    min-width: 50px;
+    text-align: right;
+}
+
+.descuadre-summary-card {
+    background: var(--bg-dark);
+    border: 1.5px solid var(--border-color);
+    border-radius: 12px;
+    padding: 16px;
+    margin-top: 16px;
+}
+
+.descuadre-status-box {
+    padding: 12px;
+    border-radius: 8px;
+    font-weight: 800;
+    text-align: center;
+    font-size: 0.95rem;
+    margin-top: 10px;
+}
+
+.descuadre-status-box.cuadrado {
+    background: rgba(16, 185, 129, 0.2);
+    border: 1px solid #10b981;
+    color: #34d399;
+}
+
+.descuadre-status-box.faltante {
+    background: rgba(239, 68, 68, 0.2);
+    border: 1px solid #ef4444;
+    color: #f87171;
+}
+
+.descuadre-status-box.sobrante {
+    background: rgba(59, 130, 246, 0.2);
+    border: 1px solid #3b82f6;
+    color: #60a5fa;
+}
+
+/* Plantilla para Comprobante Reporte Z */
+.reporte-z-ticket-box {
+    background: #ffffff;
+    color: #111827;
+    font-family: 'Courier New', Courier, monospace;
+    padding: 24px;
+    border-radius: 8px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+    max-width: 420px;
+    margin: 0 auto;
+    font-size: 0.8rem;
+    line-height: 1.35;
+}
+
+.ticket-divider-fiscal {
+    border-top: 1px dashed #4b5563;
+    margin: 8px 0;
+}
+
+/* Plantilla para Comprobante de Retención IVA */
+.retencion-document-box {
+    background: #ffffff;
+    color: #111827;
+    font-family: Arial, Helvetica, sans-serif;
+    padding: 24px;
+    border-radius: 8px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+    max-width: 720px;
+    margin: 0 auto;
+    font-size: 0.82rem;
+    line-height: 1.4;
+}
+
+.retencion-document-box table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 12px 0;
+}
+
+.retencion-document-box th, .retencion-document-box td {
+    border: 1px solid #9ca3af;
+    padding: 6px 8px;
+    font-size: 0.76rem;
+}
+
+.retencion-document-box th {
+    background: #e5e7eb;
+    font-weight: bold;
+    text-align: center;
+}
+
+/* ==========================================================================
+   MÓDULO 7: PANEL GERENCIAL, BUSINESS INTELLIGENCE Y REPORTES AVANZADOS
+   ========================================================================== */
+
+/* Subnavegador de Reportes */
+.reportes-subnav {
+    display: flex;
+    gap: 8px;
+    background: var(--bg-card);
+    padding: 6px;
+    border-radius: 10px;
+    border: 1px solid var(--border-color);
+    margin-bottom: 20px;
+    overflow-x: auto;
+}
+
+.reportes-subnav-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
+}
+
+.reportes-subnav-btn.active {
+    background: #a855f7;
+    color: #ffffff;
+    box-shadow: 0 2px 8px rgba(168, 85, 247, 0.35);
+}
+
+.reportes-subnav-btn:hover:not(.active) {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-primary);
+}
+
+/* KPIs de Business Intelligence */
+.bi-kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 14px;
+    margin-bottom: 20px;
+}
+
+.bi-kpi-card {
+    background: var(--bg-card);
+    border: 1.5px solid var(--border-color);
+    border-radius: 12px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.bi-kpi-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
+    border-color: #a855f7;
+}
+
+.bi-kpi-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: var(--accent-wheat);
+}
+
+.bi-kpi-card.purple::before { background: #a855f7; }
+.bi-kpi-card.emerald::before { background: #10b981; }
+.bi-kpi-card.blue::before { background: #3b82f6; }
+.bi-kpi-card.amber::before { background: #f59e0b; }
+.bi-kpi-card.rose::before { background: #f43f5e; }
+
+.bi-metric-label {
+    font-size: 0.72rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    letter-spacing: 0.5px;
+    margin-bottom: 6px;
+}
+
+.bi-metric-val {
+    font-size: 1.55rem;
+    font-weight: 900;
+    color: #ffffff;
+    line-height: 1.1;
+    font-family: monospace;
+}
+
+.bi-metric-sub {
+    font-size: 0.76rem;
+    color: var(--accent-wheat);
+    margin-top: 4px;
+    font-weight: 700;
+}
+
+/* Tarjetas y Contenedores de Gráficos SVG */
+.bi-chart-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(460px, 1fr));
+    gap: 18px;
+    margin-bottom: 24px;
+}
+
+.bi-chart-card {
+    background: var(--bg-card);
+    border: 1.5px solid var(--border-color);
+    border-radius: 14px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.bi-chart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 10px;
+}
+
+.bi-chart-title {
+    font-size: 1rem;
+    font-weight: 800;
+    color: var(--accent-wheat);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.bi-chart-body {
+    flex: 1;
+    position: relative;
+    min-height: 240px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Gráfico de Barras Horizontales Top Productos */
+.bi-bar-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+}
+
+.bi-bar-item {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.bi-bar-info {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.8rem;
+    font-weight: 700;
+}
+
+.bi-bar-track {
+    width: 100%;
+    height: 10px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.bi-bar-fill {
+    height: 100%;
+    border-radius: 6px;
+    transition: width 0.8s ease;
+}
+
+.bi-bar-fill.gold { background: linear-gradient(90deg, #d97706 0%, #fbbf24 100%); }
+.bi-bar-fill.purple { background: linear-gradient(90deg, #7e22ce 0%, #c084fc 100%); }
+.bi-bar-fill.emerald { background: linear-gradient(90deg, #059669 0%, #34d399 100%); }
+.bi-bar-fill.blue { background: linear-gradient(90deg, #1d4ed8 0%, #60a5fa 100%); }
+
+/* Gráfico Circular Donut */
+.bi-donut-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    width: 100%;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.bi-donut-legend {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    font-size: 0.78rem;
+}
+
+.bi-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.bi-legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+}
+
+/* Matriz de Rentabilidad */
+.profit-matrix-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.82rem;
+}
+
+.profit-matrix-table th {
+    background: rgba(255, 255, 255, 0.04);
+    padding: 8px 12px;
+    text-align: left;
+    color: var(--text-secondary);
+    font-size: 0.74rem;
+    font-weight: 700;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.profit-matrix-table td {
+    padding: 8px 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.margin-pill {
+    padding: 2px 7px;
+    border-radius: 4px;
+    font-size: 0.72rem;
+    font-weight: 800;
+    font-family: monospace;
+}
+
+.margin-pill.high {
+    background: rgba(16, 185, 129, 0.2);
+    color: #34d399;
+    border: 1px solid rgba(16, 185, 129, 0.35);
+}
+
+.margin-pill.mid {
+    background: rgba(245, 158, 11, 0.2);
+    color: #fbbf24;
+    border: 1px solid rgba(245, 158, 11, 0.35);
+}
+
+.margin-pill.low {
+    background: rgba(239, 68, 68, 0.2);
+    color: #f87171;
+    border: 1px solid rgba(239, 68, 68, 0.35);
+}
+
+/* Alertas Tempranas Inteligentes */
+.alert-early-warning {
+    background: var(--bg-card);
+    border-radius: 10px;
+    padding: 12px 16px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    border-left: 4px solid #ef4444;
+}
+
+.alert-early-warning.warning { border-left-color: #f59e0b; }
+.alert-early-warning.info { border-left-color: #3b82f6; }
+.alert-early-warning.success { border-left-color: #10b981; }
+
+/* Plantilla para Reportes Ejecutivos Formales (Impresión / PDF) */
+.reporte-paper-a4 {
+    background: #ffffff;
+    color: #0f172a;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    padding: 32px 36px;
+    border-radius: 8px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+    max-width: 820px;
+    margin: 0 auto;
+    font-size: 0.85rem;
+    line-height: 1.45;
+}
+
+.reporte-header-membrete {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2.5px solid #d97706;
+    padding-bottom: 14px;
+    margin-bottom: 16px;
+}
+
+.reporte-empresa-titulo {
+    font-size: 1.15rem;
+    font-weight: 900;
+    color: #78350f;
+}
+
+.reporte-table-print {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 14px 0;
+    font-size: 0.8rem;
+}
+
+.reporte-table-print th {
+    background: #f1f5f9;
+    color: #1e293b;
+    border: 1px solid #cbd5e1;
+    padding: 7px 10px;
+    font-weight: bold;
+    text-align: left;
+}
+
+.reporte-table-print td {
+    border: 1px solid #e2e8f0;
+    padding: 6px 10px;
+}
+
+.reporte-table-print tr:nth-child(even) td {
+    background: #f8fafc;
+}
+
+.reporte-footer-firmas {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 40px;
+    text-align: center;
+    font-size: 0.76rem;
+    color: #475569;
+}
+
+.firma-box {
+    width: 220px;
+    border-top: 1px solid #64748b;
+    padding-top: 6px;
+}
+
+/* Tarjetas y Guía del Empaquetador / Setup Standalone */
+.setup-guide-card {
+    background: var(--bg-card);
+    border: 1.5px solid var(--border-color);
+    border-radius: 14px;
+    padding: 24px;
+    margin-bottom: 20px;
+}
+
+.setup-step-box {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 14px 18px;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+}
+
+.setup-step-num {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #a855f7;
+    color: #ffffff;
+    font-weight: 900;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+/* ==============================================================================
+   PULIDO UX/UI: ESTADOS TÁCTILES, SINCRONIZACIÓN Y TRANSICIONES ULTRA-FLUIDAS
+   ============================================================================== */
+* {
+    -webkit-tap-highlight-color: transparent;
+}
+
+button, input, select, textarea, .pos-product-card, .cat-pill, .nav-item, .role-pill-btn, .calc-btn, .banco-tab-btn, .reportes-subnav-btn, .crm-tab-btn, .tab-btn {
+    touch-action: manipulation;
+}
+
+.pos-product-card:active,
+.btn-gold:active,
+.btn-secondary:active,
+.calc-btn:active,
+.cat-pill:active,
+.nav-item:active,
+.banco-tab-btn:active,
+.reportes-subnav-btn:active,
+.crm-tab-btn:active {
+    transform: scale(0.96);
+    transition: transform 0.05s ease-out;
+}
+
+.view-container {
+    animation: viewFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes viewFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(4px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Indicador de Estado de Conexión y Sync */
+.rate-badge.sync-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    transition: all 0.25s ease;
+}
+
+.rate-badge.sync-status.online {
+    background: rgba(16, 185, 129, 0.15);
+    border: 1px solid rgba(16, 185, 129, 0.4);
+    color: #34d399;
+}
+
+.rate-badge.sync-status.offline {
+    background: rgba(239, 68, 68, 0.15);
+    border: 1px solid rgba(239, 68, 68, 0.4);
+    color: #f87171;
+}
+
+.rate-badge.sync-status.warning {
+    background: rgba(245, 158, 11, 0.15);
+    border: 1px solid rgba(245, 158, 11, 0.4);
+    color: #fbbf24;
+}
+
+.rate-badge.sync-status.syncing {
+    background: rgba(56, 189, 248, 0.15);
+    border: 1px solid rgba(56, 189, 248, 0.4);
+    color: #38bdf8;
+    animation: pulseSync 1.2s infinite;
+}
+
+/* Indicador de Impresora Fiscal Aclas CR2050 */
+.rate-badge.aclas-fiscal-status {
+    background: rgba(14, 165, 233, 0.12);
+    border: 1px solid rgba(14, 165, 233, 0.4);
+    color: #38bdf8;
+    font-size: 0.78rem;
+    cursor: pointer;
+    transition: all 0.25s ease;
+}
+
+.rate-badge.aclas-fiscal-status:hover {
+    background: rgba(14, 165, 233, 0.25);
+    border-color: #38bdf8;
+    box-shadow: 0 0 12px rgba(56, 189, 248, 0.4);
+}
+
+.rate-badge.aclas-fiscal-status.online {
+    background: rgba(16, 185, 129, 0.15);
+    border-color: rgba(16, 185, 129, 0.4);
+    color: #34d399;
+}
+
+.rate-badge.aclas-fiscal-status.printing {
+    background: rgba(245, 158, 11, 0.15);
+    border-color: rgba(245, 158, 11, 0.5);
+    color: #fbbf24;
+    animation: pulseSync 0.8s infinite;
+}
+
+.rate-badge.aclas-fiscal-status.offline {
+    background: rgba(239, 68, 68, 0.15);
+    border-color: rgba(239, 68, 68, 0.4);
+    color: #f87171;
+}
+
+/* Insignias de Marca Fiscal Homologadas */
+.fiscal-brand-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+.fiscal-brand-chip.brand-aclas { background: rgba(245, 158, 11, 0.18); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.4); }
+.fiscal-brand-chip.brand-tfhka { background: rgba(2, 132, 199, 0.18); color: #38bdf8; border: 1px solid rgba(2, 132, 199, 0.4); }
+.fiscal-brand-chip.brand-bematech { background: rgba(99, 102, 241, 0.18); color: #818cf8; border: 1px solid rgba(99, 102, 241, 0.4); }
+.fiscal-brand-chip.brand-bixolon { background: rgba(16, 185, 129, 0.18); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4); }
+.fiscal-brand-chip.brand-star { background: rgba(236, 72, 153, 0.18); color: #f472b6; border: 1px solid rgba(236, 72, 153, 0.4); }
+
+.fiscal-hw-card {
+    background: var(--bg-card);
+    border: 1.5px solid rgba(245, 158, 11, 0.35);
+    border-radius: 14px;
+    padding: 24px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+}
+.fiscal-hw-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #f59e0b, #0284c7, #10b981, #ec4899);
+}
+
+/* Botón de Impresora Fiscal en POS Toolbar */
+.btn-fiscal-pos-header {
+    background: rgba(15, 23, 42, 0.85);
+    border: 1.5px solid rgba(245, 158, 11, 0.5);
+    color: #fde68a;
+    padding: 7px 14px;
+    border-radius: 8px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    white-space: nowrap;
+}
+.btn-fiscal-pos-header:hover {
+    background: rgba(245, 158, 11, 0.15);
+    border-color: #fbbf24;
+    color: #fff;
+    box-shadow: 0 0 14px rgba(245, 158, 11, 0.35);
+    transform: translateY(-1px);
+}
+
+.rate-badge.viasa-rate-pulse {
+    animation: viasaPulseGlow 1.4s ease-out;
+}
+
+@keyframes pulseSync {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.55; }
+}
+
+@keyframes viasaPulseGlow {
+    0% {
+        transform: scale(1.05);
+        box-shadow: 0 0 16px rgba(56, 189, 248, 0.8);
+        border-color: #38bdf8;
+    }
+    50% {
+        transform: scale(1.02);
+        box-shadow: 0 0 10px rgba(245, 158, 11, 0.6);
+        border-color: #f59e0b;
+    }
+    100% {
+        transform: scale(1);
+        box-shadow: none;
+    }
+}
+
+@keyframes slideInToast {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Optimización Responsive para Pantallas Táctiles y Terminales POS */
+@media (max-width: 1024px) {
+    .app-container {
+        flex-direction: column;
+    }
+    .app-sidebar {
+        width: 100%;
+        height: auto;
+        padding: 8px 12px;
+    }
+    .nav-menu {
+        display: flex;
+        overflow-x: auto;
+        gap: 6px;
+        padding-bottom: 4px;
+    }
+    .nav-item {
+        white-space: nowrap;
+        padding: 8px 12px;
+        font-size: 0.8rem;
+    }
+    .pos-grid-container {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ==============================================================================
+   INNOVACIÓN 1: RECONOCIMIENTO VISUAL IA PARA POS (CAMERA HUD)
+   ============================================================================== */
+.btn-vision-ai-pos {
+    background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+    border: 1px solid #38bdf8;
+    color: #ffffff;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: 800;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    box-shadow: 0 4px 12px rgba(2, 132, 199, 0.35);
+    transition: all 0.2s ease;
+}
+
+.btn-vision-ai-pos:hover {
+    background: linear-gradient(135deg, #0369a1 0%, #075985 100%);
+    box-shadow: 0 6px 16px rgba(2, 132, 199, 0.5);
+}
+
+.vision-camera-wrapper {
+    position: relative;
+    width: 100%;
+    height: 320px;
+    background: #000000;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 2px solid #0284c7;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.vision-video-feed {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.vision-canvas-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+.vision-hud-reticle {
+    position: absolute;
+    top: 15%;
+    left: 15%;
+    width: 70%;
+    height: 70%;
+    border: 1px dashed rgba(56, 189, 248, 0.4);
+    pointer-events: none;
+}
+
+.reticle-corner {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    border-color: #38bdf8;
+    border-style: solid;
+}
+
+.reticle-corner.top-left { top: -2px; left: -2px; border-width: 3px 0 0 3px; }
+.reticle-corner.top-right { top: -2px; right: -2px; border-width: 3px 3px 0 0; }
+.reticle-corner.bottom-left { bottom: -2px; left: -2px; border-width: 0 0 3px 3px; }
+.reticle-corner.bottom-right { bottom: -2px; right: -2px; border-width: 0 3px 3px 0; }
+
+.vision-scan-line {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #38bdf8, transparent);
+    box-shadow: 0 0 8px #38bdf8;
+    animation: scanAnimation 2s infinite ease-in-out;
+}
+
+@keyframes scanAnimation {
+    0% { top: 0%; opacity: 0; }
+    15% { opacity: 1; }
+    85% { opacity: 1; }
+    100% { top: 100%; opacity: 0; }
+}
+
+.vision-hud-status {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    right: 10px;
+    background: rgba(15, 23, 42, 0.85);
+    backdrop-filter: blur(6px);
+    border: 1px solid rgba(56, 189, 248, 0.3);
+    color: #e2e8f0;
+    font-size: 0.75rem;
+    padding: 6px 10px;
+    border-radius: 6px;
+    text-align: center;
+    font-weight: 700;
+}
+
+.vision-result-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1.5px solid var(--border-color);
+    border-radius: 10px;
+    padding: 12px;
+    min-height: 120px;
+}
+
+.btn-vision-preset {
+    background: var(--bg-main);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    padding: 6px 4px;
+    border-radius: 6px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.btn-vision-preset:hover {
+    border-color: #38bdf8;
+    color: #38bdf8;
+    background: rgba(56, 189, 248, 0.08);
+}
+
+/* ==============================================================================
+   INNOVACIÓN 2: SMART BAKER AI (PREDICCIÓN DE DEMANDA)
+   ============================================================================== */
+.smart-baker-hero {
+    background: linear-gradient(135deg, #1e1b4b 0%, #0f172a 100%);
+    border: 1.5px solid #6366f1;
+    border-radius: 14px;
+    padding: 20px;
+    margin-bottom: 20px;
+    position: relative;
+    overflow: hidden;
+}
+
+.smart-baker-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(99, 102, 241, 0.2);
+    border: 1px solid #818cf8;
+    color: #c7d2fe;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.72rem;
+    font-weight: 800;
+    text-transform: uppercase;
+}
+
+.ai-prediction-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.ai-prediction-card {
+    background: var(--bg-card);
+    border: 1.5px solid var(--border-color);
+    border-radius: 12px;
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: all 0.2s ease;
+}
+
+.ai-prediction-card:hover {
+    border-color: #818cf8;
+    transform: translateY(-2px);
+}
+
+.peak-hour-badge {
+    background: rgba(245, 158, 11, 0.15);
+    border: 1px solid rgba(245, 158, 11, 0.4);
+    color: #fbbf24;
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-size: 0.7rem;
+    font-weight: 800;
+}
+
+/* ==============================================================================
+   INNOVACIÓN 3: ALERTAS TEMPRANAS Y CADUCIDADES CRÍTICAS
+   ============================================================================== */
+.expiration-alert-card {
+    background: var(--bg-card);
+    border-radius: 10px;
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    border: 1px solid var(--border-color);
+    margin-bottom: 8px;
+}
+
+.expiration-alert-card.urgente {
+    background: rgba(239, 68, 68, 0.08);
+    border-left: 4px solid #ef4444;
+}
+
+.expiration-alert-card.preventiva {
+    background: rgba(245, 158, 11, 0.08);
+    border-left: 4px solid #f59e0b;
+}
+
+.critical-countdown-pill {
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 0.72rem;
+    font-weight: 800;
+    font-family: monospace;
+}
+
+.critical-countdown-pill.urgente {
+    background: #ef4444;
+    color: #ffffff;
+}
+
+.critical-countdown-pill.preventiva {
+    background: #f59e0b;
+    color: #000000;
+}
+
+/* ==============================================================================
+   INNOVACIÓN 4: MODO KIOSCO DE AUTOSERVICIO PARA CLIENTES
+   ============================================================================== */
+.kiosk-fullscreen-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background: #090d16;
+    color: #ffffff;
+    overflow-y: auto;
+    padding: 20px;
+}
+
+.kiosk-hero-banner {
+    background: linear-gradient(135deg, #831843 0%, #500724 100%);
+    border: 2px solid #ec4899;
+    border-radius: 16px;
+    padding: 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    box-shadow: 0 10px 30px rgba(236, 72, 153, 0.2);
+}
+
+.kiosk-categories-bar {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+.kiosk-cat-pill {
+    background: var(--bg-card);
+    border: 1.5px solid var(--border-color);
+    color: var(--text-secondary);
+    padding: 12px 20px;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    font-weight: 800;
+    cursor: pointer;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+}
+
+.kiosk-cat-pill.active {
+    background: linear-gradient(135deg, #ec4899 0%, #be185d 100%);
+    border-color: #f472b6;
+    color: #ffffff;
+    box-shadow: 0 4px 15px rgba(236, 72, 153, 0.4);
+}
+
+.kiosk-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 16px;
+    margin-bottom: 90px;
+}
+
+.kiosk-card {
+    background: var(--bg-card);
+    border: 1.5px solid var(--border-color);
+    border-radius: 14px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: all 0.2s ease;
+}
+
+.kiosk-card:hover {
+    border-color: #ec4899;
+    transform: translateY(-3px);
+}
+
+.kiosk-floating-dock {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+    max-width: 800px;
+    background: rgba(15, 23, 42, 0.95);
+    backdrop-filter: blur(12px);
+    border: 2px solid #ec4899;
+    border-radius: 20px;
+    padding: 14px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
+    z-index: 1000;
+}
+
+/* ==============================================================
+   INNOVACIONES OPERATIVAS POR ROLES (KDS, MÓVIL, ARQUEO, RRHH, VOZ)
+   ============================================================== */
+
+/* 1. KITCHEN DISPLAY SYSTEM (KDS) PARA PRODUCCIÓN */
+.kds-board-container {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-top: 14px;
+    min-height: calc(100vh - 220px);
+    align-items: start;
+}
+
+@media (max-width: 1200px) {
+    .kds-board-container {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .kds-board-container {
+        grid-template-columns: 1fr;
+    }
+}
+
+.kds-column {
+    background: #090e1a;
+    border: 1.5px solid var(--border-color);
+    border-radius: 14px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    min-height: 480px;
+}
+
+.kds-column-header {
+    padding: 12px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: 800;
+    font-size: 0.88rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 2px solid var(--border-color);
+}
+
+.kds-column-header.amasado {
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    color: #94a3b8;
+    border-bottom-color: #64748b;
+}
+
+.kds-column-header.fermentacion {
+    background: linear-gradient(135deg, #0369a1 0%, #0c4a6e 100%);
+    color: #38bdf8;
+    border-bottom-color: #0284c7;
+}
+
+.kds-column-header.horneando {
+    background: linear-gradient(135deg, #b45309 0%, #78350f 100%);
+    color: #fbbf24;
+    border-bottom-color: #f59e0b;
+}
+
+.kds-column-header.listo {
+    background: linear-gradient(135deg, #065f46 0%, #064e3b 100%);
+    color: #4ade80;
+    border-bottom-color: #10b981;
+}
+
+.kds-column-body {
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    flex: 1;
+    overflow-y: auto;
+    max-height: calc(100vh - 280px);
+}
+
+.kds-ticket-card {
+    background: #0f172a;
+    border: 1.5px solid rgba(255, 255, 255, 0.08);
+    border-radius: 10px;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.kds-ticket-card:hover {
+    border-color: var(--accent-gold);
+    transform: translateY(-2px);
+}
+
+.kds-ticket-card.urgente {
+    border-left: 4px solid #ef4444;
+}
+
+.kds-ticket-card.baking-active {
+    border-color: #f59e0b;
+    box-shadow: 0 0 15px rgba(245, 158, 11, 0.25);
+    animation: baking-glow 2s infinite alternate;
+}
+
+@keyframes baking-glow {
+    0% { border-color: rgba(245, 158, 11, 0.4); }
+    100% { border-color: rgba(245, 158, 11, 1); }
+}
+
+.kds-timer-badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 6px 10px;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 900;
+    font-family: monospace;
+    letter-spacing: 1px;
+}
+
+.kds-timer-badge.baking {
+    background: rgba(245, 158, 11, 0.15);
+    color: #fbbf24;
+    border: 1px solid rgba(245, 158, 11, 0.4);
+}
+
+.kds-timer-badge.done {
+    background: rgba(16, 185, 129, 0.2);
+    color: #34d399;
+    border: 1px solid rgba(16, 185, 129, 0.5);
+    animation: ready-flash 1s infinite alternate;
+}
+
+@keyframes ready-flash {
+    0% { opacity: 0.8; }
+    100% { opacity: 1; transform: scale(1.02); }
+}
+
+.kds-action-btn {
+    width: 100%;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: 800;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: all 0.15s ease;
+}
+
+/* 2. TERMINAL MÓVIL DE VENTA EN SALÓN (POS MÓVIL ROMPEFILAS) */
+.pos-movil-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 10px;
+}
+
+.pos-movil-hero {
+    background: linear-gradient(135deg, #065f46 0%, #064e3b 100%);
+    border: 1.5px solid #10b981;
+    border-radius: 14px;
+    padding: 14px 18px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+}
+
+.pos-movil-fav-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 12px;
+    margin-bottom: 80px;
+}
+
+.pos-movil-fav-card {
+    background: #0f172a;
+    border: 1.5px solid var(--border-color);
+    border-radius: 12px;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    cursor: pointer;
+    user-select: none;
+    touch-action: manipulation;
+    transition: transform 0.1s ease, border-color 0.2s ease;
+}
+
+.pos-movil-fav-card:active {
+    transform: scale(0.96);
+    border-color: #4ade80;
+}
+
+.pos-movil-bottom-dock {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(15, 23, 42, 0.96);
+    backdrop-filter: blur(12px);
+    border-top: 2px solid #4ade80;
+    padding: 12px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 1000;
+}
+
+/* 3. ARQUEO CIEGO FLASH */
+.arqueo-ciego-resumen-box {
+    background: #090e1a;
+    border: 1.5px solid var(--border-color);
+    border-radius: 10px;
+    padding: 14px;
+}
+
+.arqueo-ciego-diff-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 900;
+}
+
+.arqueo-ciego-diff-badge.cuadrado {
+    background: rgba(16, 185, 129, 0.15);
+    color: #34d399;
+    border: 1px solid #10b981;
+}
+
+.arqueo-ciego-diff-badge.sobrante {
+    background: rgba(56, 189, 248, 0.15);
+    color: #38bdf8;
+    border: 1px solid #0284c7;
+}
+
+.arqueo-ciego-diff-badge.faltante {
+    background: rgba(239, 68, 68, 0.15);
+    color: #f87171;
+    border: 1px solid #dc2626;
+}
+
+/* 4. CONTROL DE ASISTENCIA Y NÓMINA (RRHH) */
+.rrhh-kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 14px;
+    margin-bottom: 18px;
+}
+
+.rrhh-employee-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 14px;
+}
+
+.rrhh-card {
+    background: #0f172a;
+    border: 1.5px solid var(--border-color);
+    border-radius: 12px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+/* 5. ASISTENTE DE VOZ OPERATIVO (VIASA VOICE) */
+.btn-voice-header-pill {
+    background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+    color: #ffffff;
+    border: 1.5px solid #38bdf8;
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-size: 0.78rem;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(2, 132, 199, 0.35);
+    transition: all 0.2s ease;
+}
+
+.btn-voice-header-pill:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 15px rgba(56, 189, 248, 0.5);
+}
+
+.viasa-voice-overlay-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(8px);
+    z-index: 9999;
+    display: none;
+    align-items: center;
+    justify-content: center;
+}
+
+.viasa-voice-overlay-container.active {
+    display: flex;
+}
+
+.voice-card {
+    background: #090e1a;
+    border: 2px solid #38bdf8;
+    border-radius: 18px;
+    width: 90%;
+    max-width: 520px;
+    padding: 20px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 30px rgba(56, 189, 248, 0.2);
+    animation: voice-pop 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes voice-pop {
+    0% { transform: scale(0.9); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+.voice-header-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 10px;
+}
+
+.btn-close-voice {
+    background: none;
+    border: none;
+    color: #94a3b8;
+    font-size: 1.4rem;
+    cursor: pointer;
+}
+
+.btn-close-voice:hover {
+    color: #ffffff;
+}
+
+.voice-visualizer-box {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    height: 60px;
+    margin-bottom: 12px;
+}
+
+.voice-wave-bar {
+    width: 8px;
+    height: 20px;
+    background: linear-gradient(180deg, #38bdf8 0%, #0284c7 100%);
+    border-radius: 4px;
+    animation: soundwave-pulse 1.2s infinite ease-in-out alternate;
+}
+
+.voice-wave-bar.bar-1 { animation-delay: 0.1s; height: 35px; }
+.voice-wave-bar.bar-2 { animation-delay: 0.3s; height: 50px; }
+.voice-wave-bar.bar-3 { animation-delay: 0.5s; height: 40px; }
+.voice-wave-bar.bar-4 { animation-delay: 0.2s; height: 55px; }
+.voice-wave-bar.bar-5 { animation-delay: 0.4s; height: 30px; }
+
+@keyframes soundwave-pulse {
+    0% { transform: scaleY(0.4); opacity: 0.6; }
+    100% { transform: scaleY(1.3); opacity: 1; filter: drop-shadow(0 0 8px #38bdf8); }
+}
+
+.voice-status-text {
+    text-align: center;
+    font-size: 0.85rem;
+    font-weight: 800;
+    color: #38bdf8;
+    margin-bottom: 10px;
+}
+
+.voice-transcript-bubble {
+    background: rgba(15, 23, 42, 0.8);
+    border: 1px solid rgba(56, 189, 248, 0.3);
+    border-radius: 12px;
+    padding: 14px;
+    font-size: 0.95rem;
+    color: #ffffff;
+    font-style: italic;
+    text-align: center;
+    min-height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 14px;
+}
+
+.voice-response-card {
+    background: #022c22;
+    border: 1.5px solid #10b981;
+    border-radius: 10px;
+    padding: 12px;
+    color: #a7f3d0;
+    font-size: 0.88rem;
+    margin-bottom: 12px;
+    animation: fadeIn 0.3s ease;
+}
+
+.voice-shortcuts-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 6px;
+}
+
+.btn-voice-shortcut {
+    background: #1e293b;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: #e2e8f0;
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.btn-voice-shortcut:hover {
+    background: #0284c7;
+    color: #ffffff;
+    border-color: #38bdf8;
+}
+
+/* ==============================================================================
+   MÓDULO: LOGÍSTICA Y DESPACHOS (DELIVERY)
+   ============================================================================== */
+.delivery-layout {
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    gap: 16px;
+}
+
+@media (max-width: 1024px) {
+    .delivery-layout {
+        grid-template-columns: 1fr;
+    }
+}
+
+.delivery-board-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 14px;
+    margin-bottom: 16px;
+}
+
+.delivery-column {
+    background: #0b1120;
+    border: 1.5px solid #1e293b;
+    border-radius: 12px;
+    padding: 14px;
+    min-height: 480px;
+    display: flex;
+    flex-direction: column;
+}
+
+.delivery-column-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 10px;
+    margin-bottom: 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.delivery-column-title {
+    font-size: 0.88rem;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.delivery-card {
+    background: #1e293b;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 10px;
+    padding: 12px;
+    margin-bottom: 10px;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.delivery-card:hover {
+    border-color: #f97316;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(249, 115, 22, 0.15);
+}
+
+.delivery-card.en-ruta {
+    border-left: 4px solid #38bdf8;
+}
+
+.delivery-card.pendiente {
+    border-left: 4px solid #fbbf24;
+}
+
+.delivery-card.entregado {
+    border-left: 4px solid #10b981;
+}
+
+.delivery-badge-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-size: 0.7rem;
+    font-weight: 800;
+    text-transform: uppercase;
+}
+
+.delivery-badge-pill.ruta {
+    background: rgba(56, 189, 248, 0.15);
+    color: #38bdf8;
+    border: 1px solid rgba(56, 189, 248, 0.3);
+}
+
+.delivery-badge-pill.pendiente {
+    background: rgba(251, 191, 36, 0.15);
+    color: #fbbf24;
+    border: 1px solid rgba(251, 191, 36, 0.3);
+}
+
+.delivery-badge-pill.entregado {
+    background: rgba(16, 185, 129, 0.15);
+    color: #34d399;
+    border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.delivery-rider-list-card {
+    background: #0f172a;
+    border: 1px solid #334155;
+    border-radius: 10px;
+    padding: 10px;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.rider-status-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.rider-status-dot.disponible { background: #10b981; box-shadow: 0 0 6px #10b981; }
+.rider-status-dot.en_ruta { background: #38bdf8; box-shadow: 0 0 6px #38bdf8; }
+.rider-status-dot.inactivo { background: #64748b; }
+
+/* ==============================================================================
+   MÓDULO: COMPRAS PREDICTIVAS (ABASTECIMIENTO INTELIGENTE)
+   ============================================================================== */
+.predictive-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 16px;
+    margin-top: 14px;
+}
+
+.predictive-card {
+    background: #0f172a;
+    border: 1.5px solid #1e293b;
+    border-radius: 12px;
+    padding: 16px;
+    position: relative;
+    transition: all 0.2s ease;
+}
+
+.predictive-card:hover {
+    border-color: #a855f7;
+    box-shadow: 0 8px 24px rgba(168, 85, 247, 0.15);
+}
+
+.predictive-card.urgencia-critico {
+    border-color: #ef4444;
+    background: linear-gradient(180deg, rgba(239, 68, 68, 0.06) 0%, #0f172a 100%);
+}
+
+.predictive-card.urgencia-preventivo {
+    border-color: #f59e0b;
+    background: linear-gradient(180deg, rgba(245, 158, 11, 0.06) 0%, #0f172a 100%);
+}
+
+.predictive-card.urgencia-regular {
+    border-color: #10b981;
+}
+
+.autonomia-bar-container {
+    background: #1e293b;
+    border-radius: 999px;
+    height: 8px;
+    overflow: hidden;
+    margin: 8px 0;
+}
+
+.autonomia-bar-fill {
+    height: 100%;
+    border-radius: 999px;
+    transition: width 0.4s ease;
+}
+
+.autonomia-bar-fill.critico { background: #ef4444; }
+.autonomia-bar-fill.preventivo { background: #f59e0b; }
+.autonomia-bar-fill.regular { background: #10b981; }
+
+.badge-urgencia {
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-size: 0.7rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.badge-urgencia.critico {
+    background: rgba(239, 68, 68, 0.18);
+    color: #fca5a5;
+    border: 1px solid #ef4444;
+}
+
+.badge-urgencia.preventivo {
+    background: rgba(245, 158, 11, 0.18);
+    color: #fde68a;
+    border: 1px solid #f59e0b;
+}
+
+.badge-urgencia.regular {
+    background: rgba(16, 185, 129, 0.18);
+    color: #a7f3d0;
+    border: 1px solid #10b981;
+}
+
+/* ==============================================================================
+   MÓDULO: AUDITORÍA Y TRAZABILIDAD CRIPTOGRÁFICA (SHA-256 BLOCKCHAIN TRAIL)
+   ============================================================================== */
+.crypto-shield-banner {
+    background: linear-gradient(135deg, rgba(15, 118, 110, 0.3) 0%, rgba(13, 148, 136, 0.1) 100%);
+    border: 1.5px solid #14b8a6;
+    border-radius: 12px;
+    padding: 16px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.crypto-shield-banner.comprometido {
+    background: linear-gradient(135deg, rgba(220, 38, 38, 0.3) 0%, rgba(185, 28, 28, 0.1) 100%);
+    border-color: #ef4444;
+}
+
+.crypto-trail-timeline {
+    position: relative;
+    padding-left: 28px;
+    margin-top: 14px;
+}
+
+.crypto-trail-timeline::before {
+    content: '';
+    position: absolute;
+    left: 10px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: linear-gradient(180deg, #14b8a6 0%, #064e3b 100%);
+}
+
+.crypto-block-card {
+    background: #0b1120;
+    border: 1.5px solid #1e293b;
+    border-radius: 10px;
+    padding: 14px;
+    margin-bottom: 12px;
+    position: relative;
+    transition: all 0.2s ease;
+}
+
+.crypto-block-card::before {
+    content: '';
+    position: absolute;
+    left: -24px;
+    top: 18px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #2dd4bf;
+    border: 2px solid #090d16;
+    box-shadow: 0 0 8px #2dd4bf;
+}
+
+.crypto-block-card:hover {
+    border-color: #2dd4bf;
+    box-shadow: 0 6px 18px rgba(45, 212, 191, 0.12);
+}
+
+.crypto-hash-badge {
+    font-family: monospace;
+    font-size: 0.72rem;
+    background: #040810;
+    color: #5eead4;
+    padding: 3px 8px;
+    border-radius: 6px;
+    border: 1px solid #134e4a;
+    display: inline-block;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.crypto-block-json-view {
+    background: #030712;
+    border: 1px solid #1f2937;
+    border-radius: 8px;
+    padding: 12px;
+    font-family: monospace;
+    font-size: 0.75rem;
+    color: #cbd5e1;
+    max-height: 200px;
+    overflow-y: auto;
+    white-space: pre-wrap;
+    word-break: break-all;
+}
+
+/* ==============================================================================
+   MÓDULO: EMISIÓN Y CONTROL DOCUMENTAL (NCU Y FORMATO DUAL MEDIA HOJA CARTA)
+   ============================================================================== */
+.doc-filter-chip {
+    padding: 6px 14px;
+    border-radius: 20px;
+    border: 1px solid var(--border-color);
+    background: var(--bg-card);
+    color: var(--text-secondary);
+    font-size: 0.78rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.doc-filter-chip:hover {
+    border-color: #38bdf8;
+    color: #ffffff;
+}
+
+.doc-filter-chip.active {
+    background: #0284c7;
+    color: #ffffff;
+    border-color: #38bdf8;
+    box-shadow: 0 0 12px rgba(56, 189, 248, 0.3);
+}
+
+.doc-type-badge {
+    padding: 3px 10px;
+    border-radius: 6px;
+    font-size: 0.72rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    letter-spacing: 0.3px;
+}
+
+.doc-type-badge.despacho {
+    background: rgba(2, 132, 199, 0.18);
+    color: #38bdf8;
+    border: 1px solid #0284c7;
+}
+
+.doc-type-badge.entrega {
+    background: rgba(16, 185, 129, 0.18);
+    color: #34d399;
+    border: 1px solid #10b981;
+}
+
+.doc-type-badge.venta {
+    background: rgba(217, 119, 6, 0.18);
+    color: #fbbf24;
+    border: 1px solid #f59e0b;
+}
+
+.doc-type-badge.compra {
+    background: rgba(99, 102, 241, 0.18);
+    color: #818cf8;
+    border: 1px solid #6366f1;
+}
+
+.doc-type-badge.credito {
+    background: rgba(225, 29, 72, 0.18);
+    color: #fb7185;
+    border: 1px solid #e11d48;
+}
+
+.doc-ncu-pill {
+    font-family: monospace;
+    font-size: 0.85rem;
+    font-weight: 900;
+    color: #38bdf8;
+    background: rgba(15, 23, 42, 0.8);
+    padding: 2px 8px;
+    border-radius: 4px;
+    border: 1px solid rgba(56, 189, 248, 0.4);
+    letter-spacing: 1px;
+}
+
+/* ==============================================================================
+   FORMATO DE IMPRESIÓN DUAL: MEDIA HOJA CARTA (ORIGINAL + COPIA)
+   ============================================================================== */
+.half-letter-doc-container {
+    background: #ffffff;
+    color: #0f172a;
+    width: 100%;
+    max-width: 820px;
+    margin: 0 auto;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+    border-radius: 4px;
+    padding: 16px 20px;
+    font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-size: 11px;
+    line-height: 1.35;
+}
+
+.half-letter-stub {
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    padding: 12px 14px;
+    position: relative;
+}
+
+.stub-watermark-tag {
+    position: absolute;
+    top: 8px;
+    right: 12px;
+    font-size: 0.65rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 2px 8px;
+    border-radius: 4px;
+}
+
+.stub-watermark-tag.original {
+    background: #e0f2fe;
+    color: #0369a1;
+    border: 1px solid #7dd3fc;
+}
+
+.stub-watermark-tag.copia {
+    background: #f1f5f9;
+    color: #475569;
+    border: 1px solid #94a3b8;
+}
+
+.stub-header-box {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    border-bottom: 1.5px solid #0f172a;
+/* ==============================================================================
+   MÓDULO DE EMISIÓN Y CONTROL DOCUMENTAL: ARTE MAESTRO DE FORMATOS DUAL
+   (Panadería Nueva Viasa, C.A. - RIF: J-31163165-8)
+   ============================================================================== */
+
+/* Sub-Pestañas del Módulo Documental */
+.doc-tab-bar {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 18px;
+    border-bottom: 2px solid var(--border-color);
+    padding-bottom: 10px;
+}
+
+.doc-tab-btn {
+    background: var(--bg-card);
+    border: 1.5px solid var(--border-color);
+    color: var(--text-secondary);
+    padding: 10px 18px;
+    border-radius: 10px;
+    font-size: 0.88rem;
+    font-weight: 800;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+}
+
+.doc-tab-btn:hover {
+    border-color: var(--accent-gold);
+    color: #ffffff;
+}
+
+.doc-tab-btn.active {
+    background: linear-gradient(135deg, #1e3a8a 0%, #0369a1 100%);
+    border-color: #38bdf8;
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(2, 132, 199, 0.35);
+}
+
+.doc-tab-btn.active.tab-memoria {
+    background: linear-gradient(135deg, #78350f 0%, #b45309 100%);
+    border-color: #fbbf24;
+    box-shadow: 0 4px 12px rgba(217, 119, 6, 0.35);
+}
+
+/* Contenedor Principal del Arte Maestro Dual (Landscape) */
+.master-dual-landscape-page {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 12px;
+    background: #ffffff;
+    color: #0f172a;
+    padding: 12px 14px;
+    border-radius: 8px;
+    width: 100%;
+    max-width: 1100px;
+    margin: 0 auto;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    box-sizing: border-box;
+}
+
+/* Divisor de Corte Central ✂ */
+.master-cut-divider {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 4px;
+    position: relative;
+}
+
+.master-cut-line {
+    width: 1.5px;
+    height: 100%;
+    border-left: 1.5px dashed #94a3b8;
+    position: absolute;
+    left: 50%;
+    top: 0;
+    transform: translateX(-50%);
+}
+
+.master-cut-badge {
+    background: #e2e8f0;
+    border: 1px solid #cbd5e1;
+    color: #475569;
+    font-size: 0.6rem;
+    font-weight: 900;
+    padding: 4px 2px;
+    border-radius: 4px;
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    transform: rotate(180deg);
+    z-index: 2;
+    letter-spacing: 1px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+/* Talón Individual del Formato Maestro */
+.master-stub-sheet {
+    background: #ffffff;
+    border-radius: 6px;
+    padding: 10px 12px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: relative;
+    box-sizing: border-box;
+    font-size: 0.68rem;
+    line-height: 1.25;
+}
+
+.master-stub-sheet.original {
+    border: 1.5px solid #1e3a8a;
+    background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+}
+
+.master-stub-sheet.copia {
+    border: 1.5px solid #b48a3c;
+    background: linear-gradient(180deg, #ffffff 0%, #fffdfa 100%);
+}
+
+/* Encabezado Superior con Isotipo Circular y Membrete Oficial */
+.master-stub-top-ribbon {
+    display: none; /* Diseño de arte maestro tiene encabezado integrado */
+}
+
+.master-header-grid {
+    display: grid;
+    grid-template-columns: 60px 1fr;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 8px;
+    padding-bottom: 6px;
+    border-bottom: 1.5px solid #e2e8f0;
+}
+
+.master-logo-circle {
+    width: 58px;
+    height: 58px;
+    object-fit: contain;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.12));
+}
+
+.master-company-info h3 {
+    font-size: 0.95rem;
+    font-weight: 900;
+    color: #0f172a;
+    margin: 0 0 1px 0;
+    letter-spacing: 0.2px;
+}
+
+.master-company-info .master-rif {
+    font-size: 0.8rem;
+    font-weight: 800;
+    color: #334155;
+    margin-bottom: 1px;
+}
+
+.master-company-info .master-dir {
+    font-size: 0.58rem;
+    color: #64748b;
+    line-height: 1.2;
+}
+
+/* Banner de Título de la Orden (Pill Banner) */
+.master-doc-title-bar {
+    padding: 5px 12px;
+    border-radius: 6px;
+    text-align: center;
+    margin-bottom: 8px;
+}
+
+.master-doc-title-bar.original {
+    background: #1d63b8;
+    color: #ffffff;
+}
+
+.master-doc-title-bar.copia {
+    background: #b45309;
+    color: #ffffff;
+}
+
+.master-doc-title-bar h2 {
+    font-size: 0.95rem;
+    font-weight: 900;
+    margin: 0;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+/* Sección de Identificación y Metadatos: 2 Cuadros Superiores */
+.master-info-grid {
+    display: grid;
+    grid-template-columns: 1.15fr 1fr;
+    gap: 8px;
+    margin-bottom: 8px;
+    align-items: stretch;
+}
+
+/* Cuadro Izquierdo: Cliente / Receptor */
+.master-client-card {
+    border-radius: 6px;
+    padding: 6px 8px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.master-stub-sheet.original .master-client-card {
+    background: #dbeafe;
+    border: 1px solid #bfdbfe;
+    color: #1e3a8a;
+}
+
+.master-stub-sheet.copia .master-client-card {
+    background: #fef3c7;
+    border: 1px solid #fde68a;
+    color: #78350f;
+}
+
+.master-client-card .client-card-lbl {
+    font-size: 0.65rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    margin-bottom: 2px;
+}
+
+.master-client-card .client-card-name {
+    font-size: 0.9rem;
+    font-weight: 900;
+    color: #0f172a;
+    line-height: 1.2;
+}
+
+.master-client-card .client-card-sub {
+    font-size: 0.58rem;
+    color: #475569;
+    margin-top: 2px;
+}
+
+/* Cuadro Derecho: Metadatos Operativos con Celdas Redondeadas */
+.master-meta-card {
+    display: flex;
+    flex-direction: column;
+    gap: 2.5px;
+    justify-content: center;
+}
+
+.master-meta-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.62rem;
+    color: #334155;
+}
+
+.master-meta-row .meta-lbl {
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.master-meta-row .meta-pill-val {
+    background: #ffffff;
+    border: 1px solid #94a3b8;
+    border-radius: 4px;
+    padding: 1px 6px;
+    font-family: monospace;
+    font-size: 0.64rem;
+    font-weight: 800;
+    color: #0f172a;
+    min-width: 95px;
+    text-align: center;
+    box-sizing: border-box;
+}
+
+/* Tabla Maestra de Renglones */
+.master-items-wrapper {
+    position: relative;
+    margin-bottom: 6px;
+}
+
+.master-watermark {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 1.8rem;
+    font-weight: 900;
+    letter-spacing: 2px;
+    pointer-events: none;
+    user-select: none;
+    z-index: 1;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.master-watermark.original {
+    color: rgba(29, 99, 184, 0.10);
+}
+
+.master-watermark.copia {
+    color: rgba(180, 83, 9, 0.10);
+}
+
+.master-table-12 {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.63rem;
+    background: transparent;
+    position: relative;
+    z-index: 2;
+}
+
+.master-table-12 th {
+    padding: 4px 4px;
+    font-size: 0.6rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    border: 1px solid #64748b;
+}
+
+.master-stub-sheet.original .master-table-12 th {
+    background: #1d4ed8;
+    color: #ffffff;
+    border-color: #1e40af;
+}
+
+.master-stub-sheet.copia .master-table-12 th {
+    background: #854d0e;
+    color: #ffffff;
+    border-color: #713f12;
+}
+
+.master-table-12 td {
+    padding: 2.5px 4px;
+    border: 1px solid #cbd5e1;
+    color: #1e293b;
+    height: 14px;
+    vertical-align: middle;
+}
+
+.master-table-12 tr:nth-child(even) td {
+    background: rgba(248, 250, 252, 0.7);
+}
+
+.master-table-12 .col-item { width: 22px; text-align: center; font-weight: 800; }
+.master-table-12 .col-desc { text-align: left; }
+.master-table-12 .col-um { width: 55px; text-align: center; }
+.master-table-12 .col-cant { width: 36px; text-align: center; font-weight: 800; }
+.master-table-12 .col-precio { width: 68px; text-align: right; }
+.master-table-12 .col-total { width: 72px; text-align: right; font-weight: 800; }
+
+/* Bloque Inferior: Sello, Totales y Trazabilidad BCV */
+.master-bottom-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.35fr;
+    gap: 8px;
+    margin-bottom: 6px;
+    align-items: center;
+}
+
+.master-stamp-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 2px;
+}
+
+.master-stamp-img {
+    max-height: 48px;
+    max-width: 100px;
+    object-fit: contain;
+    opacity: 0.85;
+}
+
+.master-stamp-txt {
+    font-size: 0.52rem;
+    font-weight: 800;
+    color: #475569;
+    text-transform: uppercase;
+    margin-top: 1px;
+}
+
+.master-totals-box {
+    border: none;
+    font-size: 0.63rem;
+}
+
+.master-totals-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 1.5px 4px;
+    color: #334155;
+}
+
+.master-totals-row.grand-total {
+    font-weight: 900;
+    font-size: 0.78rem;
+    padding: 3px 8px;
+    border-radius: 4px;
+    margin-top: 2px;
+}
+
+.master-stub-sheet.original .master-totals-row.grand-total {
+    background: #1d4ed8;
+    color: #ffffff;
+}
+
+.master-stub-sheet.copia .master-totals-row.grand-total {
+    background: #b45309;
+    color: #ffffff;
+}
+
+.master-bcv-box {
+    grid-column: 1 / -1;
+    border-radius: 6px;
+    padding: 4px 8px;
+    text-align: center;
+    font-size: 0.63rem;
+    line-height: 1.2;
+}
+
+.master-stub-sheet.original .master-bcv-box {
+    background: #dbeafe;
+    border: 1px solid #bfdbfe;
+    color: #1e3a8a;
+}
+
+.master-stub-sheet.copia .master-bcv-box {
+    background: #fef3c7;
+    border: 1px solid #fde68a;
+    color: #78350f;
+}
+
+.master-bcv-box strong {
+    font-size: 0.72rem;
+    display: block;
+}
+
+/* Firmas Dobles */
+.master-signatures-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-top: 6px;
+    padding-top: 4px;
+}
+
+.master-signature-cell {
+    border-top: 1px solid #64748b;
+    text-align: center;
+    font-size: 0.58rem;
+    color: #475569;
+    padding-top: 2px;
+}
+
+.master-signature-cell strong {
+    color: #0f172a;
+    display: block;
+}
+
+/* Nota Legal y Hash Criptográfico */
+.master-legal-footer {
+    display: none; /* En el arte maestro no se incluye para mantener estética limpia */
+}
+
+.master-crypto-line {
+    font-family: monospace;
+    font-size: 0.48rem;
+    color: #94a3b8;
+    display: flex;
+    justify-content: space-between;
+    margin-top: 2px;
+}
+
+/* ==============================================================================
+   SECCIÓN: BANCO DE MEMORIA DIGITAL VIASA
+   ============================================================================== */
+.banco-memoria-kpis {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.banco-memoria-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.82rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.banco-memoria-table th {
+    background: #0f172a;
+    color: #ffffff;
+    padding: 10px 12px;
+    font-weight: 800;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    text-align: left;
+    border-bottom: 2px solid var(--border-color);
+}
+
+.banco-memoria-table td {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border-color);
+    color: var(--text-primary);
+    vertical-align: middle;
+}
+
+.banco-memoria-table tr:hover td {
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.crypto-valid-chip {
+    background: rgba(16, 185, 129, 0.15);
+    border: 1px solid #10b981;
+    color: #34d399;
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-size: 0.7rem;
+    font-weight: 800;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+/* REGLAS DE IMPRESIÓN OFICIALES DUAL LETTER LANDSCAPE */
+@media print {
+    body * {
+        visibility: hidden !important;
+    }
+    
+    #modal-documento-preview,
+    #modal-documento-preview *,
+    #documento-dual-print-container,
+    #documento-dual-print-container * {
+        visibility: visible !important;
+    }
+    
+    #modal-documento-preview {
+        position: fixed !important;
+        left: 0 !important;
+        top: 0 !important;
+        width: 100vw !important;
+        height: 100vh !important;
+        background: #ffffff !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        z-index: 999999 !important;
+        display: block !important;
+    }
+    
+    .viasa-modal-header,
+    .viasa-modal-footer,
+    .btn-close-modal,
+    .no-print {
+        display: none !important;
+    }
+    
+    .viasa-modal-body {
+        background: #ffffff !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        max-height: none !important;
+        overflow: visible !important;
+    }
+    
+    .viasa-modal-card {
+        border: none !important;
+        box-shadow: none !important;
+        max-width: 100% !important;
+        width: 100% !important;
+        background: #ffffff !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+    
+    .master-dual-landscape-page {
+        box-shadow: none !important;
+        border-radius: 0 !important;
+        padding: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        background: #ffffff !important;
+    }
+    
+    .master-stub-sheet.original {
+        border: 1.5px solid #1e3a8a !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+    
+    .master-stub-sheet.copia {
+        border: 1.5px solid #b48a3c !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+    
+    .master-cut-badge {
+        background: #ffffff !important;
+    }
+    
+    @page {
+        size: letter landscape;
+        margin: 4mm 5mm;
+    }
+}
+
+/* ==============================================================================
+   MÓDULO INTEGRAL DE GESTIÓN DE PERSONAL, ASISTENCIA Y EXPEDIENTES (RRHH Y LOTTT)
+   Panadería Nueva Viasa, C.A. - RIF: J-31163165-8
+   ============================================================================== */
+
+/* Barra de Sub-Navegación RRHH */
+.rrhh-tab-bar {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 18px;
+    border-bottom: 2px solid var(--border-color);
+    padding-bottom: 10px;
+    flex-wrap: wrap;
+}
+
+.rrhh-tab-btn {
+    background: var(--bg-card);
+    border: 1.5px solid var(--border-color);
+    color: var(--text-secondary);
+    padding: 9px 16px;
+    border-radius: 10px;
+    font-size: 0.85rem;
+    font-weight: 800;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+}
+
+.rrhh-tab-btn:hover {
+    border-color: #818cf8;
+    color: #ffffff;
+}
+
+.rrhh-tab-btn.active.tab-expedientes {
+    background: linear-gradient(135deg, #3730a3 0%, #1e1b4b 100%);
+    border-color: #818cf8;
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.35);
+}
+
+.rrhh-tab-btn.active.tab-asistencia {
+    background: linear-gradient(135deg, #065f46 0%, #064e3b 100%);
+    border-color: #34d399;
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35);
+}
+
+.rrhh-tab-btn.active.tab-vacaciones {
+    background: linear-gradient(135deg, #0369a1 0%, #0c4a6e 100%);
+    border-color: #38bdf8;
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(2, 132, 199, 0.35);
+}
+
+.rrhh-tab-btn.active.tab-liquidaciones {
+    background: linear-gradient(135deg, #9a3412 0%, #7c2d12 100%);
+    border-color: #fb923c;
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(234, 88, 12, 0.35);
+}
+
+.rrhh-tab-btn.active.tab-memoria {
+    background: linear-gradient(135deg, #78350f 0%, #b45309 100%);
+    border-color: #fbbf24;
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(217, 119, 6, 0.35);
+}
+
+/* Tarjetas de Empleados Mejoradas */
+.rrhh-card-modern {
+    background: #0f172a;
+    border: 1.5px solid #334155;
+    border-radius: 12px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.rrhh-card-modern:hover {
+    border-color: #818cf8;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+    transform: translateY(-2px);
+}
+
+.rrhh-card-modern.madrugada {
+    border-left: 4px solid #f59e0b;
+}
+
+.rrhh-card-modern.diurno {
+    border-left: 4px solid #38bdf8;
+}
+
+/* Semáforos de Certificados Sanitarios */
+.health-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-size: 0.68rem;
+    font-weight: 700;
+}
+
+.health-badge.vigente {
+    background: rgba(16, 185, 129, 0.15);
+    border: 1px solid #10b981;
+    color: #6ee7b7;
+}
+
+.health-badge.por_vencer {
+    background: rgba(245, 158, 11, 0.15);
+    border: 1px solid #f59e0b;
+    color: #fde047;
+}
+
+.health-badge.vencido {
+    background: rgba(239, 68, 68, 0.15);
+    border: 1px solid #ef4444;
+    color: #fca5a5;
+}
+
+/* Badges de Antigüedad LOTTT */
+.antiguedad-badge {
+    background: rgba(99, 102, 241, 0.15);
+    border: 1px solid #6366f1;
+    color: #c7d2fe;
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-size: 0.7rem;
+    font-weight: 800;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+/* Layout del Expediente Digital / Hoja de Vida */
+.expediente-header-banner-v3 {
+    background: #080d1a;
+    border: 1.5px solid #1e293b;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 16px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+}
+
+.expediente-top-dual-row {
+    display: grid;
+    grid-template-columns: 340px 1fr;
+    min-height: 290px;
+    border-bottom: 1px solid #1e293b;
+    background: radial-gradient(circle at 75% 50%, #1e1b4b 0%, #080d1a 100%);
+}
+
+@media (max-width: 820px) {
+    .expediente-top-dual-row {
+        grid-template-columns: 1fr;
+    }
+}
+
+.expediente-photo-box-v3 {
+    width: 100%;
+    height: 100%;
+    min-height: 290px;
+    background: #020617;
+    position: relative;
+    overflow: hidden;
+    border-right: 1.5px solid #1e293b;
+}
+
+.expediente-photo-img-v3 {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top center;
+    display: block;
+}
+
+.expediente-logo-box-v3 {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 24px;
+}
+
+.expediente-logo-img-v3 {
+    width: 210px;
+    height: 210px;
+    max-width: 100%;
+    object-fit: contain;
+    filter: drop-shadow(0 6px 18px rgba(0,0,0,0.6));
+    border-radius: 50%;
+}
+
+.expediente-info-block-v3 {
+    padding: 16px 24px;
+    background: #080d1a;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.expediente-worker-name-v3 {
+    font-size: 1.45rem;
+    font-weight: 900;
+    color: #ffffff;
+    letter-spacing: 0.3px;
+    line-height: 1.2;
+}
+
+.expediente-worker-cargo-v3 {
+    font-size: 0.9rem;
+    color: #cbd5e1;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.expediente-cargo-gold {
+    color: #fbbf24;
+    font-weight: 800;
+}
+
+.expediente-worker-meta-v3 {
+    font-size: 0.84rem;
+    color: #e2e8f0;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-top: 2px;
+    flex-wrap: wrap;
+}
+
+.expediente-worker-status-v3 {
+    font-size: 0.84rem;
+    color: #e2e8f0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 2px;
+}
+
+.expediente-salary-bar-v3 {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #040711;
+    border-top: 1.5px solid #1e293b;
+    padding: 8px 24px;
+}
+
+.expediente-salary-bar-left-v3 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #94a3b8;
+    font-size: 0.9rem;
+}
+
+.expediente-salary-badge-v3 {
+    text-align: right;
+    background: rgba(15, 23, 42, 0.85);
+    border: 1px solid #334155;
+    border-radius: 8px;
+    padding: 6px 18px;
+}
+
+.salary-label-v3 {
+    font-size: 0.65rem;
+    color: #94a3b8;
+    text-transform: uppercase;
+    font-weight: 800;
+    letter-spacing: 0.6px;
+}
+
+.salary-usd-v3 {
+    font-size: 1.4rem;
+    font-weight: 900;
+    color: #4ade80;
+    line-height: 1.15;
+}
+
+.salary-bs-v3 {
+    font-size: 0.75rem;
+    color: #38bdf8;
+    font-weight: 700;
+}
+
+.expediente-header-banner {
+    background: linear-gradient(135deg, #1e1b4b 0%, #0f172a 100%);
+    border: 1px solid #3730a3;
+    border-radius: 12px;
+    padding: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.rrhh-emp-photo-box {
+    position: relative;
+    width: 48px;
+    height: 48px;
+    flex-shrink: 0;
+}
+
+.rrhh-emp-photo-box img {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #818cf8;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+    display: block;
+}
+
+.rrhh-emp-photo-badge {
+    position: absolute;
+    bottom: -2px;
+    right: -2px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #1e1b4b;
+    border: 1.5px solid #fbbf24;
+    color: #fbbf24;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.6rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.4);
+}
+
+.expediente-avatar-big {
+    position: relative;
+    width: 76px;
+    height: 76px;
+    border-radius: 50%;
+    background: #312e81;
+    border: 3px solid #fbbf24;
+    color: #fbbf24;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.2rem;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.6);
+    flex-shrink: 0;
+}
+
+.expediente-avatar-big img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    display: block;
+}
+
+.expediente-avatar-badge {
+    position: absolute;
+    bottom: -2px;
+    right: -2px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: #1e1b4b;
+    border: 2px solid #818cf8;
+    color: #fbbf24;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.5);
+}
+
+.expediente-subtab-bar {
+    display: flex;
+    gap: 6px;
+    border-bottom: 1px solid #334155;
+    padding-bottom: 8px;
+    margin-bottom: 14px;
+    overflow-x: auto;
+}
+
+.expediente-subtab-btn {
+    background: transparent;
+    border: 1px solid transparent;
+    color: #94a3b8;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+}
+
+.expediente-subtab-btn:hover {
+    color: #ffffff;
+    background: rgba(255,255,255,0.05);
+}
+
+.expediente-subtab-btn.active {
+    background: #3730a3;
+    border-color: #818cf8;
+    color: #ffffff;
+}
+
+.expediente-info-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.8rem;
+}
+
+.expediente-info-table td {
+    padding: 8px 10px;
+    border-bottom: 1px solid #1e293b;
+}
+
+.expediente-info-table td.label-col {
+    color: #94a3b8;
+    width: 32%;
+    font-weight: 600;
+}
+
+.expediente-info-table td.val-col {
+    color: #ffffff;
+    font-weight: 700;
+}
+
+/* Desglose Comparativo LOTTT (Garantía vs Retroactivo) */
+.lottt-comparative-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin: 12px 0;
+}
+
+.lottt-card-formula {
+    background: #1e293b;
+    border: 1.5px solid #334155;
+    border-radius: 10px;
+    padding: 12px;
+    position: relative;
+}
+
+.lottt-card-formula.selected {
+    border-color: #10b981;
+    background: linear-gradient(135deg, rgba(6, 78, 59, 0.4) 0%, rgba(15, 23, 42, 0.6) 100%);
+}
+
+.lottt-winner-badge {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: #059669;
+    color: #ffffff;
+    font-size: 0.65rem;
+    font-weight: 900;
+    padding: 2px 6px;
+    border-radius: 6px;
+    text-transform: uppercase;
+}
+
+/* Formato Imprimible de Constancia de Trabajo Oficial */
+.constancia-document-paper {
+    background: #ffffff;
+    color: #0f172a;
+    padding: 30px 40px;
+    font-family: 'Times New Roman', Times, serif;
+    line-height: 1.6;
+    max-width: 720px;
+    margin: 0 auto;
+    border: 1px solid #cbd5e1;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.constancia-header {
+    text-align: center;
+    border-bottom: 2px solid #0f172a;
+    padding-bottom: 12px;
+    margin-bottom: 24px;
+}
+
+/* ==============================================================================
+   MÓDULO: IDENTIFICACIÓN, CARNETS CON QR Y ETIQUETAS DE CÓDIGOS DE BARRA
+   ============================================================================== */
+.carnet-render-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    padding: 10px 0;
+}
+
+.carnet-dual-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    max-width: 680px;
+    width: 100%;
+}
+
+@media (max-width: 700px) {
+    .carnet-dual-layout {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Carnet Estándar PVC CR-80 (Ratio 85.6mm x 53.98mm) */
+.carnet-card-pvc {
+    width: 320px;
+    height: 480px;
+    background: linear-gradient(165deg, #1e1b4b 0%, #0f172a 60%, #1e293b 100%);
+    border: 2px solid #6366f1;
+    border-radius: 16px;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6), 0 0 20px rgba(99, 102, 241, 0.2);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 16px;
+    position: relative;
+    overflow: hidden;
+    box-sizing: border-box;
+    color: #f8fafc;
+}
+
+.carnet-card-pvc::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 6px;
+    background: linear-gradient(90deg, #d97706, #fbbf24, #10b981, #38bdf8, #818cf8);
+}
+
+.carnet-card-pvc.vip-client {
+    background: linear-gradient(165deg, #831843 0%, #0f172a 60%, #1e293b 100%);
+    border-color: #f472b6;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6), 0 0 20px rgba(244, 114, 182, 0.25);
+}
+
+.carnet-card-pvc.supplier-card {
+    background: linear-gradient(165deg, #064e3b 0%, #0f172a 60%, #1e293b 100%);
+    border-color: #34d399;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6), 0 0 20px rgba(52, 211, 153, 0.25);
+}
+
+.carnet-header-section {
+    text-align: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+    padding-bottom: 8px;
+}
+
+.carnet-header-logo {
+    width: 44px;
+    height: 44px;
+    margin: 0 auto 4px auto;
+    object-fit: contain;
+    filter: drop-shadow(0 2px 6px rgba(0,0,0,0.5));
+}
+
+.carnet-header-title {
+    font-family: var(--font-heading);
+    font-size: 0.85rem;
+    font-weight: 900;
+    color: #fbbf24;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+.carnet-header-subtitle {
+    font-size: 0.62rem;
+    color: #cbd5e1;
+    font-weight: 700;
+}
+
+.carnet-avatar-box {
+    width: 84px;
+    height: 84px;
+    margin: 8px auto 6px auto;
+    border-radius: 50%;
+    border: 2.5px solid #818cf8;
+    background: #0f172a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    color: #c7d2fe;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+    overflow: hidden;
+    position: relative;
+}
+
+.carnet-avatar-box img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    display: block;
+}
+
+.carnet-card-pvc.vip-client .carnet-avatar-box {
+    border-color: #f472b6;
+    color: #fbcfe8;
+}
+
+.carnet-card-pvc.supplier-card .carnet-avatar-box {
+    border-color: #34d399;
+    color: #a7f3d0;
+}
+
+.carnet-identity-info {
+    text-align: center;
+    margin-bottom: 6px;
+}
+
+.carnet-name {
+    font-size: 1rem;
+    font-weight: 900;
+    color: #ffffff;
+    line-height: 1.15;
+    margin-bottom: 2px;
+}
+
+.carnet-cargo-badge {
+    display: inline-block;
+    background: rgba(99, 102, 241, 0.3);
+    border: 1px solid #6366f1;
+    color: #c7d2fe;
+    font-size: 0.68rem;
+    font-weight: 800;
+    padding: 2px 8px;
+    border-radius: 6px;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+}
+
+.carnet-qr-container {
+    background: #ffffff;
+    border-radius: 8px;
+    padding: 6px;
+    width: 108px;
+    height: 108px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
+
+.carnet-qr-container canvas {
+    width: 100% !important;
+    height: 100% !important;
+    display: block;
+}
+
+.carnet-footer-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.62rem;
+    color: #94a3b8;
+    border-top: 1px dashed rgba(255, 255, 255, 0.15);
+    padding-top: 6px;
+}
+
+/* Reverso del Carnet PVC */
+.carnet-reverso-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+    font-size: 0.65rem;
+    color: #cbd5e1;
+    line-height: 1.35;
+}
+
+.carnet-rules-list {
+    margin: 6px 0;
+    padding-left: 14px;
+}
+
+.carnet-rules-list li {
+    margin-bottom: 4px;
+}
+
+.carnet-barcode-box {
+    background: #ffffff;
+    border-radius: 6px;
+    padding: 4px 6px;
+    margin: 8px 0;
+    text-align: center;
+}
+
+.carnet-barcode-box canvas {
+    max-width: 100%;
+    height: 48px;
+}
+
+/* ==============================================================================
+   PLANILLAS DE ETIQUETAS DE CÓDIGOS DE BARRA PARA ANAQUELES Y EMPAQUES
+   ============================================================================== */
+.planilla-etiquetas-grid {
+    display: grid;
+    gap: 8px;
+    justify-content: center;
+    background: #ffffff;
+    padding: 12px;
+    border-radius: 6px;
+    border: 1px dashed #cbd5e1;
+}
+
+.planilla-etiquetas-grid.hoja-24 {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+.planilla-etiquetas-grid.hoja-12 {
+    grid-template-columns: repeat(2, 1fr);
+}
+
+.planilla-etiquetas-grid.hoja-40 {
+    grid-template-columns: repeat(4, 1fr);
+}
+
+.planilla-etiquetas-grid.rollo-termico {
+    grid-template-columns: 1fr;
+    max-width: 260px;
+    margin: 0 auto;
+}
+
+/* Etiqueta Individual Autoadhesiva */
+.etiqueta-anaquel-card {
+    background: #ffffff;
+    border: 1px dashed #94a3b8;
+    border-radius: 6px;
+    padding: 6px 8px;
+    color: #0f172a;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-sizing: border-box;
+    page-break-inside: avoid;
+    break-inside: avoid;
+}
+
+.etiqueta-anaquel-card .etq-brand {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #e2e8f0;
+    padding-bottom: 2px;
+    margin-bottom: 2px;
+}
+
+.etiqueta-anaquel-card .etq-brand-name {
+    font-size: 0.58rem;
+    font-weight: 900;
+    color: #d97706;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+}
+
+.etiqueta-anaquel-card .etq-brand-rif {
+    font-size: 0.52rem;
+    font-weight: 700;
+    color: #64748b;
+}
+
+.etiqueta-anaquel-card .etq-prod-title {
+    font-size: 0.72rem;
+    font-weight: 800;
+    color: #0f172a;
+    line-height: 1.15;
+    margin: 2px 0;
+}
+
+.etiqueta-anaquel-card .etq-prices-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin: 2px 0;
+}
+
+.etiqueta-anaquel-card .etq-price-usd {
+    font-size: 0.92rem;
+    font-weight: 900;
+    color: #15803d;
+}
+
+.etiqueta-anaquel-card .etq-price-bs {
+    font-size: 0.72rem;
+    font-weight: 800;
+    color: #0284c7;
+}
+
+.etiqueta-anaquel-card .etq-barcode-wrapper {
+    text-align: center;
+    margin: 2px 0 0 0;
+}
+
+.etiqueta-anaquel-card .etq-barcode-wrapper canvas {
+    max-width: 100%;
+    height: 42px;
+    display: block;
+    margin: 0 auto;
+}
+
+.etiqueta-anaquel-card .etq-meta-foot {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.48rem;
+    color: #64748b;
+    margin-top: 2px;
+    border-top: 1px dotted #cbd5e1;
+    padding-top: 1px;
+}
+
+/* ==============================================================================
+   REGLAS DE IMPRESIÓN PROFESIONAL (@media print)
+   ============================================================================== */
+@media print {
+    body {
+        background: #ffffff !important;
+        color: #000000 !important;
+        padding: 0 !important;
+    }
+    
+    .app-sidebar,
+    .app-header,
+    .viasa-modal-header,
+    .carnet-preview-toolbar,
+    .barcode-toolbar-grid,
+    #etq-info-producto-banner,
+    .standalone-top-bar {
+        display: none !important;
+    }
+    
+    .viasa-modal {
+        position: static !important;
+        background: none !important;
+        display: block !important;
+        padding: 0 !important;
+    }
+    
+    .viasa-modal-card {
+        max-width: 100% !important;
+        width: 100% !important;
+        box-shadow: none !important;
+        border: none !important;
+        background: #ffffff !important;
+        padding: 0 !important;
+    }
+    
+    .viasa-modal-body {
+        background: #ffffff !important;
+        padding: 0 !important;
+    }
+    
+    .sheet-paper-container {
+        background: #ffffff !important;
+        padding: 0 !important;
+        box-shadow: none !important;
+    }
+    
+    .planilla-etiquetas-grid {
+        border: none !important;
+        padding: 0 !important;
+        gap: 4mm !important;
+    }
+    
+    .etiqueta-anaquel-card {
+        border: 0.5px solid #000000 !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+
+    .carnet-card-pvc {
+        box-shadow: none !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        page-break-after: always;
+        break-after: page;
+    }
+}
+
+.constancia-body-p {
+    font-size: 1.05rem;
+    text-align: justify;
+    margin-bottom: 18px;
+    text-indent: 30px;
+}
+
+.constancia-signatures {
+    margin-top: 50px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+}
+
+/* ==========================================================================
+   VISOR DE FOTOGRAFÍA AMPLIADA FULL HD (LIGHTBOX DE PERFIL DE EMPLEADO)
+   ========================================================================== */
+.expediente-avatar-big {
+    cursor: pointer !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    position: relative !important;
+    user-select: none;
+}
+
+.expediente-avatar-big:hover {
+    transform: scale(1.06);
+    border-color: #fde047 !important;
+    box-shadow: 0 0 22px rgba(251, 191, 36, 0.65), 0 6px 18px rgba(0, 0, 0, 0.75) !important;
+}
+
+.expediente-avatar-big .avatar-hover-zoom-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(15, 23, 42, 0.7);
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.25s ease-in-out;
+    border-radius: 50%;
+    color: #fbbf24;
+    font-size: 1.15rem;
+    pointer-events: none;
+}
+
+.expediente-avatar-big:hover .avatar-hover-zoom-overlay {
+    opacity: 1;
+}
+
+.avatar-hover-zoom-overlay span {
+    font-size: 0.56rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-top: 2px;
+    color: #ffffff;
+}
+
+.rrhh-emp-photo-box {
+    cursor: pointer !important;
+    transition: all 0.25s ease !important;
+}
+
+.rrhh-emp-photo-box:hover {
+    transform: scale(1.08);
+    border-color: #fbbf24 !important;
+    box-shadow: 0 0 16px rgba(251, 191, 36, 0.55) !important;
+}
+
+@keyframes viasaModalZoomIn {
+    0% {
+        opacity: 0;
+        transform: scale(0.88);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* ==========================================================================
+   CALCULADORA SALARIAL Y DESGLOSE DE NÓMINA (CONTABILIDAD Y SENIAT - LOTTT)
+   ========================================================================== */
+.viasa-calc-container {
+    display: grid;
+    grid-template-columns: 1.12fr 1.38fr;
+    gap: 18px;
+    margin-bottom: 24px;
+}
+
+@media (max-width: 980px) {
+    .viasa-calc-container {
+        grid-template-columns: 1fr;
+    }
+}
+
+.viasa-calc-device-card {
+    background: linear-gradient(145deg, #0b1120 0%, #0f172a 100%);
+    border: 2px solid #38bdf8;
+    border-radius: 16px;
+    padding: 18px;
+    box-shadow: 0 14px 35px rgba(0, 0, 0, 0.7), 0 0 25px rgba(56, 189, 248, 0.15);
+    position: relative;
+}
+
+.viasa-calc-lcd-screen {
+    background: #020617;
+    border: 2px solid #1e293b;
+    border-radius: 10px;
+    padding: 12px 16px;
+    margin-bottom: 16px;
+    box-shadow: inset 0 3px 10px rgba(0, 0, 0, 0.9);
+    position: relative;
+    overflow: hidden;
+}
+
+.viasa-calc-lcd-screen::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(74, 222, 128, 0.4), transparent);
+}
+
+.viasa-calc-lcd-sub {
+    font-size: 0.72rem;
+    color: #94a3b8;
+    display: flex;
+    justify-content: space-between;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 700;
+}
+
+.viasa-calc-lcd-main {
+    font-family: 'Courier New', Courier, monospace, sans-serif;
+    font-size: 2.1rem;
+    font-weight: 900;
+    color: #4ade80;
+    text-shadow: 0 0 12px rgba(74, 222, 128, 0.45);
+    text-align: right;
+    margin: 4px 0;
+    letter-spacing: 1px;
+}
+
+.viasa-calc-lcd-bs {
+    font-family: 'Courier New', Courier, monospace, sans-serif;
+    font-size: 0.88rem;
+    color: #38bdf8;
+    text-align: right;
+    font-weight: 800;
+}
+
+.viasa-calc-field-group {
+    background: rgba(15, 23, 42, 0.7);
+    border: 1px solid #1e293b;
+    border-radius: 10px;
+    padding: 10px 12px;
+    margin-bottom: 10px;
+    transition: border-color 0.2s;
+}
+
+.viasa-calc-field-group:focus-within {
+    border-color: #38bdf8;
+}
+
+.viasa-calc-label {
+    font-size: 0.74rem;
+    font-weight: 800;
+    color: #cbd5e1;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 4px;
+}
+
+.viasa-calc-pill-btn {
+    background: #1e293b;
+    border: 1px solid #334155;
+    color: #94a3b8;
+    font-size: 0.68rem;
+    font-weight: 800;
+    padding: 3px 7px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.viasa-calc-pill-btn:hover {
+    background: #0369a1;
+    border-color: #38bdf8;
+    color: #ffffff;
+}
+
+.viasa-calc-btn-enter {
+    background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
+    border: none;
+    color: #0f172a;
+    font-size: 1.05rem;
+    font-weight: 900;
+    padding: 12px 18px;
+    border-radius: 10px;
+    cursor: pointer;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    box-shadow: 0 4px 18px rgba(251, 191, 36, 0.35);
+    transition: all 0.2s;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.viasa-calc-btn-enter:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 22px rgba(251, 191, 36, 0.5);
+    filter: brightness(1.08);
+}
+
+.viasa-calc-btn-enter:active {
+    transform: translateY(1px);
+}
+
+.viasa-calc-breakdown-card {
+    background: #0f172a;
+    border: 1.5px solid #fbbf24;
+    border-radius: 16px;
+    padding: 18px;
+    box-shadow: 0 14px 35px rgba(0, 0, 0, 0.7);
+    display: flex;
+    flex-direction: column;
+}
+
+.viasa-calc-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.78rem;
+    margin-bottom: 12px;
+}
+
+.viasa-calc-table th {
+    background: rgba(30, 41, 59, 0.8);
+    color: #94a3b8;
+    font-size: 0.7rem;
+    font-weight: 800;
+    padding: 6px 8px;
+    text-align: left;
+    text-transform: uppercase;
+    border-bottom: 1px solid #334155;
+}
+
+.viasa-calc-table td {
+    padding: 6px 8px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.viasa-calc-total-box {
+    background: radial-gradient(circle at center, #1e293b 0%, #0b1120 100%);
+    border: 2px solid #4ade80;
+    border-radius: 12px;
+    padding: 14px 18px;
+    margin-top: auto;
+    box-shadow: 0 4px 18px rgba(74, 222, 128, 0.15);
+}
+
+/* ==============================================================================
+   ESTILOS: GESTIÓN DE GUARDIAS, CAMPO Y VANGUARDIA OPERATIVA (VIASA SYSTEM)
+   ============================================================================== */
+
+.guardias-hub-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 16px;
+    color: #fff;
+    font-family: 'Outfit', sans-serif;
+}
+
+.guardias-hero-card {
+    background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
+    border: 1.5px solid #a855f7;
+    border-radius: 14px;
+    padding: 18px 22px;
+    box-shadow: 0 4px 25px rgba(168, 85, 247, 0.15);
+}
+
+.guardias-hero-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 14px;
+    margin-bottom: 16px;
+    border-bottom: 1px solid rgba(168, 85, 247, 0.2);
+    padding-bottom: 14px;
+}
+
+.guardias-hero-icon-box {
+    width: 46px;
+    height: 46px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #7e22ce 0%, #9333ea 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    color: #fff;
+    box-shadow: 0 0 15px rgba(168, 85, 247, 0.4);
+}
+
+.guardias-hero-title {
+    margin: 0;
+    color: #ffffff;
+    font-size: 1.25rem;
+    font-weight: 900;
+    letter-spacing: 0.3px;
+}
+
+.guardias-hero-sub {
+    font-size: 0.76rem;
+    color: #e9d5ff;
+}
+
+.guardias-hero-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.btn-companion-mobile {
+    background: linear-gradient(135deg, #7e22ce, #a855f7);
+    color: #fff;
+    border: 1px solid #c084fc;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    box-shadow: 0 0 12px rgba(168, 85, 247, 0.35);
+    transition: all 0.2s ease;
+}
+
+.btn-companion-mobile:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 18px rgba(168, 85, 247, 0.6);
+}
+
+/* KPIs Grid */
+.guardias-kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    gap: 12px;
+}
+
+.guardias-kpi-card {
+    background: rgba(15, 23, 42, 0.7);
+    border: 1px solid #334155;
+    border-radius: 10px;
+    padding: 12px 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.guardias-kpi-card:hover {
+    border-color: #a855f7;
+    background: rgba(168, 85, 247, 0.1);
+    transform: translateY(-2px);
+}
+
+.guardias-kpi-card .kpi-lbl {
+    font-size: 0.72rem;
+    color: #94a3b8;
+    font-weight: 700;
+    display: block;
+    margin-bottom: 4px;
+}
+
+.guardias-kpi-card .kpi-val {
+    font-size: 1.4rem;
+    font-weight: 900;
+    color: #fff;
+    font-family: monospace;
+}
+
+/* Tabs Bar */
+.guardias-tabs-bar {
+    display: flex;
+    gap: 8px;
+    background: #0f172a;
+    border: 1px solid #334155;
+    border-radius: 10px;
+    padding: 6px;
+    overflow-x: auto;
+}
+
+.guardias-tab-btn {
+    background: transparent;
+    border: none;
+    color: #94a3b8;
+    font-size: 0.82rem;
+    font-weight: 800;
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.guardias-tab-btn.active, .guardias-tab-btn:hover {
+    background: rgba(168, 85, 247, 0.2);
+    color: #e9d5ff;
+}
+
+.guardias-tab-btn.active {
+    background: linear-gradient(135deg, #7e22ce, #6b21a8);
+    color: #fff;
+    box-shadow: 0 0 10px rgba(168, 85, 247, 0.3);
+}
+
+.badge-tab-alert {
+    background: #ef4444;
+    color: #fff;
+    font-size: 0.62rem;
+    padding: 1px 6px;
+    border-radius: 8px;
+    font-weight: 900;
+}
+
+/* Filter Toolbar */
+.guardias-filter-toolbar {
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid #1e293b;
+    border-radius: 10px;
+    padding: 10px 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 14px;
+}
+
+.filter-pill {
+    background: #1e293b;
+    border: 1px solid #334155;
+    color: #cbd5e1;
+    font-size: 0.74rem;
+    font-weight: 700;
+    padding: 5px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.filter-pill.active, .filter-pill:hover {
+    background: #7e22ce;
+    border-color: #a855f7;
+    color: #fff;
+}
+
+.search-input-guardias, .date-input-guardias {
+    background: #1e293b;
+    border: 1px solid #334155;
+    color: #fff;
+    font-size: 0.8rem;
+    padding: 6px 12px;
+    border-radius: 6px;
+    outline: none;
+}
+
+.search-input-guardias:focus, .date-input-guardias:focus {
+    border-color: #a855f7;
+}
+
+/* Employee Cards */
+.guardias-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+    gap: 14px;
+}
+
+.emp-guardia-card {
+    background: #0f172a;
+    border: 1.5px solid #334155;
+    border-radius: 12px;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: all 0.2s ease;
+}
+
+.emp-guardia-card:hover {
+    border-color: #a855f7;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+}
+
+.emp-guardia-card.inactivo {
+    opacity: 0.6;
+    border-style: dashed;
+    border-color: #ef4444;
+}
+
+.emp-card-header {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    margin-bottom: 10px;
+}
+
+.emp-avatar-box {
+    width: 42px;
+    height: 42px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #1e1b4b, #3b0764);
+    border: 1px solid #a855f7;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    color: #e9d5ff;
+}
+
+.emp-card-name {
+    margin: 0;
+    color: #fff;
+    font-size: 0.95rem;
+    font-weight: 800;
+}
+
+.emp-card-cargo {
+    font-size: 0.74rem;
+    color: #94a3b8;
+}
+
+.badge-status-emp {
+    font-size: 0.62rem;
+    font-weight: 900;
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+.badge-status-emp.activo {
+    background: rgba(34, 197, 94, 0.2);
+    color: #4ade80;
+    border: 1px solid #16a34a;
+}
+
+.badge-status-emp.inactivo {
+    background: rgba(239, 68, 68, 0.2);
+    color: #f87171;
+    border: 1px solid #dc2626;
+}
+
+.emp-card-details {
+    background: rgba(0,0,0,0.3);
+    border-radius: 8px;
+    padding: 8px 10px;
+    font-size: 0.74rem;
+    color: #cbd5e1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: 12px;
+}
+
+.emp-card-footer {
+    display: flex;
+    gap: 6px;
+    justify-content: flex-end;
+}
+
+.btn-card-action {
+    background: #1e293b;
+    border: 1px solid #334155;
+    color: #cbd5e1;
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    transition: all 0.2s ease;
+}
+
+.btn-card-action:hover {
+    background: #334155;
+    color: #fff;
+}
+
+.btn-danger-action {
+    color: #f87171;
+    border-color: rgba(239, 68, 68, 0.4);
+}
+
+.btn-danger-action:hover {
+    background: #dc2626;
+    color: #fff;
+}
+
+.btn-success-action {
+    color: #4ade80;
+    border-color: rgba(34, 197, 94, 0.4);
+}
+
+.btn-success-action:hover {
+    background: #16a34a;
+    color: #fff;
+}
+
+/* Turnos Matrix Grid */
+.guardias-turnos-matrix-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 14px;
+}
+
+.guardia-turno-column {
+    background: #0f172a;
+    border: 1px solid #334155;
+    border-radius: 12px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.turno-column-hdr {
+    padding: 12px 14px;
+    background: rgba(0, 0, 0, 0.4);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.badge-guardia-count {
+    background: #1e293b;
+    color: #fbbf24;
+    font-size: 0.68rem;
+    font-weight: 800;
+    padding: 2px 7px;
+    border-radius: 8px;
+}
+
+.turno-column-list {
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex: 1;
+}
+
+.guardia-card-item {
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 8px;
+    padding: 8px 10px;
+}
+
+.btn-xs-delete-guardia {
+    background: none;
+    border: none;
+    color: #64748b;
+    font-size: 1.1rem;
+    cursor: pointer;
+    line-height: 1;
+}
+
+.btn-xs-delete-guardia:hover {
+    color: #ef4444;
+}
+
+/* Cruce CRM Layout */
+.cruce-crm-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+@media (max-width: 860px) {
+    .cruce-crm-layout {
+        grid-template-columns: 1fr;
+    }
+}
+
+.cruce-panel-card {
+    background: #0f172a;
+    border: 1px solid #334155;
+    border-radius: 12px;
+    padding: 16px;
+}
+
+.cruce-panel-hdr {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #334155;
+    padding-bottom: 10px;
+    margin-bottom: 12px;
+}
+
+.badge-live-alert {
+    background: #ea580c;
+    color: #fff;
+    font-size: 0.65rem;
+    font-weight: 900;
+    padding: 2px 8px;
+    border-radius: 10px;
+}
+
+.cruce-item-card {
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 8px;
+    padding: 10px;
+    margin-bottom: 10px;
+}
+
+.badge-mesa-state.libre { color: #4ade80; }
+.badge-mesa-state.ocupada { color: #fbbf24; }
+.badge-mesa-state.cuenta { color: #f87171; }
+
+/* Rutas Logistics */
+.rutas-grid-container {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+}
+
+.ruta-master-card {
+    background: #0f172a;
+    border: 1.5px solid #334155;
+    border-radius: 14px;
+    padding: 16px;
+}
+
+.ruta-master-hdr {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    border-bottom: 1px solid #334155;
+    padding-bottom: 12px;
+    margin-bottom: 14px;
+}
+
+.badge-ruta-code {
+    background: #ea580c;
+    color: #fff;
+    font-size: 0.68rem;
+    font-weight: 800;
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+.badge-ruta-state {
+    font-size: 0.68rem;
+    font-weight: 800;
+    padding: 2px 8px;
+    border-radius: 6px;
+    background: rgba(251, 191, 36, 0.15);
+    color: #fbbf24;
+}
+
+.badge-ruta-state.completada {
+    background: rgba(34, 197, 94, 0.15);
+    color: #4ade80;
+}
+
+.ruta-paradas-timeline {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.parada-timeline-item {
+    display: flex;
+    gap: 12px;
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 10px;
+    padding: 12px;
+}
+
+.parada-marker {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: #7e22ce;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    font-weight: 800;
+}
+
+.parada-timeline-item.entregado .parada-marker {
+    background: #16a34a;
+}
+
+.parada-content {
+    flex: 1;
+}
+
+.badge-parada-state {
+    font-size: 0.65rem;
+    font-weight: 800;
+    padding: 1px 6px;
+    border-radius: 4px;
+}
+
+.badge-parada-state.entregado {
+    background: rgba(34, 197, 94, 0.2);
+    color: #4ade80;
+}
+
+.badge-parada-state.pendiente, .badge-parada-state.en_camino {
+    background: rgba(251, 191, 36, 0.2);
+    color: #fbbf24;
+}
+
+.btn-confirm-delivery {
+    background: linear-gradient(135deg, #d97706, #b45309);
+    color: #fff;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+/* Marketplace Cards */
+.marketplace-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 14px;
+}
+
+.swap-card-box {
+    background: #0f172a;
+    border: 1.5px solid #a855f7;
+    border-radius: 12px;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.swap-card-box.aprobado {
+    border-color: #22c55e;
+}
+
+.swap-card-hdr {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 10px;
+}
+
+.badge-swap-id {
+    background: #1e293b;
+    color: #a855f7;
+    font-size: 0.65rem;
+    font-weight: 900;
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+.badge-swap-status {
+    font-size: 0.65rem;
+    font-weight: 900;
+    padding: 2px 8px;
+    border-radius: 6px;
+}
+
+.badge-swap-status.pendiente_aprobacion {
+    background: rgba(251, 191, 36, 0.2);
+    color: #fbbf24;
+}
+
+.badge-swap-status.aprobado {
+    background: rgba(34, 197, 94, 0.2);
+    color: #4ade80;
+}
+
+.badge-swap-status.rechazado {
+    background: rgba(239, 68, 68, 0.2);
+    color: #f87171;
+}
+
+.swap-card-body {
+    font-size: 0.76rem;
+    color: #cbd5e1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    background: rgba(0,0,0,0.3);
+    padding: 8px 10px;
+    border-radius: 8px;
+    margin-bottom: 12px;
+}
+
+.swap-card-footer {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+}
+
+.btn-swap-approve {
+    background: #16a34a;
+    color: #fff;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 0.74rem;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.btn-swap-reject {
+    background: #dc2626;
+    color: #fff;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 0.74rem;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+/* Asistencia Table */
+.asistencia-control-card {
+    background: #0f172a;
+    border: 1px solid #334155;
+    border-radius: 12px;
+    padding: 16px;
+}
+
+.table-viasa-guardias {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.78rem;
+}
+
+.table-viasa-guardias th {
+    background: #1e293b;
+    color: #cbd5e1;
+    padding: 8px 10px;
+    text-align: left;
+    font-weight: 800;
+    border-bottom: 1px solid #334155;
+}
+
+.table-viasa-guardias td {
+    padding: 8px 10px;
+    border-bottom: 1px solid #1e293b;
+}
+
+.badge-evento.entrada { color: #4ade80; }
+.badge-evento.salida { color: #f87171; }
+
+/* ========================================================================== */
+/* VIASA SYSTEM - MÓDULO DE SEGURIDAD, RBAC 5 NIVELES Y AUTO-LOCK SCREEN      */
+/* ========================================================================== */
+
+/* Insignias Jerárquicas Corporativas */
+.badge-role-master {
+    background: rgba(245, 158, 11, 0.15);
+    color: #fbbf24;
+    border: 1px solid #f59e0b;
+    font-weight: 800;
+}
+
+.badge-role-omega {
+    background: rgba(59, 130, 246, 0.15);
+    color: #60a5fa;
+    border: 1px solid #3b82f6;
+    font-weight: 800;
+}
+
+.badge-role-sigma {
+    background: rgba(168, 85, 247, 0.15);
+    color: #c084fc;
+    border: 1px solid #a855f7;
+    font-weight: 800;
+}
+
+.badge-role-kappa {
+    background: rgba(16, 185, 129, 0.15);
+    color: #34d399;
+    border: 1px solid #10b981;
+    font-weight: 800;
+}
+
+.badge-role-alfa {
+    background: rgba(6, 182, 212, 0.15);
+    color: #22d3ee;
+    border: 1px solid #06b6d4;
+    font-weight: 800;
+}
+
+/* Pantalla de Bloqueo por Inactividad (Auto-Lock Screen) */
+.viasa-lock-screen {
+    animation: fadeInLock 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes fadeInLock {
+    from {
+        opacity: 0;
+        transform: scale(1.02);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.viasa-lock-card {
+    animation: slideUpLockCard 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes slideUpLockCard {
+    from {
+        opacity: 0;
+        transform: translateY(24px) scale(0.96);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+/* ==========================================================================
+   VIASA SYSTEM - MÓDULO AVANZADO DE EXPEDIENTES, RRHH Y GESTOR DE FOTOS
+   ========================================================================== */
+.emp-form-tabs {
+    display: flex;
+    gap: 6px;
+    background: #0f172a;
+    border-bottom: 1px solid #334155;
+    padding: 8px 14px;
+    overflow-x: auto;
+}
+
+.emp-tab-btn {
+    background: transparent;
+    border: 1px solid transparent;
+    color: #94a3b8;
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+}
+
+.emp-tab-btn:hover {
+    background: rgba(139, 92, 246, 0.15);
+    color: #ddd6fe;
+}
+
+.emp-tab-btn.active {
+    background: linear-gradient(135deg, #6d28d9 0%, #4c1d95 100%);
+    border-color: #8b5cf6;
+    color: #ffffff;
+    box-shadow: 0 2px 10px rgba(139, 92, 246, 0.4);
+}
+
+.emp-tab-panel {
+    animation: fadeIn 0.25s ease;
+}
+
+.viasa-photo-dropzone {
+    border: 2px dashed #818cf8;
+    border-radius: 12px;
+    padding: 22px;
+    text-align: center;
+    background: rgba(30, 27, 75, 0.4);
+    cursor: pointer;
+    transition: all 0.25s ease;
+}
+
+.viasa-photo-dropzone:hover,
+.viasa-photo-dropzone.dragover {
+    border-color: #fbbf24 !important;
+    background: rgba(251, 191, 36, 0.12) !important;
+    box-shadow: 0 0 20px rgba(251, 191, 36, 0.25);
+    transform: scale(1.01);
+}
+
+.rrhh-card-action-bar {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr 0.9fr 0.9fr;
+    gap: 5px;
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid #1e293b;
+}
+
+.rrhh-emp-card-hover {
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.rrhh-emp-card-hover:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.6);
+    border-color: #6366f1;
+}
+
+.badge-inactivo-memoria {
+    background: #450a0a;
+    color: #fca5a5;
+    border: 1px solid #dc2626;
+}
+/* ==========================================================================
+   VIASA SYSTEM - REDISEÑO DE MICROFICHAS RRHH Y BOTONERA HORIZONTAL
+   ========================================================================== */
+.rrhh-emp-card {
+    background: #0f172a;
+    border: 1.5px solid #334155;
+    border-radius: 14px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.45);
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.rrhh-emp-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #4f46e5, #818cf8, #fbbf24);
+    opacity: 0.85;
+}
+
+.rrhh-emp-card:hover {
+    transform: translateY(-4px);
+    border-color: #818cf8;
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.65), 0 0 18px rgba(99, 102, 241, 0.25);
+}
+
+.rrhh-emp-card.rrhh-emp-card-archivado {
+    background: #130e1c !important;
+    border-color: #ef4444 !important;
+    opacity: 0.9;
+}
+
+.rrhh-emp-card.rrhh-emp-card-archivado::before {
+    background: linear-gradient(90deg, #ef4444, #991b1b);
+}
+
+.rrhh-card-action-bar {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 6px !important;
+    margin-top: 12px !important;
+    padding-top: 10px !important;
+    border-top: 1px solid #1e293b !important;
+    width: 100% !important;
+}
+
+.rrhh-action-btn {
+    flex: 1 1 0 !important;
+    min-width: 0 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 4px !important;
+    padding: 7px 4px !important;
+    font-size: 0.72rem !important;
+    font-weight: 800 !important;
+    border-radius: 8px !important;
+    border: 1px solid transparent !important;
+    cursor: pointer !important;
+    white-space: nowrap !important;
+    transition: all 0.2s ease !important;
+    text-align: center !important;
+    line-height: 1.2 !important;
+}
+
+.rrhh-action-btn i {
+    font-size: 0.75rem;
+}
+
+.rrhh-action-btn.btn-expediente {
+    background: linear-gradient(135deg, #4338ca 0%, #312e81 100%) !important;
+    border-color: #6366f1 !important;
+    color: #e0e7ff !important;
+}
+.rrhh-action-btn.btn-expediente:hover {
+    background: linear-gradient(135deg, #4f46e5 0%, #3730a3 100%) !important;
+    border-color: #a5b4fc !important;
+    color: #ffffff !important;
+    box-shadow: 0 2px 8px rgba(99, 102, 241, 0.4) !important;
+}
+
+.rrhh-action-btn.btn-editar {
+    background: #1e1b4b !important;
+    border-color: #7c3aed !important;
+    color: #c4b5fd !important;
+}
+.rrhh-action-btn.btn-editar:hover {
+    background: #2e1065 !important;
+    border-color: #a78bfa !important;
+    color: #ffffff !important;
+    box-shadow: 0 2px 8px rgba(124, 58, 237, 0.4) !important;
+}
+
+.rrhh-action-btn.btn-foto {
+    background: #082f49 !important;
+    border-color: #0284c7 !important;
+    color: #7dd3fc !important;
+}
+.rrhh-action-btn.btn-foto:hover {
+    background: #0369a1 !important;
+    border-color: #38bdf8 !important;
+    color: #ffffff !important;
+    box-shadow: 0 2px 8px rgba(2, 132, 199, 0.4) !important;
+}
+
+.rrhh-action-btn.btn-baja {
+    background: #450a0a !important;
+    border-color: #dc2626 !important;
+    color: #fca5a5 !important;
+}
+.rrhh-action-btn.btn-baja:hover {
+    background: #7f1d1d !important;
+    border-color: #ef4444 !important;
+    color: #ffffff !important;
+    box-shadow: 0 2px 8px rgba(220, 38, 38, 0.4) !important;
+}
+
+.rrhh-action-btn.btn-activar {
+    background: #064e3b !important;
+    border-color: #059669 !important;
+    color: #6ee7b7 !important;
+}
+.rrhh-action-btn.btn-activar:hover {
+    background: #047857 !important;
+    border-color: #10b981 !important;
+    color: #ffffff !important;
+    box-shadow: 0 2px 8px rgba(5, 150, 105, 0.4) !important;
+}
+
+/* ==============================================================================
+   OPTIMIZACIÓN NATIVA PWA (APP-LIKE UX, TOUCH-FRIENDLY & WINDOW CONTROLS OVERLAY)
+   ============================================================================== */
+html, body {
+    overscroll-behavior-y: none;
+    overscroll-behavior-x: none;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+    touch-action: manipulation;
+}
+
+button, .nav-item, .role-pill-btn, .shortcut-card, .rate-badge {
+    touch-action: manipulation;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+input, select, textarea {
+    font-size: max(16px, 0.85rem); /* Previene auto-zoom accidental en iOS/Android */
+}
+
+.view-container.active {
+    animation: viasaFadeInView 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes viasaFadeInView {
+    from { opacity: 0.4; transform: translateY(3px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@media (display-mode: window-controls-overlay) {
+    .app-header {
+        padding-left: env(titlebar-area-x, 16px);
+        padding-right: calc(100vw - env(titlebar-area-width, 100vw) + 16px);
+        -webkit-app-region: drag;
+    }
+    .app-header button, .app-header .rate-badge, .app-header .user-badge-box {
+        -webkit-app-region: no-drag;
+    }
+}

@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>VIASA Móvil &bull; Control de Campo y Guardias</title>
+    <link rel="icon" type="image/png" href="assets/icons/favicon-32x32.png">
+    <!-- FontAwesome 6 Pro CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Outfit e Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Outfit:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #a855f7;
+            --primary-dark: #7e22ce;
+            --gold: #fbbf24;
+            --gold-dark: #d97706;
+            --bg-dark: #070a13;
+            --card-bg: #0f172a;
+            --surface: #1e293b;
+            --border: #334155;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --success: #22c55e;
+            --danger: #ef4444;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: #030712;
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 0;
+            overflow-x: hidden;
+        }
+
+        /* Mobile Shell Frame */
+        .mobile-shell {
+            width: 100%;
+            max-width: 440px;
+            height: 100vh;
+            max-height: 900px;
+            background-color: var(--bg-dark);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            box-shadow: 0 0 40px rgba(0, 0, 0, 0.8);
+            border-radius: 0;
+            overflow: hidden;
+        }
+
+        @media (min-width: 480px) {
+            .mobile-shell {
+                height: 94vh;
+                border-radius: 36px;
+                border: 3px solid #1e293b;
+            }
+        }
+
+        /* Flutter Style Top App Bar */
+        .mobile-app-bar {
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+            border-bottom: 1.5px solid var(--border);
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10;
+        }
+
+        .mobile-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .mobile-logo-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--gold-dark), var(--gold));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #000;
+            font-size: 1.1rem;
+            font-weight: 900;
+            box-shadow: 0 0 10px rgba(251, 191, 36, 0.4);
+        }
+
+        .mobile-brand-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1rem;
+            font-weight: 800;
+            color: #fff;
+            letter-spacing: 0.3px;
+        }
+
+        .mobile-brand-sub {
+            font-size: 0.65rem;
+            color: var(--gold);
+            font-weight: 600;
+            display: block;
+        }
+
+        .sync-badge-mobile {
+            font-size: 0.68rem;
+            font-weight: 700;
+            padding: 4px 8px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            background: rgba(34, 197, 94, 0.15);
+            color: #4ade80;
+            border: 1px solid #16a34a;
+        }
+
+        .sync-badge-mobile.offline {
+            background: rgba(239, 68, 68, 0.15);
+            color: #f87171;
+            border-color: #dc2626;
+        }
+
+        /* User Selector Bar */
+        .user-switch-bar {
+            background: rgba(30, 41, 59, 0.6);
+            padding: 8px 14px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.75rem;
+        }
+
+        .user-select-native {
+            background: #0f172a;
+            color: #fff;
+            border: 1px solid var(--border);
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            outline: none;
+            max-width: 220px;
+        }
+
+        /* Mobile Scrollable Body */
+        .mobile-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        /* Flutter Style Cards */
+        .flt-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 16px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+        }
+
+        .flt-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .flt-card-title {
+            font-size: 0.92rem;
+            font-weight: 800;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Big Check-in Action Buttons */
+        .checkin-btn-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 10px;
+        }
+
+        .flt-big-btn {
+            background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+            border: none;
+            color: #fff;
+            padding: 16px;
+            border-radius: 16px;
+            font-size: 0.88rem;
+            font-weight: 800;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            box-shadow: 0 4px 14px rgba(22, 163, 74, 0.35);
+            transition: all 0.2s ease;
+        }
+
+        .flt-big-btn:active {
+            transform: scale(0.96);
+        }
+
+        .flt-big-btn.btn-salida {
+            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+            box-shadow: 0 4px 14px rgba(220, 38, 38, 0.35);
+        }
+
+        .flt-big-btn i {
+            font-size: 1.6rem;
+        }
+
+        /* Delivery Stops List */
+        .mobile-parada-item {
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 10px;
+        }
+
+        .mobile-parada-item.entregado {
+            border-color: #22c55e;
+            background: rgba(34, 197, 94, 0.08);
+        }
+
+        .btn-qr-confirm {
+            width: 100%;
+            background: linear-gradient(135deg, #d97706, #b45309);
+            color: #fff;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 0.78rem;
+            font-weight: 800;
+            margin-top: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        /* Flutter Bottom Navigation Bar */
+        .mobile-nav-bar {
+            background: #0b0f19;
+            border-top: 1.5px solid var(--border);
+            display: flex;
+            justify-content: space-around;
+            padding: 8px 4px 12px 4px;
+            z-index: 10;
+        }
+
+        .mobile-nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            color: var(--text-muted);
+            font-size: 0.65rem;
+            font-weight: 700;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 10px;
+            transition: all 0.2s ease;
+        }
+
+        .mobile-nav-item i {
+            font-size: 1.15rem;
+        }
+
+        .mobile-nav-item.active {
+            color: var(--gold);
+            background: rgba(251, 191, 36, 0.12);
+        }
+
+        /* Digital Card */
+        .digital-id-card {
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+            border: 2px solid var(--gold);
+            border-radius: 20px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 0 25px rgba(217, 119, 6, 0.3);
+        }
+
+        .id-qr-box {
+            background: #fff;
+            padding: 10px;
+            border-radius: 12px;
+            display: inline-block;
+            margin: 14px 0;
+            box-shadow: 0 0 15px rgba(0,0,0,0.5);
+        }
+
+        .id-qr-box img {
+            width: 140px;
+            height: 140px;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="mobile-shell">
+        <!-- TOP APP BAR -->
+        <header class="mobile-app-bar">
+            <div class="mobile-brand">
+                <div class="mobile-logo-icon">V</div>
+                <div>
+                    <span class="mobile-brand-title">VIASA Móvil</span>
+                    <span class="mobile-brand-sub">Control de Campo y Guardias</span>
+                </div>
+            </div>
+
+            <span class="sync-badge-mobile" id="mobile-sync-status">
+                <i class="fa-solid fa-cloud-arrow-up"></i>
+                <span id="mobile-sync-text">Online</span>
+            </span>
+        </header>
+
+        <!-- SELECTOR DE PERFIL / TRABAJADOR -->
+        <div class="user-switch-bar">
+            <span style="color: var(--text-muted);"><i class="fa-solid fa-user-tag"></i> Empleado:</span>
+            <select id="mobile-user-select" class="user-select-native" onchange="ViasaMobileApp.cambiarUsuario(this.value)">
+                <!-- Dinámico -->
+            </select>
+        </div>
+
+        <!-- SCROLLABLE BODY -->
+        <main class="mobile-body" id="mobile-view-content">
+            <!-- Renderizado dinámicamente según pestaña activa -->
+        </main>
+
+        <!-- BOTTOM NAVIGATION BAR -->
+        <nav class="mobile-nav-bar">
+            <button type="button" class="mobile-nav-item active" id="nav-btn-turno" onclick="ViasaMobileApp.cambiarTab('turno')">
+                <i class="fa-solid fa-calendar-check"></i>
+                <span>Mi Turno</span>
+            </button>
+            <button type="button" class="mobile-nav-item" id="nav-btn-checkin" onclick="ViasaMobileApp.cambiarTab('checkin')">
+                <i class="fa-solid fa-fingerprint"></i>
+                <span>Check-in</span>
+            </button>
+            <button type="button" class="mobile-nav-item" id="nav-btn-despachos" onclick="ViasaMobileApp.cambiarTab('despachos')">
+                <i class="fa-solid fa-truck-fast"></i>
+                <span>Rutas</span>
+            </button>
+            <button type="button" class="mobile-nav-item" id="nav-btn-market" onclick="ViasaMobileApp.cambiarTab('market')">
+                <i class="fa-solid fa-repeat"></i>
+                <span>Swaps</span>
+            </button>
+            <button type="button" class="mobile-nav-item" id="nav-btn-carnet" onclick="ViasaMobileApp.cambiarTab('carnet')">
+                <i class="fa-solid fa-id-badge"></i>
+                <span>Carnet</span>
+            </button>
+        </nav>
+    </div>
+
+    <!-- Scripts Core de VIASA System -->
+    <script src="assets/js/storage-engine.js"></script>
+    <script src="assets/js/database.js"></script>
+    <script src="assets/js/audio-engine.js"></script>
+    <script src="assets/js/guardias-engine.js"></script>
+
+    <script>
+        const ViasaMobileApp = {
+            tabActiva: 'turno',
+            empleadoActualId: 'EMP-001',
+
+            async init() {
+                console.log('[VIASA Mobile] Iniciando Companion App Móvil...');
+                await this.cargarUsuariosSelect();
+                this.actualizarUI();
+            },
+
+            async cargarUsuariosSelect() {
+                const sel = document.getElementById('mobile-user-select');
+                if (!sel) return;
+                const emps = await window.ViasaGuardiasEngine.obtenerEmpleados();
+                const activos = emps.filter(e => e.estado === 'activo');
+                sel.innerHTML = activos.map(e => `
+                    <option value="${e.id}">${e.nombreCompleto || e.nombres} &bull; ${e.cargo}</option>
+                `).join('');
+                if (activos.length > 0) {
+                    this.empleadoActualId = activos[0].id;
+                }
+            },
+
+            cambiarUsuario(empId) {
+                this.empleadoActualId = empId;
+                if (window.ViasaAudio) window.ViasaAudio.playClick();
+                this.actualizarUI();
+            },
+
+            cambiarTab(tab) {
+                this.tabActiva = tab;
+                document.querySelectorAll('.mobile-nav-item').forEach(btn => btn.classList.remove('active'));
+                const btn = document.getElementById(`nav-btn-${tab}`);
+                if (btn) btn.classList.add('active');
+                if (window.ViasaAudio) window.ViasaAudio.playClick();
+                this.actualizarUI();
+            },
+
+            async actualizarUI() {
+                const container = document.getElementById('mobile-view-content');
+                if (!container) return;
+
+                const emps = await window.ViasaGuardiasEngine.obtenerEmpleados();
+                const emp = emps.find(e => e.id === this.empleadoActualId) || emps[0];
+                const guardias = await window.ViasaGuardiasEngine.obtenerGuardias();
+                const hoy = new Date().toISOString().split('T')[0];
+                const guardiaHoy = guardias.find(g => g.empleadoId === emp.id && g.fecha === hoy);
+
+                if (this.tabActiva === 'turno') {
+                    container.innerHTML = `
+                        <!-- Tarjeta Mi Guardia -->
+                        <div class="flt-card">
+                            <div class="flt-card-header">
+                                <span class="flt-card-title"><i class="fa-solid fa-calendar-day" style="color:var(--gold);"></i> Mi Guardia de Hoy</span>
+                                <span style="font-size:0.72rem; color:#4ade80; font-weight:800; background:rgba(34,197,94,0.15); padding:2px 8px; border-radius:10px;">
+                                    ${guardiaHoy ? 'EN TURNO' : 'DESCANSO'}
+                                </span>
+                            </div>
+
+                            <div style="font-size: 1.1rem; font-weight: 900; color: #fff; margin-bottom: 4px;">
+                                ${emp.nombreCompleto || emp.nombres}
+                            </div>
+                            <div style="font-size: 0.78rem; color: #94a3b8; margin-bottom: 12px;">
+                                ${emp.cargo} &bull; <strong style="color:var(--gold);">${emp.departamento}</strong>
+                            </div>
+
+                            ${guardiaHoy ? `
+                                <div style="background: rgba(0,0,0,0.35); border-left: 3px solid var(--gold); padding: 10px; border-radius: 6px; font-size: 0.8rem; line-height: 1.4;">
+                                    <div><strong>Horario Asignado:</strong> ${guardiaHoy.horaEntrada} - ${guardiaHoy.horaSalida}</div>
+                                    <div><strong>Ubicación:</strong> ${guardiaHoy.ubicacionAsignada || 'Sede La Sabanita'}</div>
+                                    <div><strong>Supervisor de Guardia:</strong> ${guardiaHoy.supervisor || 'Gerente General'}</div>
+                                </div>
+                            ` : `
+                                <div style="background: rgba(0,0,0,0.35); padding: 10px; border-radius: 6px; font-size: 0.8rem; color: #94a3b8;">
+                                    No tienes guardia programada para hoy. Puedes postularte a guardias disponibles en la sección <strong>Swaps</strong>.
+                                </div>
+                            `}
+                        </div>
+
+                        <!-- Acciones Rápidas -->
+                        <div class="flt-card">
+                            <span class="flt-card-title" style="margin-bottom:10px;"><i class="fa-solid fa-bolt" style="color:#38bdf8;"></i> Acceso Rápido</span>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                                <button type="button" class="btn-qr-confirm" style="background:#0284c7; padding:12px;" onclick="ViasaMobileApp.cambiarTab('checkin')">
+                                    <i class="fa-solid fa-fingerprint"></i> Marcar Asistencia
+                                </button>
+                                <button type="button" class="btn-qr-confirm" style="background:#7e22ce; padding:12px;" onclick="ViasaMobileApp.cambiarTab('market')">
+                                    <i class="fa-solid fa-repeat"></i> Solicitar Cambio
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                } else if (this.tabActiva === 'checkin') {
+                    container.innerHTML = `
+                        <div class="flt-card">
+                            <div class="flt-card-header">
+                                <span class="flt-card-title"><i class="fa-solid fa-fingerprint" style="color:#4ade80;"></i> Check-in por Proximidad</span>
+                                <span style="font-size:0.7rem; color:#38bdf8;"><i class="fa-solid fa-location-crosshairs"></i> GPS Activo</span>
+                            </div>
+                            <p style="font-size:0.75rem; color:#94a3b8; margin-bottom:12px;">
+                                Registra tu hora de entrada y salida validada con geocerca en La Sabanita, Ciudad Bolívar.
+                            </p>
+
+                            <div class="checkin-btn-grid">
+                                <button type="button" class="flt-big-btn" onclick="ViasaMobileApp.ejecutarCheckIn('entrada')">
+                                    <i class="fa-solid fa-right-to-bracket"></i>
+                                    <span>MARCAR ENTRADA</span>
+                                </button>
+                                <button type="button" class="flt-big-btn btn-salida" onclick="ViasaMobileApp.ejecutarCheckIn('salida')">
+                                    <i class="fa-solid fa-right-from-bracket"></i>
+                                    <span>MARCAR SALIDA</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="flt-card" style="text-align:center;">
+                            <span class="flt-card-title" style="justify-content:center; margin-bottom:6px;"><i class="fa-solid fa-qrcode" style="color:var(--gold);"></i> Mi Token QR Dinámico</span>
+                            <div class="id-qr-box">
+                                <img src="https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=${encodeURIComponent(emp.qrToken || `VIASA-${emp.cedula}`)}&color=0f172a" alt="QR">
+                            </div>
+                            <div style="font-size:0.75rem; color:#94a3b8;">Muestra este código al escáner de la panadería</div>
+                        </div>
+                    `;
+                } else if (this.tabActiva === 'despachos') {
+                    const rutas = await window.ViasaGuardiasEngine.obtenerRutasDespacho();
+                    container.innerHTML = `
+                        <div class="flt-card-header" style="margin-bottom:6px;">
+                            <span class="flt-card-title"><i class="fa-solid fa-route" style="color:#fb923c;"></i> Rutas de Despacho</span>
+                            <span style="font-size:0.72rem; color:var(--gold); font-weight:800;">Ciudad Bolívar</span>
+                        </div>
+
+                        ${rutas.map(r => `
+                            <div class="flt-card" style="margin-bottom:12px;">
+                                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                                    <strong style="color:#fff; font-size:0.9rem;">${r.nombreRuta}</strong>
+                                    <span style="font-size:0.68rem; color:#4ade80; background:rgba(34,197,94,0.15); padding:2px 6px; border-radius:6px; font-weight:800;">${r.estado.toUpperCase()}</span>
+                                </div>
+                                <div style="font-size:0.72rem; color:#94a3b8; margin-bottom:8px;">Chofer: ${r.choferNombre} &bull; ${r.vehiculo}</div>
+
+                                ${r.paradas.map(p => `
+                                    <div class="mobile-parada-item ${p.estado}">
+                                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                                            <strong style="color:#fff; font-size:0.82rem;">${p.paradaNum}. ${p.clienteNombre}</strong>
+                                            <span style="font-size:0.68rem; color:${p.estado === 'entregado' ? '#4ade80' : '#fbbf24'}; font-weight:800;">${p.estado.toUpperCase()}</span>
+                                        </div>
+                                        <div style="font-size:0.72rem; color:#94a3b8; margin:2px 0;">${p.direccion}</div>
+                                        <div style="font-size:0.72rem; color:#cbd5e1;">📦 ${p.tipoCarga} ($${p.montoUSD})</div>
+                                        ${p.estado !== 'entregado' ? `
+                                            <button type="button" class="btn-qr-confirm" onclick="ViasaMobileApp.confirmarEntrega('${r.id}', ${p.paradaNum})">
+                                                <i class="fa-solid fa-qrcode"></i> Confirmar Entrega QR
+                                            </button>
+                                        ` : `
+                                            <div style="font-size:0.68rem; color:#4ade80; margin-top:4px;">
+                                                <i class="fa-solid fa-check-circle"></i> Entregado a ${p.horaEntrega} (${p.firmadoPor})
+                                            </div>
+                                        `}
+                                    </div>
+                                `).join('')}
+                            </div>
+                        `).join('')}
+                    `;
+                } else if (this.tabActiva === 'market') {
+                    const swaps = await window.ViasaGuardiasEngine.obtenerShiftMarketplace();
+                    container.innerHTML = `
+                        <div class="flt-card">
+                            <div class="flt-card-header">
+                                <span class="flt-card-title"><i class="fa-solid fa-repeat" style="color:#a855f7;"></i> Shift Marketplace</span>
+                                <button type="button" class="btn-qr-confirm" style="background:#7e22ce; padding:4px 8px; width:auto;" onclick="ViasaMobileApp.pedirSwapRapido()">
+                                    + Pedir Cambio
+                                </button>
+                            </div>
+                            <p style="font-size:0.75rem; color:#94a3b8; margin-bottom:10px;">Intercambia o postúlate a guardias con tus compañeros de equipo.</p>
+
+                            ${swaps.map(s => `
+                                <div style="background:rgba(0,0,0,0.3); border:1px solid var(--border); border-radius:10px; padding:10px; margin-bottom:8px;">
+                                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                                        <strong style="color:#fff; font-size:0.85rem;">${s.solicitanteNombre}</strong>
+                                        <span style="font-size:0.65rem; color:#fbbf24; font-weight:800;">${s.estado.toUpperCase()}</span>
+                                    </div>
+                                    <div style="font-size:0.72rem; color:#94a3b8;">${s.fechaGuardia} &bull; ${s.turnoOriginal} (${s.departamento})</div>
+                                    <div style="font-size:0.72rem; color:#cbd5e1; margin-top:3px;">"${s.motivo}"</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                } else if (this.tabActiva === 'carnet') {
+                    container.innerHTML = `
+                        <div class="digital-id-card">
+                            <div style="font-size:0.7rem; font-weight:800; color:var(--gold); letter-spacing:1px; margin-bottom:4px;">
+                                PANADERÍA NUEVA VIASA, C.A.
+                            </div>
+                            <h2 style="color:#fff; font-size:1.15rem; font-weight:900;">${emp.nombreCompleto || emp.nombres}</h2>
+                            <div style="font-size:0.8rem; color:#38bdf8; font-weight:700;">${emp.cargo}</div>
+                            <div style="font-size:0.75rem; color:#94a3b8;">C.I: ${emp.cedula} &bull; RIF: J-31163165-8</div>
+
+                            <div class="id-qr-box">
+                                <img src="https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=${encodeURIComponent(emp.qrToken || `VIASA-${emp.cedula}`)}&color=0f172a" alt="QR Carnet">
+                            </div>
+
+                            <div style="font-size:0.75rem; color:#cbd5e1; display:flex; justify-content:space-around; background:rgba(0,0,0,0.4); padding:8px; border-radius:8px;">
+                                <div><span style="color:#94a3b8;">PIN:</span> <strong>${emp.pinAcceso || '1234'}</strong></div>
+                                <div><span style="color:#94a3b8;">Depto:</span> <strong>${emp.departamento}</strong></div>
+                            </div>
+                        </div>
+                    `;
+                }
+            },
+
+            async ejecutarCheckIn(tipo) {
+                await window.ViasaGuardiasEngine.registrarCheckIn(this.empleadoActualId, tipo, 'app_movil_gps');
+                this.actualizarUI();
+            },
+
+            async confirmarEntrega(rutaId, paradaNum) {
+                await window.ViasaGuardiasEngine.confirmarEntregaParada(rutaId, paradaNum);
+                this.actualizarUI();
+            },
+
+            async pedirSwapRapido() {
+                const motivo = prompt('Indica el motivo de tu solicitud de cambio de guardia:', 'Asunto personal / Cita médica');
+                if (!motivo) return;
+                alert('Solicitud enviada a la Bolsa de Guardias para aprobación del supervisor.');
+            }
+        };
+
+        window.addEventListener('DOMContentLoaded', () => ViasaMobileApp.init());
+    </script>
+</body>
+</html>

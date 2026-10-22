@@ -1,0 +1,25 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+</head>
+<body>
+    <div id="log-output">ANALYZING...</div>
+    <script>
+        window.addEventListener('DOMContentLoaded', async function() {
+            var out = document.getElementById('log-output');
+            try {
+                const resp = await fetch('assets/js/database.js');
+                const code = await resp.text();
+                try {
+                    new Function(code);
+                    out.innerText = 'DATABASE_JS_VALID: SUCCESS! Code length: ' + code.length;
+                } catch(syntaxErr) {
+                    out.innerText = 'SYNTAX_ERROR: ' + syntaxErr.message + ' | STACK: ' + syntaxErr.stack;
+                }
+            } catch(e) {
+                out.innerText = 'FETCH_ERROR: ' + e.message;
+            }
+        });
+    </script>
+</body>
+</html>
