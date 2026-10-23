@@ -187,7 +187,10 @@
                 partidasConciliacion: this.partidasConciliacion,
                 libroDiario: this.libroDiario,
                 libroVacaciones: this.libroVacaciones,
-                libroHorasExtras: this.libroHorasExtras
+                libroHorasExtras: this.libroHorasExtras,
+                libroAsistenciaLOTTT: this.libroAsistenciaLOTTT,
+                partidasBalances: this.partidasBalances,
+                costosRecetas: this.costosRecetas
             };
             window.ViasaStorage.setItem('viasa_contabilidad_seniat_v3', payload);
         },
@@ -2578,16 +2581,27 @@
         },
 
         renderSubTabAsistenciaLOTTT() {
-            const emps = (window.ViasaDatabase && window.ViasaDatabase.empleados) ? window.ViasaDatabase.empleados : [];
-            const filas = emps.slice(0, 8).map((e, i) => `
+            if (!Array.isArray(this.libroAsistenciaLOTTT) || this.libroAsistenciaLOTTT.length === 0) {
+                const emps = (window.ViasaDatabase && window.ViasaDatabase.empleados) ? window.ViasaDatabase.empleados : [];
+                this.libroAsistenciaLOTTT = emps.slice(0, 8).map((e, i) => ({
+                    id: `ASIS-00${i + 1}`,
+                    cedula: e.cedula || `V-18.452.90${i + 1}`,
+                    trabajador: e.nombreCompleto || `${e.nombres || 'Operador'} ${e.apellidos || 'Viasa'}`,
+                    cargo: e.cargo || 'Maestro Panadero / Operador',
+                    departamento: e.departamento || 'Fabricación',
+                    horario: e.horarioDefecto || e.horarioTexto || '06:00 - 14:00',
+                    estatus: '100% Asistencia Verificada QR'
+                }));
+            }
+            const filas = this.libroAsistenciaLOTTT.map((e, i) => `
                 <tr>
                     <td>${i + 1}</td>
-                    <td class="cnt-mono" style="text-align:left !important;">${e.cedula || 'V-18.452.901'}</td>
-                    <td><strong>${e.nombreCompleto || `${e.nombres || ''} ${e.apellidos || ''}`}</strong></td>
-                    <td>${e.cargo || 'Operador de Planta'}</td>
-                    <td><span class="cnt-badge cnt-badge-blue">${e.departamento || 'Fabricación'}</span></td>
-                    <td class="cnt-mono">${e.horarioDefecto || e.horarioTexto || '06:00 - 14:00'}</td>
-                    <td><span class="cnt-badge cnt-badge-emerald">100% Asistencia Verificada QR</span></td>
+                    <td class="cnt-mono" style="text-align:left !important;">${e.cedula}</td>
+                    <td><strong>${e.trabajador}</strong></td>
+                    <td>${e.cargo}</td>
+                    <td><span class="cnt-badge cnt-badge-blue">${e.departamento}</span></td>
+                    <td class="cnt-mono">${e.horario}</td>
+                    <td><span class="cnt-badge ${String(e.estatus).includes('ANULADO') ? 'cnt-badge-red' : 'cnt-badge-emerald'}">${e.estatus}</span></td>
                 </tr>
             `).join('');
 
@@ -2917,13 +2931,16 @@
         },
 
         renderSubTabCentroCostosSUNDDE() {
-            const productosCostos = [
-                { codigo: 'REC-01', producto: 'Pan Canilla Tradicional (Unidad 250g)', linea: 'Panadería Exenta', costoMPUSD: 0.28, costoMODyCIFUSD: 0.14, precioVentaSinIVAUSD: 0.54, exento: true },
-                { codigo: 'REC-02', producto: 'Pan Francés / Campesino (Bolsa 6 Unid.)', linea: 'Panadería Exenta', costoMPUSD: 0.62, costoMODyCIFUSD: 0.26, precioVentaSinIVAUSD: 1.14, exento: true },
-                { codigo: 'REC-03', producto: 'Cachito de Jamón Ahumado Viasa', linea: 'Pastelería / Cafetín (16%)', costoMPUSD: 0.68, costoMODyCIFUSD: 0.27, precioVentaSinIVAUSD: 1.23, exento: false },
-                { codigo: 'REC-04', producto: 'Pan de Jamón Tradicional Guayanés (1.2 kg)', linea: 'Especialidad (16%)', costoMPUSD: 6.40, costoMODyCIFUSD: 2.10, precioVentaSinIVAUSD: 11.05, exento: false },
-                { codigo: 'REC-05', producto: 'Torta Milhojas y Pastelería Fina (Porción)', linea: 'Pastelería (16%)', costoMPUSD: 1.10, costoMODyCIFUSD: 0.45, precioVentaSinIVAUSD: 2.00, exento: false }
-            ];
+            if (!Array.isArray(this.costosRecetas) || this.costosRecetas.length === 0) {
+                this.costosRecetas = [
+                    { codigo: 'REC-01', producto: 'Pan Canilla Tradicional (Unidad 250g)', linea: 'Panadería Exenta', costoMPUSD: 0.28, costoMODyCIFUSD: 0.14, precioVentaSinIVAUSD: 0.54, exento: true },
+                    { codigo: 'REC-02', producto: 'Pan Francés / Campesino (Bolsa 6 Unid.)', linea: 'Panadería Exenta', costoMPUSD: 0.62, costoMODyCIFUSD: 0.26, precioVentaSinIVAUSD: 1.14, exento: true },
+                    { codigo: 'REC-03', producto: 'Cachito de Jamón Ahumado Viasa', linea: 'Pastelería / Cafetín (16%)', costoMPUSD: 0.68, costoMODyCIFUSD: 0.27, precioVentaSinIVAUSD: 1.23, exento: false },
+                    { codigo: 'REC-04', producto: 'Pan de Jamón Tradicional Guayanés (1.2 kg)', linea: 'Especialidad (16%)', costoMPUSD: 6.40, costoMODyCIFUSD: 2.10, precioVentaSinIVAUSD: 11.05, exento: false },
+                    { codigo: 'REC-05', producto: 'Torta Milhojas y Pastelería Fina (Porción)', linea: 'Pastelería (16%)', costoMPUSD: 1.10, costoMODyCIFUSD: 0.45, precioVentaSinIVAUSD: 2.00, exento: false }
+                ];
+            }
+            const productosCostos = this.costosRecetas;
 
             const filas = productosCostos.map(p => {
                 const costoTotalUSD = MathFin.add(p.costoMPUSD, p.costoMODyCIFUSD);
