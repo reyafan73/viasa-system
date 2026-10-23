@@ -8077,3 +8077,573 @@ input, select, textarea {
         -webkit-app-region: no-drag;
     }
 }
+
+/* ==============================================================================
+   MÓDULO CONTABILIDAD Y SENIAT: LIGHT ENTERPRISE UI (ESTÉTICA CORPORATIVA CLARA)
+   Panadería Nueva Viasa, C.A. • RIF: J-31163165-8 • La Sabanita, Ciudad Bolívar
+   ============================================================================== */
+
+#view-contabilidad {
+    background: #F8FAFC !important;
+    color: #0F172A !important;
+    border-radius: 16px;
+    padding: 0 !important;
+    min-height: calc(100vh - 90px);
+}
+
+.cnt-light-workspace {
+    background: #F8FAFC;
+    color: #0F172A;
+    padding: 22px 24px 36px 24px;
+    border-radius: 16px;
+    font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+/* Tipografía Numérica Tabular Contable */
+.cnt-num,
+.cnt-table td.num,
+.cnt-table th.num,
+.cnt-mono {
+    font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', 'Courier New', monospace !important;
+    font-variant-numeric: tabular-nums !important;
+    text-align: right !important;
+    letter-spacing: -0.2px;
+}
+
+/* Cabecera Ejecutiva Luminosa */
+.cnt-exec-header {
+    background: #FFFFFF;
+    border: 1px solid #E2E8F0;
+    border-top: 4px solid #2563EB;
+    border-radius: 14px;
+    padding: 18px 22px;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06), 0 1px 2px rgba(15, 23, 42, 0.04);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.cnt-brand-block {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.cnt-brand-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%);
+    border: 1px solid #BFDBFE;
+    color: #1D4ED8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    flex-shrink: 0;
+}
+
+.cnt-title {
+    margin: 0 0 3px 0;
+    font-size: 1.32rem;
+    font-weight: 800;
+    color: #0F172A;
+    letter-spacing: -0.3px;
+}
+
+.cnt-subtitle {
+    font-size: 0.8rem;
+    color: #64748B;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.cnt-rates-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.cnt-rate-pill {
+    background: #F8FAFC;
+    border: 1px solid #CBD5E1;
+    border-radius: 10px;
+    padding: 6px 12px;
+    display: flex;
+    flex-direction: column;
+    min-width: 128px;
+}
+
+.cnt-rate-pill.bcv {
+    background: #EFF6FF;
+    border-color: #93C5FD;
+}
+
+.cnt-rate-pill.usdt {
+    background: #ECFDF5;
+    border-color: #6EE7B7;
+}
+
+.cnt-rate-lbl {
+    font-size: 0.65rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    color: #475569;
+    letter-spacing: 0.4px;
+}
+
+.cnt-rate-val {
+    font-family: 'Consolas', monospace;
+    font-variant-numeric: tabular-nums;
+    font-size: 0.94rem;
+    font-weight: 900;
+    color: #0F172A;
+}
+
+/* Cinta de KPIs Financieros */
+.cnt-kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 12px;
+}
+
+@media (max-width: 1200px) {
+    .cnt-kpi-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 700px) {
+    .cnt-kpi-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+.cnt-kpi-card {
+    background: #FFFFFF;
+    border: 1px solid #E2E8F0;
+    border-radius: 12px;
+    padding: 14px 16px;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: all 0.18s ease;
+    cursor: pointer;
+}
+
+.cnt-kpi-card:hover {
+    border-color: #93C5FD;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.08);
+    transform: translateY(-1px);
+}
+
+.cnt-kpi-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+}
+
+.cnt-kpi-label {
+    font-size: 0.72rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    color: #64748B;
+    letter-spacing: 0.3px;
+}
+
+.cnt-kpi-icon {
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+}
+
+.cnt-kpi-icon.blue { background: #EFF6FF; color: #2563EB; }
+.cnt-kpi-icon.emerald { background: #ECFDF5; color: #059669; }
+.cnt-kpi-icon.amber { background: #FFFBEB; color: #D97706; }
+.cnt-kpi-icon.red { background: #FEF2F2; color: #DC2626; }
+.cnt-kpi-icon.indigo { background: #EEF2FF; color: #4F46E5; }
+
+.cnt-kpi-amount-bs {
+    font-family: 'Consolas', monospace;
+    font-variant-numeric: tabular-nums;
+    font-size: 1.15rem;
+    font-weight: 900;
+    color: #0F172A;
+    line-height: 1.2;
+}
+
+.cnt-kpi-amount-usd {
+    font-family: 'Consolas', monospace;
+    font-variant-numeric: tabular-nums;
+    font-size: 0.76rem;
+    font-weight: 700;
+    color: #475569;
+    margin-top: 2px;
+}
+
+/* Barra de 6 Centros de Operaciones (Tabs Principales) */
+.cnt-main-tabs {
+    background: #FFFFFF;
+    border: 1px solid #E2E8F0;
+    border-radius: 12px;
+    padding: 6px;
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+}
+
+.cnt-main-tab-btn {
+    flex: 1 1 auto;
+    background: transparent;
+    border: 1px solid transparent;
+    color: #475569;
+    font-size: 0.79rem;
+    font-weight: 700;
+    padding: 10px 14px;
+    border-radius: 9px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    white-space: nowrap;
+    transition: all 0.18s ease;
+}
+
+.cnt-main-tab-btn:hover {
+    background: #F1F5F9;
+    color: #0F172A;
+}
+
+.cnt-main-tab-btn.active {
+    background: #2563EB;
+    color: #FFFFFF;
+    font-weight: 800;
+    border-color: #1D4ED8;
+    box-shadow: 0 2px 8px rgba(37, 99, 235, 0.25);
+}
+
+.cnt-main-tab-btn.active i {
+    color: #FFFFFF !important;
+}
+
+/* Sub-pestañas secundarias dentro de cada Centro de Operaciones */
+.cnt-subtabs {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    border-bottom: 1px solid #E2E8F0;
+    padding-bottom: 10px;
+    margin-bottom: 14px;
+}
+
+.cnt-subtab-pill {
+    background: #FFFFFF;
+    border: 1px solid #CBD5E1;
+    color: #334155;
+    font-size: 0.76rem;
+    font-weight: 700;
+    padding: 7px 14px;
+    border-radius: 999px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.15s ease;
+}
+
+.cnt-subtab-pill:hover {
+    background: #F1F5F9;
+    border-color: #94A3B8;
+    color: #0F172A;
+}
+
+.cnt-subtab-pill.active {
+    background: #EFF6FF;
+    border-color: #2563EB;
+    color: #1D4ED8;
+    font-weight: 800;
+    box-shadow: 0 1px 4px rgba(37, 99, 235, 0.12);
+}
+
+/* Superficies de Tarjetas y Paneles Claros */
+.cnt-card {
+    background: #FFFFFF;
+    border: 1px solid #E2E8F0;
+    border-radius: 14px;
+    padding: 18px 20px;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
+}
+
+.cnt-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding-bottom: 12px;
+    margin-bottom: 14px;
+    border-bottom: 1px solid #E2E8F0;
+}
+
+.cnt-card-title {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 800;
+    color: #0F172A;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.cnt-card-sub {
+    font-size: 0.76rem;
+    color: #64748B;
+    margin-top: 2px;
+}
+
+/* Tablas Contables y Fiscales de Alta Densidad */
+.cnt-table-wrap {
+    width: 100%;
+    overflow-x: auto;
+    border: 1px solid #E2E8F0;
+    border-radius: 10px;
+    background: #FFFFFF;
+}
+
+.cnt-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.76rem;
+    color: #0F172A;
+}
+
+.cnt-table thead th {
+    background: #F1F5F9;
+    color: #334155;
+    font-weight: 800;
+    text-transform: uppercase;
+    font-size: 0.68rem;
+    letter-spacing: 0.3px;
+    padding: 10px 10px;
+    border-bottom: 2px solid #CBD5E1;
+    text-align: left;
+    white-space: nowrap;
+}
+
+.cnt-table tbody td {
+    padding: 9px 10px;
+    border-bottom: 1px solid #E2E8F0;
+    color: #1E293B;
+    vertical-align: middle;
+}
+
+.cnt-table tbody tr:hover {
+    background: #F8FAFC;
+}
+
+.cnt-table tfoot td,
+.cnt-table tfoot th {
+    background: #F1F5F9;
+    color: #0F172A;
+    font-weight: 900;
+    padding: 10px 10px;
+    border-top: 2px solid #94A3B8;
+}
+
+/* Botones Ejecutivos Claros */
+.cnt-btn {
+    border-radius: 8px;
+    padding: 8px 14px;
+    font-size: 0.77rem;
+    font-weight: 700;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    border: 1px solid transparent;
+    transition: all 0.16s ease;
+    white-space: nowrap;
+}
+
+.cnt-btn-primary {
+    background: #2563EB;
+    color: #FFFFFF;
+    border-color: #1D4ED8;
+}
+.cnt-btn-primary:hover {
+    background: #1D4ED8;
+    box-shadow: 0 4px 10px rgba(37, 99, 235, 0.25);
+}
+
+.cnt-btn-emerald {
+    background: #059669;
+    color: #FFFFFF;
+    border-color: #047857;
+}
+.cnt-btn-emerald:hover {
+    background: #047857;
+    box-shadow: 0 4px 10px rgba(5, 150, 105, 0.25);
+}
+
+.cnt-btn-amber {
+    background: #D97706;
+    color: #FFFFFF;
+    border-color: #B45309;
+}
+.cnt-btn-amber:hover {
+    background: #B45309;
+}
+
+.cnt-btn-outline {
+    background: #FFFFFF;
+    color: #334155;
+    border-color: #CBD5E1;
+}
+.cnt-btn-outline:hover {
+    background: #F1F5F9;
+    color: #0F172A;
+    border-color: #94A3B8;
+}
+
+/* Badges Contables y Fiscales */
+.cnt-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 0.67rem;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.cnt-badge-emerald {
+    background: #DCFCE7;
+    color: #166534;
+    border: 1px solid #86EFAC;
+}
+
+.cnt-badge-blue {
+    background: #DBEAFE;
+    color: #1E40AF;
+    border: 1px solid #93C5FD;
+}
+
+.cnt-badge-amber {
+    background: #FEF3C7;
+    color: #92400E;
+    border: 1px solid #FDE68A;
+}
+
+.cnt-badge-red {
+    background: #FEE2E2;
+    color: #991B1B;
+    border: 1px solid #FCA5A5;
+}
+
+.cnt-badge-slate {
+    background: #F1F5F9;
+    color: #334155;
+    border: 1px solid #CBD5E1;
+}
+
+/* Controles de Formulario en Tema Claro */
+.cnt-input,
+.cnt-select {
+    background: #FFFFFF !important;
+    border: 1px solid #CBD5E1 !important;
+    color: #0F172A !important;
+    border-radius: 8px !important;
+    padding: 7px 11px !important;
+    font-size: 0.8rem !important;
+    font-weight: 600;
+    outline: none;
+    box-sizing: border-box;
+}
+
+.cnt-input:focus,
+.cnt-select:focus {
+    border-color: #2563EB !important;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15) !important;
+}
+
+.cnt-label {
+    display: block;
+    font-size: 0.73rem;
+    font-weight: 700;
+    color: #334155;
+    margin-bottom: 4px;
+}
+
+/* Zona Drag & Drop OCR IA Fiscal */
+.cnt-ocr-dropzone {
+    background: #F8FAFC;
+    border: 2px dashed #93C5FD;
+    border-radius: 14px;
+    padding: 24px 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.cnt-ocr-dropzone:hover,
+.cnt-ocr-dropzone.dragover {
+    background: #EFF6FF;
+    border-color: #2563EB;
+    box-shadow: 0 4px 16px rgba(37, 99, 235, 0.1);
+}
+
+/* Banner del Principio de Registro Único en 4 Vías */
+.cnt-fourway-banner {
+    background: linear-gradient(90deg, #EFF6FF 0%, #F0FDF4 100%);
+    border: 1px solid #BFDBFE;
+    border-left: 4px solid #2563EB;
+    border-radius: 10px;
+    padding: 10px 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    font-size: 0.76rem;
+    color: #1E3A8A;
+}
+
+.cnt-fourway-steps {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.cnt-fourway-pill {
+    background: #FFFFFF;
+    border: 1px solid #93C5FD;
+    color: #1D4ED8;
+    font-size: 0.7rem;
+    font-weight: 800;
+    padding: 3px 9px;
+    border-radius: 6px;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+

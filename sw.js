@@ -11,7 +11,7 @@
  *  5. Control de Versiones -> skipWaiting + clientsClaim + Notificación Interactiva
  */
 
-const SW_VERSION = '2.7.0';
+const SW_VERSION = '2.8.0';
 const STATIC_CACHE = `viasa-static-v${SW_VERSION}`;
 const DYNAMIC_CACHE = `viasa-dynamic-v${SW_VERSION}`;
 const MEDIA_CACHE = `viasa-media-v${SW_VERSION}`;
@@ -22,7 +22,7 @@ const APP_SHELL_ASSETS = [
     './manifest.json',
     './favicon.png',
     './assets/css/main.css',
-    './assets/css/main.css?v=2.7',
+    './assets/css/main.css?v=2.8',
     './assets/js/storage-engine.js',
     './assets/js/database.js',
     './assets/js/barcode-qr-engine.js',
@@ -30,9 +30,13 @@ const APP_SHELL_ASSETS = [
     './assets/js/driver-aclas-cr2050.js',
     './assets/js/audio-engine.js',
     './assets/js/guardias-engine.js',
+    './assets/js/guardias-engine.js?v=2.8',
+    './assets/js/contabilidad-seniat-engine.js',
+    './assets/js/contabilidad-seniat-engine.js?v=2.8',
     './assets/js/supabase-cloud.js',
     './assets/js/auth.js',
     './assets/js/app.js',
+    './assets/js/app.js?v=2.8',
     './assets/icons/favicon-16x16.png',
     './assets/icons/favicon-32x32.png',
     './assets/icons/favicon-48x48.png',

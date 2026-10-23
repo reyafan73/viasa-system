@@ -9704,6 +9704,10 @@
         },
 
         renderContabilidad() {
+            if (window.ViasaContabilidadEngine && typeof window.ViasaContabilidadEngine.render === 'function') {
+                window.ViasaContabilidadEngine.render();
+                return;
+            }
             const container = document.getElementById('contabilidad-content');
             if (!container) return;
 
