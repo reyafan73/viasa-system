@@ -1045,6 +1045,10 @@
                 contenidoTabHTML = this.renderTab5Laboral();
             } else if (this.tabPrincipal === 'tab6_contadora') {
                 contenidoTabHTML = this.renderTab6Contadora(kpi, auditoria);
+            } else if (this.tabPrincipal === 'tab7_migracion_excel') {
+                contenidoTabHTML = window.ViasaExcelMigrationAssistant
+                    ? window.ViasaExcelMigrationAssistant.renderWizardHTML()
+                    : '<div class="cnt-card">Inicializando Asistente de Migración desde Excel...</div>';
             }
 
             container.innerHTML = `
@@ -1088,6 +1092,9 @@
                                     <option value="2026-08" ${this.periodoFiscal === '2026-08' ? 'selected' : ''}>Período: Agosto 2026</option>
                                 </select>
                             </div>
+                            <button type="button" class="cnt-btn cnt-btn-emerald" onclick="ViasaContabilidadEngine.cambiarTabPrincipal('tab7_migracion_excel')" title="Asistente Inteligente de Migración de Datos Financieros desde Excel (.XLSX / .XLS / .CSV)">
+                                <i class="fa-solid fa-file-excel"></i> Importar / Migrar desde Excel
+                            </button>
                             <button type="button" class="cnt-btn cnt-btn-primary" onclick="ViasaContabilidadEngine.descargarPaqueteContableMes1Click()" title="Empaquetar y descargar todos los libros oficiales del mes">
                                 <i class="fa-solid fa-file-zipper"></i> Paquete Contable 1-Click
                             </button>
@@ -1198,6 +1205,10 @@
                         <button type="button" class="cnt-main-tab-btn ${this.tabPrincipal === 'tab6_contadora' ? 'active' : ''}" onclick="ViasaContabilidadEngine.cambiarTabPrincipal('tab6_contadora')">
                             <i class="fa-solid fa-briefcase"></i>
                             <span>6. Centro Ejecutivo Contadora (1-Click)</span>
+                        </button>
+                        <button type="button" class="cnt-main-tab-btn ${this.tabPrincipal === 'tab7_migracion_excel' ? 'active' : ''}" onclick="ViasaContabilidadEngine.cambiarTabPrincipal('tab7_migracion_excel')">
+                            <i class="fa-solid fa-file-excel"></i>
+                            <span>7. Migración desde Excel (ETL)</span>
                         </button>
                     </div>
 

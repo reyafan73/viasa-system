@@ -1,15 +1,18 @@
 {
   "name": "viasa-system-pwa",
-  "version": "2.6.0",
+  "version": "2.9.0",
   "private": true,
   "description": "VIASA SYSTEM - Progressive Web App (PWA) de Gestión Administrativa, Producción, RRHH LOTTT y Punto de Venta Multidivisa para Panadería y Pastelería Nueva Viasa, C.A.",
   "main": "index.html",
+  "dependencies": {
+    "xlsx": "0.20.3"
+  },
   "scripts": {
     "dev": "npx --yes serve . -l 3000",
     "start": "npx --yes serve . -l 3000",
-    "build": "node -e \"console.log('VIASA SYSTEM v2.6.0: Compilación estática y verificación PWA completada con 0 errores.')\"",
+    "build": "node -e \"console.log('VIASA SYSTEM v2.9.0: Compilación estática y verificación PWA completada con 0 errores.')\"",
     "deploy": "npx --yes vercel --prod",
-    "check": "node --check assets/js/app.js && node --check assets/js/database.js && node --check assets/js/auth.js && node --check assets/js/storage-engine.js && node --check assets/js/supabase-cloud.js && node --check sw.js"
+    "check": "node --check assets/js/app.js && node --check assets/js/contabilidad-seniat-engine.js && node --check assets/js/excel-migration-assistant.js && node --check assets/js/database.js && node --check assets/js/auth.js && node --check assets/js/storage-engine.js && node --check assets/js/supabase-cloud.js && node --check sw.js"
   },
   "keywords": [
     "viasa",

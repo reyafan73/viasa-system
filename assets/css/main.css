@@ -8647,3 +8647,170 @@ input, select, textarea {
     gap: 5px;
 }
 
+
+/* ============================================================================
+   ASISTENTE INTELIGENTE DE MIGRACIÓN DE DATOS DESDE EXCEL (ETL WIZARD)
+   Estética Corporativa Clara y Luminosa (Light Enterprise UI)
+   ============================================================================ */
+
+.cnt-etl-stepper {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 18px;
+}
+
+@media (max-width: 960px) {
+    .cnt-etl-stepper {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+.cnt-etl-step {
+    background: #FFFFFF;
+    border: 1.5px solid #E2E8F0;
+    border-radius: 12px;
+    padding: 12px 14px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.03);
+}
+
+.cnt-etl-step:hover {
+    border-color: #93C5FD;
+    background: #F8FAFC;
+}
+
+.cnt-etl-step.active {
+    border-color: #2563EB;
+    background: linear-gradient(135deg, #EFF6FF 0%, #FFFFFF 100%);
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.12);
+}
+
+.cnt-etl-step.done {
+    border-color: #10B981;
+    background: linear-gradient(135deg, #ECFDF5 0%, #FFFFFF 100%);
+}
+
+.cnt-etl-step-num {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #F1F5F9;
+    color: #475569;
+    font-weight: 900;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.cnt-etl-step.active .cnt-etl-step-num {
+    background: #2563EB;
+    color: #FFFFFF;
+}
+
+.cnt-etl-step.done .cnt-etl-step-num {
+    background: #059669;
+    color: #FFFFFF;
+}
+
+.cnt-etl-step-title {
+    font-size: 0.8rem;
+    font-weight: 800;
+    color: #0F172A;
+    line-height: 1.2;
+}
+
+.cnt-etl-step-sub {
+    font-size: 0.69rem;
+    color: #64748B;
+    margin-top: 2px;
+}
+
+/* Tarjetas de Categoría de Destino ETL */
+.cnt-etl-dest-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 12px;
+    margin-bottom: 18px;
+}
+
+.cnt-etl-dest-card {
+    background: #FFFFFF;
+    border: 1.5px solid #E2E8F0;
+    border-radius: 12px;
+    padding: 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.cnt-etl-dest-card:hover {
+    border-color: #93C5FD;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(15, 23, 42, 0.05);
+}
+
+.cnt-etl-dest-card.selected {
+    border-color: #059669;
+    background: linear-gradient(180deg, #ECFDF5 0%, #FFFFFF 100%);
+    box-shadow: 0 4px 14px rgba(5, 150, 105, 0.14);
+}
+
+/* Celdas editables en la Mesa de Auditoría Previa */
+.cnt-etl-editable-cell {
+    cursor: pointer;
+    position: relative;
+    transition: background 0.15s ease;
+    border-radius: 4px;
+}
+
+.cnt-etl-editable-cell:hover {
+    background: #DBEAFE !important;
+    outline: 1px dashed #2563EB;
+}
+
+.cnt-etl-inline-input {
+    width: 100%;
+    min-width: 90px;
+    padding: 4px 6px;
+    border: 1.5px solid #2563EB;
+    border-radius: 5px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.76rem;
+    color: #0F172A;
+    background: #FFFFFF;
+    outline: none;
+}
+
+/* Modal de Pantalla Completa Opcional para el Asistente Excel */
+.cnt-etl-fullscreen-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9998;
+    background: rgba(15, 23, 42, 0.65);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 18px;
+}
+
+.cnt-etl-fullscreen-modal {
+    width: 100%;
+    max-width: 1560px;
+    max-height: 94vh;
+    overflow-y: auto;
+    background: #F8FAFC;
+    border: 1px solid #CBD5E1;
+    border-radius: 16px;
+    padding: 22px;
+    box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.45);
+}
