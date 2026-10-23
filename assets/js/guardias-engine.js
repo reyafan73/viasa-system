@@ -24,11 +24,201 @@
         filtroTurno: 'todos',
         filtroBusqueda: '',
         fechaSeleccionada: new Date().toISOString().split('T')[0],
+        pinsVisibles: {},
+        empIdSubiendoFoto: null,
 
         // Inicialización
         init() {
             console.log('[VIASA GUARDIAS] Inicializando Motor Tecnológico de Guardias y Operaciones de Campo...');
             this.inicializarEventosOffline();
+        },
+
+        togglePinVisibilidad(empId) {
+            this.pinsVisibles[empId] = !this.pinsVisibles[empId];
+            this.renderGuardiasHub();
+        },
+
+        normalizarDepartamento(depto, cargo = '') {
+            const d = (depto || '').toLowerCase().trim();
+            const c = (cargo || '').toLowerCase().trim();
+            if (d.includes('fabric') || d.includes('producc') || d.includes('panader') || d.includes('horno') || d.includes('pastel')) return 'Fabricación';
+            if (d.includes('cocina') || d.includes('cafet') || c.includes('chef') || c.includes('mesoner') || c.includes('barista')) return 'Cocina';
+            if (d.includes('venta') || d.includes('mostrador') || d.includes('caja')) return 'Ventas';
+            if (d.includes('despacho') || d.includes('logistic') || d.includes('ruta') || d.includes('delivery')) return 'Despacho';
+            if (d.includes('mantenim') || d.includes('tecnic') || d.includes('servic')) return 'Mantenimiento';
+            if (d.includes('admin') || d.includes('gerenc') || d.includes('rrhh') || d.includes('contab')) return 'Administración';
+            return depto || 'Fabricación';
+        },
+
+        obtenerEstiloDepto(deptoNorm) {
+            switch (deptoNorm) {
+                case 'Fabricación':
+                    return { clase: 'depto-badge-amber', icono: 'fa-wheat-awn', label: 'Fabricación' };
+                case 'Cocina':
+                    return { clase: 'depto-badge-orange', icono: 'fa-utensils', label: 'Cocina' };
+                case 'Ventas':
+                    return { clase: 'depto-badge-emerald', icono: 'fa-cash-register', label: 'Ventas' };
+                case 'Despacho':
+                    return { clase: 'depto-badge-sky', icono: 'fa-truck-fast', label: 'Despacho' };
+                case 'Mantenimiento':
+                    return { clase: 'depto-badge-purple', icono: 'fa-screwdriver-wrench', label: 'Mantenimiento' };
+                case 'Administración':
+                    return { clase: 'depto-badge-indigo', icono: 'fa-user-tie', label: 'Administración' };
+                default:
+                    return { clase: 'depto-badge-slate', icono: 'fa-building-user', label: deptoNorm || 'Operaciones' };
+            }
+        },
+
+        obtenerFotoPorDefecto(emp = {}) {
+            const depto = this.normalizarDepartamento(emp.departamento, emp.cargo);
+            const nombre = (emp.nombreCompleto || emp.nombres || '').toLowerCase();
+            const esFemenino = nombre.includes('maría') || nombre.includes('maria') || nombre.includes('luisa') ||
+                               nombre.includes('carmen') || nombre.includes('ana') || nombre.includes('valentina') ||
+                               nombre.includes('elena') || nombre.includes('gabriela') || nombre.includes('rosa') ||
+                               nombre.includes('daniela') || nombre.includes('andrea') || nombre.includes('carolina') ||
+                               (emp.cargo || '').toLowerCase().includes('cajera') || (emp.cargo || '').toLowerCase().includes('gerente administrativa');
+            if (esFemenino) {
+                if (depto === 'Administración') return 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=300&auto=format&fit=crop&q=80';
+                if (depto === 'Ventas') return 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=300&auto=format&fit=crop&q=80';
+                return 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=300&auto=format&fit=crop&q=80';
+            }
+            if (depto === 'Fabricación') return 'https://images.unsplash.com/photo-1583394838336-acd977736f90?w=300&auto=format&fit=crop&q=80';
+            if (depto === 'Cocina') return 'https://images.unsplash.com/photo-1577219491135-ce391730fb2c?w=300&auto=format&fit=crop&q=80';
+            if (depto === 'Despacho') return 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=300&auto=format&fit=crop&q=80';
+            if (depto === 'Mantenimiento') return 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=300&auto=format&fit=crop&q=80';
+            if (depto === 'Administración') return 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=300&auto=format&fit=crop&q=80';
+            return 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&auto=format&fit=crop&q=80';
+        },
+
+        obtenerFotoEmpleado(emp) {
+            if (!emp) return this.obtenerFotoPorDefecto({});
+            if (emp.foto && typeof emp.foto === 'string' && emp.foto.trim().length > 5) return emp.foto;
+            if (emp.photoUrl && typeof emp.photoUrl === 'string' && emp.photoUrl.trim().length > 5) return emp.photoUrl;
+            // Buscar si en ViasaDatabase.empleados existe foto para esta cédula o id
+            if (window.ViasaDatabase && Array.isArray(window.ViasaDatabase.empleados)) {
+                const match = window.ViasaDatabase.empleados.find(x => x.id === emp.id || (x.cedula && x.cedula === emp.cedula));
+                if (match && match.foto) return match.foto;
+            }
+            return this.obtenerFotoPorDefecto(emp);
+        },
+
+        redimensionarImagenABase64(file, maxDim = 320, callback) {
+            if (!file || !file.type.startsWith('image/')) {
+                alert('⚠️ Por favor selecciona un archivo de imagen válido (JPG, PNG, WEBP).');
+                return;
+            }
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                const img = new Image();
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    let w = img.width;
+                    let h = img.height;
+                    const size = Math.min(w, h);
+                    const sx = (w - size) / 2;
+                    const sy = (h - size) / 2;
+                    canvas.width = maxDim;
+                    canvas.height = maxDim;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, sx, sy, size, size, 0, 0, maxDim, maxDim);
+                    const dataUrl = canvas.toDataURL('image/jpeg', 0.86);
+                    callback(dataUrl);
+                };
+                img.onerror = () => callback(ev.target.result);
+                img.src = ev.target.result;
+            };
+            reader.readAsDataURL(file);
+        },
+
+        dispararSubidaFotoTarjeta(empId, event) {
+            if (event) event.stopPropagation();
+            this.empIdSubiendoFoto = empId;
+            let input = document.getElementById('guardias-direct-photo-input');
+            if (!input) {
+                input = document.createElement('input');
+                input.type = 'file';
+                input.id = 'guardias-direct-photo-input';
+                input.accept = 'image/*';
+                input.style.display = 'none';
+                input.onchange = (e) => this.procesarFotoDirectaTarjeta(e);
+                document.body.appendChild(input);
+            }
+            input.value = '';
+            input.click();
+        },
+
+        async procesarFotoDirectaTarjeta(event) {
+            const file = event.target.files && event.target.files[0];
+            if (!file || !this.empIdSubiendoFoto) return;
+            const targetId = this.empIdSubiendoFoto;
+            this.redimensionarImagenABase64(file, 320, async (base64Url) => {
+                const emps = await this.obtenerEmpleados();
+                const emp = emps.find(e => e.id === targetId);
+                if (!emp) return;
+                emp.foto = base64Url;
+                emp.photoUrl = base64Url;
+                await window.ViasaStorage.guardarRegistro('empleados', emp);
+                if (window.ViasaDatabase && Array.isArray(window.ViasaDatabase.empleados)) {
+                    const dbIdx = window.ViasaDatabase.empleados.findIndex(x => x.id === targetId || (x.cedula && x.cedula === emp.cedula));
+                    if (dbIdx >= 0) {
+                        window.ViasaDatabase.empleados[dbIdx].foto = base64Url;
+                        window.ViasaDatabase.empleados[dbIdx].photoUrl = base64Url;
+                    }
+                }
+                if (window.ViasaAudio) window.ViasaAudio.playSuccess();
+                this.renderGuardiasHub();
+            });
+        },
+
+        onSeleccionarArchivoFotoModal(event) {
+            const file = event.target.files && event.target.files[0];
+            if (!file) return;
+            this.redimensionarImagenABase64(file, 320, (base64Url) => {
+                const prev = document.getElementById('emp-foto-preview-img');
+                const hidden = document.getElementById('emp-foto-base64');
+                if (prev) prev.src = base64Url;
+                if (hidden) hidden.value = base64Url;
+            });
+        },
+
+        onDragOverFotoModal(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            const dz = document.getElementById('emp-photo-dropzone');
+            if (dz) dz.classList.add('dragover');
+        },
+
+        onDragLeaveFotoModal(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            const dz = document.getElementById('emp-photo-dropzone');
+            if (dz) dz.classList.remove('dragover');
+        },
+
+        onDropFotoModal(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            const dz = document.getElementById('emp-photo-dropzone');
+            if (dz) dz.classList.remove('dragover');
+            const file = event.dataTransfer && event.dataTransfer.files && event.dataTransfer.files[0];
+            if (!file) return;
+            this.redimensionarImagenABase64(file, 320, (base64Url) => {
+                const prev = document.getElementById('emp-foto-preview-img');
+                const hidden = document.getElementById('emp-foto-base64');
+                if (prev) prev.src = base64Url;
+                if (hidden) hidden.value = base64Url;
+            });
+        },
+
+        restaurarFotoPorDefectoModal() {
+            const depto = document.getElementById('emp-depto')?.value || 'Fabricación';
+            const nombres = document.getElementById('emp-nombres')?.value || '';
+            const cargo = document.getElementById('emp-cargo')?.value || '';
+            const urlDefecto = this.obtenerFotoPorDefecto({ departamento: depto, nombres: nombres, cargo: cargo });
+            const prev = document.getElementById('emp-foto-preview-img');
+            const hidden = document.getElementById('emp-foto-base64');
+            if (prev) prev.src = urlDefecto;
+            if (hidden) hidden.value = urlDefecto;
         },
 
         inicializarEventosOffline() {
@@ -107,23 +297,34 @@
 
             form.reset();
             document.getElementById('emp-id-hidden').value = '';
+            const prevImg = document.getElementById('emp-foto-preview-img');
+            const fotoHidden = document.getElementById('emp-foto-base64');
 
             if (empId) {
                 const emps = await this.obtenerEmpleados();
                 const emp = emps.find(e => e.id === empId);
                 if (emp) {
-                    if (title) title.innerHTML = `<i class="fa-solid fa-user-pen"></i> Editar Expediente: ${emp.nombres || ''} ${emp.apellidos || ''}`;
+                    const nombreDisplay = emp.nombreCompleto || `${emp.nombres || ''} ${emp.apellidos || ''}`.trim();
+                    const partesNombre = (emp.nombreCompleto || '').split(' ');
+                    const nombresFallback = emp.nombres || partesNombre.slice(0, Math.ceil(partesNombre.length / 2)).join(' ');
+                    const apellidosFallback = emp.apellidos || partesNombre.slice(Math.ceil(partesNombre.length / 2)).join(' ');
+                    const deptoNorm = this.normalizarDepartamento(emp.departamento, emp.cargo);
+                    const fotoActual = this.obtenerFotoEmpleado(emp);
+
+                    if (title) title.innerHTML = `<i class="fa-solid fa-user-pen"></i> Editar Expediente: ${nombreDisplay}`;
                     document.getElementById('emp-id-hidden').value = emp.id;
                     document.getElementById('emp-cedula').value = emp.cedula || '';
-                    document.getElementById('emp-nombres').value = emp.nombres || '';
-                    document.getElementById('emp-apellidos').value = emp.apellidos || '';
-                    document.getElementById('emp-depto').value = emp.departamento || 'Fabricación';
+                    document.getElementById('emp-nombres').value = nombresFallback || '';
+                    document.getElementById('emp-apellidos').value = apellidosFallback || '';
+                    document.getElementById('emp-depto').value = deptoNorm || 'Fabricación';
                     document.getElementById('emp-cargo').value = emp.cargo || '';
                     document.getElementById('emp-telefono').value = emp.telefono || '';
                     document.getElementById('emp-email').value = emp.email || '';
-                    document.getElementById('emp-salario').value = emp.salarioUSD || 0;
-                    document.getElementById('emp-horario').value = emp.horarioDefecto || '06:00 - 14:00';
-                    document.getElementById('emp-pin').value = emp.pinAcceso || '1234';
+                    document.getElementById('emp-salario').value = emp.salarioUSD || emp.salarioMensualUSD || 280;
+                    document.getElementById('emp-horario').value = emp.horarioDefecto || emp.horarioTexto || '06:00 - 14:00';
+                    document.getElementById('emp-pin').value = emp.pinAcceso || emp.pinFichaje || '1234';
+                    if (prevImg) prevImg.src = fotoActual;
+                    if (fotoHidden) fotoHidden.value = fotoActual;
                 }
             } else {
                 if (title) title.innerHTML = `<i class="fa-solid fa-user-plus"></i> Alta Dinámica de Personal &bull; Nueva Viasa`;
@@ -131,6 +332,9 @@
                 const nextNum = emps.length + 1;
                 document.getElementById('emp-id-hidden').value = `EMP-${String(nextNum).padStart(3, '0')}`;
                 document.getElementById('emp-pin').value = String(Math.floor(1000 + Math.random() * 9000));
+                const fotoDef = this.obtenerFotoPorDefecto({ departamento: 'Fabricación' });
+                if (prevImg) prevImg.src = fotoDef;
+                if (fotoHidden) fotoHidden.value = fotoDef;
             }
 
             modal.style.display = 'flex';
@@ -154,33 +358,41 @@
             const salario = parseFloat(document.getElementById('emp-salario').value) || 0;
             const horario = document.getElementById('emp-horario').value;
             const pin = document.getElementById('emp-pin').value.trim() || '1234';
+            const fotoVal = document.getElementById('emp-foto-base64')?.value || '';
 
             const emps = await this.obtenerEmpleados();
             let index = emps.findIndex(x => x.id === idHidden);
 
             const qrToken = `VIASA-EMP-TOKEN-${cedula.replace(/[^0-9]/g, '')}-${pin}`;
+            const fotoFinal = fotoVal || (index >= 0 ? this.obtenerFotoEmpleado(emps[index]) : this.obtenerFotoPorDefecto({ departamento: depto, nombres, cargo }));
 
             let empData = {
                 id: idHidden || `EMP-${String(emps.length + 1).padStart(3, '0')}`,
                 cedula: cedula,
                 nombres: nombres,
                 apellidos: apellidos,
-                nombreCompleto: `${nombres} ${apellidos}`,
+                nombreCompleto: `${nombres} ${apellidos}`.trim(),
                 departamento: depto,
                 cargo: cargo,
                 telefono: telefono,
                 email: email,
                 salarioUSD: salario,
+                salarioMensualUSD: salario,
                 horarioDefecto: horario,
+                horarioTexto: horario,
                 pinAcceso: pin,
+                pinFichaje: pin,
                 qrToken: qrToken,
-                estado: 'activo',
+                foto: fotoFinal,
+                photoUrl: fotoFinal,
+                estado: index >= 0 ? (emps[index].estado || 'activo') : 'activo',
                 fechaIngreso: index >= 0 ? emps[index].fechaIngreso : new Date().toISOString().split('T')[0],
                 avatar: this.obtenerIconoPorDepartamento(depto)
             };
 
             if (index >= 0) {
                 emps[index] = Object.assign({}, emps[index], empData);
+                empData = emps[index];
             } else {
                 emps.push(empData);
                 if (depto === 'Despacho' || cargo.toLowerCase().includes('chofer') || cargo.toLowerCase().includes('repartidor')) {
@@ -200,6 +412,14 @@
             }
 
             await window.ViasaStorage.guardarRegistro('empleados', empData);
+            if (window.ViasaDatabase && Array.isArray(window.ViasaDatabase.empleados)) {
+                const dbIdx = window.ViasaDatabase.empleados.findIndex(x => x.id === empData.id);
+                if (dbIdx >= 0) {
+                    window.ViasaDatabase.empleados[dbIdx] = Object.assign({}, window.ViasaDatabase.empleados[dbIdx], empData);
+                } else {
+                    window.ViasaDatabase.empleados.push(empData);
+                }
+            }
             
             // Sincronizar directorio CRM
             const contactoCRM = {
@@ -310,11 +530,17 @@
             const modal = document.getElementById('modal-credencial-digital');
             if (!modal) return;
 
-            document.getElementById('cred-nombre').textContent = emp.nombreCompleto || `${emp.nombres} ${emp.apellidos}`;
-            document.getElementById('cred-cargo').textContent = emp.cargo;
-            document.getElementById('cred-depto').textContent = emp.departamento;
-            document.getElementById('cred-cedula').textContent = `C.I: ${emp.cedula}`;
-            document.getElementById('cred-pin').textContent = `PIN: ${emp.pinAcceso || '1234'}`;
+            const deptoNorm = this.normalizarDepartamento(emp.departamento, emp.cargo);
+            const fotoUrl = this.obtenerFotoEmpleado(emp);
+
+            const fotoEl = document.getElementById('cred-foto-img');
+            if (fotoEl) fotoEl.src = fotoUrl;
+
+            document.getElementById('cred-nombre').textContent = emp.nombreCompleto || `${emp.nombres || ''} ${emp.apellidos || ''}`.trim();
+            document.getElementById('cred-cargo').textContent = emp.cargo || 'Personal Operativo';
+            document.getElementById('cred-depto').textContent = `Departamento: ${deptoNorm}`;
+            document.getElementById('cred-cedula').textContent = `C.I: ${emp.cedula || 'N/A'}`;
+            document.getElementById('cred-pin').textContent = `PIN: ${emp.pinAcceso || emp.pinFichaje || '1234'}`;
             document.getElementById('cred-ingreso').textContent = `Ingreso: ${emp.fechaIngreso || '2026-01-15'}`;
             
             const qrImg = document.getElementById('cred-qr-img');
@@ -759,10 +985,10 @@
 
             container.innerHTML = `
                 <div class="guardias-hub-wrapper">
-                    <!-- ENCABEZADO PRINCIPAL DE ALTA TECNOLOGÍA -->
+                    <!-- 1. CABECERA EJECUTIVA Y TARJETAS DE RESUMEN (5 KPIs HORIZONTALES) -->
                     <div class="guardias-hero-card">
                         <div class="guardias-hero-header">
-                            <div style="display: flex; align-items: center; gap: 14px;">
+                            <div class="guardias-hero-brand">
                                 <div class="guardias-hero-icon-box">
                                     <i class="fa-solid fa-user-shield"></i>
                                 </div>
@@ -775,64 +1001,109 @@
                             </div>
                             
                             <div class="guardias-hero-actions">
-                                <span class="rate-badge sync-status ${navigator.onLine ? 'online' : 'offline'}" id="guardias-sync-pill">
+                                <span class="guardias-sync-badge ${navigator.onLine ? 'online' : 'offline'}" id="guardias-sync-pill">
+                                    <span class="sync-dot"></span>
                                     <i class="fa-solid ${navigator.onLine ? 'fa-cloud-arrow-up' : 'fa-shield-halved'}"></i>
-                                    <span>${navigator.onLine ? 'Sincronizado' : 'Modo Offline Seguro'}</span>
+                                    <span>${navigator.onLine ? 'Sincronizado' : 'Modo Offline'}</span>
                                 </span>
                                 <button type="button" class="btn-companion-mobile" onclick="window.open('mobile_app.html', '_blank', 'width=420,height=840')" title="Abrir Aplicación Móvil Companion">
                                     <i class="fa-solid fa-mobile-screen-button"></i> App Móvil
                                 </button>
-                                <button type="button" class="btn-gold" onclick="ViasaGuardiasEngine.abrirModalNuevoEmpleado()">
+                                <button type="button" class="btn-nueva-alta-amber" onclick="ViasaGuardiasEngine.abrirModalNuevoEmpleado()">
                                     <i class="fa-solid fa-user-plus"></i> + Nueva Alta
                                 </button>
                             </div>
                         </div>
 
-                        <!-- MÉTRICAS CLAVE EN TIEMPO REAL -->
+                        <!-- FILA DE KPIs (5 TARJETAS HORIZONTALES COMPACTAS) -->
                         <div class="guardias-kpi-grid">
-                            <div class="guardias-kpi-card" onclick="ViasaGuardiasEngine.cambiarSubView('plantilla')">
-                                <span class="kpi-lbl"><i class="fa-solid fa-users"></i> Plantilla Total</span>
-                                <strong class="kpi-val">${totalActivos} <small style="font-size:0.75rem; color:#94a3b8;">Activos</small></strong>
+                            <div class="guardias-kpi-card ${this.subViewActiva === 'plantilla' ? 'kpi-active' : ''}" onclick="ViasaGuardiasEngine.cambiarSubView('plantilla')">
+                                <div class="kpi-icon-badge kpi-emerald">
+                                    <i class="fa-solid fa-users"></i>
+                                </div>
+                                <div class="kpi-content-box">
+                                    <span class="kpi-lbl">Plantilla Total</span>
+                                    <div class="kpi-val-row">
+                                        <strong class="kpi-val">${totalActivos}</strong>
+                                        <small class="kpi-unit">Activos</small>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="guardias-kpi-card" onclick="ViasaGuardiasEngine.cambiarSubView('matriz')">
-                                <span class="kpi-lbl"><i class="fa-solid fa-calendar-check"></i> Guardias Hoy</span>
-                                <strong class="kpi-val" style="color:#fbbf24;">${guardiasHoyCount} <small style="font-size:0.75rem; color:#94a3b8;">En Turno</small></strong>
+
+                            <div class="guardias-kpi-card ${this.subViewActiva === 'matriz' ? 'kpi-active' : ''}" onclick="ViasaGuardiasEngine.cambiarSubView('matriz')">
+                                <div class="kpi-icon-badge kpi-amber">
+                                    <i class="fa-solid fa-calendar-check"></i>
+                                </div>
+                                <div class="kpi-content-box">
+                                    <span class="kpi-lbl">Guardias Hoy</span>
+                                    <div class="kpi-val-row">
+                                        <strong class="kpi-val" style="color:#fbbf24;">${guardiasHoyCount}</strong>
+                                        <small class="kpi-unit">En Turno</small>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="guardias-kpi-card" onclick="ViasaGuardiasEngine.cambiarSubView('crm_cafetin')">
-                                <span class="kpi-lbl"><i class="fa-solid fa-utensils"></i> Cafetín y CRM</span>
-                                <strong class="kpi-val" style="color:#38bdf8;">${cruce.mesasActivas.length} <small style="font-size:0.75rem; color:#94a3b8;">Mesas</small></strong>
+
+                            <div class="guardias-kpi-card ${this.subViewActiva === 'crm_cafetin' ? 'kpi-active' : ''}" onclick="ViasaGuardiasEngine.cambiarSubView('crm_cafetin')">
+                                <div class="kpi-icon-badge kpi-sky">
+                                    <i class="fa-solid fa-utensils"></i>
+                                </div>
+                                <div class="kpi-content-box">
+                                    <span class="kpi-lbl">Cafetín y CRM</span>
+                                    <div class="kpi-val-row">
+                                        <strong class="kpi-val" style="color:#38bdf8;">${cruce.mesasActivas.length}</strong>
+                                        <small class="kpi-unit">Mesas</small>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="guardias-kpi-card" onclick="ViasaGuardiasEngine.cambiarSubView('logistica')">
-                                <span class="kpi-lbl"><i class="fa-solid fa-truck-fast"></i> Despachos Ruta</span>
-                                <strong class="kpi-val" style="color:#f97316;">${entregasPendientes} <small style="font-size:0.75rem; color:#94a3b8;">Paradas</small></strong>
+
+                            <div class="guardias-kpi-card ${this.subViewActiva === 'logistica' ? 'kpi-active' : ''}" onclick="ViasaGuardiasEngine.cambiarSubView('logistica')">
+                                <div class="kpi-icon-badge kpi-orange">
+                                    <i class="fa-solid fa-truck-fast"></i>
+                                </div>
+                                <div class="kpi-content-box">
+                                    <span class="kpi-lbl">Despachos Ruta</span>
+                                    <div class="kpi-val-row">
+                                        <strong class="kpi-val" style="color:#fb923c;">${entregasPendientes}</strong>
+                                        <small class="kpi-unit">Paradas</small>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="guardias-kpi-card" onclick="ViasaGuardiasEngine.cambiarSubView('marketplace')">
-                                <span class="kpi-lbl"><i class="fa-solid fa-arrows-rotate"></i> Shift Market</span>
-                                <strong class="kpi-val" style="color:#a855f7;">${swapsPendientes} <small style="font-size:0.75rem; color:#94a3b8;">Pendientes</small></strong>
+
+                            <div class="guardias-kpi-card ${this.subViewActiva === 'marketplace' ? 'kpi-active' : ''}" onclick="ViasaGuardiasEngine.cambiarSubView('marketplace')">
+                                <div class="kpi-icon-badge kpi-purple">
+                                    <i class="fa-solid fa-arrows-rotate"></i>
+                                </div>
+                                <div class="kpi-content-box">
+                                    <span class="kpi-lbl">Shift Market</span>
+                                    <div class="kpi-val-row">
+                                        <strong class="kpi-val" style="color:#c084fc;">${swapsPendientes}</strong>
+                                        <small class="kpi-unit">Pendientes</small>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- BARRA DE NAVEGACIÓN MODULAR DE PESTAÑAS -->
+                    <!-- 2. NAVEGACIÓN DE SUB-MÓDULOS (SEGMENTED CONTROL / PILLS CORPORATIVAS) -->
                     <div class="guardias-tabs-bar">
                         <button type="button" class="guardias-tab-btn ${this.subViewActiva === 'plantilla' ? 'active' : ''}" onclick="ViasaGuardiasEngine.cambiarSubView('plantilla')">
-                            <i class="fa-solid fa-users-gear"></i> 1. Altas y Plantilla
+                            <i class="fa-solid fa-users-gear"></i> <span>1. Altas y Plantilla</span>
                         </button>
                         <button type="button" class="guardias-tab-btn ${this.subViewActiva === 'matriz' ? 'active' : ''}" onclick="ViasaGuardiasEngine.cambiarSubView('matriz')">
-                            <i class="fa-solid fa-calendar-days"></i> 2. Matriz de Guardias
+                            <i class="fa-solid fa-calendar-days"></i> <span>2. Matriz de Guardias</span>
                         </button>
                         <button type="button" class="guardias-tab-btn ${this.subViewActiva === 'crm_cafetin' ? 'active' : ''}" onclick="ViasaGuardiasEngine.cambiarSubView('crm_cafetin')">
-                            <i class="fa-solid fa-handshake"></i> 3. Cruce CRM Y Cafetín
+                            <i class="fa-solid fa-handshake"></i> <span>3. Cruce CRM y Cafetín</span>
                         </button>
                         <button type="button" class="guardias-tab-btn ${this.subViewActiva === 'logistica' ? 'active' : ''}" onclick="ViasaGuardiasEngine.cambiarSubView('logistica')">
-                            <i class="fa-solid fa-route"></i> 4. Logística y Despachos
+                            <i class="fa-solid fa-route"></i> <span>4. Logística y Despacho</span>
                         </button>
                         <button type="button" class="guardias-tab-btn ${this.subViewActiva === 'marketplace' ? 'active' : ''}" onclick="ViasaGuardiasEngine.cambiarSubView('marketplace')">
-                            <i class="fa-solid fa-repeat"></i> 5. Shift Marketplace
+                            <i class="fa-solid fa-repeat"></i> <span>5. Shift Marketplace</span>
                             ${swapsPendientes > 0 ? `<span class="badge-tab-alert">${swapsPendientes}</span>` : ''}
                         </button>
                         <button type="button" class="guardias-tab-btn ${this.subViewActiva === 'asistencia' ? 'active' : ''}" onclick="ViasaGuardiasEngine.cambiarSubView('asistencia')">
-                            <i class="fa-solid fa-qrcode"></i> 6. Check-in QR Y GPS
+                            <i class="fa-solid fa-qrcode"></i> <span>6. Check-in QR y GPS</span>
                         </button>
                     </div>
 
@@ -845,83 +1116,146 @@
         },
 
         // ----------------------------------------------------------------------
-        // SUB-VIEW 1: PLANTILLA DE PERSONAL Y ALTAS/BAJAS
+        // SUB-VIEW 1: DIRECTORIO DE EMPLEADOS EN FICHAS CUADRADAS CON FOTO
         // ----------------------------------------------------------------------
         renderSubViewPlantillaHTML(emps) {
             let filtrados = emps.filter(e => {
-                const matchDepto = this.filtroDepto === 'todos' || e.departamento === this.filtroDepto;
+                const deptoNorm = this.normalizarDepartamento(e.departamento, e.cargo);
+                const matchDepto = this.filtroDepto === 'todos' || deptoNorm === this.filtroDepto || e.departamento === this.filtroDepto;
                 const matchTxt = !this.filtroBusqueda || 
-                    (e.nombreCompleto || e.nombres || '').toLowerCase().includes(this.filtroBusqueda) ||
+                    (e.nombreCompleto || `${e.nombres || ''} ${e.apellidos || ''}`).toLowerCase().includes(this.filtroBusqueda) ||
                     (e.cedula || '').toLowerCase().includes(this.filtroBusqueda) ||
-                    (e.cargo || '').toLowerCase().includes(this.filtroBusqueda);
+                    (e.cargo || '').toLowerCase().includes(this.filtroBusqueda) ||
+                    deptoNorm.toLowerCase().includes(this.filtroBusqueda);
                 return matchDepto && matchTxt;
             });
 
-            const deptos = ['todos', 'Fabricación', 'Cocina', 'Ventas', 'Despacho', 'Mantenimiento', 'Administración'];
+            const deptos = [
+                { key: 'todos', label: 'Todos los Deptos', icon: 'fa-layer-group' },
+                { key: 'Fabricación', label: 'Fabricación', icon: 'fa-wheat-awn' },
+                { key: 'Cocina', label: 'Cocina', icon: 'fa-utensils' },
+                { key: 'Ventas', label: 'Ventas', icon: 'fa-cash-register' },
+                { key: 'Despacho', label: 'Despacho', icon: 'fa-truck-fast' },
+                { key: 'Mantenimiento', label: 'Mantenimiento', icon: 'fa-screwdriver-wrench' },
+                { key: 'Administración', label: 'Administración', icon: 'fa-user-tie' }
+            ];
 
             return `
+                <!-- BARRA DE HERRAMIENTAS: CHIPS DE DEPARTAMENTO + BUSCADOR CON LUPA -->
                 <div class="guardias-filter-toolbar">
-                    <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                    <div class="guardias-dept-chips">
                         ${deptos.map(d => `
-                            <button type="button" class="filter-pill ${this.filtroDepto === d ? 'active' : ''}" onclick="ViasaGuardiasEngine.setFiltroDepto('${d}')">
-                                ${d === 'todos' ? 'Todos los Deptos' : d}
+                            <button type="button" class="filter-pill ${this.filtroDepto === d.key ? 'active' : ''}" onclick="ViasaGuardiasEngine.setFiltroDepto('${d.key}')">
+                                <i class="fa-solid ${d.icon}"></i>
+                                <span>${d.label}</span>
                             </button>
                         `).join('')}
                     </div>
-                    <div style="display: flex; gap: 10px; align-items: center;">
-                        <input type="text" class="search-input-guardias" placeholder="Buscar por nombre, cédula o cargo..." value="${this.filtroBusqueda}" oninput="ViasaGuardiasEngine.setFiltroBusqueda(this.value)">
+                    <div class="guardias-search-wrapper">
+                        <i class="fa-solid fa-magnifying-glass guardias-search-icon"></i>
+                        <input type="text" class="search-input-guardias" placeholder="Buscar por nombre, cédula..." value="${this.filtroBusqueda}" oninput="ViasaGuardiasEngine.setFiltroBusqueda(this.value)">
+                        ${this.filtroBusqueda ? `
+                            <button type="button" class="guardias-search-clear" onclick="ViasaGuardiasEngine.setFiltroBusqueda('')" title="Limpiar búsqueda">
+                                <i class="fa-solid fa-xmark"></i>
+                            </button>
+                        ` : ''}
                     </div>
                 </div>
 
+                <!-- CUADRÍCULA RESPONSIVA DE FICHAS CUADRADAS CORPORATIVAS -->
                 <div class="guardias-cards-grid">
                     ${filtrados.length === 0 ? `
                         <div class="empty-msg-card">
-                            <i class="fa-solid fa-user-slash" style="font-size:2rem; color:#64748b; margin-bottom:8px;"></i>
-                            <p>No se encontraron trabajadores con los filtros aplicados.</p>
+                            <i class="fa-solid fa-user-slash" style="font-size:2.4rem; color:#64748b; margin-bottom:10px;"></i>
+                            <h4 style="margin:0 0 4px 0; color:#e2e8f0; font-size:1rem;">Sin resultados en la plantilla</h4>
+                            <p style="margin:0; color:#94a3b8; font-size:0.82rem;">No se encontraron trabajadores que coincidan con el departamento o criterio de búsqueda.</p>
                         </div>
-                    ` : filtrados.map(e => `
-                        <div class="emp-guardia-card ${e.estado === 'inactivo' ? 'inactivo' : ''}">
+                    ` : filtrados.map(e => {
+                        const nombreCompleto = e.nombreCompleto || `${e.nombres || ''} ${e.apellidos || ''}`.trim() || 'Trabajador Viasa';
+                        const deptoNorm = this.normalizarDepartamento(e.departamento, e.cargo);
+                        const deptoStyle = this.obtenerEstiloDepto(deptoNorm);
+                        const fotoUrl = this.obtenerFotoEmpleado(e);
+                        const horarioTxt = e.horarioDefecto || e.horarioTexto || '06:00 - 14:00';
+                        const pinReal = e.pinAcceso || e.pinFichaje || '1234';
+                        const pinVisible = !!this.pinsVisibles[e.id];
+                        const esActivo = e.estado !== 'inactivo';
+
+                        return `
+                        <div class="emp-guardia-card ${esActivo ? '' : 'inactivo'}">
+                            <!-- Badge de Estado en Esquina Superior Derecha -->
+                            <span class="badge-status-emp ${esActivo ? 'activo' : 'inactivo'}">
+                                <span class="status-dot"></span>
+                                ${esActivo ? 'ACTIVO' : 'BAJA LÓGICA'}
+                            </span>
+
+                            <!-- Encabezado de Ficha: Foto Cuadrada Redondeada + Botón Cámara + Jerarquía -->
                             <div class="emp-card-header">
-                                <div class="emp-avatar-box">
-                                    <i class="fa-solid ${e.avatar || 'fa-user'}"></i>
+                                <div class="emp-photo-container" title="Haz clic en la cámara para subir o actualizar la fotografía">
+                                    <img src="${fotoUrl}" alt="${nombreCompleto}" class="emp-square-photo" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&auto=format&fit=crop&q=80';">
+                                    <button type="button" class="emp-photo-cam-btn" onclick="ViasaGuardiasEngine.dispararSubidaFotoTarjeta('${e.id}', event)" title="Cambiar foto de ${nombreCompleto}">
+                                        <i class="fa-solid fa-camera"></i>
+                                    </button>
                                 </div>
-                                <div style="flex: 1;">
-                                    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                                        <h4 class="emp-card-name">${e.nombreCompleto || `${e.nombres} ${e.apellidos}`}</h4>
-                                        <span class="badge-status-emp ${e.estado === 'activo' ? 'activo' : 'inactivo'}">
-                                            ${e.estado === 'activo' ? 'ACTIVO' : 'BAJA LÓGICA'}
-                                        </span>
+
+                                <div class="emp-identity-col">
+                                    <h4 class="emp-card-name" title="${nombreCompleto}">${nombreCompleto}</h4>
+                                    <div class="emp-card-cargo">${e.cargo || 'Operador de Planta'}</div>
+                                    <div class="emp-depto-badge ${deptoStyle.clase}">
+                                        <i class="fa-solid ${deptoStyle.icono}"></i>
+                                        <span>${deptoStyle.label}</span>
                                     </div>
-                                    <span class="emp-card-cargo">${e.cargo} &bull; <strong style="color:#fbbf24;">${e.departamento}</strong></span>
                                 </div>
                             </div>
 
+                            <!-- Caja de Datos Operativos Interna -->
                             <div class="emp-card-details">
-                                <div><i class="fa-solid fa-id-card"></i> <strong>C.I:</strong> ${e.cedula}</div>
-                                <div><i class="fa-solid fa-phone"></i> <strong>Tlf:</strong> ${e.telefono || 'N/A'}</div>
-                                <div><i class="fa-solid fa-clock"></i> <strong>Horario:</strong> ${e.horarioDefecto || '06:00 - 14:00'}</div>
-                                <div><i class="fa-solid fa-key"></i> <strong>PIN App:</strong> <span style="font-family:monospace; background:rgba(0,0,0,0.3); padding:1px 6px; border-radius:4px; color:#4ade80;">${e.pinAcceso || '1234'}</span></div>
+                                <div class="emp-detail-row">
+                                    <span class="emp-detail-lbl"><i class="fa-solid fa-id-card"></i> C.I.:</span>
+                                    <strong class="emp-detail-val">${e.cedula || 'S/I'}</strong>
+                                </div>
+                                <div class="emp-detail-row">
+                                    <span class="emp-detail-lbl"><i class="fa-solid fa-phone"></i> Tel.:</span>
+                                    <strong class="emp-detail-val">${e.telefono || '0414-0000000'}</strong>
+                                </div>
+                                <div class="emp-detail-row">
+                                    <span class="emp-detail-lbl"><i class="fa-solid fa-clock"></i> Horario:</span>
+                                    <strong class="emp-detail-val emp-schedule-pill">${horarioTxt}</strong>
+                                </div>
+                                <div class="emp-detail-row">
+                                    <span class="emp-detail-lbl"><i class="fa-solid fa-key"></i> PIN App:</span>
+                                    <div class="emp-pin-box">
+                                        <span class="emp-pin-code ${pinVisible ? 'revealed' : 'masked'}">${pinVisible ? pinReal : '••••'}</span>
+                                        <button type="button" class="emp-pin-toggle-btn" onclick="ViasaGuardiasEngine.togglePinVisibilidad('${e.id}')" title="${pinVisible ? 'Ocultar PIN' : 'Mostrar PIN'}">
+                                            <i class="fa-solid ${pinVisible ? 'fa-eye-slash' : 'fa-eye'}"></i>
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
 
+                            <!-- Pie de Ficha: 3 Botones Corporativos -->
                             <div class="emp-card-footer">
-                                <button type="button" class="btn-card-action" onclick="ViasaGuardiasEngine.verCredencialDigital('${e.id}')" title="Ver Credencial Digital y Carnet QR">
-                                    <i class="fa-solid fa-qrcode"></i> Credencial
+                                <button type="button" class="btn-card-action btn-card-credencial" onclick="ViasaGuardiasEngine.verCredencialDigital('${e.id}')" title="Ver Credencial Digital y Carnet QR">
+                                    <i class="fa-solid fa-qrcode"></i>
+                                    <span>Credencial</span>
                                 </button>
-                                <button type="button" class="btn-card-action" onclick="ViasaGuardiasEngine.abrirModalNuevoEmpleado('${e.id}')" title="Editar Expediente">
-                                    <i class="fa-solid fa-pen"></i> Editar
+                                <button type="button" class="btn-card-action btn-card-editar" onclick="ViasaGuardiasEngine.abrirModalNuevoEmpleado('${e.id}')" title="Editar Expediente y Foto">
+                                    <i class="fa-solid fa-pen-to-square"></i>
+                                    <span>Editar</span>
                                 </button>
-                                ${e.estado === 'activo' ? `
+                                ${esActivo ? `
                                     <button type="button" class="btn-card-action btn-danger-action" onclick="ViasaGuardiasEngine.bajaLogicaEmpleado('${e.id}')" title="Baja Lógica / Desincorporación">
-                                        <i class="fa-solid fa-user-xmark"></i> Baja
+                                        <i class="fa-solid fa-user-minus"></i>
+                                        <span>Baja</span>
                                     </button>
                                 ` : `
                                     <button type="button" class="btn-card-action btn-success-action" onclick="ViasaGuardiasEngine.reactivarEmpleado('${e.id}')" title="Reactivar Trabajador">
-                                        <i class="fa-solid fa-user-check"></i> Reactivar
+                                        <i class="fa-solid fa-user-check"></i>
+                                        <span>Reactivar</span>
                                     </button>
                                 `}
                             </div>
                         </div>
-                    `).join('')}
+                    `}).join('')}
                 </div>
             `;
         },

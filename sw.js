@@ -11,7 +11,7 @@
  *  5. Control de Versiones -> skipWaiting + clientsClaim + Notificación Interactiva
  */
 
-const SW_VERSION = '2.6.0';
+const SW_VERSION = '2.7.0';
 const STATIC_CACHE = `viasa-static-v${SW_VERSION}`;
 const DYNAMIC_CACHE = `viasa-dynamic-v${SW_VERSION}`;
 const MEDIA_CACHE = `viasa-media-v${SW_VERSION}`;
@@ -22,7 +22,7 @@ const APP_SHELL_ASSETS = [
     './manifest.json',
     './favicon.png',
     './assets/css/main.css',
-    './assets/css/main.css?v=2.6',
+    './assets/css/main.css?v=2.7',
     './assets/js/storage-engine.js',
     './assets/js/database.js',
     './assets/js/barcode-qr-engine.js',

@@ -4612,6 +4612,10 @@ button, input, select, textarea, .pos-product-card, .cat-pill, .nav-item, .role-
     justify-content: space-between;
     align-items: flex-start;
     border-bottom: 1.5px solid #0f172a;
+    padding-bottom: 8px;
+    margin-bottom: 10px;
+}
+
 /* ==============================================================================
    MÓDULO DE EMISIÓN Y CONTROL DOCUMENTAL: ARTE MAESTRO DE FORMATOS DUAL
    (Panadería Nueva Viasa, C.A. - RIF: J-31163165-8)
@@ -6405,24 +6409,37 @@ button, input, select, textarea, .pos-product-card, .cat-pill, .nav-item, .role-
 }
 
 /* ==============================================================================
-   ESTILOS: GESTIÓN DE GUARDIAS, CAMPO Y VANGUARDIA OPERATIVA (VIASA SYSTEM)
+   ESTILOS CORPORATIVOS DARK SAAS: GESTIÓN DE GUARDIAS, CAMPO Y VANGUARDIA OPERATIVA
    ============================================================================== */
 
 .guardias-hub-wrapper {
     display: flex;
     flex-direction: column;
-    gap: 16px;
-    padding: 16px;
-    color: #fff;
-    font-family: 'Outfit', sans-serif;
+    gap: 18px;
+    padding: 18px;
+    color: #f8fafc;
+    font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
+/* 1. Cabecera Ejecutiva y KPIs */
 .guardias-hero-card {
-    background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
-    border: 1.5px solid #a855f7;
-    border-radius: 14px;
-    padding: 18px 22px;
-    box-shadow: 0 4px 25px rgba(168, 85, 247, 0.15);
+    background: linear-gradient(145deg, rgba(15, 23, 42, 0.96) 0%, rgba(11, 17, 32, 0.98) 100%);
+    border: 1px solid #1e293b;
+    border-radius: 18px;
+    padding: 20px 24px;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+    position: relative;
+    overflow: hidden;
+}
+
+.guardias-hero-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #f59e0b 0%, #6366f1 50%, #10b981 100%);
 }
 
 .guardias-hero-header {
@@ -6430,36 +6447,47 @@ button, input, select, textarea, .pos-product-card, .cat-pill, .nav-item, .role-
     justify-content: space-between;
     align-items: center;
     flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 18px;
+    border-bottom: 1px solid rgba(51, 65, 85, 0.55);
+    padding-bottom: 16px;
+}
+
+.guardias-hero-brand {
+    display: flex;
+    align-items: center;
     gap: 14px;
-    margin-bottom: 16px;
-    border-bottom: 1px solid rgba(168, 85, 247, 0.2);
-    padding-bottom: 14px;
 }
 
 .guardias-hero-icon-box {
-    width: 46px;
-    height: 46px;
-    border-radius: 12px;
-    background: linear-gradient(135deg, #7e22ce 0%, #9333ea 100%);
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.18) 0%, rgba(217, 119, 6, 0.08) 100%);
+    border: 1px solid rgba(245, 158, 11, 0.4);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.4rem;
-    color: #fff;
-    box-shadow: 0 0 15px rgba(168, 85, 247, 0.4);
+    font-size: 1.35rem;
+    color: #fbbf24;
+    box-shadow: 0 4px 16px rgba(245, 158, 11, 0.15);
+    flex-shrink: 0;
 }
 
 .guardias-hero-title {
-    margin: 0;
+    margin: 0 0 3px 0;
     color: #ffffff;
-    font-size: 1.25rem;
-    font-weight: 900;
-    letter-spacing: 0.3px;
+    font-size: 1.28rem;
+    font-weight: 800;
+    letter-spacing: -0.2px;
+    line-height: 1.2;
 }
 
 .guardias-hero-sub {
-    font-size: 0.76rem;
-    color: #e9d5ff;
+    font-size: 0.78rem;
+    color: #94a3b8;
+    font-weight: 500;
+    display: block;
 }
 
 .guardias-hero-actions {
@@ -6469,295 +6497,898 @@ button, input, select, textarea, .pos-product-card, .cat-pill, .nav-item, .role-
     flex-wrap: wrap;
 }
 
-.btn-companion-mobile {
-    background: linear-gradient(135deg, #7e22ce, #a855f7);
-    color: #fff;
-    border: 1px solid #c084fc;
-    padding: 8px 16px;
-    border-radius: 8px;
-    font-size: 0.8rem;
-    font-weight: 800;
-    display: flex;
+.guardias-sync-badge {
+    display: inline-flex;
     align-items: center;
-    gap: 6px;
+    gap: 7px;
+    padding: 8px 13px;
+    border-radius: 10px;
+    font-size: 0.76rem;
+    font-weight: 700;
+    background: rgba(16, 185, 129, 0.1);
+    color: #34d399;
+    border: 1px solid rgba(16, 185, 129, 0.25);
+}
+
+.guardias-sync-badge.offline {
+    background: rgba(245, 158, 11, 0.12);
+    color: #fbbf24;
+    border-color: rgba(245, 158, 11, 0.3);
+}
+
+.guardias-sync-badge .sync-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #10b981;
+    box-shadow: 0 0 8px #10b981;
+}
+
+.btn-companion-mobile {
+    background: #1e293b;
+    color: #e2e8f0;
+    border: 1px solid #334155;
+    padding: 9px 15px;
+    border-radius: 10px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
     cursor: pointer;
-    box-shadow: 0 0 12px rgba(168, 85, 247, 0.35);
     transition: all 0.2s ease;
+}
+
+.btn-companion-mobile i {
+    color: #38bdf8;
 }
 
 .btn-companion-mobile:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 0 18px rgba(168, 85, 247, 0.6);
+    background: #334155;
+    border-color: #475569;
+    color: #ffffff;
+    transform: translateY(-1px);
 }
 
-/* KPIs Grid */
-.guardias-kpi-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
-    gap: 12px;
-}
-
-.guardias-kpi-card {
-    background: rgba(15, 23, 42, 0.7);
-    border: 1px solid #334155;
+.btn-nueva-alta-amber {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    color: #0f172a;
+    border: 1px solid #fbbf24;
+    padding: 9px 18px;
     border-radius: 10px;
-    padding: 12px 14px;
+    font-size: 0.82rem;
+    font-weight: 800;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
     cursor: pointer;
+    box-shadow: 0 4px 16px rgba(245, 158, 11, 0.3);
     transition: all 0.2s ease;
 }
 
-.guardias-kpi-card:hover {
-    border-color: #a855f7;
-    background: rgba(168, 85, 247, 0.1);
+.btn-nueva-alta-amber:hover {
+    background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(245, 158, 11, 0.45);
+}
+
+/* Fila Horizontal de 5 KPIs */
+.guardias-kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 14px;
+}
+
+@media (max-width: 1100px) {
+    .guardias-kpi-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 680px) {
+    .guardias-kpi-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+.guardias-kpi-card {
+    background: rgba(15, 23, 42, 0.82);
+    border: 1px solid #1e293b;
+    border-radius: 14px;
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.guardias-kpi-card:hover,
+.guardias-kpi-card.kpi-active {
+    border-color: rgba(245, 158, 11, 0.45);
+    background: rgba(30, 41, 59, 0.75);
     transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
+}
+
+.kpi-icon-badge {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.15rem;
+    flex-shrink: 0;
+}
+
+.kpi-icon-badge.kpi-emerald {
+    background: rgba(16, 185, 129, 0.14);
+    color: #34d399;
+    border: 1px solid rgba(16, 185, 129, 0.28);
+}
+
+.kpi-icon-badge.kpi-amber {
+    background: rgba(245, 158, 11, 0.14);
+    color: #fbbf24;
+    border: 1px solid rgba(245, 158, 11, 0.28);
+}
+
+.kpi-icon-badge.kpi-sky {
+    background: rgba(56, 189, 248, 0.14);
+    color: #38bdf8;
+    border: 1px solid rgba(56, 189, 248, 0.28);
+}
+
+.kpi-icon-badge.kpi-orange {
+    background: rgba(249, 115, 22, 0.14);
+    color: #fb923c;
+    border: 1px solid rgba(249, 115, 22, 0.28);
+}
+
+.kpi-icon-badge.kpi-purple {
+    background: rgba(168, 85, 247, 0.14);
+    color: #c084fc;
+    border: 1px solid rgba(168, 85, 247, 0.28);
+}
+
+.kpi-content-box {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
 }
 
 .guardias-kpi-card .kpi-lbl {
     font-size: 0.72rem;
     color: #94a3b8;
     font-weight: 700;
-    display: block;
-    margin-bottom: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    margin-bottom: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.kpi-val-row {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
 }
 
 .guardias-kpi-card .kpi-val {
-    font-size: 1.4rem;
+    font-size: 1.5rem;
     font-weight: 900;
-    color: #fff;
-    font-family: monospace;
+    color: #ffffff;
+    line-height: 1.1;
+    font-family: 'Outfit', sans-serif;
 }
 
-/* Tabs Bar */
+.guardias-kpi-card .kpi-unit {
+    font-size: 0.72rem;
+    color: #64748b;
+    font-weight: 700;
+}
+
+/* 2. Barra de Pestañas Principales (Segmented Control / Pills Corporativas) */
 .guardias-tabs-bar {
-    display: flex;
-    gap: 8px;
-    background: #0f172a;
-    border: 1px solid #334155;
-    border-radius: 10px;
-    padding: 6px;
-    overflow-x: auto;
-}
-
-.guardias-tab-btn {
-    background: transparent;
-    border: none;
-    color: #94a3b8;
-    font-size: 0.82rem;
-    font-weight: 800;
-    padding: 8px 16px;
-    border-radius: 8px;
-    cursor: pointer;
     display: flex;
     align-items: center;
     gap: 6px;
-    white-space: nowrap;
-    transition: all 0.2s ease;
-    position: relative;
+    background: #0f172a;
+    border: 1px solid #1e293b;
+    border-radius: 14px;
+    padding: 6px;
+    overflow-x: auto;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
 }
 
-.guardias-tab-btn.active, .guardias-tab-btn:hover {
-    background: rgba(168, 85, 247, 0.2);
-    color: #e9d5ff;
+.guardias-tab-btn {
+    flex: 1 1 auto;
+    background: transparent;
+    border: 1px solid transparent;
+    color: #94a3b8;
+    font-size: 0.8rem;
+    font-weight: 700;
+    padding: 10px 16px;
+    border-radius: 10px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    white-space: nowrap;
+    transition: all 0.2s ease;
+}
+
+.guardias-tab-btn:hover {
+    background: rgba(30, 41, 59, 0.7);
+    color: #e2e8f0;
 }
 
 .guardias-tab-btn.active {
-    background: linear-gradient(135deg, #7e22ce, #6b21a8);
-    color: #fff;
-    box-shadow: 0 0 10px rgba(168, 85, 247, 0.3);
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    color: #0f172a;
+    font-weight: 800;
+    border-color: #fbbf24;
+    box-shadow: 0 4px 14px rgba(245, 158, 11, 0.3);
+}
+
+.guardias-tab-btn.active i {
+    color: #0f172a;
 }
 
 .badge-tab-alert {
     background: #ef4444;
-    color: #fff;
-    font-size: 0.62rem;
-    padding: 1px 6px;
-    border-radius: 8px;
+    color: #ffffff;
+    font-size: 0.65rem;
+    padding: 1px 7px;
+    border-radius: 999px;
     font-weight: 900;
 }
 
-/* Filter Toolbar */
+/* Barra de Herramientas (Filtros Chips + Buscador con Lupa) */
 .guardias-filter-toolbar {
-    background: rgba(15, 23, 42, 0.6);
+    background: rgba(15, 23, 42, 0.85);
     border: 1px solid #1e293b;
-    border-radius: 10px;
-    padding: 10px 14px;
+    border-radius: 14px;
+    padding: 12px 16px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     flex-wrap: wrap;
-    gap: 10px;
-    margin-bottom: 14px;
+    gap: 12px;
+    margin-bottom: 18px;
+}
+
+.guardias-dept-chips {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
 }
 
 .filter-pill {
-    background: #1e293b;
+    background: rgba(30, 41, 59, 0.75);
     border: 1px solid #334155;
     color: #cbd5e1;
-    font-size: 0.74rem;
+    font-size: 0.75rem;
     font-weight: 700;
-    padding: 5px 12px;
-    border-radius: 6px;
+    padding: 7px 13px;
+    border-radius: 999px;
     cursor: pointer;
-    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.18s ease;
 }
 
-.filter-pill.active, .filter-pill:hover {
-    background: #7e22ce;
-    border-color: #a855f7;
-    color: #fff;
+.filter-pill i {
+    font-size: 0.72rem;
+    color: #94a3b8;
+    transition: color 0.18s ease;
 }
 
-.search-input-guardias, .date-input-guardias {
+.filter-pill:hover {
     background: #1e293b;
+    border-color: #475569;
+    color: #ffffff;
+}
+
+.filter-pill:hover i {
+    color: #fbbf24;
+}
+
+.filter-pill.active {
+    background: rgba(245, 158, 11, 0.16);
+    border-color: #f59e0b;
+    color: #fde68a;
+    box-shadow: 0 0 12px rgba(245, 158, 11, 0.2);
+}
+
+.filter-pill.active i {
+    color: #fbbf24;
+}
+
+.guardias-search-wrapper {
+    position: relative;
+    min-width: 270px;
+    flex: 0 1 320px;
+}
+
+.guardias-search-icon {
+    position: absolute;
+    left: 13px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #64748b;
+    font-size: 0.82rem;
+    pointer-events: none;
+}
+
+.search-input-guardias {
+    width: 100%;
+    background: rgba(2, 6, 23, 0.65);
     border: 1px solid #334155;
-    color: #fff;
+    color: #f8fafc;
     font-size: 0.8rem;
-    padding: 6px 12px;
-    border-radius: 6px;
+    padding: 8px 32px 8px 36px;
+    border-radius: 10px;
+    outline: none;
+    transition: all 0.2s ease;
+    box-sizing: border-box;
+}
+
+.search-input-guardias::placeholder {
+    color: #64748b;
+}
+
+.search-input-guardias:focus,
+.date-input-guardias:focus {
+    border-color: #f59e0b;
+    background: rgba(2, 6, 23, 0.9);
+    box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.15);
+}
+
+.guardias-search-clear {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: transparent;
+    border: none;
+    color: #94a3b8;
+    cursor: pointer;
+    padding: 4px;
+    font-size: 0.8rem;
+}
+
+.guardias-search-clear:hover {
+    color: #f87171;
+}
+
+.date-input-guardias {
+    background: rgba(2, 6, 23, 0.65);
+    border: 1px solid #334155;
+    color: #f8fafc;
+    font-size: 0.8rem;
+    padding: 7px 12px;
+    border-radius: 10px;
     outline: none;
 }
 
-.search-input-guardias:focus, .date-input-guardias:focus {
-    border-color: #a855f7;
-}
-
-/* Employee Cards */
+/* 3. Directorio de Empleados en Fichas Cuadradas (Grid Responsivo de Tarjetas con Foto) */
 .guardias-cards-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
-    gap: 14px;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 20px;
+}
+
+@media (max-width: 1380px) {
+    .guardias-cards-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 980px) {
+    .guardias-cards-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 620px) {
+    .guardias-cards-grid {
+        grid-template-columns: 1fr;
+    }
 }
 
 .emp-guardia-card {
-    background: #0f172a;
-    border: 1.5px solid #334155;
-    border-radius: 12px;
-    padding: 14px;
+    background: rgba(15, 23, 42, 0.92);
+    border: 1px solid rgba(30, 41, 59, 0.95);
+    border-radius: 18px;
+    padding: 20px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    transition: all 0.2s ease;
+    position: relative;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.38);
+    transition: all 0.24s cubic-bezier(0.16, 1, 0.3, 1);
+    overflow: hidden;
+}
+
+.emp-guardia-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, rgba(245, 158, 11, 0.6), rgba(99, 102, 241, 0.6));
+    opacity: 0.65;
+    transition: opacity 0.24s ease;
 }
 
 .emp-guardia-card:hover {
-    border-color: #a855f7;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+    border-color: rgba(245, 158, 11, 0.5);
+    transform: translateY(-4px);
+    box-shadow: 0 16px 34px rgba(0, 0, 0, 0.52), 0 0 22px rgba(245, 158, 11, 0.12);
+}
+
+.emp-guardia-card:hover::before {
+    opacity: 1;
 }
 
 .emp-guardia-card.inactivo {
-    opacity: 0.6;
-    border-style: dashed;
-    border-color: #ef4444;
+    opacity: 0.72;
+    border-color: rgba(239, 68, 68, 0.35);
+    background: rgba(15, 18, 30, 0.85);
 }
 
-.emp-card-header {
-    display: flex;
-    gap: 12px;
-    align-items: flex-start;
-    margin-bottom: 10px;
+.emp-guardia-card.inactivo::before {
+    background: linear-gradient(90deg, #ef4444, #991b1b);
 }
 
-.emp-avatar-box {
-    width: 42px;
-    height: 42px;
-    border-radius: 10px;
-    background: linear-gradient(135deg, #1e1b4b, #3b0764);
-    border: 1px solid #a855f7;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.2rem;
-    color: #e9d5ff;
-}
-
-.emp-card-name {
-    margin: 0;
-    color: #fff;
-    font-size: 0.95rem;
-    font-weight: 800;
-}
-
-.emp-card-cargo {
-    font-size: 0.74rem;
-    color: #94a3b8;
-}
-
+/* Badge de Estado en Esquina Superior Derecha */
 .badge-status-emp {
-    font-size: 0.62rem;
-    font-weight: 900;
-    padding: 2px 6px;
-    border-radius: 4px;
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.65rem;
+    font-weight: 800;
+    padding: 3px 10px;
+    border-radius: 999px;
+    letter-spacing: 0.4px;
+    z-index: 2;
+}
+
+.badge-status-emp .status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
 }
 
 .badge-status-emp.activo {
-    background: rgba(34, 197, 94, 0.2);
-    color: #4ade80;
-    border: 1px solid #16a34a;
+    background: rgba(16, 185, 129, 0.12);
+    color: #34d399;
+    border: 1px solid rgba(16, 185, 129, 0.28);
+}
+
+.badge-status-emp.activo .status-dot {
+    background: #10b981;
+    box-shadow: 0 0 6px #10b981;
 }
 
 .badge-status-emp.inactivo {
-    background: rgba(239, 68, 68, 0.2);
+    background: rgba(239, 68, 68, 0.14);
     color: #f87171;
-    border: 1px solid #dc2626;
+    border: 1px solid rgba(239, 68, 68, 0.32);
 }
 
-.emp-card-details {
-    background: rgba(0,0,0,0.3);
-    border-radius: 8px;
-    padding: 8px 10px;
-    font-size: 0.74rem;
+.badge-status-emp.inactivo .status-dot {
+    background: #ef4444;
+}
+
+/* Encabezado de Ficha y Foto Cuadrada de Perfil */
+.emp-card-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-top: 6px;
+    margin-bottom: 4px;
+}
+
+.emp-photo-container {
+    position: relative;
+    width: 78px;
+    height: 78px;
+    flex-shrink: 0;
+}
+
+.emp-square-photo {
+    width: 78px;
+    height: 78px;
+    border-radius: 16px;
+    object-fit: cover;
+    border: 2px solid #334155;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.45);
+    background: #1e293b;
+    display: block;
+    transition: border-color 0.2s ease, transform 0.2s ease;
+}
+
+.emp-guardia-card:hover .emp-square-photo {
+    border-color: rgba(245, 158, 11, 0.65);
+}
+
+.emp-photo-cam-btn {
+    position: absolute;
+    bottom: -4px;
+    right: -4px;
+    width: 28px;
+    height: 28px;
+    border-radius: 9px;
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    color: #0f172a;
+    border: 2px solid #0f172a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.72rem;
+    cursor: pointer;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.5);
+    transition: all 0.18s ease;
+}
+
+.emp-photo-cam-btn:hover {
+    transform: scale(1.12);
+    background: #fbbf24;
+    box-shadow: 0 0 12px rgba(245, 158, 11, 0.65);
+}
+
+.emp-identity-col {
+    flex: 1;
+    min-width: 0;
+    padding-right: 4px;
+}
+
+.emp-card-name {
+    margin: 14px 0 3px 0;
+    color: #ffffff;
+    font-size: 1.02rem;
+    font-weight: 800;
+    line-height: 1.22;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.emp-card-cargo {
+    font-size: 0.78rem;
+    color: #94a3b8;
+    font-weight: 600;
+    margin-bottom: 7px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Badges de Departamento por Color */
+.emp-depto-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.68rem;
+    font-weight: 800;
+    padding: 3px 9px;
+    border-radius: 7px;
+    letter-spacing: 0.2px;
+}
+
+.depto-badge-amber {
+    background: rgba(245, 158, 11, 0.14);
+    color: #fbbf24;
+    border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.depto-badge-orange {
+    background: rgba(249, 115, 22, 0.14);
+    color: #fb923c;
+    border: 1px solid rgba(249, 115, 22, 0.3);
+}
+
+.depto-badge-emerald {
+    background: rgba(16, 185, 129, 0.14);
+    color: #34d399;
+    border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.depto-badge-sky {
+    background: rgba(56, 189, 248, 0.14);
+    color: #38bdf8;
+    border: 1px solid rgba(56, 189, 248, 0.3);
+}
+
+.depto-badge-purple {
+    background: rgba(168, 85, 247, 0.14);
+    color: #c084fc;
+    border: 1px solid rgba(168, 85, 247, 0.3);
+}
+
+.depto-badge-indigo {
+    background: rgba(99, 102, 241, 0.14);
+    color: #818cf8;
+    border: 1px solid rgba(99, 102, 241, 0.3);
+}
+
+.depto-badge-slate {
+    background: rgba(148, 163, 184, 0.14);
     color: #cbd5e1;
+    border: 1px solid rgba(148, 163, 184, 0.3);
+}
+
+/* Caja Interna de Datos Operativos */
+.emp-card-details {
+    background: rgba(2, 6, 23, 0.55);
+    border: 1px solid rgba(30, 41, 59, 0.9);
+    border-radius: 12px;
+    padding: 11px 13px;
+    margin: 12px 0;
     display: flex;
     flex-direction: column;
-    gap: 4px;
-    margin-bottom: 12px;
+    gap: 7px;
+    font-size: 0.76rem;
 }
 
-.emp-card-footer {
+.emp-detail-row {
     display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+}
+
+.emp-detail-lbl {
+    color: #64748b;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
     gap: 6px;
-    justify-content: flex-end;
+}
+
+.emp-detail-lbl i {
+    width: 14px;
+    text-align: center;
+    color: #94a3b8;
+}
+
+.emp-detail-val {
+    color: #e2e8f0;
+    font-weight: 700;
+    text-align: right;
+}
+
+.emp-schedule-pill {
+    color: #bae6fd;
+    font-family: monospace;
+    font-size: 0.74rem;
+}
+
+.emp-pin-box {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.emp-pin-code {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 0.8rem;
+    font-weight: 800;
+    padding: 2px 8px;
+    border-radius: 6px;
+    background: rgba(16, 185, 129, 0.12);
+    color: #34d399;
+    border: 1px solid rgba(16, 185, 129, 0.25);
+    letter-spacing: 1.5px;
+}
+
+.emp-pin-toggle-btn {
+    background: rgba(30, 41, 59, 0.8);
+    border: 1px solid #334155;
+    color: #94a3b8;
+    width: 24px;
+    height: 24px;
+    border-radius: 6px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.68rem;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.emp-pin-toggle-btn:hover {
+    background: #334155;
+    color: #fbbf24;
+    border-color: #475569;
+}
+
+/* Pie de Ficha (3 Botones Corporativos) */
+.emp-card-footer {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    padding-top: 10px;
+    border-top: 1px solid rgba(30, 41, 59, 0.85);
 }
 
 .btn-card-action {
     background: #1e293b;
     border: 1px solid #334155;
-    color: #cbd5e1;
-    font-size: 0.72rem;
+    color: #e2e8f0;
+    font-size: 0.74rem;
     font-weight: 700;
-    padding: 4px 10px;
-    border-radius: 6px;
+    padding: 8px 6px;
+    border-radius: 9px;
     cursor: pointer;
-    display: flex;
+    display: inline-flex;
     align-items: center;
-    gap: 4px;
-    transition: all 0.2s ease;
+    justify-content: center;
+    gap: 5px;
+    transition: all 0.18s ease;
+    white-space: nowrap;
 }
 
-.btn-card-action:hover {
-    background: #334155;
-    color: #fff;
+.btn-card-credencial:hover {
+    background: rgba(79, 70, 229, 0.28);
+    border-color: #6366f1;
+    color: #ffffff;
+}
+
+.btn-card-editar:hover {
+    background: rgba(245, 158, 11, 0.2);
+    border-color: #f59e0b;
+    color: #fde68a;
 }
 
 .btn-danger-action {
-    color: #f87171;
-    border-color: rgba(239, 68, 68, 0.4);
+    background: rgba(136, 19, 55, 0.22);
+    color: #fb7185;
+    border-color: rgba(225, 29, 72, 0.35);
 }
 
 .btn-danger-action:hover {
-    background: #dc2626;
-    color: #fff;
+    background: #e11d48;
+    border-color: #f43f5e;
+    color: #ffffff;
 }
 
 .btn-success-action {
-    color: #4ade80;
-    border-color: rgba(34, 197, 94, 0.4);
+    background: rgba(6, 78, 59, 0.35);
+    color: #34d399;
+    border-color: rgba(16, 185, 129, 0.4);
 }
 
 .btn-success-action:hover {
-    background: #16a34a;
-    color: #fff;
+    background: #059669;
+    border-color: #10b981;
+    color: #ffffff;
+}
+
+.empty-msg-card {
+    grid-column: 1 / -1;
+    background: rgba(15, 23, 42, 0.75);
+    border: 1px dashed #334155;
+    border-radius: 16px;
+    padding: 42px 20px;
+    text-align: center;
+}
+
+/* 4. Cargador de Fotografía en Modal de Alta / Edición */
+.emp-modal-photo-uploader {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: rgba(15, 23, 42, 0.9);
+    border: 1.5px dashed #475569;
+    border-radius: 14px;
+    padding: 14px 16px;
+    margin-bottom: 16px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.emp-modal-photo-uploader:hover,
+.emp-modal-photo-uploader.dragover {
+    border-color: #f59e0b;
+    background: rgba(30, 41, 59, 0.85);
+    box-shadow: 0 0 18px rgba(245, 158, 11, 0.15);
+}
+
+.emp-modal-photo-preview-box {
+    position: relative;
+    width: 76px;
+    height: 76px;
+    flex-shrink: 0;
+}
+
+.emp-modal-photo-preview-box img {
+    width: 76px;
+    height: 76px;
+    border-radius: 16px;
+    object-fit: cover;
+    border: 2px solid #f59e0b;
+    display: block;
+    background: #1e293b;
+}
+
+.emp-modal-photo-badge {
+    position: absolute;
+    bottom: -4px;
+    right: -4px;
+    width: 24px;
+    height: 24px;
+    border-radius: 7px;
+    background: #f59e0b;
+    color: #0f172a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7rem;
+    border: 2px solid #0b0f19;
+}
+
+.emp-modal-photo-instructions {
+    flex: 1;
+    min-width: 0;
+}
+
+.emp-modal-photo-title {
+    font-size: 0.84rem;
+    font-weight: 800;
+    color: #ffffff;
+    margin-bottom: 3px;
+}
+
+.emp-modal-photo-sub {
+    font-size: 0.72rem;
+    color: #94a3b8;
+    line-height: 1.35;
+}
+
+.emp-photo-select-btn {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    color: #0f172a;
+    border: none;
+    border-radius: 8px;
+    padding: 5px 12px;
+    font-size: 0.72rem;
+    font-weight: 800;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.emp-photo-reset-btn {
+    background: #1e293b;
+    color: #cbd5e1;
+    border: 1px solid #334155;
+    border-radius: 8px;
+    padding: 5px 11px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.emp-photo-reset-btn:hover {
+    background: #334155;
+    color: #ffffff;
 }
 
 /* Turnos Matrix Grid */
