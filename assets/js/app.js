@@ -2551,13 +2551,55 @@
 
         handleBarcodeInput(e) {
             if (e.key === 'Enter') {
-                const query = e.target.value.trim();
-                const found = this.productos.find(p => p.codigoBarras === query || p.id.toLowerCase() === query.toLowerCase());
+                const rawQuery = (e.target ? e.target.value : String(e)).trim();
+                if (!rawQuery) return;
+
+                // 1. Sincronizar catálogo Productos Nueva Viasa si está disponible
+                if (window.ViasaProductosExclusivosEngine && typeof window.ViasaProductosExclusivosEngine.sincronizarTodosConPOS === 'function') {
+                    window.ViasaProductosExclusivosEngine.sincronizarTodosConPOS();
+                }
+
+                // 2. Extraer código si es un QR (JSON o texto estructurado con pipes)
+                let query = rawQuery;
+                if (rawQuery.startsWith('{') && rawQuery.endsWith('}')) {
+                    try {
+                        const parsed = JSON.parse(rawQuery);
+                        query = parsed.ean || parsed.codigoBarras || parsed.barcode || parsed.sku || parsed.id || parsed.s || rawQuery;
+                    } catch (err) {}
+                } else if (rawQuery.includes('|')) {
+                    const parts = rawQuery.split('|').map(s => s.trim());
+                    const eanPart = parts.find(p => /^\d{8,14}$/.test(p));
+                    const skuPart = parts.find(p => /^PNV-[A-Z0-9-]+$/i.test(p) || /^NV-\d+$/i.test(p) || /^PRD-\d+$/i.test(p));
+                    if (eanPart) query = eanPart;
+                    else if (skuPart) query = skuPart;
+                    else if (parts[1]) query = parts[1];
+                }
+
+                const qLower = query.toLowerCase();
+                let found = this.productos.find(p => 
+                    (p.codigoBarras && p.codigoBarras === query) ||
+                    (p.barcode && p.barcode === query) ||
+                    p.id.toLowerCase() === qLower ||
+                    (p.sku && p.sku.toLowerCase() === qLower)
+                );
+
+                // Si no está en this.productos, buscar en Productos Nueva Viasa y sincronizar
+                if (!found && window.ViasaProductosExclusivosEngine && typeof window.ViasaProductosExclusivosEngine.buscarProducto === 'function') {
+                    const pnv = window.ViasaProductosExclusivosEngine.buscarProducto(query);
+                    if (pnv) {
+                        window.ViasaProductosExclusivosEngine.sincronizarConPOS(pnv);
+                        found = this.productos.find(p => p.id === pnv.id);
+                    }
+                }
+
                 if (found) {
                     this.agregarAlCarrito(found.id);
-                    e.target.value = '';
+                    if (e.target) e.target.value = '';
                     this.filtroBusqueda = '';
                     this.renderPOSProducts();
+                    if (window.ViasaAudio) window.ViasaAudio.playScanBeep();
+                } else {
+                    if (window.ViasaAudio) window.ViasaAudio.playError();
                 }
             }
         },
@@ -2575,7 +2617,9 @@
             if (this.filtroBusqueda) {
                 lista = lista.filter(p => 
                     p.nombre.toLowerCase().includes(this.filtroBusqueda) || 
-                    (p.codigoBarras && p.codigoBarras.includes(this.filtroBusqueda))
+                    (p.codigoBarras && p.codigoBarras.includes(this.filtroBusqueda)) ||
+                    (p.barcode && p.barcode.includes(this.filtroBusqueda)) ||
+                    (p.sku && p.sku.toLowerCase().includes(this.filtroBusqueda))
                 );
             }
 

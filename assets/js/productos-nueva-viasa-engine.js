@@ -383,24 +383,47 @@
     }
 
     // ========================================================================
-    // CÓDIGO DE BARRAS EAN-13 EN SVG (100% LOCAL / OFFLINE)
+    // MOTOR VECTORIAL DE CÓDIGOS DE BARRA (EAN-13 / CODE-128) Y QR (100% OFFLINE)
     // ========================================================================
     const EAN_L = ['0001101', '0011001', '0010011', '0111101', '0100011', '0110001', '0101111', '0111011', '0110111', '0001011'];
     const EAN_PARITY = ['LLLLLL', 'LLGLGG', 'LLGGLG', 'LLGGGL', 'LGLLGG', 'LGGLLG', 'LGGGLL', 'LGLGLG', 'LGLGGL', 'LGGLGL'];
     const EAN_R = EAN_L.map(c => c.split('').map(b => (b === '0' ? '1' : '0')).join(''));
     const EAN_G = EAN_R.map(c => c.split('').reverse().join(''));
 
+    const CODE128_PATTERNS = [
+        "212222", "222122", "222221", "121223", "121322", "131222", "122213", "122312", "132212", "221213",
+        "221312", "231212", "112232", "122132", "122231", "113222", "123122", "123221", "223211", "221132",
+        "221231", "213212", "223112", "312131", "311222", "321122", "321221", "312212", "322112", "322211",
+        "212123", "212321", "232121", "111323", "131123", "131321", "112313", "132113", "132311", "211313",
+        "231113", "231311", "112133", "112331", "132131", "113123", "113321", "133121", "313121", "211331",
+        "231131", "213113", "213311", "213131", "311123", "311321", "331121", "312113", "312311", "332111",
+        "314111", "221411", "431111", "111224", "111422", "121124", "121421", "141122", "141221", "112214",
+        "112412", "122114", "122411", "142112", "142211", "241211", "221114", "413111", "241112", "134111",
+        "111242", "121142", "121241", "114212", "124112", "124211", "411212", "421112", "421211", "212141",
+        "214121", "412121", "111143", "111341", "131141", "114113", "114311", "411113", "411311", "113141",
+        "114131", "311141", "411131", "211412", "211214", "211232", "2331112"
+    ];
+
+    function calcularChecksumEAN13(raw12) {
+        const str = String(raw12 || '').replace(/\D/g, '').padStart(12, '0').slice(0, 12);
+        let sum = 0;
+        for (let i = 0; i < 12; i++) {
+            const digit = parseInt(str[i], 10);
+            sum += (i % 2 === 0) ? digit : digit * 3;
+        }
+        const mod = sum % 10;
+        return (mod === 0) ? 0 : (10 - mod);
+    }
+
     function ean13Normalize(code) {
         const digits = String(code || '').replace(/\D/g, '');
         if (digits.length < 12) return null;
         const d12 = digits.slice(0, 12);
-        let sum = 0;
-        for (let i = 0; i < 12; i++) sum += parseInt(d12[i], 10) * (i % 2 === 0 ? 1 : 3);
-        const check = (10 - (sum % 10)) % 10;
+        const check = calcularChecksumEAN13(d12);
         return d12 + check;
     }
 
-    function ean13Svg(code, width, height) {
+    function ean13Svg(code, width = 190, height = 64) {
         const full = ean13Normalize(code);
         if (!full) return `<div style="font-family:monospace;font-size:11px;color:#0f172a;">${esc(code || 'SIN CÓDIGO')}</div>`;
         const first = parseInt(full[0], 10);
@@ -419,13 +442,334 @@
         for (let i = 0; i < bits.length; i++) {
             if (bits[i] === '1') {
                 const guard = i < 3 || (i >= 45 && i < 50) || i >= 92;
-                rects += `<rect x="${((i + 7) * mod).toFixed(2)}" y="0" width="${mod.toFixed(2)}" height="${guard ? h - 4 : h - 14}" fill="#000"/>`;
+                rects += `<rect x="${((i + 7) * mod).toFixed(2)}" y="0" width="${mod.toFixed(2)}" height="${guard ? h - 4 : h - 14}" fill="#0f172a"/>`;
             }
         }
-        return `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h + 4}" viewBox="0 0 ${w} ${h + 4}">
+        const formatted = `${full.slice(0,1)} ${full.slice(1,7)} ${full.slice(7,13)}`;
+        return `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h + 4}" viewBox="0 0 ${w} ${h + 4}" shape-rendering="crispEdges">
             <rect width="${w}" height="${h + 4}" fill="#fff"/>${rects}
-            <text x="${w / 2}" y="${h + 2}" text-anchor="middle" font-family="monospace" font-size="11" fill="#000">${full}</text>
+            <text x="${w / 2}" y="${h + 2}" text-anchor="middle" font-family="'JetBrains Mono', 'Courier New', monospace" font-size="11" font-weight="800" fill="#0f172a">${formatted}</text>
         </svg>`;
+    }
+
+    function code128Bits(text) {
+        const raw = String(text || '').trim();
+        if (!raw) return { bits: '', text: '' };
+        const values = [104];
+        let checkSum = 104;
+        for (let i = 0; i < raw.length; i++) {
+            const code = raw.charCodeAt(i) - 32;
+            const valid = (code >= 0 && code <= 95) ? code : 0;
+            values.push(valid);
+            checkSum += valid * (i + 1);
+        }
+        values.push(checkSum % 103);
+        values.push(106);
+        let bits = '';
+        values.forEach(val => {
+            const pattern = CODE128_PATTERNS[val];
+            if (pattern) {
+                for (let p = 0; p < pattern.length; p++) {
+                    const count = parseInt(pattern[p], 10);
+                    bits += ((p % 2 === 0) ? '1' : '0').repeat(count);
+                }
+            }
+        });
+        return { bits, text: raw };
+    }
+
+    function code128Svg(text, width = 190, height = 64) {
+        const raw = String(text || '').trim();
+        if (!raw) return `<div style="font-family:monospace;font-size:11px;color:#0f172a;">SIN CÓDIGO</div>`;
+        const { bits } = code128Bits(raw);
+        if (!bits) return `<div style="font-family:monospace;font-size:11px;color:#0f172a;">${esc(raw)}</div>`;
+        const w = width || 190;
+        const h = height || 64;
+        const mod = w / (bits.length + 16);
+        let rects = '';
+        for (let i = 0; i < bits.length; i++) {
+            if (bits[i] === '1') {
+                rects += `<rect x="${((i + 8) * mod).toFixed(2)}" y="2" width="${mod.toFixed(2)}" height="${h - 18}" fill="#0f172a"/>`;
+            }
+        }
+        return `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h + 2}" viewBox="0 0 ${w} ${h + 2}" shape-rendering="crispEdges">
+            <rect width="${w}" height="${h + 2}" fill="#fff"/>${rects}
+            <text x="${w / 2}" y="${h}" text-anchor="middle" font-family="'JetBrains Mono', 'Courier New', monospace" font-size="11" font-weight="800" fill="#0f172a">${esc(raw)}</text>
+        </svg>`;
+    }
+
+    function renderBarcodeSvg(code, formato = 'EAN13', width = 190, height = 64) {
+        const clean = String(code || '').trim();
+        if (formato === 'CODE128' || !/^\d{12,13}$/.test(clean)) {
+            return code128Svg(clean, width, height);
+        }
+        return ean13Svg(clean, width, height);
+    }
+
+    // Generador QR ISO/IEC 18004 100% Autónomo y Offline
+    const StandaloneQREngine = {
+        EXP_TABLE: new Uint8Array(512),
+        LOG_TABLE: new Uint8Array(256),
+        _inited: false,
+
+        _init() {
+            if (this._inited) return;
+            let x = 1;
+            for (let i = 0; i < 255; i++) {
+                this.EXP_TABLE[i] = x;
+                this.EXP_TABLE[i + 255] = x;
+                this.LOG_TABLE[x] = i;
+                x <<= 1;
+                if (x & 256) x ^= 0x11d;
+            }
+            this._inited = true;
+        },
+
+        gmul(a, b) {
+            if (a === 0 || b === 0) return 0;
+            return this.EXP_TABLE[this.LOG_TABLE[a] + this.LOG_TABLE[b]];
+        },
+
+        crearPolinomioGenerador(numEC) {
+            let poly = [1];
+            for (let i = 0; i < numEC; i++) {
+                const next = [this.EXP_TABLE[i], 1];
+                const res = new Array(poly.length + 1).fill(0);
+                for (let j = 0; j < poly.length; j++) {
+                    for (let k = 0; k < next.length; k++) {
+                        res[j + k] ^= this.gmul(poly[j], next[k]);
+                    }
+                }
+                poly = res;
+            }
+            return poly;
+        },
+
+        calcularECCodewords(dataBytes, numEC) {
+            const genPoly = this.crearPolinomioGenerador(numEC);
+            const msg = new Array(dataBytes.length + numEC).fill(0);
+            for (let i = 0; i < dataBytes.length; i++) msg[i] = dataBytes[i];
+            for (let i = 0; i < dataBytes.length; i++) {
+                const coef = msg[i];
+                if (coef !== 0) {
+                    for (let j = 0; j < genPoly.length; j++) {
+                        msg[i + j] ^= this.gmul(genPoly[j], coef);
+                    }
+                }
+            }
+            return msg.slice(dataBytes.length);
+        },
+
+        encodeUTF8(str) {
+            const utf8 = [];
+            for (let i = 0; i < str.length; i++) {
+                let charcode = str.charCodeAt(i);
+                if (charcode < 0x80) utf8.push(charcode);
+                else if (charcode < 0x800) {
+                    utf8.push(0xc0 | (charcode >> 6), 0x80 | (charcode & 0x3f));
+                } else if (charcode < 0xd800 || charcode >= 0xe000) {
+                    utf8.push(0xe0 | (charcode >> 12), 0x80 | ((charcode >> 6) & 0x3f), 0x80 | (charcode & 0x3f));
+                }
+            }
+            return utf8;
+        },
+
+        generarMatrizQR(texto) {
+            this._init();
+            const utf8Bytes = this.encodeUTF8(String(texto || ''));
+            const len = utf8Bytes.length;
+            let version = 2;
+            let totalDataCodewords = 28;
+            let ecCodewords = 16;
+            if (len > 20 && len <= 42) {
+                version = 3; totalDataCodewords = 44; ecCodewords = 26;
+            } else if (len > 42 && len <= 68) {
+                version = 4; totalDataCodewords = 64; ecCodewords = 36;
+            } else if (len > 68 && len <= 104) {
+                version = 5; totalDataCodewords = 86; ecCodewords = 48;
+            } else if (len > 104) {
+                version = 6; totalDataCodewords = 108; ecCodewords = 56;
+            }
+
+            const size = 17 + (version * 4);
+            const matrix = Array.from({ length: size }, () => Array(size).fill(null));
+
+            const addFinder = (r, c) => {
+                for (let i = -1; i <= 7; i++) {
+                    for (let j = -1; j <= 7; j++) {
+                        const row = r + i;
+                        const col = c + j;
+                        if (row >= 0 && row < size && col >= 0 && col < size) {
+                            if (i === -1 || i === 7 || j === -1 || j === 7) {
+                                matrix[row][col] = 0;
+                            } else if (i === 0 || i === 6 || j === 0 || j === 6 || (i >= 2 && i <= 4 && j >= 2 && j <= 4)) {
+                                matrix[row][col] = 1;
+                            } else {
+                                matrix[row][col] = 0;
+                            }
+                        }
+                    }
+                }
+            };
+
+            addFinder(0, 0);
+            addFinder(0, size - 7);
+            addFinder(size - 7, 0);
+
+            for (let i = 8; i < size - 8; i++) {
+                if (matrix[6][i] === null) matrix[6][i] = (i % 2 === 0) ? 1 : 0;
+                if (matrix[i][6] === null) matrix[i][6] = (i % 2 === 0) ? 1 : 0;
+            }
+            matrix[size - 8][8] = 1;
+
+            if (version >= 2) {
+                const alignPositions = { 2: [6, 18], 3: [6, 22], 4: [6, 26], 5: [6, 30], 6: [6, 34] };
+                const pos = alignPositions[version] || [6, 18];
+                for (let r of pos) {
+                    for (let c of pos) {
+                        if (matrix[r][c] === null) {
+                            for (let i = -2; i <= 2; i++) {
+                                for (let j = -2; j <= 2; j++) {
+                                    const isBorder = Math.abs(i) === 2 || Math.abs(j) === 2;
+                                    const isCenter = i === 0 && j === 0;
+                                    matrix[r + i][c + j] = (isBorder || isCenter) ? 1 : 0;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            const dataBits = [];
+            dataBits.push(0, 1, 0, 0);
+            for (let i = 7; i >= 0; i--) dataBits.push((len >> i) & 1);
+            for (let b of utf8Bytes) {
+                for (let i = 7; i >= 0; i--) dataBits.push((b >> i) & 1);
+            }
+            const maxBits = totalDataCodewords * 8;
+            const termLen = Math.min(4, maxBits - dataBits.length);
+            for (let i = 0; i < termLen; i++) dataBits.push(0);
+            while (dataBits.length % 8 !== 0) dataBits.push(0);
+
+            const dataBytes = [];
+            for (let i = 0; i < dataBits.length; i += 8) {
+                let byte = 0;
+                for (let j = 0; j < 8; j++) byte = (byte << 1) | dataBits[i + j];
+                dataBytes.push(byte);
+            }
+            const padBytes = [0xec, 0x11];
+            let pIdx = 0;
+            while (dataBytes.length < totalDataCodewords) {
+                dataBytes.push(padBytes[pIdx % 2]);
+                pIdx++;
+            }
+
+            const ecBytes = this.calcularECCodewords(dataBytes, ecCodewords);
+            const finalBits = [];
+            for (let b of [...dataBytes, ...ecBytes]) {
+                for (let i = 7; i >= 0; i--) finalBits.push((b >> i) & 1);
+            }
+
+            let bitIndex = 0;
+            let right = size - 1;
+            let goingUp = true;
+
+            while (right > 0) {
+                if (right === 6) right--;
+                const colRange = [right, right - 1];
+                const rowOrder = goingUp ? Array.from({ length: size }, (_, i) => size - 1 - i) : Array.from({ length: size }, (_, i) => i);
+
+                for (let row of rowOrder) {
+                    for (let col of colRange) {
+                        if (matrix[row][col] === null) {
+                            let bit = (bitIndex < finalBits.length) ? finalBits[bitIndex++] : 0;
+                            if ((row + col) % 2 === 0) bit ^= 1;
+                            matrix[row][col] = bit;
+                        }
+                    }
+                }
+                goingUp = !goingUp;
+                right -= 2;
+            }
+
+            const formatBits = [1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0];
+            let fIdx = 0;
+            for (let i = 0; i <= 8; i++) {
+                if (i !== 6) matrix[8][i] = formatBits[fIdx++];
+            }
+            for (let i = 7; i >= 0; i--) {
+                if (i !== 6) matrix[i][8] = formatBits[fIdx++];
+            }
+            for (let i = 0; i < 7; i++) matrix[size - 1 - i][8] = formatBits[i];
+            for (let i = 0; i < 8; i++) matrix[8][size - 8 + i] = formatBits[7 + i];
+
+            return { matrix, size };
+        }
+    };
+
+    function renderQRSvg(payload, pixelSize = 120, margin = 2) {
+        let matrixData = null;
+        if (typeof window !== 'undefined' && window.ViasaCodeEngine && window.ViasaCodeEngine.qr) {
+            try {
+                matrixData = window.ViasaCodeEngine.qr.generarMatrizQR(payload);
+            } catch (e) {
+                matrixData = null;
+            }
+        }
+        if (!matrixData) {
+            matrixData = StandaloneQREngine.generarMatrizQR(payload);
+        }
+        const { matrix, size } = matrixData;
+        const total = size + (margin * 2);
+        let pathD = '';
+        for (let r = 0; r < size; r++) {
+            for (let c = 0; c < size; c++) {
+                if (matrix[r][c] === 1) {
+                    pathD += `M${c + margin},${r + margin}h1v1h-1z`;
+                }
+            }
+        }
+        return `<svg xmlns="http://www.w3.org/2000/svg" width="${pixelSize}" height="${pixelSize}" viewBox="0 0 ${total} ${total}" shape-rendering="crispEdges">
+            <rect width="${total}" height="${total}" fill="#ffffff"/>
+            <path d="${pathD}" fill="#0f172a"/>
+        </svg>`;
+    }
+
+    function descargarSvgArchivo(svgString, filename) {
+        if (typeof document === 'undefined') return;
+        const blob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename.endsWith('.svg') ? filename : `${filename}.svg`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }
+
+    function descargarSvgComoPng(svgString, filename, targetW = 800, targetH = 800) {
+        if (typeof document === 'undefined') return;
+        const img = new Image();
+        const svgBlob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
+        const url = URL.createObjectURL(svgBlob);
+        img.onload = () => {
+            const canvas = document.createElement('canvas');
+            canvas.width = targetW;
+            canvas.height = targetH;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, targetW, targetH);
+            ctx.drawImage(img, 0, 0, targetW, targetH);
+            const a = document.createElement('a');
+            a.href = canvas.toDataURL('image/png', 1.0);
+            a.download = filename.endsWith('.png') ? filename : `${filename}.png`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        };
+        img.src = url;
     }
 
     // ========================================================================
@@ -438,6 +782,10 @@
         busqueda: '',
         detalleId: null,
         tabActiva: 'A',
+        studioFormato: 'comercial',
+        studioLoteId: null,
+        studioTipoCodigo: null,
+        studioCopias: 1,
 
         // --------------------------------------------------------------------
         // PERSISTENCIA
@@ -457,6 +805,7 @@
                 this.guardar();
             }
             this.productos.forEach(p => this.sincronizarContabilidad(p));
+            this.sincronizarTodosConPOS();
             this.initialized = true;
         },
 
@@ -484,6 +833,17 @@
                 ivaPorcentaje: 0,
                 condicionFiscal: 'EXENTO'
             }, p);
+
+            // Identificación y trazabilidad: Códigos de Barra y QR
+            if (!prod.barcode && !prod.codigoBarras) {
+                prod.barcode = this.generarEAN13Auto(prod.id ? prod.id.replace(/\D/g, '') : null);
+            } else if (!prod.barcode && prod.codigoBarras) {
+                prod.barcode = prod.codigoBarras;
+            }
+            prod.tipoCodigo = prod.tipoCodigo || (/^\d{12,13}$/.test(prod.barcode) ? 'EAN13' : 'CODE128');
+            prod.codigoBarras = prod.barcode;
+            prod.qrCode = prod.qrCode || this.generarPayloadQR(prod);
+            prod.codigoQR = prod.qrCode;
 
             prod.stockInicial = Math.max(0, parseInt(prod.stockInicial, 10) || 0);
             if (prod.stockInicialMostrador === undefined || prod.stockInicialReserva === undefined) {
@@ -516,6 +876,133 @@
                 x.costoUnitUsd = round2(x.costoUnitUsd !== undefined ? x.costoUnitUsd : prod.costoUnitarioUsd);
             });
             return prod;
+        },
+
+        // --------------------------------------------------------------------
+        // GENERADORES AUTOMÁTICOS DE CÓDIGOS (EAN-13, CODE-128 Y QR)
+        // --------------------------------------------------------------------
+        generarEAN13Auto(correlativo) {
+            const prefijoViasa = '75931163'; // 759 VE + 31163 Panadería Nueva Viasa
+            const correlativosUsados = new Set();
+            (this.productos || []).forEach(p => {
+                const cb = String(p.barcode || p.codigoBarras || '').trim();
+                if (cb.startsWith(prefijoViasa) && cb.length >= 12) {
+                    const c = parseInt(cb.slice(8, 12), 10);
+                    if (!isNaN(c)) correlativosUsados.add(c);
+                }
+            });
+            let corrNum = parseInt(correlativo, 10);
+            if (!corrNum || isNaN(corrNum) || correlativosUsados.has(corrNum)) {
+                corrNum = 1001;
+                while (correlativosUsados.has(corrNum)) corrNum++;
+            }
+            const raw12 = `${prefijoViasa}${String(corrNum).padStart(4, '0').slice(-4)}`;
+            const dv = calcularChecksumEAN13(raw12);
+            return `${raw12}${dv}`;
+        },
+
+        generarCode128Auto(correlativo) {
+            let num = parseInt(correlativo, 10);
+            if (!num || isNaN(num)) num = this.productos ? (this.productos.length + 1) : 1;
+            return `NV-${String(num).padStart(4, '0')}`;
+        },
+
+        generarCodigoAuto(tipo = 'EAN13', sku = '') {
+            if (tipo === 'CODE128') {
+                if (sku && sku.startsWith('PNV-')) return sku;
+                return this.generarCode128Auto();
+            }
+            return this.generarEAN13Auto();
+        },
+
+        generarPayloadQR(p, lote = null, formato = 'texto') {
+            const elab = lote ? String(lote.fechaHora).slice(0, 10) : nowLocalInput().slice(0, 10);
+            const venc = lote ? lote.vencimiento : addDays(elab, p.vidaUtilDias || 7);
+            const loteId = lote ? (lote.id || lote.loteId) : 'LOTE-ACT';
+            const precioUSD = round2(p.pvpUnitarioUsd);
+            const precioBs = round2(this.bs(precioUSD));
+
+            if (formato === 'json') {
+                return JSON.stringify({
+                    t: 'PRD_VIASA',
+                    id: p.id,
+                    sku: p.sku,
+                    ean: p.barcode || p.codigoBarras,
+                    nom: p.nombre,
+                    lot: loteId,
+                    elab,
+                    venc,
+                    usd: precioUSD,
+                    bs: precioBs,
+                    rif: 'J-31163165-8',
+                    fab: 'Panadería Nueva Viasa, C.A.'
+                });
+            }
+
+            // Formato estructurado inteligente
+            return `${p.nombre} | ${p.sku} | ${loteId} | Elab: ${elab} Vence: ${venc} | Ref: $${fmtNum(precioUSD)} / Bs. ${fmtNum(precioBs)} | Panadería Nueva Viasa, C.A. (RIF: J-31163165-8)`;
+        },
+
+        // --------------------------------------------------------------------
+        // INTEGRACIÓN Y SINCRONIZACIÓN CON EL PUNTO DE VENTA (POS)
+        // --------------------------------------------------------------------
+        sincronizarConPOS(p, eliminar = false) {
+            if (typeof window === 'undefined' || !window.ViasaApp) return;
+            try {
+                if (!Array.isArray(window.ViasaApp.productos)) window.ViasaApp.productos = [];
+                const lista = window.ViasaApp.productos;
+                const idx = lista.findIndex(x => x.id === p.id || (p.sku && x.sku === p.sku));
+
+                if (eliminar) {
+                    if (idx >= 0) lista.splice(idx, 1);
+                } else {
+                    const st = this.calcStock(p);
+                    const itemPOS = {
+                        id: p.id,
+                        sku: p.sku,
+                        nombre: p.nombre,
+                        codigoBarras: p.barcode,
+                        barcode: p.barcode,
+                        qrCode: p.qrCode || this.generarPayloadQR(p),
+                        codigoQR: p.qrCode || this.generarPayloadQR(p),
+                        categoria: p.categoria || 'Panadería Autóctona',
+                        precioUSD: round2(p.pvpUnitarioUsd),
+                        precioBs: round2(this.bs(p.pvpUnitarioUsd)),
+                        costoUSD: round2(p.costoUnitarioUsd),
+                        unidad: p.presentacion || 'UND',
+                        stock: Math.max(0, st.mostrador),
+                        stockMinimo: p.stockMinimo || 10,
+                        exentoIVA: p.condicionFiscal === 'EXENTO',
+                        tipoCodigo: p.tipoCodigo || 'EAN13',
+                        produccionPropia: true,
+                        envasadoViasa: true,
+                        origen: 'Productos Nueva Viasa'
+                    };
+                    if (idx >= 0) {
+                        Object.assign(lista[idx], itemPOS);
+                    } else {
+                        lista.push(itemPOS);
+                    }
+                }
+            } catch (e) {
+                console.warn('[PNV -> POS Sync] Advertencia:', e);
+            }
+        },
+
+        sincronizarTodosConPOS() {
+            (this.productos || []).forEach(p => this.sincronizarConPOS(p, p.activo === false));
+        },
+
+        buscarProducto(query) {
+            if (!query) return null;
+            const q = String(query).trim().toLowerCase();
+            return (this.productos || []).find(p => 
+                (p.barcode && p.barcode.toLowerCase() === q) ||
+                (p.codigoBarras && p.codigoBarras.toLowerCase() === q) ||
+                (p.sku && p.sku.toLowerCase() === q) ||
+                (p.id && p.id.toLowerCase() === q) ||
+                (p.nombre && p.nombre.toLowerCase() === q)
+            );
         },
 
         // --------------------------------------------------------------------
@@ -794,6 +1281,16 @@
                         <span><i class="fa-solid fa-barcode"></i> ${esc(p.sku)} • ${esc(p.barcode || '—')}</span>
                     </div>
                     <div style="font-size:0.76rem;color:#CBD5E1;"><i class="fa-solid fa-box" style="color:#FBBF24;"></i> ${esc(p.presentacion)}</div>
+                    
+                    <!-- Tarjeta / Vista rápida de códigos de barras y QR -->
+                    <div class="pnv-card-codes-box" onclick="event.stopPropagation();ViasaProductosExclusivosEngine.abrirEstudioStickers('${id}')" title="Clic para abrir Estudio de Códigos e Impresión de Stickers">
+                        <div style="flex:1;overflow:hidden;margin-right:8px;background:#fff;padding:2px 4px;border-radius:4px;display:flex;align-items:center;justify-content:center;">
+                            ${renderBarcodeSvg(p.barcode || p.sku, p.tipoCodigo || 'EAN13', 140, 32)}
+                        </div>
+                        <div style="flex-shrink:0;background:#fff;padding:2px;border-radius:4px;display:flex;align-items:center;justify-content:center;">
+                            ${renderQRSvg(p.qrCode || this.generarPayloadQR(p), 34, 1)}
+                        </div>
+                    </div>
                     <div class="pnv-metrics-box">
                         <div class="pnv-stock-row">
                             <div>
@@ -826,9 +1323,10 @@
                     </div>
                 </div>
                 <div class="pnv-card-footer">
-                    <button type="button" class="pnv-btn pnv-btn-gold pnv-btn-sm" style="flex:1;" onclick="event.stopPropagation();ViasaProductosExclusivosEngine.abrirDetalle('${id}')"><i class="fa-solid fa-route"></i> Ver Detalle y Trazabilidad</button>
-                    <button type="button" class="pnv-btn pnv-btn-ghost pnv-btn-sm" title="Modificar producto" onclick="event.stopPropagation();ViasaProductosExclusivosEngine.abrirFormProducto('${id}')">✏️ Modificar</button>
-                    <button type="button" class="pnv-btn pnv-btn-danger pnv-btn-sm" title="Eliminar producto" onclick="event.stopPropagation();ViasaProductosExclusivosEngine.confirmarEliminarProducto('${id}')">🗑️ Eliminar</button>
+                    <button type="button" class="pnv-btn pnv-btn-gold pnv-btn-sm" style="flex:1;" onclick="event.stopPropagation();ViasaProductosExclusivosEngine.abrirDetalle('${id}')"><i class="fa-solid fa-route"></i> Ver Detalle</button>
+                    <button type="button" class="pnv-btn pnv-btn-ghost pnv-btn-sm" title="Imprimir stickers y ver códigos" onclick="event.stopPropagation();ViasaProductosExclusivosEngine.abrirEstudioStickers('${id}')"><i class="fa-solid fa-qrcode"></i> Stickers</button>
+                    <button type="button" class="pnv-btn pnv-btn-ghost pnv-btn-sm" title="Modificar producto" onclick="event.stopPropagation();ViasaProductosExclusivosEngine.abrirFormProducto('${id}')">✏️</button>
+                    <button type="button" class="pnv-btn pnv-btn-danger pnv-btn-sm" title="Eliminar producto" onclick="event.stopPropagation();ViasaProductosExclusivosEngine.confirmarEliminarProducto('${id}')">🗑️</button>
                 </div>
             </article>`;
         },
@@ -920,11 +1418,15 @@
         // --------------------------------------------------------------------
         abrirFormProducto(id) {
             const p = id ? this.getProducto(id) : null;
-            const v = p || {
-                nombre: '', sku: this.sugerirSku(), barcode: '', presentacion: '', categoria: CATEGORIAS[0], condicionFiscal: 'EXENTO',
+            const v = p ? Object.assign({}, p) : {
+                nombre: '', sku: this.sugerirSku(), barcode: this.generarEAN13Auto(), tipoCodigo: 'EAN13', presentacion: '', categoria: CATEGORIAS[0], condicionFiscal: 'EXENTO',
                 stockInicialMostrador: 0, stockInicialReserva: 0, stockMinimo: 10, costoUnitarioUsd: 0, pvpUnitarioUsd: 0,
                 precioAliadoUsd: 0, margenObjetivoPct: 35, vidaUtilDias: 7, fotoUrl: '', activo: true
             };
+            if (!v.barcode) {
+                v.barcode = (v.tipoCodigo === 'CODE128') ? this.generarCode128Auto() : this.generarEAN13Auto();
+            }
+            v.tipoCodigo = v.tipoCodigo || 'EAN13';
             this._fotoTemporal = v.fotoUrl || '';
             const tasa = this.getTasa();
             const opt = (arr, sel) => arr.map(o => `<option value="${esc(o)}" ${o === sel ? 'selected' : ''}>${esc(o)}</option>`).join('');
@@ -946,7 +1448,25 @@
                         <div class="pnv-form-grid">
                             <div class="pnv-field" style="grid-column:span 2;"><label class="pnv-label">Nombre del producto *</label><input name="nombre" class="pnv-input" required maxlength="120" value="${esc(v.nombre)}"></div>
                             <div class="pnv-field"><label class="pnv-label">Código SKU *</label><input name="sku" class="pnv-input" required maxlength="30" value="${esc(v.sku)}"></div>
-                            <div class="pnv-field"><label class="pnv-label">Código de barras (EAN-13)</label><input name="barcode" class="pnv-input" inputmode="numeric" maxlength="13" value="${esc(v.barcode)}"></div>
+                            <div class="pnv-field" style="grid-column:span 2;">
+                                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+                                    <label class="pnv-label" style="margin-bottom:0;"><i class="fa-solid fa-barcode" style="color:#FBBF24;"></i> Código de Barras y QR de Trazabilidad *</label>
+                                    <div style="display:flex;gap:6px;">
+                                        <button type="button" class="pnv-btn pnv-btn-ghost pnv-btn-xs" style="color:#FBBF24;border-color:rgba(251,191,36,0.35);" onclick="ViasaProductosExclusivosEngine.regenerarCodigoForm('EAN13')">⚡ Generar EAN-13 (759...)</button>
+                                        <button type="button" class="pnv-btn pnv-btn-ghost pnv-btn-xs" onclick="ViasaProductosExclusivosEngine.regenerarCodigoForm('CODE128')">⚡ Generar Code-128</button>
+                                    </div>
+                                </div>
+                                <div style="display:grid;grid-template-columns:140px 1fr;gap:8px;">
+                                    <select name="tipoCodigo" class="pnv-input" onchange="ViasaProductosExclusivosEngine.cambiarTipoCodigoForm(this.value)">
+                                        <option value="EAN13" ${v.tipoCodigo !== 'CODE128' ? 'selected' : ''}>EAN-13 (Comercial)</option>
+                                        <option value="CODE128" ${v.tipoCodigo === 'CODE128' ? 'selected' : ''}>Code-128 (Interno)</option>
+                                    </select>
+                                    <input name="barcode" id="pnv-form-input-barcode" class="pnv-input" maxlength="25" placeholder="EAN-13 o Código interno" value="${esc(v.barcode || '')}" oninput="ViasaProductosExclusivosEngine.recalcFormCodes()">
+                                </div>
+                                <div id="pnv-form-codes-live" style="margin-top:10px;padding:8px 12px;background:#080D1A;border:1px solid rgba(251,191,36,0.25);border-radius:10px;display:flex;align-items:center;justify-content:space-between;gap:14px;">
+                                    <!-- Renderizado dinámico de códigos en vivo -->
+                                </div>
+                            </div>
                             <div class="pnv-field"><label class="pnv-label">Presentación *</label><input name="presentacion" class="pnv-input" required placeholder="Unidad 500 g, Paquete x 6, Bandeja..." value="${esc(v.presentacion)}"></div>
                             <div class="pnv-field"><label class="pnv-label">Categoría *</label><select name="categoria" class="pnv-input">${opt(CATEGORIAS, v.categoria)}</select></div>
                             <div class="pnv-field"><label class="pnv-label">Condición IVA (SENIAT)</label><select name="condicionFiscal" class="pnv-input"><option value="EXENTO" ${v.condicionFiscal !== 'GRAVADO' ? 'selected' : ''}>Exento</option><option value="GRAVADO" ${v.condicionFiscal === 'GRAVADO' ? 'selected' : ''}>Gravado 16%</option></select></div>
@@ -969,6 +1489,7 @@
                 </form>`;
             this.abrirModal('pnv-form-overlay', html, 1040);
             this.recalcForm();
+            this.recalcFormCodes();
         },
 
         sugerirSku() {
@@ -1017,15 +1538,91 @@
                 <div><span>Precio B2B en Bs.</span><b>Bs. ${fmtNum(this.bs(b2b))}</b></div>
                 <div><span>Stock inicial total</span><b>${fmtInt(stIni)} und</b></div>
                 ${(pvp > 0 && pvp < costo) || (b2b > 0 && b2b < costo) ? '<div style="grid-column:1/-1;color:#f87171;font-weight:800;">⚠️ Atención: hay precios por debajo del costo de producción.</div>' : ''}`;
+            this.recalcFormCodes();
+        },
+
+        regenerarCodigoForm(tipo = 'EAN13') {
+            const f = document.getElementById('pnv-form-producto');
+            if (!f) return;
+            const nuevo = (tipo === 'CODE128') ? this.generarCode128Auto() : this.generarEAN13Auto();
+            if (f.tipoCodigo) f.tipoCodigo.value = tipo;
+            if (f.barcode) f.barcode.value = nuevo;
+            this.recalcFormCodes();
+            this.toast(`⚡ Nuevo código ${tipo} generado: ${nuevo}`);
+        },
+
+        cambiarTipoCodigoForm(tipo) {
+            const f = document.getElementById('pnv-form-producto');
+            if (!f) return;
+            const curVal = (f.barcode ? f.barcode.value : '').trim();
+            if (tipo === 'EAN13' && !/^\d{12,13}$/.test(curVal)) {
+                f.barcode.value = this.generarEAN13Auto();
+            } else if (tipo === 'CODE128' && /^\d{13}$/.test(curVal)) {
+                f.barcode.value = this.generarCode128Auto();
+            }
+            this.recalcFormCodes();
+        },
+
+        recalcFormCodes() {
+            const f = document.getElementById('pnv-form-producto');
+            const liveBox = document.getElementById('pnv-form-codes-live');
+            if (!f || !liveBox) return;
+            const tipo = f.tipoCodigo ? f.tipoCodigo.value : 'EAN13';
+            let code = (f.barcode ? f.barcode.value : '').trim();
+            if (!code) {
+                code = (tipo === 'EAN13') ? this.generarEAN13Auto() : this.generarCode128Auto();
+                if (f.barcode) f.barcode.value = code;
+            }
+            const nombre = (f.nombre && f.nombre.value.trim()) || 'Nuevo Producto';
+            const sku = (f.sku && f.sku.value.trim().toUpperCase()) || 'NV-0000';
+            const pvp = f.pvpUnitarioUsd ? round2(f.pvpUnitarioUsd.value) : 0;
+            const tempProd = { nombre, sku, barcode: code, tipoCodigo: tipo, pvpUnitarioUsd: pvp };
+            const payloadQR = this.generarPayloadQR(tempProd, null, 'texto');
+            liveBox.innerHTML = `
+                <div style="flex:1;min-width:0;">
+                    <div style="font-size:0.68rem;font-weight:800;color:#94A3B8;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:3px;">
+                        <i class="fa-solid fa-barcode" style="color:#FBBF24;"></i> Código de Barras (${tipo})
+                    </div>
+                    <div style="background:#fff;padding:4px 8px;border-radius:5px;display:inline-block;box-shadow:0 2px 6px rgba(0,0,0,0.35);">
+                        ${renderBarcodeSvg(code, tipo, 190, 42)}
+                    </div>
+                </div>
+                <div style="flex-shrink:0;text-align:center;">
+                    <div style="font-size:0.68rem;font-weight:800;color:#94A3B8;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:3px;">
+                        <i class="fa-solid fa-qrcode" style="color:#FBBF24;"></i> QR Trazabilidad
+                    </div>
+                    <div style="background:#fff;padding:3px;border-radius:5px;display:inline-block;box-shadow:0 2px 6px rgba(0,0,0,0.35);">
+                        ${renderQRSvg(payloadQR, 48, 1)}
+                    </div>
+                </div>`;
         },
 
         guardarFormProducto(id) {
             const f = document.getElementById('pnv-form-producto');
             if (!f) return;
+            const tipoCodigo = (f.tipoCodigo ? f.tipoCodigo.value : 'EAN13');
+            let barcodeVal = (f.barcode ? f.barcode.value : '').trim();
+
+            if (tipoCodigo === 'EAN13') {
+                barcodeVal = barcodeVal.replace(/\D/g, '');
+                if (barcodeVal.length === 12 || barcodeVal.length === 13) {
+                    barcodeVal = ean13Normalize(barcodeVal);
+                } else if (!barcodeVal) {
+                    barcodeVal = this.generarEAN13Auto();
+                } else {
+                    this.toast('⚠️ El código EAN-13 debe tener 12 o 13 dígitos numéricos.', 'error');
+                    return;
+                }
+            } else {
+                if (!barcodeVal) barcodeVal = this.generarCode128Auto();
+            }
+
             const datos = {
                 nombre: f.nombre.value.trim(),
                 sku: f.sku.value.trim().toUpperCase(),
-                barcode: f.barcode.value.replace(/\D/g, ''),
+                barcode: barcodeVal,
+                tipoCodigo: tipoCodigo,
+                codigoBarras: barcodeVal,
                 presentacion: f.presentacion.value.trim(),
                 categoria: f.categoria.value,
                 condicionFiscal: f.condicionFiscal.value,
@@ -1039,12 +1636,13 @@
                 precioAliadoUsd: round2(f.precioAliadoUsd.value),
                 activo: f.activo.value === '1'
             };
+            datos.qrCode = this.generarPayloadQR(datos, null, 'texto');
+            datos.codigoQR = datos.qrCode;
             datos.stockInicial = datos.stockInicialMostrador + datos.stockInicialReserva;
             datos.ivaPorcentaje = datos.condicionFiscal === 'GRAVADO' ? 16 : 0;
 
             if (!datos.nombre || !datos.sku || !datos.presentacion) { this.toast('⚠️ Complete nombre, SKU y presentación.', 'error'); return; }
             if (this.productos.some(p => p.sku === datos.sku && p.id !== id)) { this.toast(`⚠️ El SKU ${datos.sku} ya existe en el catálogo.`, 'error'); return; }
-            if (datos.barcode && datos.barcode.length !== 13 && datos.barcode.length !== 12) { this.toast('⚠️ El código de barras debe tener 12 o 13 dígitos (EAN-13).', 'error'); return; }
             if (datos.pvpUnitarioUsd <= 0 || datos.precioAliadoUsd <= 0) { this.toast('⚠️ Los precios deben ser mayores que cero.', 'error'); return; }
             if ((datos.pvpUnitarioUsd < datos.costoUnitarioUsd || datos.precioAliadoUsd < datos.costoUnitarioUsd) &&
                 !confirm('Hay precios por debajo del costo de producción. ¿Desea guardar de todas formas?')) return;
@@ -1064,6 +1662,7 @@
                 if (skuAnterior !== p.sku) this.sincronizarContabilidad(Object.assign({}, respaldo), true);
                 if (!this.guardar()) { Object.assign(p, respaldo); return; }
                 this.sincronizarContabilidad(p);
+                this.sincronizarConPOS(p);
                 this.toast(`✅ Producto modificado: ${p.nombre}`);
             } else {
                 const nuevo = this.normalizar(Object.assign({
@@ -1075,6 +1674,7 @@
                 this.productos.unshift(nuevo);
                 if (!this.guardar()) { this.productos.shift(); return; }
                 this.sincronizarContabilidad(nuevo);
+                this.sincronizarConPOS(nuevo);
                 this.toast(`✅ Producto registrado en el catálogo: ${nuevo.nombre}`);
             }
             this.cerrarModal('pnv-form-overlay');
@@ -1113,6 +1713,7 @@
             if (!p) return;
             p.activo = false;
             this.guardar();
+            this.sincronizarConPOS(p, true);
             this.cerrarModal('pnv-del-overlay');
             this.toast(`📦 Producto dado de baja (historial conservado): ${p.nombre}`, 'warn');
             this.refrescarTodo();
@@ -1130,6 +1731,7 @@
             this.productos.splice(idx, 1);
             if (!this.guardar()) { this.productos.splice(idx, 0, p); return; }
             this.sincronizarContabilidad(p, true);
+            this.sincronizarConPOS(p, true);
             this.cerrarModal('pnv-del-overlay');
             if (this.detalleId === id) this.cerrarModal('pnv-detalle-overlay');
             this.toast(`🗑️ Producto eliminado: ${p.nombre}`, 'warn');
@@ -1165,7 +1767,8 @@
                 ['A', 'fa-fire-burner', 'A. Producción y Entrada al Stock'],
                 ['B', 'fa-truck-ramp-box', 'B. Distribución y Cadena de Custodia'],
                 ['C', 'fa-triangle-exclamation', 'C. Mermas e Incidencias (Art. 177)'],
-                ['D', 'fa-file-lines', 'D. Ficha Técnica, Etiqueta y Kardex']
+                ['D', 'fa-file-lines', 'D. Ficha Técnica, Etiqueta y Kardex'],
+                ['E', 'fa-qrcode', 'E. Códigos (Barras / QR) e Impresión de Stickers']
             ];
             const resumen = (label, val, color) => `<div class="pnv-sum-cell"><span>${label}</span><b style="color:${color || '#fff'};">${val}</b></div>`;
 
@@ -1206,7 +1809,15 @@
                     ${this.tabActiva === 'B' ? this.tabDistribucion(p, st) : ''}
                     ${this.tabActiva === 'C' ? this.tabMermas(p, st) : ''}
                     ${this.tabActiva === 'D' ? this.tabFicha(p) : ''}
+                    ${this.tabActiva === 'E' ? this.tabCodigosEstudio(p) : ''}
                 </div>`;
+            if (this.tabActiva === 'E') {
+                this.renderStudioPreview();
+            }
+        },
+
+        abrirEstudioStickers(id) {
+            this.abrirDetalle(id, 'E');
         },
 
         // ---------------------- PESTAÑA A: PRODUCCIÓN ----------------------
@@ -1672,7 +2283,9 @@
         stickerHtml(p, lote) {
             const elab = lote ? String(lote.fechaHora).slice(0, 10) : nowLocalInput().slice(0, 10);
             const venc = lote ? lote.vencimiento : addDays(elab, p.vidaUtilDias);
-            const qrData = `NUEVA VIASA|RIF J-31163165-8|${p.sku}|${p.nombre}|LOTE ${lote ? lote.id : 'S/L'}|ELAB ${elab}|VENCE ${venc}`;
+            const qrData = this.generarPayloadQR(p, lote, 'texto');
+            const tipo = p.tipoCodigo || 'EAN13';
+            const barcode = p.barcode || (tipo === 'EAN13' ? this.generarEAN13Auto() : this.generarCode128Auto());
             return `<div class="pnv-sticker">
                 <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">
                     <div>
@@ -1681,7 +2294,9 @@
                         <div style="font-size:14px;font-weight:900;color:#0f172a;line-height:1.15;margin-top:4px;">${esc(p.nombre)}</div>
                         <div style="font-size:9px;color:#334155;">${esc(p.presentacion)} • ${p.condicionFiscal === 'GRAVADO' ? 'IVA 16%' : 'Exento de IVA'}</div>
                     </div>
-                    <img src="${this.qrUrl(qrData, 120)}" alt="QR" width="64" height="64" style="flex-shrink:0;background:#fff;" onerror="this.outerHTML='<div style=&quot;width:64px;height:64px;border:2px dashed #0f172a;display:flex;align-items:center;justify-content:center;font-size:8px;text-align:center;color:#0f172a;&quot;>QR requiere conexión</div>'">
+                    <div style="flex-shrink:0;background:#fff;padding:2px;border:1px solid #cbd5e1;border-radius:4px;">
+                        ${renderQRSvg(qrData, 60, 1)}
+                    </div>
                 </div>
                 <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;margin:6px 0;font-size:8.5px;color:#0f172a;">
                     <div><b>LOTE</b><br>${esc(lote ? lote.id : 'S/L')}</div>
@@ -1689,10 +2304,614 @@
                     <div><b>VENCE</b><br>${esc(venc)}</div>
                 </div>
                 <div style="display:flex;justify-content:space-between;align-items:flex-end;">
-                    <div>${ean13Svg(p.barcode, 170, 44)}</div>
+                    <div style="background:#fff;padding:2px 4px;border-radius:4px;border:1px solid #cbd5e1;">${renderBarcodeSvg(barcode, tipo, 170, 44)}</div>
                     <div style="text-align:right;color:#0f172a;"><div style="font-size:8px;">PVP</div><div style="font-size:15px;font-weight:900;">USD ${fmtNum(p.pvpUnitarioUsd)}</div><div style="font-size:9px;">Bs. ${fmtNum(this.bs(p.pvpUnitarioUsd))}</div></div>
                 </div>
             </div>`;
+        },
+
+        // ====================================================================
+        // ESTUDIO INTERACTIVO DE CÓDIGOS E IMPRESIÓN DE STICKERS (PESTAÑA E)
+        // ====================================================================
+        obtenerLoteStudio(p) {
+            if (!p || !p.lotesProduccion || !p.lotesProduccion.length) return null;
+            const selId = this.studioLoteId || this._studioLoteId;
+            if (selId && selId !== 'GENERICO') {
+                const found = p.lotesProduccion.find(l => l.id === selId);
+                if (found) return found;
+            }
+            return [...p.lotesProduccion].sort((a, b) => String(b.fechaHora).localeCompare(String(a.fechaHora)))[0];
+        },
+
+        setStudioFormato(formato) {
+            this.studioFormato = formato;
+            this._studioFormato = formato;
+            document.querySelectorAll('.pnv-format-option').forEach(el => {
+                if (el.getAttribute('data-format') === formato) el.classList.add('active');
+                else el.classList.remove('active');
+            });
+            this.renderStudioPreview();
+        },
+
+        setStudioLote(loteId) {
+            this.studioLoteId = loteId;
+            this._studioLoteId = loteId;
+            this.renderStudioPreview();
+        },
+
+        setStudioTipoCodigo(tipo) {
+            this.studioTipoCodigo = tipo;
+            this._studioTipoCodigo = tipo;
+            const p = this.getProducto(this.detalleId);
+            if (p) {
+                p.tipoCodigo = tipo;
+                if (tipo === 'EAN13' && (!/^\d{12,13}$/.test(p.barcode))) {
+                    p.barcode = this.generarEAN13Auto();
+                    p.codigoBarras = p.barcode;
+                } else if (tipo === 'CODE128' && /^\d{13}$/.test(p.barcode)) {
+                    p.barcode = this.generarCode128Auto();
+                    p.codigoBarras = p.barcode;
+                }
+                this.guardar();
+                this.sincronizarConPOS(p);
+            }
+            this.renderStudioPreview();
+        },
+
+        setStudioCopias(n) {
+            const val = Math.max(1, parseInt(n, 10) || 1);
+            this.studioCopias = val;
+            this._studioCopias = val;
+            const input = document.getElementById('pnv-studio-copias-input');
+            if (input && document.activeElement !== input) input.value = val;
+            const btn = document.getElementById('pnv-btn-imprimir-studio');
+            if (btn) btn.innerHTML = `<i class="fa-solid fa-print"></i> Imprimir Etiquetas (${val} ${val === 1 ? 'copia' : 'copias'})`;
+            if ((this.studioFormato || this._studioFormato) === 'a4') {
+                this.renderStudioPreview();
+            }
+        },
+
+        renderStudioPreview() {
+            const container = document.getElementById('pnv-studio-preview-content');
+            if (!container) return;
+            const p = this.getProducto(this.detalleId);
+            if (!p) return;
+            const formato = this.studioFormato || this._studioFormato || 'comercial';
+            const lote = this.obtenerLoteStudio(p);
+            const tipoCodigo = this.studioTipoCodigo || this._studioTipoCodigo || p.tipoCodigo || 'EAN13';
+            const barcode = p.barcode || (tipoCodigo === 'EAN13' ? this.generarEAN13Auto() : this.generarCode128Auto());
+            const loteId = lote ? lote.id : 'LOT-' + new Date().getFullYear() + '-001';
+            const fechaElab = lote ? String(lote.fechaHora).slice(0, 10) : nowLocalInput().slice(0, 10);
+            const fechaVenc = lote ? lote.vencimiento : addDays(fechaElab, p.vidaUtilDias);
+            const payloadQR = this.generarPayloadQR(p, lote, 'texto');
+
+            if (formato === 'termica-5030') {
+                container.innerHTML = `
+                    <div class="pnv-sticker-termica-5030" id="pnv-sticker-active-preview">
+                        <div style="display:flex;justify-content:space-between;align-items:flex-start;border-bottom:1px solid #000;padding-bottom:2px;">
+                            <div style="overflow:hidden;padding-right:4px;">
+                                <div style="font-size:7.5px;font-weight:900;text-transform:uppercase;white-space:nowrap;">PANADERIA NUEVA VIASA</div>
+                                <div style="font-size:11px;font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${esc(p.nombre)}</div>
+                            </div>
+                            <div style="text-align:right;flex-shrink:0;">
+                                <div style="font-size:6.5px;font-weight:700;">${esc(loteId)}</div>
+                                <div style="font-size:11px;font-weight:900;">${fmtNum(p.pvpUnitarioUsd)}</div>
+                            </div>
+                        </div>
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin:2px 0;">
+                            <div style="font-size:7px;line-height:1.2;">
+                                <div>ELAB: ${esc(fechaElab)}</div>
+                                <div>VENC: ${esc(fechaVenc)}</div>
+                                <div>BS: ${fmtNum(this.bs(p.pvpUnitarioUsd))}</div>
+                            </div>
+                            <div style="flex-shrink:0;">
+                                ${renderQRSvg(payloadQR, 44, 1)}
+                            </div>
+                        </div>
+                        <div style="text-align:center;border-top:1px dashed #000;padding-top:2px;">
+                            ${renderBarcodeSvg(barcode, tipoCodigo, 210, 34)}
+                        </div>
+                    </div>`;
+            } else if (formato === 'termica-4040') {
+                container.innerHTML = `
+                    <div class="pnv-sticker-termica-4040" id="pnv-sticker-active-preview">
+                        <div style="text-align:center;border-bottom:1px solid #000;padding-bottom:3px;">
+                            <div style="font-size:7.5px;font-weight:900;">NUEVA VIASA • J-31163165-8</div>
+                            <div style="font-size:10.5px;font-weight:900;line-height:1.15;margin-top:1px;">${esc(p.nombre)}</div>
+                            <div style="font-size:7.5px;">${esc(p.presentacion)}</div>
+                        </div>
+                        <div style="display:flex;justify-content:center;margin:4px 0;">
+                            ${renderQRSvg(payloadQR, 74, 1)}
+                        </div>
+                        <div style="display:flex;justify-content:space-between;align-items:center;font-size:7.5px;font-weight:700;">
+                            <span>L: ${esc(loteId)}</span>
+                            <span style="font-size:11px;font-weight:900;">USD ${fmtNum(p.pvpUnitarioUsd)}</span>
+                            <span>V: ${esc(fechaVenc)}</span>
+                        </div>
+                        <div style="text-align:center;border-top:1px dashed #000;padding-top:2px;">
+                            ${renderBarcodeSvg(barcode, tipoCodigo, 180, 28)}
+                        </div>
+                    </div>`;
+            } else if (formato === 'a4') {
+                const sampleSticker = `
+                    <div style="background:#fff;border:1px solid #0f172a;border-radius:6px;padding:8px;font-size:8px;box-shadow:0 2px 6px rgba(0,0,0,0.25);">
+                        <div style="display:flex;justify-content:space-between;align-items:flex-start;border-bottom:1px solid #0f172a;padding-bottom:3px;margin-bottom:3px;">
+                            <div>
+                                <div style="font-size:7.5px;font-weight:900;color:#92400e;">👑 NUEVA VIASA</div>
+                                <div style="font-size:10px;font-weight:900;color:#0f172a;">${esc(p.nombre.slice(0, 18))}</div>
+                                <div style="font-size:7px;color:#475569;">${esc(p.presentacion)}</div>
+                            </div>
+                            <div style="flex-shrink:0;">${renderQRSvg(payloadQR, 36, 1)}</div>
+                        </div>
+                        <div style="display:flex;justify-content:space-between;align-items:center;font-size:6.5px;color:#0f172a;margin-bottom:3px;font-family:monospace;">
+                            <span>L: ${esc(loteId)}</span>
+                            <span>V: ${esc(fechaVenc)}</span>
+                        </div>
+                        <div style="display:flex;justify-content:space-between;align-items:flex-end;">
+                            <div>${renderBarcodeSvg(barcode, tipoCodigo, 110, 26)}</div>
+                            <div style="text-align:right;"><b style="font-size:11px;color:#0f172a;">${fmtNum(p.pvpUnitarioUsd)}</b></div>
+                        </div>
+                    </div>`;
+                container.innerHTML = `
+                    <div style="width:100%;text-align:center;margin-bottom:8px;font-size:0.75rem;color:#FBBF24;">
+                        <i class="fa-solid fa-table-cells"></i> Vista preliminar de planilla A4 (Etiquetas organizadas para papel adhesivo troquelado)
+                    </div>
+                    <div class="pnv-a4-preview-grid">
+                        ${Array(6).fill(sampleSticker).join('')}
+                    </div>`;
+            } else { // comercial (65x45 mm)
+                container.innerHTML = `
+                    <div class="pnv-sticker-comercial" id="pnv-sticker-active-preview">
+                        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;border-bottom:1.5px solid #0F172A;padding-bottom:6px;margin-bottom:6px;">
+                            <div>
+                                <div style="font-size:10px;font-weight:900;letter-spacing:0.06em;color:#92400e;text-transform:uppercase;">👑 PANADERÍA NUEVA VIASA, C.A.</div>
+                                <div style="font-size:8px;font-weight:700;color:#334155;">RIF: J-31163165-8 • La Sabanita, Ciudad Bolívar</div>
+                                <div style="font-size:15px;font-weight:900;color:#0F172A;line-height:1.15;margin-top:3px;">${esc(p.nombre)}</div>
+                                <div style="font-size:9.5px;color:#334155;font-weight:600;">${esc(p.presentacion)} • <span style="color:${p.condicionFiscal === 'GRAVADO' ? '#1D4ED8' : '#047857'};font-weight:800;">${p.condicionFiscal === 'GRAVADO' ? 'IVA 16%' : 'EXENTO IVA'}</span></div>
+                            </div>
+                            <div style="background:#fff;padding:4px;border:1px solid #CBD5E1;border-radius:6px;box-shadow:0 1px 4px rgba(0,0,0,0.1);flex-shrink:0;">
+                                ${renderQRSvg(payloadQR, 68, 1)}
+                            </div>
+                        </div>
+                        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;background:rgba(241,245,249,0.9);padding:4px 6px;border-radius:4px;margin-bottom:6px;font-size:8.5px;color:#0F172A;font-family:'JetBrains Mono',monospace;">
+                            <div><span style="font-size:7.5px;color:#64748B;display:block;">LOTE</span><b>${esc(loteId)}</b></div>
+                            <div><span style="font-size:7.5px;color:#64748B;display:block;">ELAB.</span><b>${esc(fechaElab)}</b></div>
+                            <div><span style="font-size:7.5px;color:#64748B;display:block;">VENCE</span><b>${esc(fechaVenc)}</b></div>
+                        </div>
+                        <div style="display:flex;justify-content:space-between;align-items:flex-end;">
+                            <div style="background:#fff;padding:4px 6px;border-radius:4px;border:1px solid #CBD5E1;display:inline-block;">
+                                ${renderBarcodeSvg(barcode, tipoCodigo, 160, 42)}
+                            </div>
+                            <div style="text-align:right;color:#0F172A;">
+                                <div style="font-size:8px;font-weight:800;color:#64748B;text-transform:uppercase;">PVP OFICIAL</div>
+                                <div style="font-size:16px;font-weight:900;color:#0F172A;line-height:1;font-variant-numeric:tabular-nums;">USD ${fmtNum(p.pvpUnitarioUsd)}</div>
+                                <div style="font-size:9.5px;font-weight:800;color:#B45309;font-variant-numeric:tabular-nums;margin-top:2px;">Bs. ${fmtNum(this.bs(p.pvpUnitarioUsd))}</div>
+                            </div>
+                        </div>
+                    </div>`;
+            }
+        },
+
+        tabCodigosEstudio(p) {
+            const formato = this.studioFormato || this._studioFormato || 'comercial';
+            const loteSel = this.obtenerLoteStudio(p);
+            const tipoCodigo = this.studioTipoCodigo || this._studioTipoCodigo || p.tipoCodigo || 'EAN13';
+            const copias = this.studioCopias || this._studioCopias || 1;
+
+            const lotesOptions = (p.lotesProduccion && p.lotesProduccion.length > 0)
+                ? [...p.lotesProduccion].sort((a, b) => String(b.fechaHora).localeCompare(String(a.fechaHora))).map(l => 
+                    `<option value="${esc(l.id)}" ${loteSel && loteSel.id === l.id ? 'selected' : ''}>${esc(l.id)} • Creado: ${esc(String(l.fechaHora).slice(0, 10))} • Vence: ${esc(l.vencimiento)} (${fmtInt(l.cantidad)} und)</option>`
+                  ).join('')
+                : '<option value="GENERICO">Lote genérico del día (sin registros previos)</option>';
+
+            return `
+                <div class="pnv-section" style="margin-bottom:0;">
+                    <div class="pnv-studio-layout">
+                        <!-- PANEL DE CONTROL DEL ESTUDIO -->
+                        <div class="pnv-studio-controls">
+                            <div>
+                                <div class="pnv-label" style="display:flex;align-items:center;gap:6px;">
+                                    <i class="fa-solid fa-shapes" style="color:#FBBF24;"></i> 1. Formato de Etiqueta / Salida
+                                </div>
+                                <div style="display:flex;flex-direction:column;gap:8px;margin-top:6px;">
+                                    <div class="pnv-format-option ${formato === 'comercial' ? 'active' : ''}" data-format="comercial" onclick="ViasaProductosExclusivosEngine.setStudioFormato('comercial')">
+                                        <div style="font-size:1.3rem;color:#FBBF24;"><i class="fa-solid fa-tag"></i></div>
+                                        <div style="flex:1;">
+                                            <div style="font-size:0.82rem;font-weight:800;color:#fff;">Sticker Comercial (65 x 45 mm)</div>
+                                            <div style="font-size:0.7rem;color:#94A3B8;">Empaque final, bolsas y vitrinas con logo, QR, barras y PVP</div>
+                                        </div>
+                                    </div>
+                                    <div class="pnv-format-option ${formato === 'termica-5030' ? 'active' : ''}" data-format="termica-5030" onclick="ViasaProductosExclusivosEngine.setStudioFormato('termica-5030')">
+                                        <div style="font-size:1.3rem;color:#38BDF8;"><i class="fa-solid fa-receipt"></i></div>
+                                        <div style="flex:1;">
+                                            <div style="font-size:0.82rem;font-weight:800;color:#fff;">Etiqueta Térmica Balanza (50 x 30 mm)</div>
+                                            <div style="font-size:0.7rem;color:#94A3B8;">Impresora térmica de rollo (Zebra / Xprinter / Balanzas)</div>
+                                        </div>
+                                    </div>
+                                    <div class="pnv-format-option ${formato === 'termica-4040' ? 'active' : ''}" data-format="termica-4040" onclick="ViasaProductosExclusivosEngine.setStudioFormato('termica-4040')">
+                                        <div style="font-size:1.3rem;color:#A78BFA;"><i class="fa-solid fa-square"></i></div>
+                                        <div style="flex:1;">
+                                            <div style="font-size:0.82rem;font-weight:800;color:#fff;">Etiqueta Cuadrada (40 x 40 mm)</div>
+                                            <div style="font-size:0.7rem;color:#94A3B8;">Formato compacto con QR predominante y microcódigo</div>
+                                        </div>
+                                    </div>
+                                    <div class="pnv-format-option ${formato === 'a4' ? 'active' : ''}" data-format="a4" onclick="ViasaProductosExclusivosEngine.setStudioFormato('a4')">
+                                        <div style="font-size:1.3rem;color:#4ADE80;"><i class="fa-solid fa-table-cells"></i></div>
+                                        <div style="flex:1;">
+                                            <div style="font-size:0.82rem;font-weight:800;color:#fff;">Planilla A4 / Carta Troquelada</div>
+                                            <div style="font-size:0.7rem;color:#94A3B8;">Cuadrícula de stickers para papel autoadhesivo estándar</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div>
+                                <div class="pnv-label"><i class="fa-solid fa-boxes-stacked" style="color:#FBBF24;"></i> 2. Lote de Trazabilidad Vinculado</div>
+                                <select class="pnv-input" onchange="ViasaProductosExclusivosEngine.setStudioLote(this.value)">
+                                    ${lotesOptions}
+                                </select>
+                            </div>
+
+                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+                                <div>
+                                    <div class="pnv-label"><i class="fa-solid fa-barcode" style="color:#FBBF24;"></i> Estándar de Barras</div>
+                                    <select class="pnv-input" onchange="ViasaProductosExclusivosEngine.setStudioTipoCodigo(this.value)">
+                                        <option value="EAN13" ${tipoCodigo !== 'CODE128' ? 'selected' : ''}>EAN-13 (Comercial)</option>
+                                        <option value="CODE128" ${tipoCodigo === 'CODE128' ? 'selected' : ''}>Code-128 (Interno)</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <div class="pnv-label"><i class="fa-solid fa-copy" style="color:#FBBF24;"></i> Cantidad Copias</div>
+                                    <input type="number" id="pnv-studio-copias-input" min="1" max="500" value="${copias}" class="pnv-input" oninput="ViasaProductosExclusivosEngine.setStudioCopias(this.value)">
+                                </div>
+                            </div>
+
+                            <!-- Presets de copias rápidas -->
+                            <div style="display:flex;gap:4px;flex-wrap:wrap;">
+                                <span style="font-size:0.68rem;color:#94A3B8;align-self:center;margin-right:2px;">Copias rápidas:</span>
+                                ${[1, 5, 10, 25, 50].map(n => `
+                                    <button type="button" class="pnv-btn pnv-btn-ghost pnv-btn-xs" style="padding:2px 8px;${copias === n ? 'border-color:#FBBF24;color:#FBBF24;background:rgba(251,191,36,0.1);' : ''}" onclick="ViasaProductosExclusivosEngine.setStudioCopias(${n})">${n}</button>
+                                `).join('')}
+                            </div>
+
+                            <!-- Botón Principal de Impresión -->
+                            <button type="button" id="pnv-btn-imprimir-studio" class="pnv-btn pnv-btn-gold" style="width:100%;justify-content:center;padding:12px;font-size:0.92rem;font-weight:900;" onclick="ViasaProductosExclusivosEngine.imprimirEtiquetas()">
+                                <i class="fa-solid fa-print"></i> Imprimir Etiquetas (${copias} ${copias === 1 ? 'copia' : 'copias'})
+                            </button>
+
+                            <!-- Descargas individuales de alta resolución -->
+                            <div style="border-top:1px solid rgba(148,163,184,0.18);padding-top:10px;">
+                                <div class="pnv-label" style="font-size:0.7rem;text-transform:uppercase;color:#94A3B8;margin-bottom:6px;">
+                                    <i class="fa-solid fa-download" style="color:#FBBF24;"></i> Descarga Individual de Activos (HD / Vector)
+                                </div>
+                                <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
+                                    <button type="button" class="pnv-btn pnv-btn-ghost pnv-btn-xs" style="justify-content:center;" onclick="ViasaProductosExclusivosEngine.descargarBarcodePNGActual()">⬇️ Barcode PNG</button>
+                                    <button type="button" class="pnv-btn pnv-btn-ghost pnv-btn-xs" style="justify-content:center;" onclick="ViasaProductosExclusivosEngine.descargarBarcodeSVGActual()">⬇️ Barcode SVG</button>
+                                    <button type="button" class="pnv-btn pnv-btn-ghost pnv-btn-xs" style="justify-content:center;" onclick="ViasaProductosExclusivosEngine.descargarQRPNGActual()">⬇️ QR PNG (HD)</button>
+                                    <button type="button" class="pnv-btn pnv-btn-ghost pnv-btn-xs" style="justify-content:center;" onclick="ViasaProductosExclusivosEngine.descargarQRSVGActual()">⬇️ QR SVG</button>
+                                    <button type="button" class="pnv-btn pnv-btn-ghost pnv-btn-xs" style="grid-column:span 2;justify-content:center;border-color:rgba(251,191,36,0.4);color:#FDE68A;" onclick="ViasaProductosExclusivosEngine.descargarStickerPNGActual()">
+                                        <i class="fa-solid fa-image"></i> ⬇️ Descargar Sticker Completo PNG (HD)
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Estado de Validación POS / Fiscal -->
+                            <div style="background:#080D1A;border:1px solid rgba(74,222,128,0.25);border-radius:8px;padding:8px 10px;font-size:0.72rem;line-height:1.4;">
+                                <div style="color:#4ADE80;font-weight:800;display:flex;align-items:center;gap:6px;">
+                                    <i class="fa-solid fa-circle-check"></i> Compatibilidad POS y Lectores Garantizada
+                                </div>
+                                <div style="color:#94A3B8;margin-top:2px;">
+                                    Pistola Láser 1D: <b style="color:#E2E8F0;">OK (${esc(p.barcode || 'EAN-13')})</b><br>
+                                    Escáner 2D / Celular: <b style="color:#E2E8F0;">OK (QR Trazabilidad)</b><br>
+                                    Sincronización POS VIASA: <b style="color:#4ADE80;">100% Activa</b>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ETAPA DE VISTA PREVIA (CANVAS) -->
+                        <div class="pnv-preview-stage">
+                            <div style="font-size:0.74rem;font-weight:800;color:#94A3B8;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:14px;text-align:center;">
+                                <i class="fa-solid fa-eye" style="color:#FBBF24;"></i> Vista Previa en Tiempo Real — Escala 1:1
+                            </div>
+                            <div id="pnv-studio-preview-content">
+                                <!-- Generado por renderStudioPreview() -->
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
+        },
+
+        imprimirEtiquetas() {
+            const p = this.getProducto(this.detalleId);
+            if (!p) return;
+            const formato = this.studioFormato || this._studioFormato || 'comercial';
+            const copias = Math.max(1, parseInt(this.studioCopias || this._studioCopias, 10) || 1);
+            const lote = this.obtenerLoteStudio(p);
+            const tipoCodigo = this.studioTipoCodigo || this._studioTipoCodigo || p.tipoCodigo || 'EAN13';
+            const barcode = p.barcode || (tipoCodigo === 'EAN13' ? this.generarEAN13Auto() : this.generarCode128Auto());
+            const loteId = lote ? lote.id : 'LOT-' + new Date().getFullYear() + '-001';
+            const fechaElab = lote ? String(lote.fechaHora).slice(0, 10) : nowLocalInput().slice(0, 10);
+            const fechaVenc = lote ? lote.vencimiento : addDays(fechaElab, p.vidaUtilDias);
+            const payloadQR = this.generarPayloadQR(p, lote, 'texto');
+
+            let singleHtml = '';
+            let pageCss = '';
+
+            if (formato === 'termica-5030') {
+                pageCss = `
+                    @page { size: 50mm 30mm; margin: 0; }
+                    body { margin: 0; padding: 0; background: #fff; font-family: 'JetBrains Mono', monospace; }
+                    .print-label { width: 50mm; height: 30mm; padding: 1.5mm 2mm; box-sizing: border-box; page-break-after: always; display: flex; flex-direction: column; justify-content: space-between; }
+                `;
+                singleHtml = `
+                    <div class="print-label">
+                        <div style="display:flex;justify-content:space-between;align-items:flex-start;border-bottom:0.8px solid #000;padding-bottom:1px;">
+                            <div style="overflow:hidden;padding-right:2px;">
+                                <div style="font-size:6.5pt;font-weight:900;text-transform:uppercase;">NUEVA VIASA</div>
+                                <div style="font-size:8.5pt;font-weight:900;white-space:nowrap;overflow:hidden;line-height:1;">${esc(p.nombre.slice(0, 22))}</div>
+                            </div>
+                            <div style="text-align:right;flex-shrink:0;">
+                                <div style="font-size:5.5pt;font-weight:700;">${esc(loteId)}</div>
+                                <div style="font-size:8.5pt;font-weight:900;">${fmtNum(p.pvpUnitarioUsd)}</div>
+                            </div>
+                        </div>
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin:1px 0;">
+                            <div style="font-size:5.5pt;line-height:1.2;">
+                                <div>ELAB: ${esc(fechaElab)}</div>
+                                <div>VENC: ${esc(fechaVenc)}</div>
+                                <div>BS: ${fmtNum(this.bs(p.pvpUnitarioUsd))}</div>
+                            </div>
+                            <div style="flex-shrink:0;">
+                                ${renderQRSvg(payloadQR, 38, 1)}
+                            </div>
+                        </div>
+                        <div style="text-align:center;border-top:0.8px dashed #000;padding-top:1px;">
+                            ${renderBarcodeSvg(barcode, tipoCodigo, 160, 26)}
+                        </div>
+                    </div>`;
+            } else if (formato === 'termica-4040') {
+                pageCss = `
+                    @page { size: 40mm 40mm; margin: 0; }
+                    body { margin: 0; padding: 0; background: #fff; font-family: 'JetBrains Mono', monospace; }
+                    .print-label { width: 40mm; height: 40mm; padding: 1.5mm; box-sizing: border-box; page-break-after: always; display: flex; flex-direction: column; justify-content: space-between; text-align: center; }
+                `;
+                singleHtml = `
+                    <div class="print-label">
+                        <div style="border-bottom:0.8px solid #000;padding-bottom:1px;">
+                            <div style="font-size:6pt;font-weight:900;">NUEVA VIASA • J-31163165-8</div>
+                            <div style="font-size:8pt;font-weight:900;line-height:1;">${esc(p.nombre.slice(0, 20))}</div>
+                        </div>
+                        <div style="display:flex;justify-content:center;margin:1px 0;">
+                            ${renderQRSvg(payloadQR, 52, 1)}
+                        </div>
+                        <div style="display:flex;justify-content:space-between;align-items:center;font-size:6pt;font-weight:700;">
+                            <span>L: ${esc(loteId)}</span>
+                            <span style="font-size:8.5pt;font-weight:900;">USD ${fmtNum(p.pvpUnitarioUsd)}</span>
+                            <span>V: ${esc(fechaVenc)}</span>
+                        </div>
+                        <div style="text-align:center;border-top:0.8px dashed #000;padding-top:1px;">
+                            ${renderBarcodeSvg(barcode, tipoCodigo, 130, 22)}
+                        </div>
+                    </div>`;
+            } else if (formato === 'a4') {
+                pageCss = `
+                    @page { size: A4 portrait; margin: 8mm; }
+                    body { margin: 0; padding: 0; background: #fff; font-family: system-ui, -apple-system, sans-serif; }
+                    .a4-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4mm; page-break-inside: avoid; }
+                    .print-card { border: 1px solid #1e293b; border-radius: 6px; padding: 3mm; box-sizing: border-box; page-break-inside: avoid; }
+                `;
+                singleHtml = `
+                    <div class="print-card">
+                        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:4px;border-bottom:1px solid #0f172a;padding-bottom:2px;margin-bottom:3px;">
+                            <div>
+                                <div style="font-size:7pt;font-weight:900;color:#92400e;">👑 PANADERÍA NUEVA VIASA</div>
+                                <div style="font-size:5.5pt;color:#334155;">RIF: J-31163165-8</div>
+                                <div style="font-size:9.5pt;font-weight:900;color:#0f172a;line-height:1.1;margin-top:2px;">${esc(p.nombre)}</div>
+                                <div style="font-size:6.5pt;color:#334155;">${esc(p.presentacion)} • ${p.condicionFiscal === 'GRAVADO' ? 'IVA 16%' : 'EXENTO'}</div>
+                            </div>
+                            <div style="flex-shrink:0;">
+                                ${renderQRSvg(payloadQR, 44, 1)}
+                            </div>
+                        </div>
+                        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:2px;font-size:5.5pt;color:#0f172a;margin-bottom:3px;font-family:monospace;">
+                            <div><b>L:</b> ${esc(loteId)}</div>
+                            <div><b>E:</b> ${esc(fechaElab)}</div>
+                            <div><b>V:</b> ${esc(fechaVenc)}</div>
+                        </div>
+                        <div style="display:flex;justify-content:space-between;align-items:flex-end;">
+                            <div>${renderBarcodeSvg(barcode, tipoCodigo, 115, 30)}</div>
+                            <div style="text-align:right;">
+                                <div style="font-size:10pt;font-weight:900;color:#0f172a;line-height:1;">${fmtNum(p.pvpUnitarioUsd)}</div>
+                                <div style="font-size:6.5pt;font-weight:800;color:#b45309;">Bs. ${fmtNum(this.bs(p.pvpUnitarioUsd))}</div>
+                            </div>
+                        </div>
+                    </div>`;
+            } else { // comercial (65x45mm)
+                pageCss = `
+                    @page { size: 68mm 48mm; margin: 1mm; }
+                    body { margin: 0; padding: 0; background: #fff; font-family: system-ui, -apple-system, sans-serif; }
+                    .print-label { width: 66mm; height: 46mm; padding: 2.5mm; box-sizing: border-box; page-break-after: always; display: flex; flex-direction: column; justify-content: space-between; border: 1.2px solid #0f172a; border-radius: 4px; }
+                `;
+                singleHtml = `
+                    <div class="print-label">
+                        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:4px;border-bottom:1.2px solid #0f172a;padding-bottom:2px;">
+                            <div>
+                                <div style="font-size:7.5pt;font-weight:900;color:#92400e;">👑 PANADERÍA NUEVA VIASA, C.A.</div>
+                                <div style="font-size:5.5pt;color:#334155;font-weight:700;">RIF: J-31163165-8 • La Sabanita, Ciudad Bolívar</div>
+                                <div style="font-size:10pt;font-weight:900;color:#0f172a;line-height:1.15;margin-top:2px;">${esc(p.nombre)}</div>
+                                <div style="font-size:6.5pt;color:#334155;font-weight:700;">${esc(p.presentacion)} • ${p.condicionFiscal === 'GRAVADO' ? 'IVA 16%' : 'EXENTO'}</div>
+                            </div>
+                            <div style="flex-shrink:0;">
+                                ${renderQRSvg(payloadQR, 48, 1)}
+                            </div>
+                        </div>
+                        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:2px;font-size:6pt;color:#0f172a;background:#f8fafc;padding:2px 4px;border-radius:3px;font-family:monospace;">
+                            <div><b>LOTE:</b> ${esc(loteId)}</div>
+                            <div><b>ELAB:</b> ${esc(fechaElab)}</div>
+                            <div><b>VENCE:</b> ${esc(fechaVenc)}</div>
+                        </div>
+                        <div style="display:flex;justify-content:space-between;align-items:flex-end;">
+                            <div>${renderBarcodeSvg(barcode, tipoCodigo, 130, 32)}</div>
+                            <div style="text-align:right;">
+                                <div style="font-size:5.5pt;font-weight:800;color:#64748b;">PVP OFICIAL</div>
+                                <div style="font-size:11.5pt;font-weight:900;color:#0f172a;line-height:1;">USD ${fmtNum(p.pvpUnitarioUsd)}</div>
+                                <div style="font-size:7pt;font-weight:800;color:#b45309;">Bs. ${fmtNum(this.bs(p.pvpUnitarioUsd))}</div>
+                            </div>
+                        </div>
+                    </div>`;
+            }
+
+            let bodyContent = '';
+            if (formato === 'a4') {
+                bodyContent = `<div class="a4-grid">${Array(copias).fill(singleHtml).join('')}</div>`;
+            } else {
+                bodyContent = Array(copias).fill(singleHtml).join('');
+            }
+
+            const w = window.open('', '_blank', 'width=800,height=600');
+            if (!w) {
+                this.toast('⚠️ El navegador bloqueó la ventana de impresión. Habilite popups para imprimir.', 'error');
+                return;
+            }
+            w.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Etiquetas_${esc(p.sku)}</title><style>${pageCss}</style></head><body>${bodyContent}<script>window.onload=function(){window.print();};<\/script></body></html>`);
+            w.document.close();
+        },
+
+        descargarBarcodePNGActual() {
+            const p = this.getProducto(this.detalleId);
+            if (!p) return;
+            const tipo = this.studioTipoCodigo || this._studioTipoCodigo || p.tipoCodigo || 'EAN13';
+            const code = p.barcode || (tipo === 'EAN13' ? this.generarEAN13Auto() : this.generarCode128Auto());
+            const svg = renderBarcodeSvg(code, tipo, 380, 120);
+            descargarSvgComoPng(svg, `Barcode_${p.sku}_${code}.png`, 1140, 360);
+            this.toast(`⬇️ Código de barras PNG descargado: ${code}`);
+        },
+
+        descargarBarcodeSVGActual() {
+            const p = this.getProducto(this.detalleId);
+            if (!p) return;
+            const tipo = this.studioTipoCodigo || this._studioTipoCodigo || p.tipoCodigo || 'EAN13';
+            const code = p.barcode || (tipo === 'EAN13' ? this.generarEAN13Auto() : this.generarCode128Auto());
+            const svg = renderBarcodeSvg(code, tipo, 380, 120);
+            descargarSvgArchivo(svg, `Barcode_${p.sku}_${code}.svg`);
+            this.toast(`⬇️ Código de barras vectorial SVG descargado: ${code}`);
+        },
+
+        descargarQRPNGActual() {
+            const p = this.getProducto(this.detalleId);
+            if (!p) return;
+            const lote = this.obtenerLoteStudio(p);
+            const payload = this.generarPayloadQR(p, lote, 'texto');
+            const svg = renderQRSvg(payload, 300, 2);
+            descargarSvgComoPng(svg, `QR_${p.sku}.png`, 900, 900);
+            this.toast(`⬇️ Código QR PNG descargado para ${p.sku}`);
+        },
+
+        descargarQRSVGActual() {
+            const p = this.getProducto(this.detalleId);
+            if (!p) return;
+            const lote = this.obtenerLoteStudio(p);
+            const payload = this.generarPayloadQR(p, lote, 'texto');
+            const svg = renderQRSvg(payload, 300, 2);
+            descargarSvgArchivo(svg, `QR_${p.sku}.svg`);
+            this.toast(`⬇️ Código QR vectorial SVG descargado para ${p.sku}`);
+        },
+
+        descargarStickerPNGActual() {
+            const p = this.getProducto(this.detalleId);
+            if (!p) return;
+            const lote = this.obtenerLoteStudio(p);
+            const tipo = this.studioTipoCodigo || this._studioTipoCodigo || p.tipoCodigo || 'EAN13';
+            const barcode = p.barcode || (tipo === 'EAN13' ? this.generarEAN13Auto() : this.generarCode128Auto());
+            const loteId = lote ? lote.id : 'LOT-' + new Date().getFullYear() + '-001';
+            const elab = lote ? String(lote.fechaHora).slice(0, 10) : nowLocalInput().slice(0, 10);
+            const venc = lote ? lote.vencimiento : addDays(elab, p.vidaUtilDias);
+            const payloadQR = this.generarPayloadQR(p, lote, 'texto');
+
+            if (typeof document === 'undefined') return;
+            const canvas = document.createElement('canvas');
+            canvas.width = 720;
+            canvas.height = 480;
+            const ctx = canvas.getContext('2d');
+
+            ctx.fillStyle = '#FFFBEB';
+            ctx.fillRect(0, 0, 720, 480);
+            ctx.strokeStyle = '#0F172A';
+            ctx.lineWidth = 6;
+            ctx.strokeRect(6, 6, 708, 468);
+
+            ctx.fillStyle = '#92400E';
+            ctx.font = 'bold 20px system-ui, sans-serif';
+            ctx.fillText('👑 PANADERÍA NUEVA VIASA, C.A.', 24, 42);
+
+            ctx.fillStyle = '#334155';
+            ctx.font = 'bold 15px system-ui, sans-serif';
+            ctx.fillText('RIF: J-31163165-8 • La Sabanita, Ciudad Bolívar', 24, 68);
+
+            ctx.fillStyle = '#0F172A';
+            ctx.font = '900 28px system-ui, sans-serif';
+            ctx.fillText(p.nombre.slice(0, 26), 24, 110);
+
+            ctx.fillStyle = '#334155';
+            ctx.font = '16px system-ui, sans-serif';
+            ctx.fillText(`${p.presentacion} • ${p.condicionFiscal === 'GRAVADO' ? 'GRAVADO IVA 16%' : 'EXENTO DE IVA'}`, 24, 140);
+
+            ctx.fillStyle = '#E2E8F0';
+            ctx.fillRect(24, 160, 672, 44);
+            ctx.strokeStyle = '#CBD5E1';
+            ctx.lineWidth = 1;
+            ctx.strokeRect(24, 160, 672, 44);
+
+            ctx.fillStyle = '#0F172A';
+            ctx.font = 'bold 14px "JetBrains Mono", monospace';
+            ctx.fillText(`LOTE: ${loteId}`, 36, 188);
+            ctx.fillText(`ELAB: ${elab}`, 260, 188);
+            ctx.fillText(`VENCE: ${venc}`, 480, 188);
+
+            ctx.fillStyle = '#64748B';
+            ctx.font = 'bold 14px system-ui, sans-serif';
+            ctx.fillText('PVP OFICIAL:', 480, 395);
+
+            ctx.fillStyle = '#0F172A';
+            ctx.font = '900 36px system-ui, sans-serif';
+            ctx.fillText(`${fmtNum(p.pvpUnitarioUsd)}`, 480, 435);
+
+            ctx.fillStyle = '#B45309';
+            ctx.font = 'bold 18px system-ui, sans-serif';
+            ctx.fillText(`Bs. ${fmtNum(this.bs(p.pvpUnitarioUsd))}`, 480, 462);
+
+            const barcodeSvg = renderBarcodeSvg(barcode, tipo, 340, 80);
+            const qrSvg = renderQRSvg(payloadQR, 110, 1);
+
+            const imgBarcode = new Image();
+            const imgQR = new Image();
+
+            let loaded = 0;
+            const tryFinish = () => {
+                loaded++;
+                if (loaded === 2) {
+                    ctx.drawImage(imgQR, 570, 24, 120, 120);
+                    ctx.drawImage(imgBarcode, 24, 380, 420, 80);
+
+                    const a = document.createElement('a');
+                    a.href = canvas.toDataURL('image/png', 1.0);
+                    a.download = `Sticker_Completo_${p.sku}.png`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(imgBarcode.src);
+                    URL.revokeObjectURL(imgQR.src);
+                }
+            };
+
+            imgBarcode.onload = tryFinish;
+            imgBarcode.onerror = tryFinish;
+            imgQR.onload = tryFinish;
+            imgQR.onerror = tryFinish;
+
+            imgBarcode.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(barcodeSvg);
+            imgQR.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(qrSvg);
+            this.toast(`⬇️ Generando descarga en alta definición de Sticker Completo...`);
         },
 
         // --------------------------------------------------------------------
