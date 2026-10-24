@@ -331,6 +331,12 @@
             if (!rolInfo || !rolInfo.permisos) return false;
 
             if (rolInfo.permisos.includes('*')) return true;
+
+            // Productos Nueva Viasa: accesible para roles operativos y administrativos relacionados
+            if (permiso === 'productos-nueva-viasa') {
+                return ['productos-nueva-viasa', 'inventario', 'produccion', 'pos', 'contabilidad', 'caja', 'reportes']
+                    .some(p => rolInfo.permisos.includes(p));
+            }
             return rolInfo.permisos.includes(permiso);
         }
 

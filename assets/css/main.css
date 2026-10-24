@@ -9028,3 +9028,383 @@ input, select, textarea {
     flex-wrap: wrap;
     gap: 10px;
 }
+
+/* ============================================================================
+   MÓDULO: PRODUCTOS NUEVA VIASA — CATÁLOGO EXCLUSIVO Y TRAZABILIDAD 360°
+   Panadería Nueva Viasa, C.A. • RIF: J-31163165-8 • La Sabanita, Ciudad Bolívar
+   ============================================================================ */
+
+.pnv-workspace {
+    padding: 20px 24px 48px 24px;
+    color: #F8FAFC;
+    font-family: 'Outfit', 'Inter', sans-serif;
+}
+
+.pnv-exec-header {
+    background: linear-gradient(135deg, rgba(15, 23, 42, 0.96) 0%, rgba(30, 41, 59, 0.92) 100%);
+    border: 1px solid rgba(251, 191, 36, 0.28);
+    border-left: 5px solid #F59E0B;
+    border-radius: 16px;
+    padding: 20px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 18px;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+}
+
+.pnv-kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 14px;
+    margin-bottom: 18px;
+}
+
+@media (max-width: 1280px) {
+    .pnv-kpi-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+@media (max-width: 768px) {
+    .pnv-kpi-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.pnv-kpi-card {
+    background: rgba(15, 23, 42, 0.88);
+    border: 1px solid rgba(148, 163, 184, 0.18);
+    border-radius: 14px;
+    padding: 15px 16px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.22);
+    transition: all 0.2s ease;
+}
+
+.pnv-kpi-card:hover {
+    border-color: rgba(251, 191, 36, 0.45);
+    transform: translateY(-2px);
+}
+
+.pnv-toolbar {
+    background: rgba(15, 23, 42, 0.9);
+    border: 1px solid rgba(148, 163, 184, 0.18);
+    border-radius: 14px;
+    padding: 14px 18px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 22px;
+}
+
+.pnv-cat-pills {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.pnv-cat-pill {
+    background: rgba(30, 41, 59, 0.85);
+    color: #CBD5E1;
+    border: 1px solid rgba(148, 163, 184, 0.22);
+    padding: 7px 14px;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.18s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.pnv-cat-pill:hover {
+    border-color: #F59E0B;
+    color: #FFFFFF;
+}
+
+.pnv-cat-pill.active {
+    background: linear-gradient(135deg, #D97706 0%, #B45309 100%);
+    color: #FFFFFF;
+    border-color: #FBBF24;
+    box-shadow: 0 4px 12px rgba(217, 119, 6, 0.35);
+}
+
+/* Cuadrícula Responsiva de Fichas de Producto */
+.pnv-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+}
+
+@media (max-width: 1440px) {
+    .pnv-cards-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+@media (max-width: 1024px) {
+    .pnv-cards-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+@media (max-width: 640px) {
+    .pnv-cards-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.pnv-product-card {
+    background: linear-gradient(180deg, #1E293B 0%, #0F172A 100%);
+    border: 1px solid rgba(148, 163, 184, 0.22);
+    border-radius: 16px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: all 0.24s ease;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.32);
+    position: relative;
+}
+
+.pnv-product-card:hover {
+    border-color: #F59E0B;
+    transform: translateY(-4px);
+    box-shadow: 0 16px 36px rgba(217, 119, 6, 0.22);
+}
+
+.pnv-img-wrap {
+    position: relative;
+    height: 196px;
+    width: 100%;
+    overflow: hidden;
+    background: #0B0F19;
+    cursor: pointer;
+}
+
+.pnv-img-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.38s ease;
+}
+
+.pnv-product-card:hover .pnv-img-wrap img {
+    transform: scale(1.06);
+}
+
+.pnv-badge-top-left {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    z-index: 2;
+}
+
+.pnv-badge-top-right {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 2;
+}
+
+.pnv-photo-btn {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    z-index: 3;
+    background: rgba(15, 23, 42, 0.85);
+    backdrop-filter: blur(4px);
+    color: #FDE68A;
+    border: 1px solid rgba(251, 191, 36, 0.45);
+    border-radius: 8px;
+    padding: 4px 9px;
+    font-size: 0.68rem;
+    font-weight: 800;
+    cursor: pointer;
+    transition: all 0.18s ease;
+}
+
+.pnv-photo-btn:hover {
+    background: #D97706;
+    color: #FFFFFF;
+}
+
+.pnv-card-body {
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 11px;
+    flex: 1;
+}
+
+.pnv-product-title {
+    font-size: 1.16rem;
+    font-weight: 900;
+    color: #FFFFFF;
+    line-height: 1.25;
+    letter-spacing: -0.01em;
+    margin: 0;
+    cursor: pointer;
+}
+
+.pnv-product-title:hover {
+    color: #FBBF24;
+}
+
+.pnv-sku-line {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.72rem;
+    color: #94A3B8;
+    font-family: 'JetBrains Mono', monospace;
+}
+
+.pnv-metrics-box {
+    background: rgba(15, 23, 42, 0.78);
+    border: 1px solid rgba(148, 163, 184, 0.16);
+    border-radius: 12px;
+    padding: 11px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.pnv-stock-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px dashed rgba(148, 163, 184, 0.18);
+    padding-bottom: 7px;
+}
+
+.pnv-price-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 6px;
+    text-align: right;
+}
+
+.pnv-card-footer {
+    padding: 12px 16px;
+    background: rgba(15, 23, 42, 0.92);
+    border-top: 1px solid rgba(148, 163, 184, 0.15);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Modal 360° de Trazabilidad de Producto Nueva Viasa */
+.pnv-modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 10020;
+    background: rgba(2, 6, 23, 0.78);
+    backdrop-filter: blur(5px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 18px;
+}
+
+.pnv-modal-container {
+    width: 100%;
+    max-width: 1380px;
+    max-height: 93vh;
+    overflow-y: auto;
+    background: #0F172A;
+    border: 1.5px solid rgba(251, 191, 36, 0.35);
+    border-radius: 18px;
+    color: #F8FAFC;
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.65);
+}
+
+.pnv-modal-tabs {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    padding: 12px 22px;
+    background: #1E293B;
+    border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.pnv-modal-tab-btn {
+    background: rgba(15, 23, 42, 0.75);
+    color: #CBD5E1;
+    border: 1px solid rgba(148, 163, 184, 0.25);
+    padding: 9px 15px;
+    border-radius: 10px;
+    font-size: 0.8rem;
+    font-weight: 800;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    transition: all 0.18s ease;
+}
+
+.pnv-modal-tab-btn.active {
+    background: linear-gradient(135deg, #D97706 0%, #B45309 100%);
+    color: #FFFFFF;
+    border-color: #FBBF24;
+}
+
+
+/* --- Productos Nueva Viasa: componentes complementarios --- */
+.pnv-chip { display: inline-flex; align-items: center; gap: 6px; background: rgba(30, 41, 59, 0.9); border: 1px solid rgba(148, 163, 184, 0.25); color: #E2E8F0; padding: 7px 12px; border-radius: 999px; font-size: 0.76rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+.pnv-badge { display: inline-flex; align-items: center; padding: 3px 9px; border-radius: 999px; font-size: 0.64rem; font-weight: 900; letter-spacing: 0.04em; backdrop-filter: blur(4px); white-space: nowrap; }
+.pnv-btn { display: inline-flex; align-items: center; gap: 7px; border-radius: 10px; padding: 10px 16px; font-size: 0.82rem; font-weight: 800; cursor: pointer; border: 1px solid transparent; transition: all 0.18s ease; font-family: inherit; white-space: nowrap; }
+.pnv-btn-sm { padding: 7px 11px; font-size: 0.74rem; }
+.pnv-btn-xs { padding: 4px 8px; font-size: 0.7rem; border-radius: 7px; }
+.pnv-btn-gold { background: linear-gradient(135deg, #F59E0B 0%, #B45309 100%); color: #fff; border-color: #FBBF24; box-shadow: 0 6px 16px rgba(217, 119, 6, 0.32); }
+.pnv-btn-gold:hover { filter: brightness(1.1); transform: translateY(-1px); }
+.pnv-btn-ghost { background: rgba(30, 41, 59, 0.9); color: #E2E8F0; border-color: rgba(148, 163, 184, 0.3); }
+.pnv-btn-ghost:hover { border-color: #F59E0B; color: #fff; }
+.pnv-btn-danger { background: rgba(127, 29, 29, 0.55); color: #FECACA; border-color: rgba(248, 113, 113, 0.45); }
+.pnv-btn-danger:hover { background: #B91C1C; color: #fff; }
+.pnv-input { width: 100%; box-sizing: border-box; background: #0B1220; color: #F8FAFC; border: 1px solid rgba(148, 163, 184, 0.28); border-radius: 9px; padding: 9px 11px; font-size: 0.84rem; font-family: inherit; font-variant-numeric: tabular-nums; outline: none; transition: border-color 0.15s ease; }
+.pnv-input:focus { border-color: #F59E0B; box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.18); }
+.pnv-input[readonly] { color: #94A3B8; }
+.pnv-label { display: block; font-size: 0.7rem; font-weight: 800; color: #94A3B8; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 5px; }
+.pnv-field { display: flex; flex-direction: column; min-width: 0; }
+.pnv-form-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+.pnv-form-grid-4 { grid-template-columns: repeat(4, 1fr); }
+@media (max-width: 900px) { .pnv-form-grid-4 { grid-template-columns: repeat(2, 1fr); } .pnv-form-split { grid-template-columns: 1fr !important; } }
+.pnv-calc-box { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(251, 191, 36, 0.25); border-radius: 12px; padding: 12px; font-size: 0.78rem; }
+.pnv-calc-box > div { display: flex; flex-direction: column; gap: 2px; }
+.pnv-calc-box span { color: #94A3B8; font-size: 0.68rem; font-weight: 700; text-transform: uppercase; }
+.pnv-calc-box b { color: #F8FAFC; font-variant-numeric: tabular-nums; font-size: 0.95rem; }
+.pnv-mini-label { font-size: 0.6rem; color: #94A3B8; font-weight: 800; text-transform: uppercase; }
+.pnv-mini-val { font-size: 0.86rem; font-weight: 900; color: #F8FAFC; font-variant-numeric: tabular-nums; }
+.pnv-mini-sub { font-size: 0.64rem; color: #94A3B8; font-variant-numeric: tabular-nums; }
+.pnv-empty { text-align: center; padding: 60px 20px; border: 1px dashed rgba(148, 163, 184, 0.3); border-radius: 16px; color: #E2E8F0; }
+.pnv-modal-header { display: flex; justify-content: space-between; align-items: center; gap: 14px; padding: 18px 22px; border-bottom: 1px solid rgba(148, 163, 184, 0.2); background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%); border-radius: 18px 18px 0 0; position: sticky; top: 0; z-index: 2; }
+.pnv-modal-body { padding: 18px 22px 22px; }
+.pnv-modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 18px; flex-wrap: wrap; }
+.pnv-sum-strip { display: grid; grid-template-columns: repeat(8, 1fr); gap: 1px; background: rgba(148, 163, 184, 0.18); border-bottom: 1px solid rgba(148, 163, 184, 0.2); }
+@media (max-width: 1100px) { .pnv-sum-strip { grid-template-columns: repeat(4, 1fr); } }
+.pnv-sum-cell { background: #0F172A; padding: 10px 12px; display: flex; flex-direction: column; gap: 2px; }
+.pnv-sum-cell span { font-size: 0.62rem; color: #94A3B8; font-weight: 800; text-transform: uppercase; }
+.pnv-sum-cell b { font-size: 1.05rem; font-variant-numeric: tabular-nums; }
+.pnv-section { background: rgba(30, 41, 59, 0.45); border: 1px solid rgba(148, 163, 184, 0.18); border-radius: 14px; padding: 16px; margin-bottom: 16px; }
+.pnv-section-title { font-size: 0.86rem; font-weight: 900; color: #FBBF24; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+.pnv-custody { background: rgba(120, 53, 15, 0.18); border: 1px dashed rgba(251, 191, 36, 0.45); border-radius: 12px; padding: 12px; }
+.pnv-hint { font-size: 0.74rem; color: #94A3B8; margin-top: 10px; }
+.pnv-alert { margin-top: 10px; background: rgba(127, 29, 29, 0.3); border: 1px solid rgba(248, 113, 113, 0.5); color: #FECACA; border-radius: 10px; padding: 10px 12px; font-size: 0.8rem; font-weight: 700; }
+.pnv-table-wrap { overflow-x: auto; border: 1px solid rgba(148, 163, 184, 0.18); border-radius: 10px; }
+.pnv-table { width: 100%; border-collapse: collapse; font-size: 0.78rem; }
+.pnv-table th { background: #1E293B; color: #94A3B8; font-size: 0.66rem; text-transform: uppercase; letter-spacing: 0.04em; text-align: left; padding: 9px 10px; white-space: nowrap; }
+.pnv-table td { padding: 9px 10px; border-top: 1px solid rgba(148, 163, 184, 0.12); color: #E2E8F0; vertical-align: top; }
+.pnv-table tbody tr:hover td { background: rgba(245, 158, 11, 0.05); }
+.pnv-table tfoot td { background: #111827; border-top: 2px solid rgba(251, 191, 36, 0.35); }
+.pnv-table .num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.pnv-table .mono { font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: #FDE68A; }
+.pnv-td-sub { font-size: 0.68rem; color: #94A3B8; }
+.pnv-td-empty { text-align: center; color: #64748B; padding: 22px !important; }
+.pnv-sticker { background: #FFFBEB; border: 1.5px solid #0F172A; border-radius: 10px; padding: 10px; max-width: 360px; color: #0F172A; }

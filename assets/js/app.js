@@ -1486,6 +1486,7 @@
             if (viewName === 'documentos') this.renderDocumentos();
             if (viewName === 'cafetin') this.renderCafetin();
             if (viewName === 'guardias-hub') { if (window.ViasaGuardiasEngine) window.ViasaGuardiasEngine.renderGuardiasHub(); }
+            if (viewName === 'productos-nueva-viasa') { if (window.ViasaProductosExclusivosEngine) window.ViasaProductosExclusivosEngine.render(); }
         },
 
         initClock() {
