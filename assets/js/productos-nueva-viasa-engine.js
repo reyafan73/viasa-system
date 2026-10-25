@@ -735,6 +735,27 @@
         </svg>`;
     }
 
+    function renderBarcodeGraphic(p, code, formato = 'EAN13', width = 190, height = 64) {
+        if (p && p.customBarcodeImage) {
+            const numStr = String(code || p.barcode || '').trim();
+            const fontSize = Math.min(10, Math.max(7, Math.round(height * 0.17)));
+            return `<div style="width:${width}px;height:${height}px;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;background:#ffffff;border-radius:3px;box-sizing:border-box;padding:2px 4px;">
+                <img src="${esc(p.customBarcodeImage)}" alt="Código de barras" style="max-width:100%;max-height:${Math.max(16, height - 16)}px;object-fit:contain;display:block;margin:auto;">
+                ${numStr ? `<div style="font-size:${fontSize}px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#0f172a;letter-spacing:1px;line-height:1;margin-top:2px;text-align:center;">${esc(numStr)}</div>` : ''}
+            </div>`;
+        }
+        return renderBarcodeSvg(code || (p ? p.barcode : ''), formato, width, height);
+    }
+
+    function renderQRGraphic(p, payloadQR, pixelSize = 120, margin = 2) {
+        if (p && p.customQrImage) {
+            return `<div style="width:${pixelSize}px;height:${pixelSize}px;display:flex;align-items:center;justify-content:center;overflow:hidden;background:#ffffff;border-radius:4px;box-sizing:border-box;padding:2px;">
+                <img src="${esc(p.customQrImage)}" alt="Código QR" style="max-width:100%;max-height:100%;object-fit:contain;display:block;margin:auto;">
+            </div>`;
+        }
+        return renderQRSvg(payloadQR, pixelSize, margin);
+    }
+
     function descargarSvgArchivo(svgString, filename) {
         if (typeof document === 'undefined') return;
         const blob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
@@ -844,6 +865,8 @@
             prod.codigoBarras = prod.barcode;
             prod.qrCode = prod.qrCode || this.generarPayloadQR(prod);
             prod.codigoQR = prod.qrCode;
+            prod.customBarcodeImage = prod.customBarcodeImage || null;
+            prod.customQrImage = prod.customQrImage || null;
 
             prod.stockInicial = Math.max(0, parseInt(prod.stockInicial, 10) || 0);
             if (prod.stockInicialMostrador === undefined || prod.stockInicialReserva === undefined) {
@@ -963,6 +986,8 @@
                         nombre: p.nombre,
                         codigoBarras: p.barcode,
                         barcode: p.barcode,
+                        customBarcodeImage: p.customBarcodeImage || null,
+                        customQrImage: p.customQrImage || null,
                         qrCode: p.qrCode || this.generarPayloadQR(p),
                         codigoQR: p.qrCode || this.generarPayloadQR(p),
                         categoria: p.categoria || 'Panadería Autóctona',
@@ -1285,10 +1310,10 @@
                     <!-- Tarjeta / Vista rápida de códigos de barras y QR -->
                     <div class="pnv-card-codes-box" onclick="event.stopPropagation();ViasaProductosExclusivosEngine.abrirEstudioStickers('${id}')" title="Clic para abrir Estudio de Códigos e Impresión de Stickers">
                         <div style="flex:1;overflow:hidden;margin-right:8px;background:#fff;padding:2px 4px;border-radius:4px;display:flex;align-items:center;justify-content:center;">
-                            ${renderBarcodeSvg(p.barcode || p.sku, p.tipoCodigo || 'EAN13', 140, 32)}
+                            ${renderBarcodeGraphic(p, p.barcode || p.sku, p.tipoCodigo || 'EAN13', 140, 32)}
                         </div>
                         <div style="flex-shrink:0;background:#fff;padding:2px;border-radius:4px;display:flex;align-items:center;justify-content:center;">
-                            ${renderQRSvg(p.qrCode || this.generarPayloadQR(p), 34, 1)}
+                            ${renderQRGraphic(p, p.qrCode || this.generarPayloadQR(p), 34, 1)}
                         </div>
                     </div>
                     <div class="pnv-metrics-box">
@@ -1428,6 +1453,8 @@
             }
             v.tipoCodigo = v.tipoCodigo || 'EAN13';
             this._fotoTemporal = v.fotoUrl || '';
+            this._customBarcodeImageForm = v.customBarcodeImage || '';
+            this._customQrImageForm = v.customQrImage || '';
             const tasa = this.getTasa();
             const opt = (arr, sel) => arr.map(o => `<option value="${esc(o)}" ${o === sel ? 'selected' : ''}>${esc(o)}</option>`).join('');
 
@@ -1450,7 +1477,7 @@
                             <div class="pnv-field"><label class="pnv-label">Código SKU *</label><input name="sku" class="pnv-input" required maxlength="30" value="${esc(v.sku)}"></div>
                             <div class="pnv-field" style="grid-column:span 2;">
                                 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
-                                    <label class="pnv-label" style="margin-bottom:0;"><i class="fa-solid fa-barcode" style="color:#FBBF24;"></i> Código de Barras y QR de Trazabilidad *</label>
+                                    <label class="pnv-label" style="margin-bottom:0;"><i class="fa-solid fa-barcode" style="color:#FBBF24;"></i> Código de Barras Asignado (Escanear o escribir número) *</label>
                                     <div style="display:flex;gap:6px;">
                                         <button type="button" class="pnv-btn pnv-btn-ghost pnv-btn-xs" style="color:#FBBF24;border-color:rgba(251,191,36,0.35);" onclick="ViasaProductosExclusivosEngine.regenerarCodigoForm('EAN13')">⚡ Generar EAN-13 (759...)</button>
                                         <button type="button" class="pnv-btn pnv-btn-ghost pnv-btn-xs" onclick="ViasaProductosExclusivosEngine.regenerarCodigoForm('CODE128')">⚡ Generar Code-128</button>
@@ -1461,7 +1488,7 @@
                                         <option value="EAN13" ${v.tipoCodigo !== 'CODE128' ? 'selected' : ''}>EAN-13 (Comercial)</option>
                                         <option value="CODE128" ${v.tipoCodigo === 'CODE128' ? 'selected' : ''}>Code-128 (Interno)</option>
                                     </select>
-                                    <input name="barcode" id="pnv-form-input-barcode" class="pnv-input" maxlength="25" placeholder="EAN-13 o Código interno" value="${esc(v.barcode || '')}" oninput="ViasaProductosExclusivosEngine.recalcFormCodes()">
+                                    <input name="barcode" id="pnv-form-input-barcode" class="pnv-input" maxlength="25" placeholder="Escanear con pistola o escribir código (ej. 759... o NV-...)" value="${esc(v.barcode || '')}" oninput="ViasaProductosExclusivosEngine.recalcFormCodes()">
                                 </div>
                                 <div id="pnv-form-codes-live" style="margin-top:10px;padding:8px 12px;background:#080D1A;border:1px solid rgba(251,191,36,0.25);border-radius:10px;display:flex;align-items:center;justify-content:space-between;gap:14px;">
                                     <!-- Renderizado dinámico de códigos en vivo -->
@@ -1563,6 +1590,72 @@
             this.recalcFormCodes();
         },
 
+        leerImagenCodigo(file) {
+            return new Promise((resolve, reject) => {
+                if (!file) { reject(new Error('No se seleccionó ningún archivo.')); return; }
+                const isImg = /^image\//.test(file.type) || file.name.match(/\.(png|jpe?g|svg|webp)$/i);
+                if (!isImg) { reject(new Error('El archivo seleccionado debe ser una imagen (.png, .jpg, .jpeg, .svg, .webp).')); return; }
+                const reader = new FileReader();
+                reader.onerror = () => reject(new Error('Error al leer el archivo de imagen.'));
+                reader.onload = () => {
+                    const result = reader.result;
+                    if (file.type === 'image/svg+xml' || file.name.endsWith('.svg') || (result && result.length < 600000 && (file.type === 'image/png' || file.type === 'image/webp'))) {
+                        resolve(result);
+                        return;
+                    }
+                    const img = new Image();
+                    img.onload = () => {
+                        const maxDim = 1200;
+                        const scale = Math.min(1, maxDim / Math.max(img.width, img.height));
+                        const canvas = document.createElement('canvas');
+                        canvas.width = Math.round(img.width * scale);
+                        canvas.height = Math.round(img.height * scale);
+                        const ctx = canvas.getContext('2d');
+                        ctx.imageSmoothingEnabled = false;
+                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                        resolve(canvas.toDataURL('image/png'));
+                    };
+                    img.onerror = () => reject(new Error('Formato de imagen no compatible.'));
+                    img.src = result;
+                };
+                reader.readAsDataURL(file);
+            });
+        },
+
+        async subirBarcodeForm(input) {
+            try {
+                if (!input.files || !input.files[0]) return;
+                this._customBarcodeImageForm = await this.leerImagenCodigo(input.files[0]);
+                this.recalcFormCodes();
+                this.toast('🖼️ Imagen de código de barras cargada correctamente.');
+            } catch (e) {
+                this.toast('⚠️ ' + e.message, 'error');
+            }
+        },
+
+        restaurarBarcodeForm() {
+            this._customBarcodeImageForm = '';
+            this.recalcFormCodes();
+            this.toast('🔄 Generador automático de código de barras restaurado.');
+        },
+
+        async subirQRForm(input) {
+            try {
+                if (!input.files || !input.files[0]) return;
+                this._customQrImageForm = await this.leerImagenCodigo(input.files[0]);
+                this.recalcFormCodes();
+                this.toast('🖼️ Imagen de código QR cargada correctamente.');
+            } catch (e) {
+                this.toast('⚠️ ' + e.message, 'error');
+            }
+        },
+
+        restaurarQRForm() {
+            this._customQrImageForm = '';
+            this.recalcFormCodes();
+            this.toast('🔄 Generador automático de código QR restaurado.');
+        },
+
         recalcFormCodes() {
             const f = document.getElementById('pnv-form-producto');
             const liveBox = document.getElementById('pnv-form-codes-live');
@@ -1576,23 +1669,84 @@
             const nombre = (f.nombre && f.nombre.value.trim()) || 'Nuevo Producto';
             const sku = (f.sku && f.sku.value.trim().toUpperCase()) || 'NV-0000';
             const pvp = f.pvpUnitarioUsd ? round2(f.pvpUnitarioUsd.value) : 0;
-            const tempProd = { nombre, sku, barcode: code, tipoCodigo: tipo, pvpUnitarioUsd: pvp };
+            const tempProd = {
+                nombre,
+                sku,
+                barcode: code,
+                tipoCodigo: tipo,
+                pvpUnitarioUsd: pvp,
+                customBarcodeImage: this._customBarcodeImageForm || null,
+                customQrImage: this._customQrImageForm || null
+            };
             const payloadQR = this.generarPayloadQR(tempProd, null, 'texto');
+            const hasCustomBarcode = !!this._customBarcodeImageForm;
+            const hasCustomQr = !!this._customQrImageForm;
+
+            const barcodePreviewHtml = hasCustomBarcode
+                ? `<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2px 4px;box-sizing:border-box;">
+                     <img src="${esc(this._customBarcodeImageForm)}" alt="Código de barras personalizado" style="max-height:44px;max-width:180px;object-fit:contain;display:block;">
+                     <div style="font-size:10px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#0F172A;margin-top:2px;">${esc(code)}</div>
+                   </div>`
+                : renderBarcodeSvg(code, tipo, 190, 42);
+
+            const qrPreviewHtml = hasCustomQr
+                ? `<div style="display:flex;align-items:center;justify-content:center;padding:2px;box-sizing:border-box;">
+                     <img src="${esc(this._customQrImageForm)}" alt="QR personalizado" style="width:48px;height:48px;object-fit:contain;display:block;">
+                   </div>`
+                : renderQRSvg(payloadQR, 48, 1);
+
             liveBox.innerHTML = `
-                <div style="flex:1;min-width:0;">
-                    <div style="font-size:0.68rem;font-weight:800;color:#94A3B8;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:3px;">
-                        <i class="fa-solid fa-barcode" style="color:#FBBF24;"></i> Código de Barras (${tipo})
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:flex-start;width:100%;">
+                    <!-- Columna Código de Barras -->
+                    <div>
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+                            <span style="font-size:0.68rem;font-weight:800;color:#94A3B8;text-transform:uppercase;letter-spacing:0.04em;">
+                                <i class="fa-solid fa-barcode" style="color:#FBBF24;"></i> Código de Barras
+                            </span>
+                            ${hasCustomBarcode
+                                ? '<span class="pnv-badge" style="background:#065F46;color:#A7F3D0;font-size:0.62rem;border:1px solid #10B981;">Imagen Propia</span>'
+                                : `<span style="font-size:0.65rem;color:#94A3B8;font-weight:700;">${tipo} (Sistema)</span>`}
+                        </div>
+                        <div style="background:#fff;padding:6px;border-radius:6px;display:flex;align-items:center;justify-content:center;min-height:56px;box-shadow:0 2px 6px rgba(0,0,0,0.35);">
+                            ${barcodePreviewHtml}
+                        </div>
+                        <div style="display:flex;gap:4px;margin-top:6px;flex-wrap:wrap;">
+                            <label class="pnv-btn pnv-btn-ghost pnv-btn-xs" style="flex:1;justify-content:center;cursor:pointer;font-size:0.68rem;" title="Subir imagen propia (.png, .jpg, .svg, .webp) para el código de barras">
+                                🖼️ Cambiar Imagen de Código de Barras
+                                <input type="file" accept="image/png,image/jpeg,image/svg+xml,image/webp" style="display:none;" onchange="ViasaProductosExclusivosEngine.subirBarcodeForm(this)">
+                            </label>
+                            ${hasCustomBarcode ? `
+                                <button type="button" class="pnv-btn pnv-btn-ghost pnv-btn-xs" style="color:#F87171;border-color:rgba(248,113,113,0.35);font-size:0.65rem;" title="Volver al código de barras dibujado por el sistema" onclick="ViasaProductosExclusivosEngine.restaurarBarcodeForm()">
+                                    🔄 Restaurar Generador Automático
+                                </button>
+                            ` : ''}
+                        </div>
                     </div>
-                    <div style="background:#fff;padding:4px 8px;border-radius:5px;display:inline-block;box-shadow:0 2px 6px rgba(0,0,0,0.35);">
-                        ${renderBarcodeSvg(code, tipo, 190, 42)}
-                    </div>
-                </div>
-                <div style="flex-shrink:0;text-align:center;">
-                    <div style="font-size:0.68rem;font-weight:800;color:#94A3B8;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:3px;">
-                        <i class="fa-solid fa-qrcode" style="color:#FBBF24;"></i> QR Trazabilidad
-                    </div>
-                    <div style="background:#fff;padding:3px;border-radius:5px;display:inline-block;box-shadow:0 2px 6px rgba(0,0,0,0.35);">
-                        ${renderQRSvg(payloadQR, 48, 1)}
+
+                    <!-- Columna Código QR -->
+                    <div>
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+                            <span style="font-size:0.68rem;font-weight:800;color:#94A3B8;text-transform:uppercase;letter-spacing:0.04em;">
+                                <i class="fa-solid fa-qrcode" style="color:#FBBF24;"></i> Código QR
+                            </span>
+                            ${hasCustomQr
+                                ? '<span class="pnv-badge" style="background:#065F46;color:#A7F3D0;font-size:0.62rem;border:1px solid #10B981;">QR Propio</span>'
+                                : '<span style="font-size:0.65rem;color:#94A3B8;font-weight:700;">Trazable (Sistema)</span>'}
+                        </div>
+                        <div style="background:#fff;padding:4px;border-radius:6px;display:flex;align-items:center;justify-content:center;min-height:56px;box-shadow:0 2px 6px rgba(0,0,0,0.35);">
+                            ${qrPreviewHtml}
+                        </div>
+                        <div style="display:flex;gap:4px;margin-top:6px;flex-wrap:wrap;">
+                            <label class="pnv-btn pnv-btn-ghost pnv-btn-xs" style="flex:1;justify-content:center;cursor:pointer;font-size:0.68rem;" title="Subir imagen propia (.png, .jpg, .svg, .webp) para el código QR">
+                                🖼️ Cambiar Imagen de Código QR
+                                <input type="file" accept="image/png,image/jpeg,image/svg+xml,image/webp" style="display:none;" onchange="ViasaProductosExclusivosEngine.subirQRForm(this)">
+                            </label>
+                            ${hasCustomQr ? `
+                                <button type="button" class="pnv-btn pnv-btn-ghost pnv-btn-xs" style="color:#F87171;border-color:rgba(248,113,113,0.35);font-size:0.65rem;" title="Volver al código QR dibujado por el sistema" onclick="ViasaProductosExclusivosEngine.restaurarQRForm()">
+                                    🔄 Restaurar Generador Automático
+                                </button>
+                            ` : ''}
+                        </div>
                     </div>
                 </div>`;
         },
@@ -1604,14 +1758,13 @@
             let barcodeVal = (f.barcode ? f.barcode.value : '').trim();
 
             if (tipoCodigo === 'EAN13') {
-                barcodeVal = barcodeVal.replace(/\D/g, '');
-                if (barcodeVal.length === 12 || barcodeVal.length === 13) {
-                    barcodeVal = ean13Normalize(barcodeVal);
+                const cleanDigits = barcodeVal.replace(/\D/g, '');
+                if (cleanDigits.length === 12 || cleanDigits.length === 13) {
+                    barcodeVal = ean13Normalize(cleanDigits);
                 } else if (!barcodeVal) {
                     barcodeVal = this.generarEAN13Auto();
-                } else {
-                    this.toast('⚠️ El código EAN-13 debe tener 12 o 13 dígitos numéricos.', 'error');
-                    return;
+                } else if (!this._customBarcodeImageForm) {
+                    tipoCodigo = 'CODE128';
                 }
             } else {
                 if (!barcodeVal) barcodeVal = this.generarCode128Auto();
@@ -1623,6 +1776,8 @@
                 barcode: barcodeVal,
                 tipoCodigo: tipoCodigo,
                 codigoBarras: barcodeVal,
+                customBarcodeImage: this._customBarcodeImageForm || null,
+                customQrImage: this._customQrImageForm || null,
                 presentacion: f.presentacion.value.trim(),
                 categoria: f.categoria.value,
                 condicionFiscal: f.condicionFiscal.value,
@@ -1652,7 +1807,11 @@
                 if (!p) return;
                 const respaldo = JSON.parse(JSON.stringify(p));
                 const skuAnterior = p.sku;
-                Object.assign(p, datos, { fotoUrl: this._fotoTemporal || p.fotoUrl });
+                Object.assign(p, datos, {
+                    fotoUrl: this._fotoTemporal || p.fotoUrl,
+                    customBarcodeImage: this._customBarcodeImageForm !== undefined ? (this._customBarcodeImageForm || null) : p.customBarcodeImage,
+                    customQrImage: this._customQrImageForm !== undefined ? (this._customQrImageForm || null) : p.customQrImage
+                });
                 const st = this.calcStock(p);
                 if (st.mostrador < 0 || st.reserva < 0) {
                     Object.assign(p, respaldo);
@@ -2295,7 +2454,7 @@
                         <div style="font-size:9px;color:#334155;">${esc(p.presentacion)} • ${p.condicionFiscal === 'GRAVADO' ? 'IVA 16%' : 'Exento de IVA'}</div>
                     </div>
                     <div style="flex-shrink:0;background:#fff;padding:2px;border:1px solid #cbd5e1;border-radius:4px;">
-                        ${renderQRSvg(qrData, 60, 1)}
+                        ${renderQRGraphic(p, qrData, 60, 1)}
                     </div>
                 </div>
                 <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;margin:6px 0;font-size:8.5px;color:#0f172a;">
@@ -2304,7 +2463,7 @@
                     <div><b>VENCE</b><br>${esc(venc)}</div>
                 </div>
                 <div style="display:flex;justify-content:space-between;align-items:flex-end;">
-                    <div style="background:#fff;padding:2px 4px;border-radius:4px;border:1px solid #cbd5e1;">${renderBarcodeSvg(barcode, tipo, 170, 44)}</div>
+                    <div style="background:#fff;padding:2px 4px;border-radius:4px;border:1px solid #cbd5e1;">${renderBarcodeGraphic(p, barcode, tipo, 170, 44)}</div>
                     <div style="text-align:right;color:#0f172a;"><div style="font-size:8px;">PVP</div><div style="font-size:15px;font-weight:900;">USD ${fmtNum(p.pvpUnitarioUsd)}</div><div style="font-size:9px;">Bs. ${fmtNum(this.bs(p.pvpUnitarioUsd))}</div></div>
                 </div>
             </div>`;
@@ -2358,6 +2517,68 @@
             this.renderStudioPreview();
         },
 
+        actualizarBarcodeDesdeStudio(val) {
+            const p = this.getProducto(this.detalleId);
+            if (!p) return;
+            const clean = String(val || '').trim();
+            p.barcode = clean;
+            p.codigoBarras = clean;
+            if (/^\d{12,13}$/.test(clean)) p.tipoCodigo = 'EAN13';
+            else p.tipoCodigo = 'CODE128';
+            this.guardar();
+            this.sincronizarConPOS(p);
+            this.toast(`💾 Código de barras asignado actualizado: ${clean}`);
+            this.renderStudioPreview();
+        },
+
+        async subirBarcodeStudio(input) {
+            const p = this.getProducto(this.detalleId);
+            if (!p || !input.files || !input.files[0]) return;
+            try {
+                p.customBarcodeImage = await this.leerImagenCodigo(input.files[0]);
+                this.guardar();
+                this.sincronizarConPOS(p);
+                this.toast(`🖼️ Imagen propia de código de barras guardada para ${p.nombre}.`);
+                this.renderDetalle();
+            } catch (e) {
+                this.toast('⚠️ ' + e.message, 'error');
+            }
+        },
+
+        restaurarBarcodeStudio() {
+            const p = this.getProducto(this.detalleId);
+            if (!p) return;
+            p.customBarcodeImage = null;
+            this.guardar();
+            this.sincronizarConPOS(p);
+            this.toast('🔄 Generador automático de código de barras restaurado.');
+            this.renderDetalle();
+        },
+
+        async subirQRStudio(input) {
+            const p = this.getProducto(this.detalleId);
+            if (!p || !input.files || !input.files[0]) return;
+            try {
+                p.customQrImage = await this.leerImagenCodigo(input.files[0]);
+                this.guardar();
+                this.sincronizarConPOS(p);
+                this.toast(`🖼️ Imagen propia de código QR guardada para ${p.nombre}.`);
+                this.renderDetalle();
+            } catch (e) {
+                this.toast('⚠️ ' + e.message, 'error');
+            }
+        },
+
+        restaurarQRStudio() {
+            const p = this.getProducto(this.detalleId);
+            if (!p) return;
+            p.customQrImage = null;
+            this.guardar();
+            this.sincronizarConPOS(p);
+            this.toast('🔄 Generador automático de código QR restaurado.');
+            this.renderDetalle();
+        },
+
         setStudioCopias(n) {
             const val = Math.max(1, parseInt(n, 10) || 1);
             this.studioCopias = val;
@@ -2405,11 +2626,11 @@
                                 <div>BS: ${fmtNum(this.bs(p.pvpUnitarioUsd))}</div>
                             </div>
                             <div style="flex-shrink:0;">
-                                ${renderQRSvg(payloadQR, 44, 1)}
+                                ${renderQRGraphic(p, payloadQR, 44, 1)}
                             </div>
                         </div>
                         <div style="text-align:center;border-top:1px dashed #000;padding-top:2px;">
-                            ${renderBarcodeSvg(barcode, tipoCodigo, 210, 34)}
+                            ${renderBarcodeGraphic(p, barcode, tipoCodigo, 210, 34)}
                         </div>
                     </div>`;
             } else if (formato === 'termica-4040') {
@@ -2421,7 +2642,7 @@
                             <div style="font-size:7.5px;">${esc(p.presentacion)}</div>
                         </div>
                         <div style="display:flex;justify-content:center;margin:4px 0;">
-                            ${renderQRSvg(payloadQR, 74, 1)}
+                            ${renderQRGraphic(p, payloadQR, 74, 1)}
                         </div>
                         <div style="display:flex;justify-content:space-between;align-items:center;font-size:7.5px;font-weight:700;">
                             <span>L: ${esc(loteId)}</span>
@@ -2429,7 +2650,7 @@
                             <span>V: ${esc(fechaVenc)}</span>
                         </div>
                         <div style="text-align:center;border-top:1px dashed #000;padding-top:2px;">
-                            ${renderBarcodeSvg(barcode, tipoCodigo, 180, 28)}
+                            ${renderBarcodeGraphic(p, barcode, tipoCodigo, 180, 28)}
                         </div>
                     </div>`;
             } else if (formato === 'a4') {
@@ -2441,14 +2662,14 @@
                                 <div style="font-size:10px;font-weight:900;color:#0f172a;">${esc(p.nombre.slice(0, 18))}</div>
                                 <div style="font-size:7px;color:#475569;">${esc(p.presentacion)}</div>
                             </div>
-                            <div style="flex-shrink:0;">${renderQRSvg(payloadQR, 36, 1)}</div>
+                            <div style="flex-shrink:0;">${renderQRGraphic(p, payloadQR, 36, 1)}</div>
                         </div>
                         <div style="display:flex;justify-content:space-between;align-items:center;font-size:6.5px;color:#0f172a;margin-bottom:3px;font-family:monospace;">
                             <span>L: ${esc(loteId)}</span>
                             <span>V: ${esc(fechaVenc)}</span>
                         </div>
                         <div style="display:flex;justify-content:space-between;align-items:flex-end;">
-                            <div>${renderBarcodeSvg(barcode, tipoCodigo, 110, 26)}</div>
+                            <div>${renderBarcodeGraphic(p, barcode, tipoCodigo, 110, 26)}</div>
                             <div style="text-align:right;"><b style="font-size:11px;color:#0f172a;">${fmtNum(p.pvpUnitarioUsd)}</b></div>
                         </div>
                     </div>`;
@@ -2470,7 +2691,7 @@
                                 <div style="font-size:9.5px;color:#334155;font-weight:600;">${esc(p.presentacion)} • <span style="color:${p.condicionFiscal === 'GRAVADO' ? '#1D4ED8' : '#047857'};font-weight:800;">${p.condicionFiscal === 'GRAVADO' ? 'IVA 16%' : 'EXENTO IVA'}</span></div>
                             </div>
                             <div style="background:#fff;padding:4px;border:1px solid #CBD5E1;border-radius:6px;box-shadow:0 1px 4px rgba(0,0,0,0.1);flex-shrink:0;">
-                                ${renderQRSvg(payloadQR, 68, 1)}
+                                ${renderQRGraphic(p, payloadQR, 68, 1)}
                             </div>
                         </div>
                         <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;background:rgba(241,245,249,0.9);padding:4px 6px;border-radius:4px;margin-bottom:6px;font-size:8.5px;color:#0F172A;font-family:'JetBrains Mono',monospace;">
@@ -2480,7 +2701,7 @@
                         </div>
                         <div style="display:flex;justify-content:space-between;align-items:flex-end;">
                             <div style="background:#fff;padding:4px 6px;border-radius:4px;border:1px solid #CBD5E1;display:inline-block;">
-                                ${renderBarcodeSvg(barcode, tipoCodigo, 160, 42)}
+                                ${renderBarcodeGraphic(p, barcode, tipoCodigo, 160, 42)}
                             </div>
                             <div style="text-align:right;color:#0F172A;">
                                 <div style="font-size:8px;font-weight:800;color:#64748B;text-transform:uppercase;">PVP OFICIAL</div>
@@ -2550,6 +2771,49 @@
                                 <select class="pnv-input" onchange="ViasaProductosExclusivosEngine.setStudioLote(this.value)">
                                     ${lotesOptions}
                                 </select>
+                            </div>
+
+                            <!-- Control de Código Asignado e Imágenes Propias -->
+                            <div style="background:#080D1A;border:1px solid rgba(251,191,36,0.28);border-radius:10px;padding:12px;">
+                                <div class="pnv-label" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+                                    <span><i class="fa-solid fa-barcode" style="color:#FBBF24;"></i> Código de Barras Asignado (POS)</span>
+                                    ${p.customBarcodeImage
+                                        ? '<span class="pnv-badge" style="background:#065F46;color:#A7F3D0;font-size:0.62rem;border:1px solid #10B981;">Imagen Propia Activa</span>'
+                                        : '<span class="pnv-badge" style="background:#1E293B;color:#94A3B8;font-size:0.62rem;">Autogenerado</span>'}
+                                </div>
+                                <div style="display:flex;gap:6px;align-items:center;">
+                                    <input type="text" id="pnv-studio-barcode-input" class="pnv-input" style="font-family:'JetBrains Mono',monospace;font-weight:700;letter-spacing:1px;" value="${esc(p.barcode || '')}" placeholder="Escanear o escribir número antiguo..." onchange="ViasaProductosExclusivosEngine.actualizarBarcodeDesdeStudio(this.value)">
+                                    <button type="button" class="pnv-btn pnv-btn-ghost pnv-btn-xs" style="color:#FBBF24;border-color:rgba(251,191,36,0.35);padding:6px 10px;" title="Guardar número de código de barras" onclick="ViasaProductosExclusivosEngine.actualizarBarcodeDesdeStudio(document.getElementById('pnv-studio-barcode-input').value)">💾</button>
+                                </div>
+                                <div style="font-size:0.68rem;color:#94A3B8;margin-top:4px;line-height:1.3;">
+                                    ${p.customBarcodeImage ? 'Mostrando imagen propia en stickers. El lector POS leerá el número asignado arriba.' : 'Las barras se dibujan en tiempo real con este número.'}
+                                </div>
+
+                                <!-- Botonera Imágenes Propias del Producto -->
+                                <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:10px;">
+                                    <div>
+                                        <label class="pnv-btn pnv-btn-ghost pnv-btn-xs" style="width:100%;justify-content:center;cursor:pointer;font-size:0.68rem;padding:6px 4px;" title="Subir imagen propia (.png, .jpg, .svg, .webp) para el código de barras">
+                                            🖼️ Cambiar Imagen de Código de Barras
+                                            <input type="file" accept="image/png,image/jpeg,image/svg+xml,image/webp" style="display:none;" onchange="ViasaProductosExclusivosEngine.subirBarcodeStudio(this)">
+                                        </label>
+                                        ${p.customBarcodeImage ? `
+                                            <button type="button" class="pnv-btn pnv-btn-ghost pnv-btn-xs" style="width:100%;margin-top:4px;color:#F87171;border-color:rgba(248,113,113,0.3);font-size:0.65rem;justify-content:center;" onclick="ViasaProductosExclusivosEngine.restaurarBarcodeStudio()">
+                                                🔄 Restaurar Generador Automático
+                                            </button>
+                                        ` : ''}
+                                    </div>
+                                    <div>
+                                        <label class="pnv-btn pnv-btn-ghost pnv-btn-xs" style="width:100%;justify-content:center;cursor:pointer;font-size:0.68rem;padding:6px 4px;" title="Subir imagen propia (.png, .jpg, .svg, .webp) para el código QR">
+                                            🖼️ Cambiar Imagen de Código QR
+                                            <input type="file" accept="image/png,image/jpeg,image/svg+xml,image/webp" style="display:none;" onchange="ViasaProductosExclusivosEngine.subirQRStudio(this)">
+                                        </label>
+                                        ${p.customQrImage ? `
+                                            <button type="button" class="pnv-btn pnv-btn-ghost pnv-btn-xs" style="width:100%;margin-top:4px;color:#F87171;border-color:rgba(248,113,113,0.3);font-size:0.65rem;justify-content:center;" onclick="ViasaProductosExclusivosEngine.restaurarQRStudio()">
+                                                🔄 Restaurar Generador Automático
+                                            </button>
+                                        ` : ''}
+                                    </div>
+                                </div>
                             </div>
 
                             <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
@@ -2662,11 +2926,11 @@
                                 <div>BS: ${fmtNum(this.bs(p.pvpUnitarioUsd))}</div>
                             </div>
                             <div style="flex-shrink:0;">
-                                ${renderQRSvg(payloadQR, 38, 1)}
+                                ${renderQRGraphic(p, payloadQR, 38, 1)}
                             </div>
                         </div>
                         <div style="text-align:center;border-top:0.8px dashed #000;padding-top:1px;">
-                            ${renderBarcodeSvg(barcode, tipoCodigo, 160, 26)}
+                            ${renderBarcodeGraphic(p, barcode, tipoCodigo, 160, 26)}
                         </div>
                     </div>`;
             } else if (formato === 'termica-4040') {
@@ -2682,7 +2946,7 @@
                             <div style="font-size:8pt;font-weight:900;line-height:1;">${esc(p.nombre.slice(0, 20))}</div>
                         </div>
                         <div style="display:flex;justify-content:center;margin:1px 0;">
-                            ${renderQRSvg(payloadQR, 52, 1)}
+                            ${renderQRGraphic(p, payloadQR, 52, 1)}
                         </div>
                         <div style="display:flex;justify-content:space-between;align-items:center;font-size:6pt;font-weight:700;">
                             <span>L: ${esc(loteId)}</span>
@@ -2690,7 +2954,7 @@
                             <span>V: ${esc(fechaVenc)}</span>
                         </div>
                         <div style="text-align:center;border-top:0.8px dashed #000;padding-top:1px;">
-                            ${renderBarcodeSvg(barcode, tipoCodigo, 130, 22)}
+                            ${renderBarcodeGraphic(p, barcode, tipoCodigo, 130, 22)}
                         </div>
                     </div>`;
             } else if (formato === 'a4') {
@@ -2710,7 +2974,7 @@
                                 <div style="font-size:6.5pt;color:#334155;">${esc(p.presentacion)} • ${p.condicionFiscal === 'GRAVADO' ? 'IVA 16%' : 'EXENTO'}</div>
                             </div>
                             <div style="flex-shrink:0;">
-                                ${renderQRSvg(payloadQR, 44, 1)}
+                                ${renderQRGraphic(p, payloadQR, 44, 1)}
                             </div>
                         </div>
                         <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:2px;font-size:5.5pt;color:#0f172a;margin-bottom:3px;font-family:monospace;">
@@ -2719,7 +2983,7 @@
                             <div><b>V:</b> ${esc(fechaVenc)}</div>
                         </div>
                         <div style="display:flex;justify-content:space-between;align-items:flex-end;">
-                            <div>${renderBarcodeSvg(barcode, tipoCodigo, 115, 30)}</div>
+                            <div>${renderBarcodeGraphic(p, barcode, tipoCodigo, 115, 30)}</div>
                             <div style="text-align:right;">
                                 <div style="font-size:10pt;font-weight:900;color:#0f172a;line-height:1;">${fmtNum(p.pvpUnitarioUsd)}</div>
                                 <div style="font-size:6.5pt;font-weight:800;color:#b45309;">Bs. ${fmtNum(this.bs(p.pvpUnitarioUsd))}</div>
@@ -2742,7 +3006,7 @@
                                 <div style="font-size:6.5pt;color:#334155;font-weight:700;">${esc(p.presentacion)} • ${p.condicionFiscal === 'GRAVADO' ? 'IVA 16%' : 'EXENTO'}</div>
                             </div>
                             <div style="flex-shrink:0;">
-                                ${renderQRSvg(payloadQR, 48, 1)}
+                                ${renderQRGraphic(p, payloadQR, 48, 1)}
                             </div>
                         </div>
                         <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:2px;font-size:6pt;color:#0f172a;background:#f8fafc;padding:2px 4px;border-radius:3px;font-family:monospace;">
@@ -2751,7 +3015,7 @@
                             <div><b>VENCE:</b> ${esc(fechaVenc)}</div>
                         </div>
                         <div style="display:flex;justify-content:space-between;align-items:flex-end;">
-                            <div>${renderBarcodeSvg(barcode, tipoCodigo, 130, 32)}</div>
+                            <div>${renderBarcodeGraphic(p, barcode, tipoCodigo, 130, 32)}</div>
                             <div style="text-align:right;">
                                 <div style="font-size:5.5pt;font-weight:800;color:#64748b;">PVP OFICIAL</div>
                                 <div style="font-size:11.5pt;font-weight:900;color:#0f172a;line-height:1;">USD ${fmtNum(p.pvpUnitarioUsd)}</div>
@@ -2780,6 +3044,16 @@
         descargarBarcodePNGActual() {
             const p = this.getProducto(this.detalleId);
             if (!p) return;
+            if (p.customBarcodeImage) {
+                const a = document.createElement('a');
+                a.href = p.customBarcodeImage;
+                a.download = `Barcode_Personalizado_${p.sku}.png`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                this.toast(`⬇️ Imagen propia de código de barras descargada para ${p.sku}`);
+                return;
+            }
             const tipo = this.studioTipoCodigo || this._studioTipoCodigo || p.tipoCodigo || 'EAN13';
             const code = p.barcode || (tipo === 'EAN13' ? this.generarEAN13Auto() : this.generarCode128Auto());
             const svg = renderBarcodeSvg(code, tipo, 380, 120);
@@ -2800,6 +3074,16 @@
         descargarQRPNGActual() {
             const p = this.getProducto(this.detalleId);
             if (!p) return;
+            if (p.customQrImage) {
+                const a = document.createElement('a');
+                a.href = p.customQrImage;
+                a.download = `QR_Personalizado_${p.sku}.png`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                this.toast(`⬇️ Imagen propia de código QR descargada para ${p.sku}`);
+                return;
+            }
             const lote = this.obtenerLoteStudio(p);
             const payload = this.generarPayloadQR(p, lote, 'texto');
             const svg = renderQRSvg(payload, 300, 2);
@@ -2909,8 +3193,8 @@
             imgQR.onload = tryFinish;
             imgQR.onerror = tryFinish;
 
-            imgBarcode.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(barcodeSvg);
-            imgQR.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(qrSvg);
+            imgBarcode.src = (p.customBarcodeImage) ? p.customBarcodeImage : ('data:image/svg+xml;charset=utf-8,' + encodeURIComponent(barcodeSvg));
+            imgQR.src = (p.customQrImage) ? p.customQrImage : ('data:image/svg+xml;charset=utf-8,' + encodeURIComponent(qrSvg));
             this.toast(`⬇️ Generando descarga en alta definición de Sticker Completo...`);
         },
 
@@ -2998,6 +3282,11 @@
             this.imprimirHtml(`Etiqueta de Lote ${lote ? lote.id : p.sku}`, this.stickerHtml(p, lote));
         }
     };
+
+    ViasaProductosExclusivosEngine.renderBarcodeSvg = renderBarcodeSvg;
+    ViasaProductosExclusivosEngine.renderQRSvg = renderQRSvg;
+    ViasaProductosExclusivosEngine.renderBarcodeGraphic = renderBarcodeGraphic;
+    ViasaProductosExclusivosEngine.renderQRGraphic = renderQRGraphic;
 
     window.ViasaProductosExclusivosEngine = ViasaProductosExclusivosEngine;
 })();
