@@ -540,6 +540,8 @@
 
             document.getElementById('cred-nombre').textContent = emp.nombreCompleto || `${emp.nombres || ''} ${emp.apellidos || ''}`.trim();
             document.getElementById('cred-cargo').textContent = emp.cargo || 'Personal Operativo';
+            const codEl = document.getElementById('cred-codigo-laboral');
+            if (codEl) codEl.textContent = emp.codigoLaboral || 'PROD-001';
             document.getElementById('cred-depto').textContent = `Departamento: ${deptoNorm}`;
             document.getElementById('cred-cedula').textContent = `C.I: ${emp.cedula || 'N/A'}`;
             document.getElementById('cred-pin').textContent = `PIN: ${emp.pinAcceso || emp.pinFichaje || '1234'}`;

@@ -9554,6 +9554,7 @@ input, select, textarea {
 /* ============================================================================== */
 /* VIASA SYSTEM - MÓDULO IDENTIFICACIÓN CORPORATIVA, CONTROL DE PERSONAL Y CARNETS */
 /* Panadería y Pastelería Nueva Viasa, C.A. • RIF: J-31163165-8 */
+/* Estilo Oficial: Marrón Coffee (#4B371C) + Oro Panadero (#D97706 / #F59E0B) */
 /* ============================================================================== */
 
 .pnv-carnets-module {
@@ -9567,10 +9568,10 @@ input, select, textarea {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    background: linear-gradient(135deg, #4B371C 0%, #2f2212 100%);
     padding: 1.5rem 2rem;
     border-radius: 14px;
-    border: 1px solid rgba(217, 119, 6, 0.35);
+    border: 1px solid rgba(217, 119, 6, 0.45);
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
     margin-bottom: 1.5rem;
     flex-wrap: wrap;
@@ -9586,8 +9587,8 @@ input, select, textarea {
     letter-spacing: 1px;
     text-transform: uppercase;
     color: #fbbf24;
-    background: rgba(217, 119, 6, 0.15);
-    border: 1px solid rgba(245, 158, 11, 0.3);
+    background: rgba(75, 55, 28, 0.5);
+    border: 1px solid rgba(245, 158, 11, 0.4);
     padding: 4px 12px;
     border-radius: 20px;
     margin-bottom: 8px;
@@ -9603,7 +9604,7 @@ input, select, textarea {
 
 .pnv-header-subtitle {
     font-size: 0.9rem;
-    color: #94a3b8;
+    color: #fde68a;
     margin: 0;
 }
 
@@ -9635,7 +9636,7 @@ input, select, textarea {
 
 .pnv-kpi-card:hover {
     transform: translateY(-2px);
-    border-color: rgba(217, 119, 6, 0.4);
+    border-color: rgba(217, 119, 6, 0.5);
 }
 
 .pnv-kpi-icon {
@@ -9777,15 +9778,15 @@ input, select, textarea {
 }
 
 .pnv-worker-row:hover {
-    background: #172554;
-    border-color: #3b82f6;
+    background: #2a1f10;
+    border-color: #d97706;
     transform: translateX(2px);
 }
 
 .pnv-worker-row.is-selected {
-    background: #1e293b;
+    background: #382713;
     border-color: #f59e0b;
-    box-shadow: 0 0 0 1px #f59e0b, 0 4px 15px rgba(245, 158, 11, 0.2);
+    box-shadow: 0 0 0 1px #f59e0b, 0 4px 15px rgba(245, 158, 11, 0.25);
 }
 
 .pnv-worker-avatar-box {
@@ -9842,14 +9843,23 @@ input, select, textarea {
     text-overflow: ellipsis;
 }
 
-.pnv-area-badge {
-    font-size: 0.65rem;
-    font-weight: 800;
+.pnv-worker-cod-laboral {
+    background: #4B371C;
+    color: #fbbf24;
+    border: 1.5px solid #d97706;
     padding: 2px 7px;
-    border-radius: 6px;
-    text-transform: uppercase;
+    border-radius: 4px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    font-weight: 800;
     letter-spacing: 0.5px;
     flex-shrink: 0;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+.pnv-worker-cod-laboral.large {
+    font-size: 0.85rem;
+    padding: 3px 10px;
 }
 
 .pnv-worker-cargo-row {
@@ -9909,7 +9919,7 @@ input, select, textarea {
 .pnv-btn-icon:hover {
     color: #ffffff;
     border-color: #d97706;
-    background: #0f172a;
+    background: #4B371C;
 }
 
 /* Columna Estudio del Carnet */
@@ -9955,10 +9965,10 @@ input, select, textarea {
 }
 
 .pnv-tab-btn.active {
-    background: linear-gradient(135deg, #d97706, #b45309);
+    background: linear-gradient(135deg, #4B371C 0%, #6d4e24 100%);
     border-color: #fbbf24;
     color: #ffffff;
-    box-shadow: 0 4px 12px rgba(217, 119, 6, 0.3);
+    box-shadow: 0 4px 12px rgba(75, 55, 28, 0.4);
 }
 
 .pnv-active-actions-bar {
@@ -10008,12 +10018,12 @@ input, select, textarea {
     display: flex;
     justify-content: center;
     align-items: center;
-    background: radial-gradient(circle at center, #1e293b 0%, #0b1120 100%);
-    min-height: 560px;
+    background: radial-gradient(circle at center, #2e2213 0%, #0b0f19 100%);
+    min-height: 600px;
 }
 
 /* ============================================================================== */
-/* DISEÑO DEL CARNET CR80 ESTÁNDAR (PVC 54mm x 86mm / 320px x 508px) */
+/* DISEÑO DEL CARNET CR80 ESTÁNDAR (PVC 54mm x 86mm / 324px x 560px) */
 /* ============================================================================== */
 .pnv-cr80-single-wrapper, .pnv-cr80-dual-wrapper {
     display: flex;
@@ -10024,8 +10034,8 @@ input, select, textarea {
 }
 
 .pnv-carnet-card {
-    width: 324px;
-    height: 512px;
+    width: 326px;
+    height: 560px;
     background: #ffffff;
     color: #0f172a;
     border-radius: 14px;
@@ -10040,191 +10050,107 @@ input, select, textarea {
     user-select: none;
 }
 
-/* Sello de agua sutil de fondo */
 .pnv-carnet-card::before {
     content: "";
     position: absolute;
     top: 0; left: 0; right: 0; bottom: 0;
-    background-image: radial-gradient(circle at 50% 40%, rgba(217, 119, 6, 0.04) 0%, transparent 70%);
+    background-image: radial-gradient(circle at 50% 35%, rgba(75, 55, 28, 0.04) 0%, transparent 70%);
     pointer-events: none;
 }
 
-/* Encabezado General */
+/* ENCABEZADO CON LOGOTIPO CIRCULAR 2X Y FONDO MARRÓN COFFEE (#4B371C) */
 .pnv-carnet-header {
-    background: #0f172a;
+    background: #4B371C !important;
     color: #ffffff;
     padding: 10px 14px;
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    border-bottom: 2px solid var(--area-accent, #d97706);
-}
-
-.pnv-carnet-crest {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-}
-
-.pnv-crest-title {
-    font-size: 0.85rem;
-    font-weight: 900;
-    letter-spacing: 0.5px;
-    color: #ffffff;
-}
-
-.pnv-carnet-org {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-}
-
-.pnv-org-name {
-    font-size: 0.65rem;
-    font-weight: 700;
-    color: #fbbf24;
-    text-transform: uppercase;
-}
-
-.pnv-org-rif {
-    font-size: 0.58rem;
-    color: #94a3b8;
-    font-family: 'JetBrains Mono', monospace;
-}
-
-/* Barra de Área */
-.pnv-carnet-banda-area, .pnv-unificado-area-bar {
-    color: #ffffff;
-    padding: 5px 12px;
-    font-size: 0.7rem;
-    font-weight: 800;
-    text-transform: uppercase;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    letter-spacing: 0.5px;
-}
-
-/* ================= VISTA UNIFICADA (FRENTE TODO-EN-UNO) ================= */
-.pnv-unificado-photo-block {
-    display: flex;
-    align-items: center;
+    justify-content: flex-start;
     gap: 12px;
-    padding: 10px 14px;
+    border-bottom: 2.5px solid #d97706 !important;
 }
 
-.pnv-unificado-photo-frame {
-    width: 95px;
-    height: 95px;
-    border-radius: 12px;
-    overflow: hidden;
+.pnv-carnet-logo-box {
+    width: 58px;
+    height: 58px;
     flex-shrink: 0;
-    background: #0f172a;
-}
-
-.pnv-unificado-photo-frame img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-}
-
-.pnv-unificado-person-details {
-    flex: 1;
-    min-width: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-}
-
-.pnv-unificado-name {
-    font-size: 1.05rem;
-    font-weight: 800;
-    color: #0f172a;
-    line-height: 1.15;
-    margin: 0;
-}
-
-.pnv-unificado-cargo-badge {
-    display: inline-block;
-    color: #ffffff;
-    padding: 3px 8px;
-    border-radius: 6px;
-    font-size: 0.68rem;
-    font-weight: 700;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.pnv-unificado-meta-row {
-    display: flex;
-    flex-direction: column;
-    font-size: 0.68rem;
-    color: #475569;
-    gap: 2px;
-}
-
-.pnv-meta-ci strong, .pnv-meta-blood strong {
-    color: #0f172a;
-}
-
-/* Sección QR de Gran Tamaño (Mínimo 140x140px reales) */
-.pnv-unificado-qr-section {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 6px 14px 10px 14px;
-    background: #f8fafc;
-    border-top: 1px dashed #cbd5e1;
-    border-bottom: 1px dashed #cbd5e1;
-}
-
-.pnv-unificado-qr-box {
-    width: 154px;
-    height: 154px;
-    background: #ffffff;
-    padding: 6px;
-    border-radius: 8px;
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
-    box-sizing: border-box;
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
-.pnv-unificado-token-pill {
-    margin-top: 6px;
+/* LOGOTIPO CIRCULAR OFICIAL AL DOBLE DE TAMAÑO (2x) */
+.pnv-official-circular-logo {
+    width: 58px;
+    height: 58px;
+    border-radius: 50%;
+    border: 2.5px solid #d97706;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+    background: #ffffff;
+    object-fit: contain;
+    padding: 2px;
+    flex-shrink: 0;
+    display: block;
 }
 
-.pnv-unificado-token-pill code {
-    background: #0f172a;
+.pnv-official-circular-logo.small {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: 2px solid #d97706;
+    background: #ffffff;
+    object-fit: contain;
+    padding: 2px;
+    flex-shrink: 0;
+}
+
+.pnv-carnet-org {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    flex: 1;
+    min-width: 0;
+}
+
+.pnv-org-name {
+    font-size: 0.72rem;
+    font-weight: 900;
     color: #fbbf24;
-    padding: 3px 8px;
-    border-radius: 4px;
-    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    line-height: 1.15;
+}
+
+.pnv-org-rif {
+    font-size: 0.58rem;
+    color: #FFFBEB;
     font-family: 'JetBrains Mono', monospace;
+    font-weight: 600;
+    margin-top: 1px;
+}
+
+.pnv-org-tagline {
+    font-size: 0.52rem;
+    color: #fde68a;
     font-weight: 700;
     letter-spacing: 0.5px;
+    text-transform: uppercase;
+    margin-top: 2px;
 }
 
-.pnv-unificado-scan-hint {
-    font-size: 0.58rem;
+/* CINTILLO DE ÁREA EN MARRÓN COFFEE (#4B371C) */
+.pnv-carnet-banda-area, .pnv-unificado-area-bar {
+    background: #4B371C !important;
+    color: #FFFBEB !important;
+    padding: 6px 14px;
+    font-size: 0.72rem;
     font-weight: 800;
-    color: #64748b;
-    margin-top: 4px;
-    letter-spacing: 0.5px;
-}
-
-.pnv-unificado-footer {
-    padding: 8px 12px;
+    text-transform: uppercase;
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    font-size: 0.6rem;
-    font-weight: 800;
-    color: #ffffff;
+    gap: 8px;
     letter-spacing: 0.5px;
+    border-bottom: 2px solid #d97706 !important;
 }
 
 /* ================= VISTA DOBLE CARA (ANVERSO) ================= */
@@ -10232,35 +10158,29 @@ input, select, textarea {
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 14px 14px 8px 14px;
+    padding: 12px 14px 6px 14px;
 }
 
+/* FOTOGRAFÍA AL DOBLE DE TAMAÑO (2X) CON RELACIÓN DE ASPECTO ESTRICTA 4:5 */
 .pnv-carnet-photo-frame {
-    width: 124px;
-    height: 124px;
+    width: 148px;
+    height: 185px;
+    aspect-ratio: 4 / 5 !important;
     border-radius: 14px;
     overflow: hidden;
-    border: 3px solid #d97706;
-    background: #0f172a;
+    border: 3.5px solid #d97706 !important;
+    box-shadow: 0 0 0 2px #4B371C, 0 8px 24px rgba(75, 55, 28, 0.45) !important;
+    background: #4B371C;
+    margin: 0 auto;
+    flex-shrink: 0;
 }
 
 .pnv-photo-img {
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    aspect-ratio: 4 / 5 !important;
+    object-fit: cover !important;
     display: block;
-}
-
-.pnv-turno-tag {
-    margin-top: 6px;
-    color: #ffffff;
-    font-size: 0.65rem;
-    font-weight: 700;
-    padding: 2px 10px;
-    border-radius: 12px;
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
 }
 
 .pnv-carnet-frente .pnv-carnet-info {
@@ -10269,7 +10189,7 @@ input, select, textarea {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 6px;
+    gap: 4px;
 }
 
 .pnv-emp-name {
@@ -10277,52 +10197,101 @@ input, select, textarea {
     font-weight: 900;
     color: #0f172a;
     margin: 0;
-    line-height: 1.2;
+    line-height: 1.15;
 }
 
+/* PASTILLA DE CARGO EN MARRÓN COFFEE (#4B371C) */
 .pnv-emp-cargo-pill {
-    padding: 4px 12px;
+    background: #4B371C !important;
+    color: #ffffff !important;
+    border: 1.5px solid #d97706 !important;
+    padding: 4px 14px;
     border-radius: 6px;
-    font-size: 0.72rem;
-    font-weight: 700;
-    width: 90%;
+    font-size: 0.74rem;
+    font-weight: 800;
+    width: 92%;
     box-sizing: border-box;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+/* CÓDIGO LABORAL CORRELATIVO JUSTO DEBAJO DEL CARGO */
+.pnv-emp-codigo-laboral-box {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    background: #4B371C;
+    border: 1.5px solid #d97706;
+    padding: 3px 12px;
+    border-radius: 6px;
+    box-shadow: 0 2px 8px rgba(75, 55, 28, 0.35);
+    margin: 3px auto;
+}
+
+.pnv-codigo-lbl {
+    font-size: 0.62rem;
+    font-weight: 800;
+    color: #fde68a;
+    letter-spacing: 0.5px;
+}
+
+.pnv-codigo-val {
+    font-size: 0.88rem;
+    font-weight: 900;
+    color: #ffffff;
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: 1px;
 }
 
 .pnv-emp-cedula-row {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 2px;
+    gap: 1px;
 }
 
 .pnv-cedula-label {
-    font-size: 0.55rem;
+    font-size: 0.52rem;
     color: #64748b;
-    font-weight: 700;
+    font-weight: 800;
     letter-spacing: 0.5px;
 }
 
 .pnv-cedula-val {
     font-size: 0.85rem;
-    font-weight: 800;
+    font-weight: 900;
     color: #0f172a;
     font-family: 'JetBrains Mono', monospace;
 }
 
+/* FOOTER ANVERSO EN MARRÓN COFFEE (#4B371C) */
 .pnv-carnet-anverso-footer {
-    background: #0f172a;
+    background: #4B371C !important;
     color: #ffffff;
     padding: 8px 12px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-top: 2px solid var(--area-accent, #d97706);
+    border-top: 2.5px solid #d97706 !important;
 }
 
 .pnv-footer-code-box {
     display: flex;
     flex-direction: column;
+    gap: 2px;
+}
+
+.pnv-footer-cod-badge {
+    background: #ffffff;
+    color: #4B371C;
+    border: 1.5px solid #d97706;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 900;
+    font-family: 'JetBrains Mono', monospace;
+    display: inline-block;
+    width: fit-content;
 }
 
 .pnv-footer-token {
@@ -10333,28 +10302,45 @@ input, select, textarea {
 }
 
 .pnv-footer-sub {
-    font-size: 0.52rem;
-    color: #94a3b8;
+    font-size: 0.5rem;
+    color: #fde68a;
     letter-spacing: 0.5px;
 }
 
+/* CÓDIGO QR EN EL ANVERSO AL DOBLE DE TAMAÑO (2X / 88px) */
 .pnv-mini-qr-box {
-    width: 44px;
-    height: 44px;
-    background: #ffffff;
-    padding: 2px;
-    border-radius: 4px;
+    width: 88px !important;
+    height: 88px !important;
+    background: #ffffff !important;
+    padding: 4px !important;
+    border-radius: 8px !important;
+    border: 2px solid #d97706 !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 /* ================= VISTA DOBLE CARA (REVERSO GIGANTE) ================= */
 .pnv-reverso-header {
-    background: #0f172a;
+    background: #4B371C !important;
     color: #ffffff;
     padding: 8px 12px;
+    border-bottom: 2.5px solid #d97706 !important;
+}
+
+.pnv-reverso-header-inner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.pnv-reverso-text-box {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    border-bottom: 2px solid var(--area-accent, #d97706);
+    text-align: left;
 }
 
 .pnv-reverso-title {
@@ -10366,7 +10352,8 @@ input, select, textarea {
 
 .pnv-reverso-subtitle {
     font-size: 0.58rem;
-    color: #94a3b8;
+    color: #FFFBEB;
+    font-weight: 600;
 }
 
 .pnv-giant-qr-container {
@@ -10382,7 +10369,7 @@ input, select, textarea {
     background: #ffffff;
     padding: 8px;
     border-radius: 10px;
-    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
     box-sizing: border-box;
     display: flex;
     align-items: center;
@@ -10391,21 +10378,34 @@ input, select, textarea {
 
 .pnv-giant-qr-token {
     margin-top: 6px;
+    display: flex;
+    gap: 6px;
+    align-items: center;
 }
 
-.pnv-giant-qr-token code {
+.pnv-token-cod-pill code {
+    background: #4B371C;
+    color: #ffffff;
+    border: 1.5px solid #d97706;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 0.74rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 900;
+}
+
+.pnv-token-raw-pill code {
     background: #0f172a;
     color: #fbbf24;
-    padding: 3px 10px;
+    padding: 3px 8px;
     border-radius: 4px;
-    font-size: 0.72rem;
+    font-size: 0.68rem;
     font-family: 'JetBrains Mono', monospace;
-    font-weight: 800;
-    letter-spacing: 0.5px;
+    font-weight: 700;
 }
 
 .pnv-medical-box {
-    background: #f8fafc;
+    background: #fdfbf7;
     border: 1px solid #e2e8f0;
     border-radius: 8px;
     margin: 4px 14px;
@@ -10472,6 +10472,147 @@ input, select, textarea {
     border-top: 1px solid #e2e8f0;
 }
 
+/* ================= VISTA UNIFICADA (FRENTE TODO-EN-UNO) ================= */
+.pnv-unificado-photo-block {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 10px 14px;
+}
+
+.pnv-unificado-photo-frame {
+    width: 130px;
+    height: 162.5px;
+    aspect-ratio: 4 / 5 !important;
+    border-radius: 12px;
+    overflow: hidden;
+    flex-shrink: 0;
+    border: 3.5px solid #d97706;
+    background: #4B371C;
+    box-shadow: 0 6px 20px rgba(75, 55, 28, 0.45);
+}
+
+.pnv-unificado-photo-frame img {
+    width: 100%;
+    height: 100%;
+    aspect-ratio: 4 / 5 !important;
+    object-fit: cover !important;
+    display: block;
+}
+
+.pnv-unificado-person-details {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.pnv-unificado-name {
+    font-size: 1.05rem;
+    font-weight: 800;
+    color: #0f172a;
+    line-height: 1.15;
+    margin: 0;
+}
+
+.pnv-unificado-cargo-badge {
+    display: inline-block;
+    color: #ffffff;
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-size: 0.68rem;
+    font-weight: 700;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.pnv-unificado-meta-row {
+    display: flex;
+    flex-direction: column;
+    font-size: 0.68rem;
+    color: #475569;
+    gap: 2px;
+}
+
+.pnv-meta-ci strong, .pnv-meta-blood strong {
+    color: #0f172a;
+}
+
+.pnv-unificado-qr-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 6px 14px 10px 14px;
+    background: #fdfbf7;
+    border-top: 1px dashed #cbd5e1;
+    border-bottom: 1px dashed #cbd5e1;
+}
+
+.pnv-unificado-qr-box {
+    width: 154px;
+    height: 154px;
+    background: #ffffff;
+    padding: 6px;
+    border-radius: 8px;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.pnv-unificado-token-pill {
+    margin-top: 6px;
+    display: flex;
+    gap: 6px;
+    align-items: center;
+}
+
+.pnv-cod-badge-inline code {
+    background: #4B371C;
+    color: #ffffff;
+    border: 1px solid #d97706;
+    padding: 2px 7px;
+    border-radius: 4px;
+    font-size: 0.72rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 900;
+}
+
+.pnv-unificado-token-pill > code {
+    background: #0f172a;
+    color: #fbbf24;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 0.68rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+.pnv-unificado-scan-hint {
+    font-size: 0.58rem;
+    font-weight: 800;
+    color: #64748b;
+    margin-top: 4px;
+    letter-spacing: 0.5px;
+}
+
+.pnv-unificado-footer {
+    background: #4B371C !important;
+    border-top: 2px solid #d97706 !important;
+    padding: 8px 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.6rem;
+    font-weight: 800;
+    color: #ffffff;
+    letter-spacing: 0.5px;
+}
+
 /* ============================================================================== */
 /* MODAL DE EDICIÓN Y REGISTRO DE TRABAJADOR */
 /* ============================================================================== */
@@ -10512,7 +10653,16 @@ input, select, textarea {
 .pnv-modal-title-box {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
+}
+
+.pnv-modal-mini-logo {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    border: 1.5px solid #d97706;
+    object-fit: contain;
+    background: #ffffff;
 }
 
 .pnv-modal-title {
@@ -10558,14 +10708,6 @@ input, select, textarea {
     flex-direction: column;
     align-items: center;
     gap: 8px;
-}
-
-.pnv-photo-preview-box img {
-    width: 140px;
-    height: 140px;
-    border-radius: 14px;
-    object-fit: cover;
-    border: 3px solid #d97706;
 }
 
 .pnv-form-token-display {
@@ -10634,14 +10776,8 @@ input, select, textarea {
     gap: 12px;
 }
 
-.pnv-form-row-3 {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: 12px;
-}
-
 @media (max-width: 600px) {
-    .pnv-form-row-2, .pnv-form-row-3 {
+    .pnv-form-row-2 {
         grid-template-columns: 1fr;
     }
 }
@@ -10659,7 +10795,6 @@ input, select, textarea {
 /* HOJA DE ESTILOS @MEDIA PRINT PARA IMPRESIÓN EXACTA CR80 Y LOTE */
 /* ============================================================================== */
 @media print {
-    /* Ocultar elementos generales de la app */
     body > *:not(#pnv-print-container-isolated) {
         display: none !important;
     }
@@ -10675,7 +10810,6 @@ input, select, textarea {
         padding: 0 !important;
     }
 
-    /* Impresión individual CR80 */
     .pnv-print-isolated.single-card {
         width: 54mm;
         height: 86mm;
@@ -10698,7 +10832,6 @@ input, select, textarea {
         gap: 5mm !important;
     }
 
-    /* Impresión en lote */
     .pnv-print-isolated.batch-cards .pnv-batch-print-grid {
         display: grid !important;
         grid-template-columns: repeat(2, 54mm) !important;

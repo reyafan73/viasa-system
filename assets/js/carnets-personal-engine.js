@@ -15,36 +15,43 @@
     // ==========================================================================
     const EMPRESA_CONFIG = {
         nombre: 'Panadería Nueva Viasa, C.A.',
-        nombreCorto: 'NUEVA VIASA',
+        nombreCorto: 'NUEVA VIASA GOURMET',
         rif: 'J-31163165-8',
         direccion: 'Av. España c/ Calle Bolívar, La Sabanita, Ciudad Bolívar, Edo. Bolívar',
         telefono: '0414-1234567',
-        lema: 'Tradición y Calidad en Cada Pieza de Pan'
+        lema: 'Tradición y Calidad Gourmet en Cada Pieza de Pan',
+        colorCoffee: '#4B371C', // Marrón Coffee Corporativo
+        colorGold: '#D97706',   // Dorado Corporativo
+        colorGoldLight: '#F59E0B',
+        logoCircularUrl: 'assets/img/viasa_logo_circular.png',
+        logoCircularFallback: 'LOGO CIRCULAR FB - PNV.jpg'
     };
 
     const AREAS_CORPORATIVAS = {
         ADM: {
             codigo: 'ADM',
             nombre: 'Gerencia y Administración',
-            colorPrimario: '#0F172A', // Azul Marino Ejecutivo
+            colorPrimario: '#4B371C', // Marrón Coffee Corporativo
             colorAcento: '#D97706',   // Dorado Corporativo
             colorAcentoLight: '#F59E0B',
-            bgCard: 'linear-gradient(145deg, #0f172a 0%, #1e293b 70%, #0f172a 100%)',
-            bgLight: '#F8FAFC',
-            textLight: '#F1F5F9',
+            colorDistintivo: '#0F172A',
+            bgCard: 'linear-gradient(145deg, #4b371c 0%, #362612 100%)',
+            bgLight: '#FDFBF7',
+            textLight: '#FFFBEB',
             icon: 'fa-briefcase',
             badgeClass: 'pnv-badge-adm',
             descripcion: 'Dirección General, Finanzas, Contabilidad y RRHH'
         },
         PROD: {
             codigo: 'PROD',
-            nombre: 'Producción / Panaderos / Horneros / Pasteleros',
-            colorPrimario: '#991B1B', // Rojo Horno Corporativo
+            nombre: 'Producción / Panadería y Pastelería',
+            colorPrimario: '#4B371C', // Marrón Coffee Corporativo
             colorAcento: '#D97706',   // Dorado Espiga
             colorAcentoLight: '#F59E0B',
-            bgCard: 'linear-gradient(145deg, #991b1b 0%, #7f1d1d 70%, #450a0a 100%)',
-            bgLight: '#FEF2F2',
-            textLight: '#FEF2F2',
+            colorDistintivo: '#991B1B',
+            bgCard: 'linear-gradient(145deg, #4b371c 0%, #362612 100%)',
+            bgLight: '#FDFBF7',
+            textLight: '#FFFBEB',
             icon: 'fa-fire-burner',
             badgeClass: 'pnv-badge-prod',
             descripcion: 'Maestros Panaderos, Horneros, Pastelería y Repostería'
@@ -52,12 +59,13 @@
         VNT: {
             codigo: 'VNT',
             nombre: 'Ventas / Mostrador / Caja POS',
-            colorPrimario: '#065F46', // Verde Esmeralda
+            colorPrimario: '#4B371C', // Marrón Coffee Corporativo
             colorAcento: '#D97706',   // Dorado Espiga
             colorAcentoLight: '#F59E0B',
-            bgCard: 'linear-gradient(145deg, #065f46 0%, #064e3b 70%, #022c22 100%)',
-            bgLight: '#ECFDF5',
-            textLight: '#ECFDF5',
+            colorDistintivo: '#065F46',
+            bgCard: 'linear-gradient(145deg, #4b371c 0%, #362612 100%)',
+            bgLight: '#FDFBF7',
+            textLight: '#FFFBEB',
             icon: 'fa-store',
             badgeClass: 'pnv-badge-vnt',
             descripcion: 'Atención al Público, Despacho Mostrador y Facturación'
@@ -65,12 +73,13 @@
         LOG: {
             codigo: 'LOG',
             nombre: 'Distribución B2B / Despacho y Logística',
-            colorPrimario: '#1E3A8A', // Azul Acero
+            colorPrimario: '#4B371C', // Marrón Coffee Corporativo
             colorAcento: '#F59E0B',   // Ámbar Logístico
             colorAcentoLight: '#FBBF24',
-            bgCard: 'linear-gradient(145deg, #1e3a8a 0%, #172554 70%, #0f172a 100%)',
-            bgLight: '#EFF6FF',
-            textLight: '#EFF6FF',
+            colorDistintivo: '#1E3A8A',
+            bgCard: 'linear-gradient(145deg, #4b371c 0%, #362612 100%)',
+            bgLight: '#FDFBF7',
+            textLight: '#FFFBEB',
             icon: 'fa-truck-fast',
             badgeClass: 'pnv-badge-log',
             descripcion: 'Reparto a Comercios Aliados, Despacho Mayorista y Flota'
@@ -78,12 +87,13 @@
         MNT: {
             codigo: 'MNT',
             nombre: 'Mantenimiento, Almacén y Servicios Generales',
-            colorPrimario: '#334155', // Gris Industrial
+            colorPrimario: '#4B371C', // Marrón Coffee Corporativo
             colorAcento: '#D97706',   // Dorado Corporativo
             colorAcentoLight: '#F59E0B',
-            bgCard: 'linear-gradient(145deg, #334155 0%, #1e293b 70%, #0f172a 100%)',
-            bgLight: '#F1F5F9',
-            textLight: '#F1F5F9',
+            colorDistintivo: '#334155',
+            bgCard: 'linear-gradient(145deg, #4b371c 0%, #362612 100%)',
+            bgLight: '#FDFBF7',
+            textLight: '#FFFBEB',
             icon: 'fa-screwdriver-wrench',
             badgeClass: 'pnv-badge-mnt',
             descripcion: 'Mantenimiento de Maquinaria, Higiene y Almacén Central'
@@ -94,18 +104,11 @@
     // 2. MOTOR AUTÓNOMO DE GENERACIÓN VECTORIAL DE CÓDIGO QR (SVG NATIVO)
     // ==========================================================================
     const QRVectorRenderer = {
-        /**
-         * Genera la representación SVG vectorial pura de alta fidelidad para el QR
-         * @param {string} payload - Texto o JSON a codificar
-         * @param {object} opt - Opciones de color, margen y tamaño
-         * @returns {string} - Código SVG listo para incrustar en HTML
-         */
         renderSvg(payload, opt = {}) {
-            const margin = opt.margin !== undefined ? opt.margin : 4;
+            const margin = opt.margin !== undefined ? opt.margin : 3;
             const colorDark = opt.colorDark || '#000000';
             const colorLight = opt.colorLight || '#FFFFFF';
 
-            // Si ViasaCodeEngine está disponible, usamos su algoritmo de matriz QR
             let matrixData = null;
             if (window.ViasaCodeEngine && window.ViasaCodeEngine.qr && typeof window.ViasaCodeEngine.qr.generarMatrizQR === 'function') {
                 try {
@@ -115,7 +118,6 @@
                 }
             }
 
-            // Fallback si no hay matriz disponible
             if (!matrixData || !matrixData.matrix) {
                 matrixData = this._generarMatrizFallback(payload);
             }
@@ -141,10 +143,8 @@
         },
 
         _generarMatrizFallback(texto) {
-            // Generador pseudo-QR básico para casos de contingencia offline
             const size = 29;
             const matrix = Array.from({ length: size }, () => Array(size).fill(0));
-            // Posicionamiento de Finders (7x7 en las 3 esquinas)
             const colocarFinder = (r0, c0) => {
                 for (let r = 0; r < 7; r++) {
                     for (let c = 0; c < 7; c++) {
@@ -158,13 +158,11 @@
             colocarFinder(0, size - 7);
             colocarFinder(size - 7, 0);
 
-            // Patrones de sincronización
             for (let i = 8; i < size - 8; i++) {
                 matrix[6][i] = i % 2 === 0 ? 1 : 0;
                 matrix[i][6] = i % 2 === 0 ? 1 : 0;
             }
 
-            // Datos pseudo-aleatorios basados en hash del texto
             let hash = 0;
             for (let i = 0; i < texto.length; i++) {
                 hash = ((hash << 5) - hash) + texto.charCodeAt(i);
@@ -196,9 +194,6 @@
         enEdicion: false,
         trabajadorEditando: null,
 
-        /**
-         * Inicialización del módulo de carnets
-         */
         async init() {
             await this.cargarEmpleados();
             if (!this.trabajadorSeleccionadoId && this.coleccionEmpleados.length > 0) {
@@ -206,9 +201,6 @@
             }
         },
 
-        /**
-         * Cargar empleados desde ViasaStorage y normalizar datos de credenciales
-         */
         async cargarEmpleados() {
             let emps = [];
             if (window.ViasaStorage && typeof window.ViasaStorage.obtenerColeccion === 'function') {
@@ -222,33 +214,53 @@
             }
 
             let huboCambios = false;
-            // Normalizar y enriquecer registros con las especificaciones del carnet
-            emps = (emps || []).map(emp => {
-                let modificado = false;
 
-                // 1. Área normalizada
+            // 1. Normalizar área de cada trabajador
+            emps.forEach(emp => {
                 if (!emp.areaCodigo) {
                     emp.areaCodigo = this.determinarAreaPorDepto(emp.departamento, emp.cargo);
-                    modificado = true;
+                    huboCambios = true;
+                }
+            });
+
+            // 2. Asignar y garantizar Códigos Laborales Correlativos por Departamento (SIGLA-001)
+            const contadoresCorrelativos = { ADM: 0, PROD: 0, VNT: 0, LOG: 0, MNT: 0 };
+            
+            // Primer pase: detectar códigos existentes válidos
+            emps.forEach(emp => {
+                if (emp.codigoLaboral && emp.codigoLaboral.startsWith(emp.areaCodigo + '-')) {
+                    const num = parseInt(emp.codigoLaboral.split('-')[1], 10);
+                    if (!isNaN(num) && num > contadoresCorrelativos[emp.areaCodigo]) {
+                        contadoresCorrelativos[emp.areaCodigo] = num;
+                    }
+                }
+            });
+
+            // Segundo pase: asignar códigos correlativos faltantes
+            emps.forEach(emp => {
+                if (!emp.codigoLaboral || !emp.codigoLaboral.startsWith(emp.areaCodigo + '-')) {
+                    contadoresCorrelativos[emp.areaCodigo]++;
+                    emp.codigoLaboral = `${emp.areaCodigo}-${String(contadoresCorrelativos[emp.areaCodigo]).padStart(3, '0')}`;
+                    huboCambios = true;
                 }
 
-                // 2. Token QR único según especificación: NV-EMP-{AREA}-{CEDULA}-{HASH4}
+                // Token QR único según especificación: NV-EMP-{AREA}-{CEDULA}-{HASH4}
                 if (!emp.qrToken || !emp.qrToken.startsWith('NV-EMP-')) {
                     emp.qrToken = this.construirTokenUnico(emp.areaCodigo, emp.cedula, emps, emp.id);
-                    modificado = true;
+                    huboCambios = true;
                 }
 
-                // 3. Ficha Médica básica
+                // Ficha Médica básica
                 if (!emp.tipoSangre) {
                     const tipos = ['O+', 'A+', 'B+', 'O+', 'O+', 'AB+'];
                     const hashVal = (emp.cedula || '1').replace(/\D/g, '') || '1';
                     emp.tipoSangre = tipos[parseInt(hashVal, 10) % tipos.length];
-                    modificado = true;
+                    huboCambios = true;
                 }
 
                 if (!emp.alergias) {
                     emp.alergias = 'Ninguna conocida';
-                    modificado = true;
+                    huboCambios = true;
                 }
 
                 if (!emp.telefonoEmergencia) {
@@ -257,36 +269,22 @@
                     } else {
                         emp.telefonoEmergencia = '0414-1234567 (Recursos Humanos)';
                     }
-                    modificado = true;
+                    huboCambios = true;
                 }
 
-                // 4. Estatus
                 if (!emp.estatus) {
-                    emp.estatus = emp.estado === 'inactivo' ? 'Inactivo' : 'Activo';
-                    modificado = true;
+                    emp.estatus = emp.estado === 'inactivo_archivado' || emp.estado === 'inactivo' ? 'Inactivo' : 'Activo';
+                    huboCambios = true;
                 }
-
-                // 5. Turno
-                if (!emp.turno) {
-                    emp.turno = 'Diurno';
-                    modificado = true;
-                }
-
-                if (modificado) huboCambios = true;
-                return emp;
             });
 
             this.coleccionEmpleados = emps;
 
-            // Persistir cambios si hubo normalización
             if (huboCambios && window.ViasaStorage && typeof window.ViasaStorage.guardarColeccion === 'function') {
                 await window.ViasaStorage.guardarColeccion('empleados', this.coleccionEmpleados);
             }
         },
 
-        /**
-         * Mapear departamento o cargo al código de área institucional (ADM, PROD, VNT, LOG, MNT)
-         */
         determinarAreaPorDepto(depto, cargo = '') {
             const d = (depto || '').toLowerCase();
             const c = (cargo || '').toLowerCase();
@@ -310,8 +308,29 @@
         },
 
         /**
-         * Generar Hash Hexadecimal de 4 dígitos
+         * Calcula el siguiente código laboral correlativo para un departamento (SIGLA-001)
          */
+        calcularSiguienteCodigoLaboral(areaCodigo, lista = null, idExcluir = null) {
+            const area = (areaCodigo || 'ADM').toUpperCase().trim();
+            const empleados = lista || this.coleccionEmpleados || [];
+            let maxNum = 0;
+            const prefix = `${area}-`;
+
+            empleados.forEach(e => {
+                if (idExcluir && e.id === idExcluir) return;
+                const cod = e.codigoLaboral || '';
+                if (cod.startsWith(prefix)) {
+                    const numStr = cod.replace(prefix, '').trim();
+                    const num = parseInt(numStr, 10);
+                    if (!isNaN(num) && num > maxNum) {
+                        maxNum = num;
+                    }
+                }
+            });
+
+            return `${area}-${String(maxNum + 1).padStart(3, '0')}`;
+        },
+
         generarHash4() {
             const chars = '0123456789ABCDEF';
             let res = '';
@@ -321,10 +340,6 @@
             return res;
         },
 
-        /**
-         * Construir Token Único respetando la estructura:
-         * NV-EMP-{CODIGO_AREA}-{CEDULA}-{HASH_4_DIGITOS}
-         */
         construirTokenUnico(areaCodigo, cedula, lista = null, actualId = null) {
             const area = (areaCodigo || 'ADM').toUpperCase().trim();
             const ciClean = (cedula || 'V00000000').toUpperCase().replace(/[^VE0-9]/g, '');
@@ -341,31 +356,25 @@
             return token;
         },
 
-        /**
-         * Construir Payload legible y estructurado para el QR
-         */
         construirPayloadQR(emp) {
             const areaInfo = AREAS_CORPORATIVAS[emp.areaCodigo] || AREAS_CORPORATIVAS.ADM;
             return JSON.stringify({
                 empresa: EMPRESA_CONFIG.nombre,
                 rif: EMPRESA_CONFIG.rif,
+                codigoLaboral: emp.codigoLaboral,
                 token: emp.qrToken,
                 id: emp.id,
                 nombre: emp.nombreCompleto,
                 cedula: emp.cedula,
                 cargo: emp.cargo,
                 area: areaInfo.nombre,
-                turno: emp.turno,
                 sangre: emp.tipoSangre,
                 emergencia: emp.telefonoEmergencia,
                 emision: emp.fechaIngreso || '2026-01-15',
-                valido: 'PANADERIA NUEVA VIASA - CIUDAD BOLIVAR'
+                valido: 'PANADERIA NUEVA VIASA GOURMET - CIUDAD BOLIVAR'
             });
         },
 
-        /**
-         * Obtener datos del empleado activo en el estudio
-         */
         getEmpleadoSeleccionado() {
             if (!this.trabajadorSeleccionadoId && this.coleccionEmpleados.length > 0) {
                 this.trabajadorSeleccionadoId = this.coleccionEmpleados[0].id;
@@ -376,38 +385,31 @@
         // ======================================================================
         // 4. ACCIONES DINÁMICAS (REGENERAR TOKEN, FOTO, QR PERSONALIZADO)
         // ======================================================================
-
-        /**
-         * Regenerar Token QR por extravío de carnet físico
-         */
         async regenerarTokenTrabajador(empId) {
             const emp = this.coleccionEmpleados.find(e => e.id === empId);
             if (!emp) return;
 
             const confirmar = confirm(
                 `⚠️ ¿Desea regenerar el Token QR para "${emp.nombreCompleto}"?\n\n` +
+                `• Código Laboral: ${emp.codigoLaboral}\n` +
                 `• El token anterior (${emp.qrToken}) quedará INVALIDADO por seguridad institucional.\n` +
-                `• Se emitirá un nuevo carnet oficial con código criptográfico irrepetible.\n` +
-                `• Utilice esta acción en caso de extravío, deterioro o renovación de credencial.`
+                `• Se emitirá una nueva credencial con firma criptográfica renovada.`
             );
             if (!confirmar) return;
 
             const nuevoToken = this.construirTokenUnico(emp.areaCodigo, emp.cedula, this.coleccionEmpleados, emp.id);
             emp.qrToken = nuevoToken;
-            emp.qrCustomImage = null; // Reiniciar imagen personalizada si la hubiere
+            emp.qrCustomImage = null;
             emp.fechaUltimaEmision = new Date().toISOString().split('T')[0];
 
             await this._guardarCambiosPersistentes();
             if (window.ViasaAudio && typeof window.ViasaAudio.playSuccess === 'function') {
                 window.ViasaAudio.playSuccess();
             }
-            alert(`✅ Token QR regenerado con éxito:\n\n${nuevoToken}\n\nEl nuevo carnet ya está listo para imprimir.`);
+            alert(`✅ Token QR regenerado con éxito:\n\n${nuevoToken}\n\nEl carnet oficial ya está listo para imprimir.`);
             this.render();
         },
 
-        /**
-         * Subir imagen propia de Código QR para el trabajador
-         */
         subirQRPersonalizado(empId) {
             const emp = this.coleccionEmpleados.find(e => e.id === empId);
             if (!emp) return;
@@ -419,11 +421,6 @@
                 const file = e.target.files[0];
                 if (!file) return;
 
-                if (file.size > 3 * 1024 * 1024) {
-                    alert('⚠️ La imagen es demasiado pesada. El tamaño máximo recomendado es 3MB.');
-                    return;
-                }
-
                 const reader = new FileReader();
                 reader.onload = async (event) => {
                     emp.qrCustomImage = event.target.result;
@@ -431,7 +428,6 @@
                     if (window.ViasaAudio && typeof window.ViasaAudio.playSuccess === 'function') {
                         window.ViasaAudio.playSuccess();
                     }
-                    alert(`✅ Código QR personalizado cargado exitosamente para ${emp.nombreCompleto}.`);
                     this.render();
                 };
                 reader.readAsDataURL(file);
@@ -439,9 +435,6 @@
             input.click();
         },
 
-        /**
-         * Restaurar al código QR vectorial nativo generado por el sistema
-         */
         async restaurarQRAutomatico(empId) {
             const emp = this.coleccionEmpleados.find(e => e.id === empId);
             if (!emp) return;
@@ -454,9 +447,6 @@
             this.render();
         },
 
-        /**
-         * Subir o cambiar fotografía de alta resolución para el trabajador
-         */
         cambiarFotografiaTrabajador(empId) {
             const emp = this.coleccionEmpleados.find(e => e.id === empId);
             if (!emp) return;
@@ -482,9 +472,6 @@
             input.click();
         },
 
-        /**
-         * Guardar el estado general en ViasaStorage
-         */
         async _guardarCambiosPersistentes() {
             if (window.ViasaStorage && typeof window.ViasaStorage.guardarColeccion === 'function') {
                 await window.ViasaStorage.guardarColeccion('empleados', this.coleccionEmpleados);
@@ -492,7 +479,7 @@
         },
 
         // ======================================================================
-        // 5. GESTIÓN Y FORMULARIO DE TRABAJADOR (CREAR / EDITAR)
+        // 5. GESTIÓN Y FORMULARIO DE TRABAJADOR
         // ======================================================================
         abrirModalTrabajador(empId = null) {
             if (empId) {
@@ -502,12 +489,16 @@
             } else {
                 const nuevoIdNum = this.coleccionEmpleados.length + 1;
                 const nuevoId = `EMP-${String(nuevoIdNum).padStart(3, '0')}`;
+                const defaultArea = 'PROD';
+                const siglaCod = this.calcularSiguienteCodigoLaboral(defaultArea, this.coleccionEmpleados);
+
                 this.trabajadorEditando = {
                     id: nuevoId,
+                    codigoLaboral: siglaCod,
                     nombreCompleto: '',
                     cedula: 'V-',
                     cargo: '',
-                    areaCodigo: 'PROD',
+                    areaCodigo: defaultArea,
                     turno: 'Diurno',
                     fechaIngreso: new Date().toISOString().split('T')[0],
                     tipoSangre: 'O+',
@@ -538,6 +529,17 @@
         actualizarAreaEnFormulario(areaCode) {
             if (!this.trabajadorEditando) return;
             this.trabajadorEditando.areaCodigo = areaCode;
+            
+            // Recalcular Código Laboral correlativo para el nuevo departamento
+            this.trabajadorEditando.codigoLaboral = this.calcularSiguienteCodigoLaboral(
+                areaCode,
+                this.coleccionEmpleados,
+                this.trabajadorEditando.id
+            );
+            const codInput = document.getElementById('form-pnv-codigo-laboral');
+            if (codInput) codInput.value = this.trabajadorEditando.codigoLaboral;
+
+            // Recalcular Token QR
             this.trabajadorEditando.qrToken = this.construirTokenUnico(
                 areaCode,
                 this.trabajadorEditando.cedula,
@@ -547,14 +549,14 @@
             const tokenInput = document.getElementById('form-pnv-token');
             if (tokenInput) tokenInput.value = this.trabajadorEditando.qrToken;
 
-            // Actualizar estilo visual del preview de área
+            // Actualizar preview de área
             const areaInfo = AREAS_CORPORATIVAS[areaCode];
             const badgePreview = document.getElementById('form-pnv-area-preview');
             if (badgePreview && areaInfo) {
-                badgePreview.style.background = areaInfo.colorPrimario;
-                badgePreview.style.color = '#FFFFFF';
+                badgePreview.style.background = '#4B371C';
+                badgePreview.style.color = '#FFFBEB';
                 badgePreview.style.borderColor = areaInfo.colorAcento;
-                badgePreview.innerHTML = `<i class="fa-solid ${areaInfo.icon}"></i> ${areaInfo.nombre}`;
+                badgePreview.innerHTML = `<i class="fa-solid ${areaInfo.icon}" style="color: #fbbf24;"></i> ${areaInfo.nombre} • ${this.trabajadorEditando.codigoLaboral}`;
             }
         },
 
@@ -590,17 +592,15 @@
                 return;
             }
 
-            // Validar unicidad de cédula
             const cedulaDuplicada = this.coleccionEmpleados.find(
                 e => e.id !== this.trabajadorEditando.id &&
                      e.cedula.replace(/\D/g, '') === cedula.replace(/\D/g, '')
             );
             if (cedulaDuplicada) {
-                alert(`⛔ Error: La cédula ${cedula} ya está asignada a "${cedulaDuplicada.nombreCompleto}". Cada trabajador debe tener cédula única.`);
+                alert(`⛔ Error: La cédula ${cedula} ya está asignada a "${cedulaDuplicada.nombreCompleto}".`);
                 return;
             }
 
-            // Actualizar objeto
             this.trabajadorEditando.nombreCompleto = nombre;
             this.trabajadorEditando.cedula = cedula;
             this.trabajadorEditando.cargo = cargo;
@@ -612,12 +612,14 @@
             this.trabajadorEditando.telefonoEmergencia = telefonoEmergencia || '0414-1234567';
             this.trabajadorEditando.estatus = estatus;
 
-            // Revalidar token único
+            if (!this.trabajadorEditando.codigoLaboral || !this.trabajadorEditando.codigoLaboral.startsWith(areaCodigo + '-')) {
+                this.trabajadorEditando.codigoLaboral = this.calcularSiguienteCodigoLaboral(areaCodigo, this.coleccionEmpleados, this.trabajadorEditando.id);
+            }
+
             if (!this.trabajadorEditando.qrToken || !this.trabajadorEditando.qrToken.startsWith('NV-EMP-')) {
                 this.trabajadorEditando.qrToken = this.construirTokenUnico(areaCodigo, cedula, this.coleccionEmpleados, this.trabajadorEditando.id);
             }
 
-            // Insertar o actualizar en la lista
             const idx = this.coleccionEmpleados.findIndex(e => e.id === this.trabajadorEditando.id);
             if (idx >= 0) {
                 this.coleccionEmpleados[idx] = this.trabajadorEditando;
@@ -634,16 +636,12 @@
 
             this.cerrarModalTrabajador();
             this.render();
-            alert(`✅ Expediente y credencial de "${nombre}" guardados correctamente.`);
+            alert(`✅ Expediente guardado con éxito. Código Laboral asignado: ${this.trabajadorEditando.codigoLaboral}`);
         },
 
         // ======================================================================
         // 6. ESTUDIO VISUAL CR80 (VISTA UNIFICADA Y VISTA DOBLE CARA)
         // ======================================================================
-
-        /**
-         * Renderizar la plantilla HTML del Carnet CR80 según el modo
-         */
         renderPlantillaCarnet(emp, modo = 'unificada', esParaImpresion = false) {
             if (!emp) {
                 return `<div class="pnv-empty-studio">Seleccione un trabajador para visualizar su carnet corporativo.</div>`;
@@ -651,8 +649,9 @@
 
             const areaInfo = AREAS_CORPORATIVAS[emp.areaCodigo] || AREAS_CORPORATIVAS.ADM;
             const payload = this.construirPayloadQR(emp);
+            const logoSrc = EMPRESA_CONFIG.logoCircularUrl;
 
-            // Código QR: si tiene imagen personalizada se usa esa, sino el SVG vectorial
+            // Renderizado de Código QR
             let qrHtml = '';
             if (emp.qrCustomImage) {
                 qrHtml = `<img src="${emp.qrCustomImage}" alt="QR Personalizado" style="width: 100%; height: 100%; object-fit: contain; display: block; border-radius: 4px;" />`;
@@ -664,75 +663,94 @@
                 });
             }
 
+            // ================= MODO: VISTA DOBLE CARA (ANVERSO + REVERSO) =================
             if (modo === 'doble-cara') {
                 return `
                 <div class="pnv-cr80-dual-wrapper ${esParaImpresion ? 'is-printing' : ''}">
                     <!-- ================= ANVERSO (FRENTE) ================= -->
-                    <div class="pnv-carnet-card pnv-carnet-frente" style="--area-color: ${areaInfo.colorPrimario}; --area-accent: ${areaInfo.colorAcento};">
-                        <div class="pnv-carnet-header">
-                            <div class="pnv-carnet-crest">
-                                <i class="fa-solid fa-wheat-awn" style="color: #fbbf24;"></i>
-                                <span class="pnv-crest-title">${EMPRESA_CONFIG.nombreCorto}</span>
+                    <div class="pnv-carnet-card pnv-carnet-frente" style="--area-color: #4B371C; --area-accent: ${areaInfo.colorAcento};">
+                        <!-- ENCABEZADO CON LOGOTIPO OFICIAL AL DOBLE DE TAMAÑO (2x) Y FONDO MARRÓN COFFEE -->
+                        <div class="pnv-carnet-header" style="background: #4B371C; border-bottom: 2.5px solid #d97706;">
+                            <div class="pnv-carnet-logo-box">
+                                <img src="${logoSrc}" alt="Logo Oficial PNV" class="pnv-official-circular-logo" onerror="this.onerror=null; this.src='LOGO CIRCULAR FB - PNV.jpg';" />
                             </div>
                             <div class="pnv-carnet-org">
                                 <span class="pnv-org-name">${EMPRESA_CONFIG.nombre}</span>
-                                <span class="pnv-org-rif">RIF: ${EMPRESA_CONFIG.rif} • CIUDAD BOLÍVAR</span>
+                                <span class="pnv-org-rif">RIF: ${EMPRESA_CONFIG.rif} &bull; CIUDAD BOLÍVAR</span>
+                                <span class="pnv-org-tagline">TRADICIÓN Y CALIDAD GOURMET</span>
                             </div>
                         </div>
 
-                        <div class="pnv-carnet-banda-area" style="background: ${areaInfo.colorPrimario}; border-bottom: 2px solid ${areaInfo.colorAcento};">
-                            <i class="fa-solid ${areaInfo.icon}"></i>
+                        <!-- CINTILLO INSTITUCIONAL MARRÓN COFFEE -->
+                        <div class="pnv-carnet-banda-area" style="background: #4B371C; border-bottom: 2px solid ${areaInfo.colorAcento};">
+                            <i class="fa-solid ${areaInfo.icon}" style="color: #fbbf24;"></i>
                             <span>${areaInfo.nombre}</span>
                         </div>
 
-                        <!-- FOTOGRAFÍA EXTRA GRANDE CON MARCO DORADO -->
+                        <!-- FOTOGRAFÍA AL DOBLE DE TAMAÑO (2x) CON ASPECT-RATIO 4:5 ESTRICTO -->
                         <div class="pnv-carnet-photo-container">
-                            <div class="pnv-carnet-photo-frame" style="border-color: ${areaInfo.colorAcento}; box-shadow: 0 0 0 3px ${areaInfo.colorPrimario};">
-                                <img src="${emp.foto || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=400&h=400&q=80'}" alt="${emp.nombreCompleto}" class="pnv-photo-img" />
+                            <div class="pnv-carnet-photo-frame" style="aspect-ratio: 4/5; width: 148px; height: 185px; border: 3.5px solid #d97706; box-shadow: 0 0 0 2px #4B371C, 0 8px 24px rgba(75, 55, 28, 0.45); overflow: hidden; border-radius: 14px;">
+                                <img src="${emp.foto || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=400&h=400&q=80'}" alt="${emp.nombreCompleto}" class="pnv-photo-img" style="aspect-ratio: 4/5; width: 100%; height: 100%; object-fit: cover; display: block;" />
                             </div>
-                            <span class="pnv-turno-tag" style="background: ${areaInfo.colorPrimario}; border: 1px solid ${areaInfo.colorAcento};">
-                                <i class="fa-solid fa-clock"></i> Turno ${emp.turno || 'Diurno'}
-                            </span>
                         </div>
 
-                        <!-- DATOS DEL TRABAJADOR -->
+                        <!-- DATOS DEL TRABAJADOR Y UBICACIÓN EXACTA DEL CÓDIGO LABORAL -->
                         <div class="pnv-carnet-info">
                             <h3 class="pnv-emp-name">${emp.nombreCompleto}</h3>
-                            <div class="pnv-emp-cargo-pill" style="background: ${areaInfo.colorPrimario}; color: #FFFFFF; border-left: 3px solid ${areaInfo.colorAcento};">
+                            
+                            <!-- 1. Cargo del Empleado -->
+                            <div class="pnv-emp-cargo-pill" style="background: #4B371C; color: #FFFFFF; border: 1.5px solid #d97706;">
                                 ${emp.cargo}
                             </div>
+
+                            <!-- 2. Código Laboral Único Correlativo (Justo debajo del cargo) -->
+                            <div class="pnv-emp-codigo-laboral-box">
+                                <span class="pnv-codigo-lbl">CÓDIGO:</span>
+                                <span class="pnv-codigo-val">${emp.codigoLaboral || 'PROD-001'}</span>
+                            </div>
+
+                            <!-- 3. Cédula de Identidad -->
                             <div class="pnv-emp-cedula-row">
                                 <span class="pnv-cedula-label">CÉDULA DE IDENTIDAD</span>
                                 <span class="pnv-cedula-val">${emp.cedula}</span>
                             </div>
                         </div>
 
-                        <!-- FOOTER ANVERSO -->
-                        <div class="pnv-carnet-anverso-footer">
+                        <!-- FOOTER ANVERSO CON QR AL DOBLE DE TAMAÑO (2x / 88px) Y FONDO MARRÓN COFFEE -->
+                        <div class="pnv-carnet-anverso-footer" style="background: #4B371C; border-top: 2.5px solid #d97706;">
                             <div class="pnv-footer-code-box">
+                                <span class="pnv-footer-cod-badge">${emp.codigoLaboral || 'ADM-001'}</span>
                                 <span class="pnv-footer-token">${emp.qrToken}</span>
-                                <span class="pnv-footer-sub">CREDENCIAL OFICIAL DE SEGURIDAD</span>
+                                <span class="pnv-footer-sub">CREDENCIAL OFICIAL DE IDENTIFICACIÓN</span>
                             </div>
-                            <div class="pnv-mini-qr-box">
+                            <!-- CÓDIGO QR 2x EN EL ANVERSO -->
+                            <div class="pnv-mini-qr-box" style="border: 2px solid #d97706;">
                                 ${qrHtml}
                             </div>
                         </div>
                     </div>
 
-                    <!-- ================= REVERSO (DORSO CON QR GIGANTE) ================= -->
-                    <div class="pnv-carnet-card pnv-carnet-reverso" style="--area-color: ${areaInfo.colorPrimario}; --area-accent: ${areaInfo.colorAcento};">
-                        <div class="pnv-reverso-header">
-                            <span class="pnv-reverso-title">CONTROL DE IDENTIFICACIÓN Y ACCESO</span>
-                            <span class="pnv-reverso-subtitle">PANADERÍA NUEVA VIASA, C.A.</span>
+                    <!-- ================= REVERSO (DORSO CON LOGO 2X Y QR GIGANTE) ================= -->
+                    <div class="pnv-carnet-card pnv-carnet-reverso" style="--area-color: #4B371C; --area-accent: ${areaInfo.colorAcento};">
+                        <!-- ENCABEZADO REVERSO CON LOGO OFICIAL CIRCULAR 2X Y MARRÓN COFFEE -->
+                        <div class="pnv-reverso-header" style="background: #4B371C; border-bottom: 2.5px solid #d97706;">
+                            <div class="pnv-reverso-header-inner">
+                                <img src="${logoSrc}" alt="Logo Oficial PNV" class="pnv-official-circular-logo small" onerror="this.onerror=null; this.src='LOGO CIRCULAR FB - PNV.jpg';" />
+                                <div class="pnv-reverso-text-box">
+                                    <span class="pnv-reverso-title">CONTROL DE IDENTIFICACIÓN Y ACCESO</span>
+                                    <span class="pnv-reverso-subtitle">PANADERÍA NUEVA VIASA, C.A. &bull; RIF: J-31163165-8</span>
+                                </div>
+                            </div>
                         </div>
 
-                        <!-- CÓDIGO QR GIGANTE (PROTAGONISTA ABSOLUTO) -->
+                        <!-- CÓDIGO QR GIGANTE CENTRAL -->
                         <div class="pnv-giant-qr-container">
-                            <div class="pnv-giant-qr-box" style="border: 2px solid ${areaInfo.colorAcento};">
+                            <div class="pnv-giant-qr-box" style="border: 2.5px solid #d97706;">
                                 ${qrHtml}
                             </div>
                             <div class="pnv-giant-qr-token">
-                                <code>${emp.qrToken}</code>
+                                <span class="pnv-token-cod-pill"><code>${emp.codigoLaboral || 'PROD-001'}</code></span>
+                                <span class="pnv-token-raw-pill"><code>${emp.qrToken}</code></span>
                             </div>
                         </div>
 
@@ -755,12 +773,12 @@
                         <!-- FIRMA Y SELLO -->
                         <div class="pnv-signature-box">
                             <div class="pnv-signature-line"></div>
-                            <span class="pnv-signature-label">Firma Autorizada • Gerencia General</span>
+                            <span class="pnv-signature-label">Firma Autorizada &bull; Gerencia General / RRHH</span>
                         </div>
 
                         <!-- NOTA DE SEGURIDAD LEGAL -->
                         <div class="pnv-legal-notice">
-                            Este documento es personal e intransferible. Propiedad exclusiva de Panadería Nueva Viasa, C.A. En caso de extravío favor devolver a: Av. España c/ Calle Bolívar, La Sabanita, Ciudad Bolívar. Tel: (0414) 123-4567.
+                            Este documento es personal e intransferible. Propiedad exclusiva de Panadería Nueva Viasa, C.A. En caso de extravío devolver a: Av. España c/ Calle Bolívar, La Sabanita, Ciudad Bolívar. Tel: (0414) 123-4567.
                         </div>
                     </div>
                 </div>
@@ -770,34 +788,38 @@
             // ================= MODO 1: VISTA UNIFICADA (FRENTE TODO-EN-UNO) =================
             return `
             <div class="pnv-cr80-single-wrapper ${esParaImpresion ? 'is-printing' : ''}">
-                <div class="pnv-carnet-card pnv-carnet-unificado" style="--area-color: ${areaInfo.colorPrimario}; --area-accent: ${areaInfo.colorAcento};">
-                    <!-- ENCABEZADO INSTITUCIONAL -->
-                    <div class="pnv-carnet-header" style="background: ${areaInfo.colorPrimario}; border-bottom: 2px solid ${areaInfo.colorAcento};">
-                        <div class="pnv-carnet-crest">
-                            <i class="fa-solid fa-crown" style="color: #fbbf24; font-size: 1.1rem;"></i>
-                            <span class="pnv-crest-title">${EMPRESA_CONFIG.nombreCorto}</span>
+                <div class="pnv-carnet-card pnv-carnet-unificado" style="--area-color: #4B371C; --area-accent: ${areaInfo.colorAcento};">
+                    <!-- ENCABEZADO INSTITUCIONAL CON LOGO CIRCULAR 2x Y MARRÓN COFFEE -->
+                    <div class="pnv-carnet-header" style="background: #4B371C; border-bottom: 2.5px solid #d97706;">
+                        <div class="pnv-carnet-logo-box">
+                            <img src="${logoSrc}" alt="Logo Oficial PNV" class="pnv-official-circular-logo" onerror="this.onerror=null; this.src='LOGO CIRCULAR FB - PNV.jpg';" />
                         </div>
                         <div class="pnv-carnet-org">
                             <span class="pnv-org-name">${EMPRESA_CONFIG.nombre}</span>
-                            <span class="pnv-org-rif">RIF: ${EMPRESA_CONFIG.rif} • LA SABANITA</span>
+                            <span class="pnv-org-rif">RIF: ${EMPRESA_CONFIG.rif} &bull; CIUDAD BOLÍVAR</span>
+                            <span class="pnv-org-tagline">CREDENCIAL CORPORATIVA OFICIAL</span>
                         </div>
                     </div>
 
-                    <!-- BANDA DE ÁREA Y NIVEL -->
-                    <div class="pnv-unificado-area-bar" style="background: ${areaInfo.colorPrimario}; border-bottom: 1.5px solid ${areaInfo.colorAcento};">
+                    <!-- BANDA DE ÁREA Y NIVEL EN MARRÓN COFFEE -->
+                    <div class="pnv-unificado-area-bar" style="background: #4B371C; border-bottom: 2px solid ${areaInfo.colorAcento};">
                         <i class="fa-solid ${areaInfo.icon}" style="color: #fbbf24;"></i>
                         <span>${areaInfo.nombre}</span>
                     </div>
 
-                    <!-- FOTOGRAFÍA DE GRAN TAMAÑO CON MARCO DORADO -->
+                    <!-- FOTOGRAFÍA AL DOBLE DE TAMAÑO (2x) ASPECT-RATIO 4:5 -->
                     <div class="pnv-unificado-photo-block">
-                        <div class="pnv-unificado-photo-frame" style="border: 3px solid ${areaInfo.colorAcento}; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
-                            <img src="${emp.foto || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=400&h=400&q=80'}" alt="${emp.nombreCompleto}" class="pnv-photo-img" />
+                        <div class="pnv-unificado-photo-frame" style="aspect-ratio: 4/5; width: 130px; height: 162.5px; border: 3.5px solid #d97706; box-shadow: 0 6px 20px rgba(75, 55, 28, 0.45); overflow: hidden; border-radius: 12px;">
+                            <img src="${emp.foto || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=400&h=400&q=80'}" alt="${emp.nombreCompleto}" class="pnv-photo-img" style="aspect-ratio: 4/5; width: 100%; height: 100%; object-fit: cover; display: block;" />
                         </div>
                         <div class="pnv-unificado-person-details">
                             <h2 class="pnv-unificado-name">${emp.nombreCompleto}</h2>
-                            <div class="pnv-unificado-cargo-badge" style="background: ${areaInfo.colorPrimario}; border: 1px solid ${areaInfo.colorAcento};">
+                            <div class="pnv-unificado-cargo-badge" style="background: #4B371C; border: 1.5px solid #d97706;">
                                 ${emp.cargo}
+                            </div>
+                            <div class="pnv-emp-codigo-laboral-box" style="margin: 4px 0;">
+                                <span class="pnv-codigo-lbl">CÓDIGO:</span>
+                                <span class="pnv-codigo-val">${emp.codigoLaboral || 'PROD-001'}</span>
                             </div>
                             <div class="pnv-unificado-meta-row">
                                 <span class="pnv-meta-ci">C.I: <strong>${emp.cedula}</strong></span>
@@ -806,23 +828,24 @@
                         </div>
                     </div>
 
-                    <!-- CÓDIGO QR DE GRAN TAMAÑO (MÍNIMO 140x140px REALES) -->
+                    <!-- CÓDIGO QR DE GRAN TAMAÑO -->
                     <div class="pnv-unificado-qr-section">
-                        <div class="pnv-unificado-qr-box" style="border: 2px solid ${areaInfo.colorAcento};">
+                        <div class="pnv-unificado-qr-box" style="border: 2px solid #d97706;">
                             ${qrHtml}
                         </div>
                         <div class="pnv-unificado-token-pill">
+                            <span class="pnv-cod-badge-inline"><code>${emp.codigoLaboral || ''}</code></span>
                             <code>${emp.qrToken}</code>
                         </div>
                         <div class="pnv-unificado-scan-hint">
-                            <i class="fa-solid fa-qrcode" style="color: ${areaInfo.colorAcento};"></i> ESCANEAR PARA CONTROL DE ASISTENCIA Y ACCESO
+                            <i class="fa-solid fa-qrcode" style="color: #d97706;"></i> ESCANEAR PARA CONTROL DE ASISTENCIA Y ACCESO
                         </div>
                     </div>
 
-                    <!-- FOOTER UNIFICADO -->
-                    <div class="pnv-unificado-footer" style="background: ${areaInfo.colorPrimario}; border-top: 1.5px solid ${areaInfo.colorAcento};">
-                        <span>PERSONAL AUTORIZADO • CIUDAD BOLÍVAR</span>
-                        <span>TURNO: ${emp.turno ? emp.turno.toUpperCase() : 'DIURNO'}</span>
+                    <!-- FOOTER UNIFICADO EN MARRÓN COFFEE -->
+                    <div class="pnv-unificado-footer" style="background: #4B371C; border-top: 2px solid #d97706;">
+                        <span>PERSONAL AUTORIZADO &bull; LA SABANITA, CIUDAD BOLÍVAR</span>
+                        <span>VIASA SYSTEM 2026</span>
                     </div>
                 </div>
             </div>
@@ -832,16 +855,11 @@
         // ======================================================================
         // 7. ACCIONES DE IMPRESIÓN Y EXPORTACIÓN
         // ======================================================================
-
-        /**
-         * Imprimir carnet individual del trabajador seleccionado
-         */
         imprimirCarnetIndividual(empId = null) {
             const id = empId || this.trabajadorSeleccionadoId;
             const emp = this.coleccionEmpleados.find(e => e.id === id);
             if (!emp) return;
 
-            // Generar contenedor de impresión temporal
             const contenedorAnterior = document.getElementById('pnv-print-container-isolated');
             if (contenedorAnterior) contenedorAnterior.remove();
 
@@ -853,15 +871,11 @@
 
             window.print();
 
-            // Limpieza posterior
             setTimeout(() => {
                 if (printDiv) printDiv.remove();
             }, 1000);
         },
 
-        /**
-         * Imprimir lote completo de carnets en hoja lista para cortar y plastificar
-         */
         imprimirLoteCarnets(filtroArea = 'TODAS') {
             let lista = this.coleccionEmpleados;
             if (filtroArea !== 'TODAS') {
@@ -900,13 +914,12 @@
         },
 
         // ======================================================================
-        // 8. RENDERIZADO PRINCIPAL DE LA VISTA DEL MÓDULO
+        // 8. RENDERIZADO PRINCIPAL DEL MÓDULO
         // ======================================================================
         render() {
             const container = document.getElementById('carnets-personal-content');
             if (!container) return;
 
-            // Filtrado de trabajadores
             let empleadosFiltrados = this.coleccionEmpleados.filter(emp => {
                 const matchArea = (this.filtroArea === 'TODAS' || emp.areaCodigo === this.filtroArea);
                 const matchEstatus = (this.filtroEstatus === 'TODOS' || emp.estatus === this.filtroEstatus);
@@ -915,13 +928,13 @@
                     (emp.nombreCompleto && emp.nombreCompleto.toLowerCase().includes(q)) ||
                     (emp.cedula && emp.cedula.toLowerCase().includes(q)) ||
                     (emp.cargo && emp.cargo.toLowerCase().includes(q)) ||
+                    (emp.codigoLaboral && emp.codigoLaboral.toLowerCase().includes(q)) ||
                     (emp.qrToken && emp.qrToken.toLowerCase().includes(q));
                 return matchArea && matchEstatus && matchBusqueda;
             });
 
             const empActivo = this.getEmpleadoSeleccionado();
 
-            // Métricas de cabecera
             const totalEmps = this.coleccionEmpleados.length;
             const totalActivos = this.coleccionEmpleados.filter(e => e.estatus === 'Activo').length;
             const totalTokens = this.coleccionEmpleados.filter(e => e.qrToken && e.qrToken.startsWith('NV-EMP-')).length;
@@ -939,18 +952,18 @@
                 <div class="pnv-module-header">
                     <div class="pnv-header-info">
                         <div class="pnv-header-badge">
-                            <i class="fa-solid fa-id-card-clip"></i> RECURSOS HUMANOS & IDENTIFICACIÓN CORPORATIVA
+                            <i class="fa-solid fa-id-card-clip"></i> RECURSOS HUMANOS &bull; IDENTIFICACIÓN CORPORATIVA
                         </div>
                         <h1 class="pnv-header-title">Identificación de Personal y Carnets con Código QR Único</h1>
                         <p class="pnv-header-subtitle">
-                            <strong>${EMPRESA_CONFIG.nombre}</strong> • RIF: ${EMPRESA_CONFIG.rif} • La Sabanita, Ciudad Bolívar
+                            <strong>${EMPRESA_CONFIG.nombre}</strong> &bull; RIF: ${EMPRESA_CONFIG.rif} &bull; La Sabanita, Ciudad Bolívar
                         </p>
                     </div>
                     <div class="pnv-header-actions">
                         <button class="btn btn-outline" onclick="window.ViasaCarnetsEngine.abrirModalTrabajador()">
                             <i class="fa-solid fa-user-plus"></i> Registrar Trabajador
                         </button>
-                        <button class="btn btn-primary" onclick="window.ViasaCarnetsEngine.imprimirLoteCarnets(window.ViasaCarnetsEngine.filtroArea)" style="background: linear-gradient(135deg, #d97706, #b45309);">
+                        <button class="btn btn-primary" onclick="window.ViasaCarnetsEngine.imprimirLoteCarnets(window.ViasaCarnetsEngine.filtroArea)" style="background: linear-gradient(135deg, #4B371C, #694a20); border-color: #d97706;">
                             <i class="fa-solid fa-print"></i> Imprimir Lote de Carnets
                         </button>
                     </div>
@@ -959,7 +972,7 @@
                 <!-- ================= 2. FILA DE 5 KPIS EN TIEMPO REAL ================= -->
                 <div class="pnv-kpi-grid">
                     <div class="pnv-kpi-card">
-                        <div class="pnv-kpi-icon" style="background: rgba(15, 23, 42, 0.15); color: #0f172a;">
+                        <div class="pnv-kpi-icon" style="background: rgba(75, 55, 28, 0.2); color: #fbbf24;">
                             <i class="fa-solid fa-users"></i>
                         </div>
                         <div class="pnv-kpi-content">
@@ -985,14 +998,14 @@
                             <i class="fa-solid fa-qrcode"></i>
                         </div>
                         <div class="pnv-kpi-content">
-                            <span class="pnv-kpi-label">Tokens QR Únicos</span>
-                            <span class="pnv-kpi-value">${totalTokens} / ${totalEmps}</span>
-                            <span class="pnv-kpi-sub">100% Criptográficos</span>
+                            <span class="pnv-kpi-label">Códigos Laborales</span>
+                            <span class="pnv-kpi-value">${totalEmps} / ${totalEmps}</span>
+                            <span class="pnv-kpi-sub">Correlativos Correlacionados</span>
                         </div>
                     </div>
 
                     <div class="pnv-kpi-card">
-                        <div class="pnv-kpi-icon" style="background: rgba(153, 27, 27, 0.15); color: #991b1b;">
+                        <div class="pnv-kpi-icon" style="background: rgba(153, 27, 27, 0.15); color: #ef4444;">
                             <i class="fa-solid fa-fire-burner"></i>
                         </div>
                         <div class="pnv-kpi-content">
@@ -1003,29 +1016,28 @@
                     </div>
 
                     <div class="pnv-kpi-card">
-                        <div class="pnv-kpi-icon" style="background: rgba(6, 95, 70, 0.15); color: #065f46;">
+                        <div class="pnv-kpi-icon" style="background: rgba(6, 95, 70, 0.15); color: #10b981;">
                             <i class="fa-solid fa-shield-halved"></i>
                         </div>
                         <div class="pnv-kpi-content">
-                            <span class="pnv-kpi-label">Validación Seguridad</span>
+                            <span class="pnv-kpi-label">Seguridad de Acceso</span>
                             <span class="pnv-kpi-value" style="color: #10b981; font-size: 1.25rem;">Sin Colisiones</span>
-                            <span class="pnv-kpi-sub">Cédula y Token Únicos</span>
+                            <span class="pnv-kpi-sub">Token y Cédula Únicos</span>
                         </div>
                     </div>
                 </div>
 
                 <!-- ================= 3. ESTUDIO CENTRAL (2 COLUMNAS) ================= -->
                 <div class="pnv-studio-layout">
-                    <!-- COLUMNA IZQUIERDA: DIRECTORIO MAESTRO DE TRABAJADORES -->
+                    <!-- COLUMNA IZQUIERDA: DIRECTORIO DE TRABAJADORES -->
                     <div class="pnv-directory-column">
                         <div class="pnv-directory-box">
-                            <!-- BARRA DE BÚSQUEDA Y FILTROS -->
                             <div class="pnv-filter-bar">
                                 <div class="pnv-search-input-wrapper">
                                     <i class="fa-solid fa-magnifying-glass"></i>
                                     <input type="text"
                                            class="pnv-search-input"
-                                           placeholder="Buscar por nombre, cédula, cargo o token..."
+                                           placeholder="Buscar por código (ADM-001), nombre, cédula..."
                                            value="${this.busqueda}"
                                            oninput="window.ViasaCarnetsEngine.busqueda = this.value; window.ViasaCarnetsEngine.render();" />
                                 </div>
@@ -1048,7 +1060,6 @@
                                 </div>
                             </div>
 
-                            <!-- LISTA INTERACTIVA DE TRABAJADORES -->
                             <div class="pnv-workers-list">
                                 ${empleadosFiltrados.length === 0 ? `
                                     <div class="pnv-no-results">
@@ -1061,17 +1072,15 @@
                                     return `
                                     <div class="pnv-worker-row ${esSeleccionado ? 'is-selected' : ''}"
                                          onclick="window.ViasaCarnetsEngine.trabajadorSeleccionadoId = '${emp.id}'; window.ViasaCarnetsEngine.render();"
-                                         style="--accent-border: ${areaInfo.colorAcento};">
+                                         style="--accent-border: #d97706;">
                                         <div class="pnv-worker-avatar-box">
-                                            <img src="${emp.foto || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=400&h=400&q=80'}" alt="${emp.nombreCompleto}" class="pnv-worker-avatar" style="border: 2px solid ${areaInfo.colorAcento};" />
+                                            <img src="${emp.foto || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=400&h=400&q=80'}" alt="${emp.nombreCompleto}" class="pnv-worker-avatar" style="border: 2px solid #d97706;" />
                                             <span class="pnv-status-dot ${emp.estatus === 'Activo' ? 'is-active' : 'is-inactive'}"></span>
                                         </div>
                                         <div class="pnv-worker-main-info">
                                             <div class="pnv-worker-name-row">
                                                 <strong class="pnv-worker-name">${emp.nombreCompleto}</strong>
-                                                <span class="pnv-area-badge" style="background: ${areaInfo.colorPrimario}; color: #FFFFFF; border: 1px solid ${areaInfo.colorAcento};">
-                                                    <i class="fa-solid ${areaInfo.icon}"></i> ${emp.areaCodigo}
-                                                </span>
+                                                <span class="pnv-worker-cod-laboral">${emp.codigoLaboral || 'PROD-001'}</span>
                                             </div>
                                             <div class="pnv-worker-cargo-row">
                                                 <span class="pnv-worker-cargo">${emp.cargo}</span>
@@ -1101,7 +1110,6 @@
                     <!-- COLUMNA DERECHA: ESTUDIO VISUAL Y PREVISUALIZADOR DEL CARNET CR80 -->
                     <div class="pnv-preview-column">
                         <div class="pnv-studio-card">
-                            <!-- BARRA DE MODO DE VISTA Y CONTROLES DEL ESTUDIO -->
                             <div class="pnv-studio-toolbar">
                                 <div class="pnv-view-mode-tabs">
                                     <button class="pnv-tab-btn ${this.modoVista === 'unificada' ? 'active' : ''}"
@@ -1116,10 +1124,10 @@
                             </div>
 
                             ${empActivo ? `
-                            <!-- BARRA DE ACCIONES DIRECTAS SOBRE EL CARNET ACTIVO -->
                             <div class="pnv-active-actions-bar">
                                 <div class="pnv-active-summary">
                                     <span class="pnv-summary-label">Carnet en Pantalla:</span>
+                                    <span class="pnv-worker-cod-laboral large">${empActivo.codigoLaboral || 'PROD-001'}</span>
                                     <strong class="pnv-summary-name">${empActivo.nombreCompleto}</strong>
                                     <span class="pnv-summary-token"><code>${empActivo.qrToken}</code></span>
                                 </div>
@@ -1138,13 +1146,12 @@
                                     <button class="btn btn-sm btn-outline" title="Cambiar fotografía del trabajador" onclick="window.ViasaCarnetsEngine.cambiarFotografiaTrabajador('${empActivo.id}')">
                                         <i class="fa-solid fa-camera"></i> Cambiar Foto
                                     </button>
-                                    <button class="btn btn-sm btn-primary" title="Imprimir este carnet" onclick="window.ViasaCarnetsEngine.imprimirCarnetIndividual('${empActivo.id}')" style="background: #0f172a; border-color: #d97706;">
+                                    <button class="btn btn-sm btn-primary" title="Imprimir este carnet" onclick="window.ViasaCarnetsEngine.imprimirCarnetIndividual('${empActivo.id}')" style="background: #4B371C; border-color: #d97706;">
                                         <i class="fa-solid fa-print"></i> Imprimir PVC
                                     </button>
                                 </div>
                             </div>
 
-                            <!-- CONTENEDOR VISUAL DEL CARNET CR80 -->
                             <div class="pnv-carnet-viewport">
                                 ${this.renderPlantillaCarnet(empActivo, this.modoVista, false)}
                             </div>
@@ -1162,7 +1169,7 @@
         },
 
         // ======================================================================
-        // 9. MODAL FLOTANTE DE EXPEDIENTE / REGISTRO DE TRABAJADOR
+        // 9. MODAL DE EDICIÓN / REGISTRO DE TRABAJADOR
         // ======================================================================
         renderModalTrabajador() {
             const emp = this.trabajadorEditando;
@@ -1178,9 +1185,9 @@
             modal.className = 'pnv-modal-overlay';
             modal.innerHTML = `
             <div class="pnv-modal-card">
-                <div class="pnv-modal-header" style="background: ${areaInfo.colorPrimario}; border-bottom: 2px solid ${areaInfo.colorAcento};">
+                <div class="pnv-modal-header" style="background: #4B371C; border-bottom: 2px solid #d97706;">
                     <div class="pnv-modal-title-box">
-                        <i class="fa-solid fa-id-badge" style="color: #fbbf24;"></i>
+                        <img src="${EMPRESA_CONFIG.logoCircularUrl}" alt="Logo" class="pnv-modal-mini-logo" onerror="this.onerror=null; this.src='LOGO CIRCULAR FB - PNV.jpg';" />
                         <h2 class="pnv-modal-title">${emp.id ? 'Expediente y Credencial de Personal' : 'Nuevo Registro de Trabajador'}</h2>
                     </div>
                     <button class="pnv-modal-close-btn" onclick="window.ViasaCarnetsEngine.cerrarModalTrabajador()">&times;</button>
@@ -1188,12 +1195,11 @@
 
                 <div class="pnv-modal-body">
                     <div class="pnv-modal-form-grid">
-                        <!-- COLUMNA FOTO Y PREVIEW -->
                         <div class="pnv-form-photo-side">
                             <div class="pnv-photo-preview-box">
-                                <img id="form-pnv-photo-img" src="${emp.foto || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=400&h=400&q=80'}" alt="Foto" />
+                                <img id="form-pnv-photo-img" src="${emp.foto || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=400&h=400&q=80'}" alt="Foto" style="aspect-ratio: 4/5; width: 140px; height: 175px; object-fit: cover; border: 3px solid #d97706; border-radius: 12px;" />
                                 <button type="button" class="btn btn-sm btn-outline pnv-btn-upload-photo" onclick="document.getElementById('form-pnv-file-photo').click()">
-                                    <i class="fa-solid fa-upload"></i> Subir Fotografía
+                                    <i class="fa-solid fa-upload"></i> Subir Fotografía (4:5)
                                 </button>
                                 <input type="file" id="form-pnv-file-photo" accept="image/*" style="display:none;" onchange="
                                     const f = this.files[0];
@@ -1209,17 +1215,21 @@
                             </div>
 
                             <div class="pnv-form-token-display">
-                                <label class="pnv-form-label">Token QR Único:</label>
-                                <input type="text" id="form-pnv-token" class="pnv-form-input readonly-code" value="${emp.qrToken}" readonly />
-                                <small class="pnv-form-help">Generado bajo norma <code>NV-EMP-{AREA}-{CI}-{HASH4}</code></small>
+                                <label class="pnv-form-label">Código Laboral Correlativo:</label>
+                                <input type="text" id="form-pnv-codigo-laboral" class="pnv-form-input readonly-code" value="${emp.codigoLaboral || 'PROD-001'}" readonly />
+                                <small class="pnv-form-help">Calculado automáticamente por departamento</small>
                             </div>
 
-                            <div class="pnv-form-area-badge-preview" id="form-pnv-area-preview" style="background: ${areaInfo.colorPrimario}; color: #FFFFFF; border: 1.5px solid ${areaInfo.colorAcento};">
-                                <i class="fa-solid ${areaInfo.icon}"></i> ${areaInfo.nombre}
+                            <div class="pnv-form-token-display" style="margin-top: 8px;">
+                                <label class="pnv-form-label">Token QR Único:</label>
+                                <input type="text" id="form-pnv-token" class="pnv-form-input readonly-code" value="${emp.qrToken}" readonly />
+                            </div>
+
+                            <div class="pnv-form-area-badge-preview" id="form-pnv-area-preview" style="background: #4B371C; color: #FFFBEB; border: 1.5px solid #d97706; margin-top: 8px;">
+                                <i class="fa-solid ${areaInfo.icon}" style="color: #fbbf24;"></i> ${areaInfo.nombre} &bull; ${emp.codigoLaboral || ''}
                             </div>
                         </div>
 
-                        <!-- COLUMNA DATOS -->
                         <div class="pnv-form-data-side">
                             <div class="pnv-form-row-2">
                                 <div class="pnv-form-group">
@@ -1238,10 +1248,10 @@
                                     <input type="text" id="form-pnv-cargo" class="pnv-form-input" value="${emp.cargo}" placeholder="Ej. Maestro Panadero Jefe" required />
                                 </div>
                                 <div class="pnv-form-group">
-                                    <label class="pnv-form-label">Área / Nivel Institucional *</label>
+                                    <label class="pnv-form-label">Área / Departamento *</label>
                                     <select id="form-pnv-area" class="pnv-form-input" onchange="window.ViasaCarnetsEngine.actualizarAreaEnFormulario(this.value)">
                                         <option value="ADM" ${emp.areaCodigo === 'ADM' ? 'selected' : ''}>Gerencia y Administración (ADM)</option>
-                                        <option value="PROD" ${emp.areaCodigo === 'PROD' ? 'selected' : ''}>Producción / Panadería / Horneros (PROD)</option>
+                                        <option value="PROD" ${emp.areaCodigo === 'PROD' ? 'selected' : ''}>Producción / Panadería / Pastelería (PROD)</option>
                                         <option value="VNT" ${emp.areaCodigo === 'VNT' ? 'selected' : ''}>Ventas / Mostrador / Caja POS (VNT)</option>
                                         <option value="LOG" ${emp.areaCodigo === 'LOG' ? 'selected' : ''}>Distribución B2B / Despacho (LOG)</option>
                                         <option value="MNT" ${emp.areaCodigo === 'MNT' ? 'selected' : ''}>Mantenimiento y Servicios (MNT)</option>
@@ -1249,15 +1259,7 @@
                                 </div>
                             </div>
 
-                            <div class="pnv-form-row-3">
-                                <div class="pnv-form-group">
-                                    <label class="pnv-form-label">Turno</label>
-                                    <select id="form-pnv-turno" class="pnv-form-input">
-                                        <option value="Diurno" ${emp.turno === 'Diurno' || emp.turno === 'diurno' ? 'selected' : ''}>Diurno (Mañana/Tarde)</option>
-                                        <option value="Mixto" ${emp.turno === 'Mixto' || emp.turno === 'mixto' ? 'selected' : ''}>Mixto</option>
-                                        <option value="Nocturno" ${emp.turno === 'Nocturno' || emp.turno === 'nocturno' || emp.turno === 'nocturno_madrugada' ? 'selected' : ''}>Nocturno (Madrugada)</option>
-                                    </select>
-                                </div>
+                            <div class="pnv-form-row-2">
                                 <div class="pnv-form-group">
                                     <label class="pnv-form-label">Fecha de Ingreso</label>
                                     <input type="date" id="form-pnv-ingreso" class="pnv-form-input" value="${emp.fechaIngreso || '2026-01-15'}" />
@@ -1273,8 +1275,8 @@
                                 </div>
                             </div>
 
-                            <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 15px 0;" />
-                            <h4 style="margin: 0 0 10px 0; font-size: 0.9rem; color: #64748b; text-transform: uppercase;">Ficha Médica y Contacto de Emergencia</h4>
+                            <hr style="border: 0; border-top: 1px solid #334155; margin: 15px 0;" />
+                            <h4 style="margin: 0 0 10px 0; font-size: 0.85rem; color: #fbbf24; text-transform: uppercase;">Ficha Médica y Contacto de Emergencia</h4>
 
                             <div class="pnv-form-row-2">
                                 <div class="pnv-form-group">
@@ -1306,7 +1308,7 @@
 
                 <div class="pnv-modal-footer">
                     <button type="button" class="btn btn-outline" onclick="window.ViasaCarnetsEngine.cerrarModalTrabajador()">Cancelar</button>
-                    <button type="button" class="btn btn-primary" onclick="window.ViasaCarnetsEngine.guardarTrabajadorDesdeModal()" style="background: ${areaInfo.colorPrimario}; border-color: ${areaInfo.colorAcento};">
+                    <button type="button" class="btn btn-primary" onclick="window.ViasaCarnetsEngine.guardarTrabajadorDesdeModal()" style="background: #4B371C; border-color: #d97706;">
                         <i class="fa-solid fa-floppy-disk"></i> Guardar Expediente y Credencial
                     </button>
                 </div>
@@ -1316,10 +1318,8 @@
         }
     };
 
-    // Publicación en el ámbito global
     window.ViasaCarnetsEngine = ViasaCarnetsEngine;
 
-    // Inicialización automática cuando el DOM esté listo
     if (typeof document !== 'undefined') {
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', () => ViasaCarnetsEngine.init());

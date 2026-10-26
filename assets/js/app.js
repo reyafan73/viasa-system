@@ -1254,6 +1254,27 @@
             if (!this.empleados || this.empleados.length === 0) {
                 this.empleados = window.ViasaDatabase.empleados || [];
             }
+            if (window.ViasaCarnetsEngine && typeof window.ViasaCarnetsEngine.determinarAreaPorDepto === 'function') {
+                const contadores = { ADM: 0, PROD: 0, VNT: 0, LOG: 0, MNT: 0 };
+                this.empleados.forEach(e => {
+                    if (!e.areaCodigo) e.areaCodigo = window.ViasaCarnetsEngine.determinarAreaPorDepto(e.departamento, e.cargo);
+                    if (e.codigoLaboral && e.codigoLaboral.startsWith(e.areaCodigo + '-')) {
+                        const num = parseInt(e.codigoLaboral.split('-')[1], 10);
+                        if (!isNaN(num) && num > contadores[e.areaCodigo]) contadores[e.areaCodigo] = num;
+                    }
+                });
+                let modif = false;
+                this.empleados.forEach(e => {
+                    if (!e.codigoLaboral || !e.codigoLaboral.startsWith(e.areaCodigo + '-')) {
+                        contadores[e.areaCodigo]++;
+                        e.codigoLaboral = `${e.areaCodigo}-${String(contadores[e.areaCodigo]).padStart(3, '0')}`;
+                        modif = true;
+                    }
+                });
+                if (modif) {
+                    window.ViasaStorage.guardarColeccion('empleados', this.empleados);
+                }
+            }
         },
 
         async cargarFichajesAsistencia() {
@@ -18088,6 +18109,7 @@
                     (e.nombreCompleto && e.nombreCompleto.toLowerCase().includes(q)) ||
                     (e.cedula && e.cedula.toLowerCase().includes(q)) ||
                     (e.cargo && e.cargo.toLowerCase().includes(q)) ||
+                    (e.codigoLaboral && e.codigoLaboral.toLowerCase().includes(q)) ||
                     (e.telefono && e.telefono.toLowerCase().includes(q));
                 return matchDepto && matchQ;
             });
@@ -18171,7 +18193,7 @@
                     </div>
 
                     <div style="flex: 1; min-width: 250px; max-width: 380px;">
-                        <input type="text" class="pos-search-input" value="${this.filtroBusquedaRRHH || ''}" placeholder="🔍 Buscar por nombre, cédula o cargo..." oninput="ViasaApp.filtrarBusquedaRRHH(this.value)" style="width: 100%; font-size: 0.85rem; padding: 7px 12px;">
+                        <input type="text" class="pos-search-input" value="${this.filtroBusquedaRRHH || ''}" placeholder="🔍 Buscar por código (ADM-001), nombre, cédula o cargo..." oninput="ViasaApp.filtrarBusquedaRRHH(this.value)" style="width: 100%; font-size: 0.85rem; padding: 7px 12px;">
                     </div>
                 </div>
 
@@ -18198,7 +18220,10 @@
                                                 </div>
                                             </div>
                                             <div>
-                                                <div style="font-weight: 900; font-size: 0.95rem; color: #ffffff; letter-spacing: 0.2px;">${emp.nombreCompleto}</div>
+                                                <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+                                                    <span style="font-weight: 900; font-size: 0.95rem; color: #ffffff; letter-spacing: 0.2px;">${emp.nombreCompleto}</span>
+                                                    <span class="badge" style="background: #4B371C; color: #fbbf24; border: 1.5px solid #d97706; font-family: monospace; font-weight: 900; font-size: 0.72rem; padding: 1px 6px; border-radius: 4px;">${emp.codigoLaboral || ''}</span>
+                                                </div>
                                                 <div style="font-size: 0.72rem; color: #94a3b8;">${emp.cargo} &bull; <strong style="color: #cbd5e1;">${emp.cedula}</strong></div>
                                             </div>
                                         </div>
@@ -18691,6 +18716,9 @@
                                 </button>
                             </div>
                             <div style="font-size: 0.88rem; color: #cbd5e1; display: flex; align-items: center; gap: 8px; margin-top: 3px; flex-wrap: wrap;">
+                                <span class="badge" style="background: #4B371C; color: #fbbf24; border: 1.5px solid #d97706; font-weight: 900; font-family: monospace; font-size: 0.82rem; padding: 2px 8px; border-radius: 4px;">
+                                    <i class="fa-solid fa-id-badge"></i> CÓDIGO LABORAL: ${emp.codigoLaboral || 'PROD-001'}
+                                </span> &bull;
                                 <strong style="color: #fbbf24;">${emp.cargo}</strong> &bull;
                                 <span>C.I: <strong style="color: #ffffff;">${emp.cedula}</strong></span> &bull;
                                 <span>RIF: <strong style="color: #ffffff;">${emp.rif || emp.cedula}</strong></span>
@@ -20116,6 +20144,8 @@
                 },
                 cargo: cargo,
                 departamento: depto,
+                areaCodigo: window.ViasaCarnetsEngine ? window.ViasaCarnetsEngine.determinarAreaPorDepto(depto, cargo) : 'ADM',
+                codigoLaboral: existEmp?.codigoLaboral || (window.ViasaCarnetsEngine ? window.ViasaCarnetsEngine.calcularSiguienteCodigoLaboral(window.ViasaCarnetsEngine.determinarAreaPorDepto(depto, cargo), this.empleados, empId) : 'EMP-001'),
                 turno: document.getElementById('emp-turno')?.value || 'diurno',
                 fechaIngreso: document.getElementById('emp-fecha-ingreso')?.value || new Date().toISOString().split('T')[0],
                 tipoContrato: 'Tiempo Indeterminado (LOTTT)',

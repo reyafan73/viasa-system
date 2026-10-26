@@ -1259,6 +1259,7 @@
         empleados: [
             {
                 id: "EMP-001",
+                codigoLaboral: "ADM-001",
                 nombreCompleto: "Gerente General",
                 cedula: "V-14.892.110",
                 rif: "V14892110-0",
@@ -1296,6 +1297,7 @@
             },
             {
                 id: "EMP-002",
+                codigoLaboral: "VNT-001",
                 nombreCompleto: "María Contreras",
                 cedula: "V-22.341.980",
                 rif: "V22341980-4",
@@ -1333,6 +1335,7 @@
             },
             {
                 id: "EMP-003",
+                codigoLaboral: "PROD-001",
                 nombreCompleto: "Carlos Hernández",
                 cedula: "V-18.765.432",
                 rif: "V18765432-8",
@@ -1372,6 +1375,7 @@
             },
             {
                 id: "EMP-004",
+                codigoLaboral: "VNT-002",
                 nombreCompleto: "José Gregorio Morales",
                 cedula: "V-26.112.540",
                 rif: "V26112540-1",
@@ -1411,6 +1415,7 @@
             },
             {
                 id: "EMP-005",
+                codigoLaboral: "PROD-002",
                 nombreCompleto: "Daniela Salazar",
                 cedula: "V-24.908.120",
                 rif: "V24908120-7",
@@ -1448,6 +1453,7 @@
             },
             {
                 id: "EMP-006",
+                codigoLaboral: "PROD-003",
                 nombreCompleto: "Luis Eduardo Rivas",
                 cedula: "V-20.450.670",
                 rif: "V20450670-3",
@@ -1487,6 +1493,7 @@
             },
             {
                 id: "EMP-007",
+                codigoLaboral: "PROD-004",
                 nombreCompleto: "Carmen Elena Mendoza",
                 cedula: "V-19.123.890",
                 rif: "V19123890-9",
@@ -1524,6 +1531,7 @@
             },
             {
                 id: "EMP-008",
+                codigoLaboral: "LOG-001",
                 nombreCompleto: "Anthony Valenzuela",
                 cedula: "V-27.890.340",
                 rif: "V27890340-2",
@@ -1561,6 +1569,7 @@
             },
             {
                 id: "EMP-009",
+                codigoLaboral: "MNT-001",
                 nombreCompleto: "Rosaura Medina",
                 cedula: "V-17.654.321",
                 rif: "V17654321-5",
