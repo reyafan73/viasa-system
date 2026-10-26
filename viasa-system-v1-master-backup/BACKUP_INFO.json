@@ -1,0 +1,73 @@
+﻿{
+    "system_name":  "VIASA System",
+    "release_version":  "1.0.0",
+    "company_name":  "Panadería y Pastelería Nueva Viasa, C.A.",
+    "company_rif":  "J-31163165-8",
+    "company_city":  "Ciudad Bolívar, Estado Bolívar, Venezuela",
+    "backup_timestamp":  "2026-10-26T10:37:48.2455967-04:00",
+    "backup_date_local":  "2026-10-26 10:37:48",
+    "architecture":  "Zero-Dependency Vanilla ES6+, Offline-First PWA, IndexedDB Local Persistence, Pure Vector SVG/Canvas Engines",
+    "total_files":  53,
+    "total_bytes":  43182100,
+    "total_size_mb":  41.18,
+    "modules":  [
+                    {
+                        "id":  "MOD-01-ADMIN-DASHBOARD",
+                        "name":  "Módulo Administrativo y Dashboard Financiero",
+                        "description":  "Tasas BCV/USDT en tiempo real, balance financiero multidivisa, cierres Z/X, caja y estadísticas de ventas.",
+                        "status":  "VERIFICADO_100_OPERATIVO"
+                    },
+                    {
+                        "id":  "MOD-02-PRODUCTOS-VIASA",
+                        "name":  "Módulo Productos Nueva Viasa (CRUD, Barcodes \u0026 QR)",
+                        "description":  "Catálogo exclusivo, generador automático EAN-13/Code-128 con dígito verificador, QR inteligente de trazabilidad 360, carga/reemplazo de imágenes personalizadas y estudio de impresión térmica de etiquetas.",
+                        "status":  "VERIFICADO_100_OPERATIVO"
+                    },
+                    {
+                        "id":  "MOD-03-KDS-PRODUCCION",
+                        "name":  "Módulo KDS (Kitchen Display System) Producción de Panadería",
+                        "description":  "Pantalla de cocina interactiva para maestros panaderos/pasteleros con tiempos de fermentación, horneado y despacho.",
+                        "status":  "VERIFICADO_100_OPERATIVO"
+                    },
+                    {
+                        "id":  "MOD-04-POS-VENTAS",
+                        "name":  "Módulo Punto de Venta (POS Móvil y Salón)",
+                        "description":  "Facturación rápida en barra y mesas, pagos mixtos Bs/USD/Transferencia/Punto, compatibilidad con lector de barras y gavetas de dinero.",
+                        "status":  "VERIFICADO_100_OPERATIVO"
+                    },
+                    {
+                        "id":  "MOD-05-CONTABILIDAD-SENIAT",
+                        "name":  "Módulo Contabilidad y SENIAT",
+                        "description":  "Libros de Compras y Ventas fiscales, retenciones de IVA/ISLR, generación de XML/TXT para portal SENIAT y estados financieros.",
+                        "status":  "VERIFICADO_100_OPERATIVO"
+                    },
+                    {
+                        "id":  "MOD-06-RRHH-CARNETS-QR",
+                        "name":  "Módulo Personal (RRHH), Control de Asistencia y Carnets QR",
+                        "description":  "Credenciales corporativas con QR inteligente, fotografía 4:5 (148x185px), QR 2x (88x88px), Logotipo oficial circular 2x en Anverso y Reverso, paleta Marrón Coffee #4B371C con ribetes dorados #D97706, códigos laborales correlativos por departamento (ADM-001, PROD-001, etc.) y eliminación de turnos.",
+                        "status":  "VERIFICADO_100_OPERATIVO"
+                    }
+                ],
+    "sha256_checksums":  {
+                             "assets/js/database.js":  "E6AEDD2843FC1975B1D7BB031DD447B02A96864D3746D7D143892290674BF8AC",
+                             "sw.js":  "563889EE50C2E6E1BEDDBEE7D9E8FD1EAB32CB0249553F2E070641C51258AF2C",
+                             "setup-installer.ps1":  "A0D3C0C48E3C4D9AD2F0FA9E35F0F281329E26D34F4852D283DBF83907E3C496",
+                             "mobile_app.html":  "A4F281AD3C5A95CB64C1649EEF8544AE757C8EBFCEE3C9FE2D88A998465050B5",
+                             "assets/js/contabilidad-seniat-engine.js":  "2B76189D7128AF44175E379850F20AF5C63D4C72C32536F7C4D3F0B9A84B51FB",
+                             "assets/js/contabilidad-crud-engine.js":  "A31268E929ED40C950ABA933A8BB91E9A7D0921F97BAF701480D9EB91C4954AC",
+                             "assets/js/barcode-qr-engine.js":  "21B3E3E9F08BDEAD33487BEB1AC3A40200DC4138879C444D877DACE4F00CC58A",
+                             "assets/js/productos-nueva-viasa-engine.js":  "06E9C8F6959423243DD25BFACA7C14AA052579DA108890526D73068AE1936D7A",
+                             "MANUAL_DE_INSTALACION_VIASA_SYSTEM_V1.0.md":  "7526B0CE17BCCDA83A87F39FAB37B49E77AD80F70610267EC38B9A02AAC6855E",
+                             "Instalar_VIASA_System_V1.0.bat":  "09E12CC898086E715BDE3EAD559C3D36E89F0A0986F332820EF4DD215CD0B5A5",
+                             "assets/js/excel-migration-assistant.js":  "FBC983C09BE873D25702D593B490A56CA9F17261E65C8E949125805B2731E0C9",
+                             "iniciar_sistema.bat":  "967727682FB38CDCE069CAC4B1C1DAE6388804FAB5FBFF5243034542FC3973CC",
+                             "assets/js/carnets-personal-engine.js":  "0ED58B41B8FEA9B5B636FCF64760A48A54DF3AB3B4D1801182A6E6CBE8313FDC",
+                             "assets/js/guardias-engine.js":  "4F9CD2007DD62F59E40E10FD4A09B45464E8EDB8104381F17A1D89A0405F2EB5",
+                             "assets/js/storage-engine.js":  "E281EC62F7BCC0F6CBDA263D5D5F39B85F2A970450F14B2086F06B5A7AF21D10",
+                             "assets/js/app.js":  "EFCAFD2BC07E11A96FC0E550E21FC41BE2426DFC502ED52229AB36CB76973724",
+                             "assets/js/auth.js":  "6D93CF115B885C92C7AB7B2845652293D7784E5ABA1D0C2BC9B1DB84F8EADB71",
+                             "index.html":  "7C306F75656432AA8A33755F0AFC8C3665597ACAA8247D125709072BCF4EEA2A",
+                             "package.json":  "309BBD28412E97BAB8F2975013C74978E2CCA2F6ED84308B4800984D7F18A919"
+                         },
+    "integrity_status":  "CHECKSUM_INTEGRITY_VERIFIED_PASS"
+}

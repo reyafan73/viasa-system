@@ -1,0 +1,129 @@
+{
+  "id": "/?source=pwa",
+  "name": "VIASA SYSTEM",
+  "short_name": "VIASA",
+  "description": "Sistema Integral de Gestión Administrativa, Operativa, Producción, RRHH LOTTT y Punto de Venta Multidivisa para Panadería y Pastelería Nueva Viasa, C.A.",
+  "lang": "es-VE",
+  "dir": "ltr",
+  "start_url": "./index.html?source=pwa",
+  "scope": "./",
+  "display": "standalone",
+  "display_override": [
+    "window-controls-overlay",
+    "standalone",
+    "minimal-ui"
+  ],
+  "background_color": "#0d1117",
+  "theme_color": "#d97706",
+  "orientation": "any",
+  "prefer_related_applications": false,
+  "categories": [
+    "business",
+    "finance",
+    "productivity"
+  ],
+  "icons": [
+    {
+      "src": "assets/icons/favicon-16x16.png",
+      "sizes": "16x16",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/icons/favicon-32x32.png",
+      "sizes": "32x32",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/icons/favicon-48x48.png",
+      "sizes": "48x48",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/icons/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "assets/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Punto de Venta (POS)",
+      "short_name": "POS Mostrador",
+      "description": "Abrir directamente la facturación multidivisa en mostrador",
+      "url": "./index.html?view=pos",
+      "icons": [
+        {
+          "src": "assets/icons/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Cafetín Viasa",
+      "short_name": "Cafetín",
+      "description": "Control de mesas, comandas y barra gastronómica",
+      "url": "./index.html?view=cafetin",
+      "icons": [
+        {
+          "src": "assets/icons/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Producción y Fórmulas",
+      "short_name": "Producción",
+      "description": "Órdenes de horneo, recetas panaderas y control de mermas",
+      "url": "./index.html?view=produccion",
+      "icons": [
+        {
+          "src": "assets/icons/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Casillero de Respaldos",
+      "short_name": "Respaldos",
+      "description": "Bóveda de guardado general y respaldos del sistema",
+      "url": "./index.html?view=casillero-respaldos",
+      "icons": [
+        {
+          "src": "assets/icons/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    }
+  ]
+}

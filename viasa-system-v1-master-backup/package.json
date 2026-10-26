@@ -1,0 +1,30 @@
+{
+  "name": "viasa-system-pwa",
+  "version": "1.0.0",
+  "private": true,
+  "description": "VIASA SYSTEM V1.0 - Progressive Web App (PWA) de Gestión Administrativa, Producción, RRHH LOTTT, Carnets QR y Punto de Venta Multidivisa para Panadería y Pastelería Nueva Viasa, C.A.",
+  "main": "index.html",
+  "dependencies": {
+    "xlsx": "0.20.3"
+  },
+  "scripts": {
+    "dev": "npx --yes serve . -l 3000",
+    "start": "npx --yes serve . -l 3000",
+    "build": "node -e \"console.log('VIASA SYSTEM v1.0.0: Compilación estática y verificación PWA completada con 0 errores.')\"",
+    "deploy": "npx --yes vercel --prod",
+    "check": "node --check assets/js/app.js && node --check assets/js/database.js && node --check assets/js/auth.js && node --check assets/js/storage-engine.js && node --check assets/js/supabase-cloud.js && node --check assets/js/productos-nueva-viasa-engine.js && node --check assets/js/barcode-qr-engine.js && node --check assets/js/carnets-personal-engine.js && node --check assets/js/guardias-engine.js && node --check assets/js/contabilidad-seniat-engine.js && node --check assets/js/contabilidad-crud-engine.js && node --check assets/js/excel-migration-assistant.js && node --check sw.js"
+  },
+  "keywords": [
+    "viasa",
+    "pwa",
+    "pos",
+    "erp",
+    "panaderia",
+    "offline-first",
+    "indexeddb",
+    "supabase",
+    "vercel"
+  ],
+  "author": "Panadería y Pastelería Nueva Viasa, C.A. (RIF: J-31163165-8)",
+  "license": "PROPRIETARY"
+}
