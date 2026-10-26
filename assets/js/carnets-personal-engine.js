@@ -612,6 +612,18 @@
             this.trabajadorEditando.telefonoEmergencia = telefonoEmergencia || '0414-1234567';
             this.trabajadorEditando.estatus = estatus;
 
+            // Garantizar consistencia con RRHH y LOTTT
+            if (typeof this.trabajadorEditando.salarioBaseUSD !== 'number' || isNaN(this.trabajadorEditando.salarioBaseUSD)) {
+                this.trabajadorEditando.salarioBaseUSD = 280.00;
+            }
+            if (!this.trabajadorEditando.departamento) {
+                const areaMap = { ADM: 'administracion', PROD: 'produccion', VNT: 'mostrador_caja', LOG: 'despacho', MNT: 'mantenimiento' };
+                this.trabajadorEditando.departamento = areaMap[areaCodigo] || 'produccion';
+            }
+            if (!this.trabajadorEditando.estado) {
+                this.trabajadorEditando.estado = estatus === 'Inactivo' ? 'inactivo_archivado' : 'activo';
+            }
+
             if (!this.trabajadorEditando.codigoLaboral || !this.trabajadorEditando.codigoLaboral.startsWith(areaCodigo + '-')) {
                 this.trabajadorEditando.codigoLaboral = this.calcularSiguienteCodigoLaboral(areaCodigo, this.coleccionEmpleados, this.trabajadorEditando.id);
             }
@@ -629,6 +641,13 @@
 
             this.trabajadorSeleccionadoId = this.trabajadorEditando.id;
             await this._guardarCambiosPersistentes();
+
+            if (window.ViasaApp) {
+                window.ViasaApp.empleados = this.coleccionEmpleados;
+                if (typeof window.ViasaApp.renderRRHH === 'function' && window.ViasaApp.subViewRRHH !== 'carnets') {
+                    window.ViasaApp.renderRRHH();
+                }
+            }
 
             if (window.ViasaAudio && typeof window.ViasaAudio.playSuccess === 'function') {
                 window.ViasaAudio.playSuccess();
@@ -913,11 +932,32 @@
             }, 1000);
         },
 
+        ultimoTargetId: null,
+
         // ======================================================================
         // 8. RENDERIZADO PRINCIPAL DEL MÓDULO
         // ======================================================================
-        render() {
-            const container = document.getElementById('carnets-personal-content');
+        render(targetId = null) {
+            if (targetId) {
+                this.ultimoTargetId = targetId;
+            }
+            let container = null;
+            if (this.ultimoTargetId) {
+                container = document.getElementById(this.ultimoTargetId);
+            }
+            if (!container) {
+                const embedded = document.getElementById('carnets-rrhh-embedded-content');
+                const standalone = document.getElementById('carnets-personal-content');
+                if (embedded && embedded.offsetParent !== null) {
+                    container = embedded;
+                    this.ultimoTargetId = 'carnets-rrhh-embedded-content';
+                } else if (standalone && standalone.offsetParent !== null) {
+                    container = standalone;
+                    this.ultimoTargetId = 'carnets-personal-content';
+                } else {
+                    container = embedded || standalone;
+                }
+            }
             if (!container) return;
 
             let empleadosFiltrados = this.coleccionEmpleados.filter(emp => {

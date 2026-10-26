@@ -1251,9 +1251,32 @@
 
         async cargarEmpleados() {
             this.empleados = await window.ViasaStorage.obtenerColeccion('empleados');
-            if (!this.empleados || this.empleados.length === 0) {
-                this.empleados = window.ViasaDatabase.empleados || [];
+            const catalogoOficial = (window.ViasaDatabase && Array.isArray(window.ViasaDatabase.empleados)) ? window.ViasaDatabase.empleados : [];
+            
+            const requiereRecarga = !this.empleados || this.empleados.length === 0 || 
+                (catalogoOficial.length > 0 && this.empleados.length < catalogoOficial.length) ||
+                this.empleados.some(e => !e.nombreCompleto || e.nombreCompleto === 'Gerente General' || typeof e.salarioBaseUSD !== 'number' || !e.codigoLaboral);
+
+            if (requiereRecarga && catalogoOficial.length > 0) {
+                console.log('[VIASA RRHH] Cargando y sincronizando nómina oficial enriquecida (19 empleados)...');
+                this.empleados = JSON.parse(JSON.stringify(catalogoOficial));
+                if (window.ViasaStorage) {
+                    await window.ViasaStorage.guardarColeccion('empleados', this.empleados);
+                }
             }
+
+            // Normalización defensiva de todos los empleados
+            if (Array.isArray(this.empleados)) {
+                this.empleados.forEach(e => {
+                    if (typeof e.salarioBaseUSD !== 'number' || isNaN(e.salarioBaseUSD)) e.salarioBaseUSD = 280.00;
+                    if (!e.nombreCompleto) e.nombreCompleto = 'Trabajador Panadería Nueva Viasa';
+                    if (!e.cedula) e.cedula = 'V-00.000.000';
+                    if (!e.cargo) e.cargo = 'Operario General';
+                    if (!e.departamento) e.departamento = 'produccion';
+                    if (!e.estado) e.estado = 'activo';
+                });
+            }
+
             if (window.ViasaCarnetsEngine && typeof window.ViasaCarnetsEngine.determinarAreaPorDepto === 'function') {
                 const contadores = { ADM: 0, PROD: 0, VNT: 0, LOG: 0, MNT: 0 };
                 this.empleados.forEach(e => {
@@ -1271,9 +1294,12 @@
                         modif = true;
                     }
                 });
-                if (modif) {
-                    window.ViasaStorage.guardarColeccion('empleados', this.empleados);
+                if (modif && window.ViasaStorage) {
+                    await window.ViasaStorage.guardarColeccion('empleados', this.empleados);
                 }
+            }
+            if (window.ViasaCarnetsEngine) {
+                window.ViasaCarnetsEngine.coleccionEmpleados = this.empleados;
             }
         },
 
@@ -9471,8 +9497,8 @@
                 netoPagarBs: ((emp.salarioBaseUSD || 300) / 2) * this.tasaBCV
             };
 
-            const netoUSD = calc.netoPagarUSD || (emp.salarioBaseUSD / 2);
-            const netoBs = calc.netoPagarBs || (netoUSD * this.tasaBCV);
+            const netoUSD = calc.netoPagarUSD || ((Number(emp.salarioBaseUSD || 300)) / 2);
+            const netoBs = calc.netoPagarBs || (netoUSD * (this.tasaBCV || 36.85));
 
             this.abrirRedactorCorreo({
                 destinatarioEmail: emp.email || '',
@@ -13114,7 +13140,7 @@
                 const emp = (this.empleados || []).find(e => e.id === empId);
                 if (emp) {
                     const salInput = document.getElementById('calc-nom-salario-base');
-                    if (salInput) salInput.value = emp.salarioBaseUSD.toFixed(2);
+                    if (salInput) salInput.value = Number(emp.salarioBaseUSD || 0).toFixed(2);
                 }
             }
             this.ejecutarCalculoSalarialNomina();
@@ -18037,7 +18063,60 @@
         cambiarSubViewRRHH(subView) {
             this.subViewRRHH = subView;
             this.renderRRHH();
+            if (subView === 'carnets' && window.ViasaCarnetsEngine) {
+                setTimeout(() => {
+                    if (typeof window.ViasaCarnetsEngine.render === 'function') {
+                        window.ViasaCarnetsEngine.render('carnets-rrhh-embedded-content');
+                    }
+                }, 40);
+            }
             if (window.ViasaAudio) window.ViasaAudio.playClick();
+        },
+
+        verCarnetEmpleado(empId) {
+            this.subViewRRHH = 'carnets';
+            if (window.ViasaCarnetsEngine) {
+                window.ViasaCarnetsEngine.trabajadorSeleccionadoId = empId;
+            }
+            this.renderRRHH();
+            if (window.ViasaCarnetsEngine) {
+                setTimeout(() => {
+                    if (typeof window.ViasaCarnetsEngine.render === 'function') {
+                        window.ViasaCarnetsEngine.render('carnets-rrhh-embedded-content');
+                    }
+                }, 40);
+            }
+            if (window.ViasaAudio) window.ViasaAudio.playClick();
+        },
+
+        async sincronizarNominaOficialViasa() {
+            try {
+                if (!window.ViasaDatabase || !Array.isArray(window.ViasaDatabase.empleados)) {
+                    alert('⚠️ No se encontró el catálogo oficial de nómina en la memoria del sistema.');
+                    return;
+                }
+                const confirmar = confirm('¿Desea sincronizar y cargar los 19 trabajadores oficiales de Panadería Nueva Viasa con sus cédulas, códigos laborales (ADM-001..MNT-002), salarios y credenciales QR?');
+                if (!confirmar) return;
+
+                this.empleados = JSON.parse(JSON.stringify(window.ViasaDatabase.empleados));
+                if (window.ViasaStorage) {
+                    await window.ViasaStorage.guardarColeccion('empleados', this.empleados);
+                }
+                if (window.ViasaCarnetsEngine) {
+                    window.ViasaCarnetsEngine.coleccionEmpleados = this.empleados;
+                    if (this.empleados.length > 0) {
+                        window.ViasaCarnetsEngine.trabajadorSeleccionadoId = this.empleados[0].id;
+                    }
+                }
+                if (window.ViasaAudio && typeof window.ViasaAudio.playSuccess === 'function') {
+                    window.ViasaAudio.playSuccess();
+                }
+                this.renderRRHH();
+                alert('✅ ¡Nómina oficial sincronizada exitosamente con los 19 trabajadores de Panadería Nueva Viasa!');
+            } catch (err) {
+                console.error('[VIASA RRHH] Error sincronizando nómina:', err);
+                alert('Ocurrió un error al sincronizar la nómina: ' + err.message);
+            }
         },
 
         filtrarDepartamentoRRHH(depto) {
@@ -18054,46 +18133,89 @@
             const container = document.getElementById('rrhh-content');
             if (!container) return;
 
-            const sv = this.subViewRRHH || 'expedientes';
-            const totalEmpleados = (this.empleados || []).length;
-            const activosHoy = (this.fichajesAsistencia || []).filter(f => f.tipo === 'entrada' && !f.horaSalida).length;
-            const totalVacaciones = (this.vacacionesProgramadas || []).length;
-            const totalLiquidaciones = (this.liquidacionesLOTTT || []).length;
-            const totalMemoriaRRHH = (this.bancoMemoriaRRHH || []).length;
+            try {
+                // Auto-recarga si la nómina está vacía
+                if (!this.empleados || this.empleados.length === 0) {
+                    if (window.ViasaDatabase && Array.isArray(window.ViasaDatabase.empleados) && window.ViasaDatabase.empleados.length > 0) {
+                        this.empleados = JSON.parse(JSON.stringify(window.ViasaDatabase.empleados));
+                    }
+                }
 
-            container.innerHTML = `
-                <!-- Sub-Barra de Navegación Modular de RRHH -->
-                <div class="rrhh-tab-bar">
-                    <button type="button" class="rrhh-tab-btn ${sv === 'expedientes' ? 'active tab-expedientes' : ''}" onclick="ViasaApp.cambiarSubViewRRHH('expedientes')">
-                        <i class="fa-solid fa-address-card"></i> 1. Expedientes y Hoja de Vida
-                        <span style="background: rgba(255,255,255,0.2); padding: 2px 7px; border-radius: 10px; font-size: 0.72rem; margin-left: 4px;">${totalEmpleados}</span>
-                    </button>
-                    <button type="button" class="rrhh-tab-btn ${sv === 'asistencia' ? 'active tab-asistencia' : ''}" onclick="ViasaApp.cambiarSubViewRRHH('asistencia')">
-                        <i class="fa-solid fa-user-clock"></i> 2. Reloj Control y Asistencias
-                        <span style="background: rgba(255,255,255,0.2); padding: 2px 7px; border-radius: 10px; font-size: 0.72rem; margin-left: 4px;">${activosHoy} Activos</span>
-                    </button>
-                    <button type="button" class="rrhh-tab-btn ${sv === 'vacaciones' ? 'active tab-vacaciones' : ''}" onclick="ViasaApp.cambiarSubViewRRHH('vacaciones')">
-                        <i class="fa-solid fa-umbrella-beach"></i> 3. Vacaciones y Permisos IVSS
-                        <span style="background: rgba(255,255,255,0.2); padding: 2px 7px; border-radius: 10px; font-size: 0.72rem; margin-left: 4px;">${totalVacaciones}</span>
-                    </button>
-                    <button type="button" class="rrhh-tab-btn ${sv === 'liquidaciones' ? 'active tab-liquidaciones' : ''}" onclick="ViasaApp.cambiarSubViewRRHH('liquidaciones')">
-                        <i class="fa-solid fa-scale-balanced"></i> 4. Liquidaciones y Prestaciones LOTTT
-                        <span style="background: rgba(255,255,255,0.2); padding: 2px 7px; border-radius: 10px; font-size: 0.72rem; margin-left: 4px;">${totalLiquidaciones}</span>
-                    </button>
-                    <button type="button" class="rrhh-tab-btn ${sv === 'banco_memoria' ? 'active tab-memoria' : ''}" onclick="ViasaApp.cambiarSubViewRRHH('banco_memoria')">
-                        <i class="fa-solid fa-vault"></i> 5. Archivo y Banco de Memoria
-                        <span style="background: rgba(255,255,255,0.2); padding: 2px 7px; border-radius: 10px; font-size: 0.72rem; margin-left: 4px;">${totalMemoriaRRHH}</span>
-                    </button>
-                </div>
+                // Normalización de salarios y campos críticos
+                if (Array.isArray(this.empleados)) {
+                    this.empleados.forEach(emp => {
+                        if (typeof emp.salarioBaseUSD !== 'number' || isNaN(emp.salarioBaseUSD)) {
+                            emp.salarioBaseUSD = 280.00;
+                        }
+                    });
+                }
 
-                <div id="rrhh-subview-dynamic-container">
-                    ${sv === 'expedientes' ? this.renderExpedientesHTML() : ''}
-                    ${sv === 'asistencia' ? this.renderAsistenciaHTML() : ''}
-                    ${sv === 'vacaciones' ? this.renderVacacionesHTML() : ''}
-                    ${sv === 'liquidaciones' ? this.renderLiquidacionesHTML() : ''}
-                    ${sv === 'banco_memoria' ? this.renderBancoMemoriaRRHHHTML() : ''}
-                </div>
-            `;
+                const sv = this.subViewRRHH || 'expedientes';
+                const totalEmpleados = (this.empleados || []).length;
+                const activosHoy = (this.fichajesAsistencia || []).filter(f => f.tipo === 'entrada' && !f.horaSalida).length;
+                const totalVacaciones = (this.vacacionesProgramadas || []).length;
+                const totalLiquidaciones = (this.liquidacionesLOTTT || []).length;
+                const totalMemoriaRRHH = (this.bancoMemoriaRRHH || []).length;
+
+                container.innerHTML = `
+                    <!-- Sub-Barra de Navegación Modular de RRHH -->
+                    <div class="rrhh-tab-bar" style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; border-bottom: 2px solid #334155; padding-bottom: 10px;">
+                        <button type="button" class="rrhh-tab-btn ${sv === 'carnets' ? 'active tab-carnets' : ''}" onclick="ViasaApp.cambiarSubViewRRHH('carnets')" style="border-left: 3px solid #d97706; background: ${sv === 'carnets' ? '#4B371C' : 'rgba(75, 55, 28, 0.35)'};">
+                            <i class="fa-solid fa-id-card-clip" style="color: #fbbf24;"></i> 🪪 1. Carnets y Credenciales QR
+                            <span style="background: rgba(251,191,36,0.25); color: #fde68a; padding: 2px 7px; border-radius: 10px; font-size: 0.72rem; margin-left: 4px; font-weight: 800;">Studio QR</span>
+                        </button>
+                        <button type="button" class="rrhh-tab-btn ${sv === 'expedientes' ? 'active tab-expedientes' : ''}" onclick="ViasaApp.cambiarSubViewRRHH('expedientes')">
+                            <i class="fa-solid fa-address-card"></i> 2. Expedientes y Hoja de Vida
+                            <span style="background: rgba(255,255,255,0.2); padding: 2px 7px; border-radius: 10px; font-size: 0.72rem; margin-left: 4px;">${totalEmpleados}</span>
+                        </button>
+                        <button type="button" class="rrhh-tab-btn ${sv === 'asistencia' ? 'active tab-asistencia' : ''}" onclick="ViasaApp.cambiarSubViewRRHH('asistencia')">
+                            <i class="fa-solid fa-user-clock"></i> 3. Reloj Control y Asistencias
+                            <span style="background: rgba(255,255,255,0.2); padding: 2px 7px; border-radius: 10px; font-size: 0.72rem; margin-left: 4px;">${activosHoy} Activos</span>
+                        </button>
+                        <button type="button" class="rrhh-tab-btn ${sv === 'vacaciones' ? 'active tab-vacaciones' : ''}" onclick="ViasaApp.cambiarSubViewRRHH('vacaciones')">
+                            <i class="fa-solid fa-umbrella-beach"></i> 4. Vacaciones y Permisos IVSS
+                            <span style="background: rgba(255,255,255,0.2); padding: 2px 7px; border-radius: 10px; font-size: 0.72rem; margin-left: 4px;">${totalVacaciones}</span>
+                        </button>
+                        <button type="button" class="rrhh-tab-btn ${sv === 'liquidaciones' ? 'active tab-liquidaciones' : ''}" onclick="ViasaApp.cambiarSubViewRRHH('liquidaciones')">
+                            <i class="fa-solid fa-scale-balanced"></i> 5. Liquidaciones y Prestaciones LOTTT
+                            <span style="background: rgba(255,255,255,0.2); padding: 2px 7px; border-radius: 10px; font-size: 0.72rem; margin-left: 4px;">${totalLiquidaciones}</span>
+                        </button>
+                        <button type="button" class="rrhh-tab-btn ${sv === 'banco_memoria' ? 'active tab-memoria' : ''}" onclick="ViasaApp.cambiarSubViewRRHH('banco_memoria')">
+                            <i class="fa-solid fa-vault"></i> 6. Archivo y Banco de Memoria
+                            <span style="background: rgba(255,255,255,0.2); padding: 2px 7px; border-radius: 10px; font-size: 0.72rem; margin-left: 4px;">${totalMemoriaRRHH}</span>
+                        </button>
+                    </div>
+
+                    <div id="rrhh-subview-dynamic-container">
+                        ${sv === 'carnets' ? `<div id="carnets-rrhh-embedded-content"></div>` : ''}
+                        ${sv === 'expedientes' ? this.renderExpedientesHTML() : ''}
+                        ${sv === 'asistencia' ? this.renderAsistenciaHTML() : ''}
+                        ${sv === 'vacaciones' ? this.renderVacacionesHTML() : ''}
+                        ${sv === 'liquidaciones' ? this.renderLiquidacionesHTML() : ''}
+                        ${sv === 'banco_memoria' ? this.renderBancoMemoriaRRHHHTML() : ''}
+                    </div>
+                `;
+
+                if (sv === 'carnets' && window.ViasaCarnetsEngine) {
+                    setTimeout(() => {
+                        if (typeof window.ViasaCarnetsEngine.render === 'function') {
+                            window.ViasaCarnetsEngine.render('carnets-rrhh-embedded-content');
+                        }
+                    }, 30);
+                }
+            } catch (err) {
+                console.error('[VIASA RRHH] Error fatal en renderRRHH:', err);
+                container.innerHTML = `
+                    <div style="background: #1e1b4b; border: 2px solid #ef4444; border-radius: 12px; padding: 28px; text-align: center; color: #ffffff; margin: 20px 0;">
+                        <i class="fa-solid fa-triangle-exclamation" style="font-size: 2.8rem; color: #ef4444; margin-bottom: 14px;"></i>
+                        <h3 style="font-size: 1.35rem; margin-bottom: 8px;">Restauración del Módulo de Personal (RRHH)</h3>
+                        <p style="color: #cbd5e1; max-width: 600px; margin: 0 auto 18px;">Se detectó un error al procesar el expediente local. Haga clic en el botón para sincronizar y cargar los 19 trabajadores de nómina oficial.</p>
+                        <button type="button" class="btn-gold" onclick="ViasaApp.sincronizarNominaOficialViasa()" style="padding: 12px 24px; font-weight: 800; cursor: pointer; font-size: 1rem;">
+                            <i class="fa-solid fa-rotate"></i> Sincronizar Nómina Oficial (19 Trabajadores)
+                        </button>
+                    </div>
+                `;
+            }
         },
 
         // --------------------------------------------------------------
@@ -18133,9 +18255,15 @@
                             <span>Control centralizado, microfichas individuales, certificaciones sanitarias MPPS, fotografías HD y gestión integral.</span>
                         </div>
                     </div>
-                    <div style="display: flex; gap: 8px;">
+                    <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                        <button type="button" class="btn-secondary" onclick="ViasaApp.sincronizarNominaOficialViasa()" style="display: flex; align-items: center; gap: 6px; font-weight: 700; border-color: #d97706; color: #fbbf24; background: rgba(217, 119, 6, 0.15);" title="Sincronizar los 19 trabajadores oficiales de Panadería Nueva Viasa">
+                            <i class="fa-solid fa-arrows-rotate"></i> <span>Sincronizar Nómina (19 Trabajadores)</span>
+                        </button>
+                        <button type="button" class="btn-secondary" onclick="ViasaApp.cambiarSubViewRRHH('carnets')" style="display: flex; align-items: center; gap: 6px; font-weight: 700; border-color: #4B371C; color: #fde68a; background: #4B371C;" title="Abrir Generador de Carnets QR">
+                            <i class="fa-solid fa-id-card-clip" style="color: #fbbf24;"></i> <span>Estudio Carnets QR</span>
+                        </button>
                         <button type="button" class="btn-gold" onclick="ViasaApp.abrirModalNuevoEmpleado()" style="display: flex; align-items: center; gap: 6px; background: linear-gradient(135deg, #4f46e5 0%, #3730a3 100%); border-color: #818cf8; font-weight: 800;">
-                            <i class="fa-solid fa-user-plus"></i> Registrar Nuevo Trabajador
+                            <i class="fa-solid fa-user-plus"></i> <span>Registrar Nuevo</span>
                         </button>
                     </div>
                 </div>
@@ -18199,7 +18327,21 @@
 
                 <!-- Grilla de Tarjetas de Empleados (Microfichas Enmarcadas con Botonera Horizontal) -->
                 <div class="rrhh-employee-grid">
-                    ${filtrados.map(emp => {
+                    ${filtrados.length === 0 ? `
+                        <div style="grid-column: 1 / -1; background: rgba(15, 23, 42, 0.85); border: 2px dashed #d97706; border-radius: 12px; padding: 36px 20px; text-align: center; color: #cbd5e1;">
+                            <i class="fa-solid fa-users" style="font-size: 2.8rem; color: #fbbf24; margin-bottom: 12px;"></i>
+                            <h3 style="color: #ffffff; font-size: 1.25rem; margin-bottom: 6px;">Nómina de Personal - Panadería Nueva Viasa</h3>
+                            <p style="color: #94a3b8; max-width: 500px; margin: 0 auto 16px; font-size: 0.85rem;">No se encontraron registros con los filtros actuales o la base de datos local necesita ser inicializada.</p>
+                            <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+                                <button type="button" class="btn-gold" onclick="ViasaApp.sincronizarNominaOficialViasa()" style="padding: 10px 18px; font-weight: 800; cursor: pointer;">
+                                    <i class="fa-solid fa-arrows-rotate"></i> Cargar Nómina Oficial (19 Trabajadores)
+                                </button>
+                                <button type="button" class="btn-secondary" onclick="ViasaApp.filtrarDepartamentoRRHH('todos'); ViasaApp.filtrarBusquedaRRHH('');" style="padding: 10px 18px; cursor: pointer;">
+                                    <i class="fa-solid fa-filter-circle-xmark"></i> Quitar Filtros
+                                </button>
+                            </div>
+                        </div>
+                    ` : filtrados.map(emp => {
                         const esArchivado = emp.estado === 'inactivo_archivado';
                         const antiguedad = this.calcularAntiguedadLOTTT(emp.fechaIngreso);
                         const fichajeHoy = (this.fichajesAsistencia || []).find(f => f.empleadoId === emp.id);
@@ -18207,6 +18349,8 @@
                         const esMadrugada = emp.turno === 'nocturno_madrugada';
                         const certSalud = emp.certificadoSalud || { estado: 'vigente' };
                         const manipAlim = emp.manipulacionAlimentos || { estado: 'vigente' };
+                        const salarioVal = Number(emp.salarioBaseUSD || 0);
+                        const tasaVal = Number(this.tasaBCV || 36.85);
 
                         return `
                             <div class="rrhh-emp-card ${esArchivado ? 'rrhh-emp-card-archivado' : ''}">
@@ -18260,13 +18404,16 @@
                                         </div>
                                         <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #334155; padding-top: 4px; margin-top: 2px;">
                                             <span style="color: #94a3b8;">Sueldo Base:</span>
-                                            <strong style="color: #4ade80;">$${emp.salarioBaseUSD.toFixed(2)}/mes (Bs. ${(emp.salarioBaseUSD * this.tasaBCV).toLocaleString('es-VE', { minimumFractionDigits: 2 })})</strong>
+                                            <strong style="color: #4ade80;">$${salarioVal.toFixed(2)}/mes (Bs. ${(salarioVal * tasaVal).toLocaleString('es-VE', { minimumFractionDigits: 2 })})</strong>
                                         </div>
                                     </div>
                                 </div>
 
                                 <!-- Botonera de Acción Estrictamente Horizontal -->
                                 <div class="rrhh-card-action-bar">
+                                    <button type="button" class="rrhh-action-btn btn-carnet" onclick="ViasaApp.verCarnetEmpleado('${emp.id}')" title="Ver Carnet y Código QR Oficial" style="background: rgba(75, 55, 28, 0.4); border-left: 2px solid #d97706;">
+                                        <i class="fa-solid fa-id-card-clip" style="color: #fbbf24;"></i> <span style="color: #fde68a;">Carnet QR</span>
+                                    </button>
                                     <button type="button" class="rrhh-action-btn btn-expediente" onclick="ViasaApp.abrirExpedienteEmpleado('${emp.id}')" title="Ver Hoja de Vida Completa">
                                         <i class="fa-solid fa-folder-open"></i> <span>Expediente</span>
                                     </button>
@@ -18733,8 +18880,8 @@
                     
                     <div style="text-align: right; background: rgba(0,0,0,0.3); border: 1px solid #334155; border-radius: 10px; padding: 10px 16px;">
                         <div style="font-size: 0.68rem; color: #94a3b8; text-transform: uppercase; font-weight: 800; letter-spacing: 0.5px;">Salario Base Mensual:</div>
-                        <div style="font-size: 1.35rem; font-weight: 900; color: #4ade80;">$${emp.salarioBaseUSD.toFixed(2)}</div>
-                        <div style="font-size: 0.74rem; color: #38bdf8;">Bs. ${(emp.salarioBaseUSD * this.tasaBCV).toLocaleString('es-VE', { minimumFractionDigits: 2, maximumFractionDigits: 3 })}</div>
+                        <div style="font-size: 1.35rem; font-weight: 900; color: #4ade80;">$${Number(emp.salarioBaseUSD || 0).toFixed(2)}</div>
+                        <div style="font-size: 0.74rem; color: #38bdf8;">Bs. ${(Number(emp.salarioBaseUSD || 0) * (this.tasaBCV || 36.85)).toLocaleString('es-VE', { minimumFractionDigits: 2, maximumFractionDigits: 3 })}</div>
                     </div>
                 </div>
 
@@ -18813,7 +18960,7 @@
                                 <tr><td class="label-col">Turno de Trabajo:</td><td class="val-col">${esMadrugada ? '<strong style="color: #f97316;">Madrugada Panaderos (03:00 AM - 10:00 AM)</strong>' : 'Diurno Regular'}</td></tr>
                                 <tr><td class="label-col">Fecha de Ingreso:</td><td class="val-col">${emp.fechaIngreso}</td></tr>
                                 <tr><td class="label-col">Tipo de Contrato:</td><td class="val-col">Tiempo Indeterminado (LOTTT)</td></tr>
-                                <tr><td class="label-col">Sueldo Base Mensual:</td><td class="val-col"><strong style="color: #4ade80;">$${emp.salarioBaseUSD.toFixed(2)} USD</strong> (Bs. ${(emp.salarioBaseUSD * this.tasaBCV).toLocaleString('es-VE', { minimumFractionDigits: 2 })})</td></tr>
+                                <tr><td class="label-col">Sueldo Base Mensual:</td><td class="val-col"><strong style="color: #4ade80;">$${Number(emp.salarioBaseUSD || 0).toFixed(2)} USD</strong> (Bs. ${(Number(emp.salarioBaseUSD || 0) * (this.tasaBCV || 36.85)).toLocaleString('es-VE', { minimumFractionDigits: 2 })})</td></tr>
                                 <tr><td class="label-col">Bono de Asistencia y Puntualidad:</td><td class="val-col">+$${(emp.bonoPuntualidadUSD || 40).toFixed(2)} USD</td></tr>
                                 <tr><td class="label-col">Bono Cestaticket Alimentación:</td><td class="val-col">+$${(emp.bonoCestaTicketUSD || 40).toFixed(2)} USD</td></tr>
                                 <tr><td class="label-col">Cuenta Bancaria para Nómina:</td><td class="val-col">${banco.banco} &bull; ${banco.tipo} &bull; <code>${banco.cuenta}</code></td></tr>
@@ -19098,7 +19245,8 @@
                                     const ant = this.calcularAntiguedadLOTTT(emp.fechaIngreso);
                                     const diasDisfrute = this.calcularDiasVacacionesLOTTT(ant.anios);
                                     const diasBono = this.calcularBonoVacacionalLOTTT(ant.anios);
-                                    const salarioDiario = emp.salarioBaseUSD / 30;
+                                    const salario = Number(emp.salarioBaseUSD || 0);
+                                    const salarioDiario = salario / 30;
                                     const montoBono = diasBono * salarioDiario;
 
                                     return `
@@ -19111,7 +19259,7 @@
                                             <td><span class="antiguedad-badge">${ant.anios}a ${ant.meses}m</span></td>
                                             <td><strong style="color: #38bdf8;">${diasDisfrute} Días Hábiles</strong></td>
                                             <td><strong style="color: #fbbf24;">${diasBono} Días</strong></td>
-                                            <td>$${emp.salarioBaseUSD.toFixed(2)}</td>
+                                            <td>$${salario.toFixed(2)}</td>
                                             <td><strong style="color: #4ade80;">$${montoBono.toFixed(2)}</strong></td>
                                             <td>
                                                 <button type="button" class="btn-secondary" onclick="ViasaApp.abrirModalProgramarVacaciones('${emp.id}')" style="font-size: 0.72rem; padding: 4px 8px;">
@@ -19408,7 +19556,7 @@
             const diasBonoVac = this.calcularBonoVacacionalLOTTT(ant.anios);
 
             // 2. Salario Base Diario e Integral
-            const salarioBaseMensual = emp.salarioBaseUSD || 380.00;
+            const salarioBaseMensual = Number(emp.salarioBaseUSD || 280.00);
             const salarioBaseDiario = salarioBaseMensual / 30;
 
             // Alícuota Bono Vacacional = (Días Bono * Salario Diario) / 360
@@ -19456,7 +19604,7 @@
 
             // 10. Gran Total de Liquidación
             const totalLiquidacionUSD = montoPrestacionesDefinitivo + interesesPrestaciones + vacacionesFraccionadas + bonoVacacionalFraccionado + utilidadesFraccionadas + indemnizacionDespido;
-            const totalLiquidacionBs = totalLiquidacionUSD * this.tasaBCV;
+            const totalLiquidacionBs = totalLiquidacionUSD * (this.tasaBCV || 36.85);
 
             this.calculoLiquidacionActivo = {
                 id: `LIQ-${Date.now().toString().slice(-6)}`,
@@ -19660,7 +19808,9 @@
             const antiguedad = this.calcularAntiguedadLOTTT(emp.fechaIngreso);
             const hoy = new Date();
             const fechaLetras = hoy.toLocaleDateString('es-VE', { day: 'numeric', month: 'long', year: 'numeric' });
-            const salarioBs = (emp.salarioBaseUSD * this.tasaBCV).toLocaleString('es-VE', { minimumFractionDigits: 2 });
+            const salarioVal = Number(emp.salarioBaseUSD || 0);
+            const tasaVal = Number(this.tasaBCV || 36.85);
+            const salarioBs = (salarioVal * tasaVal).toLocaleString('es-VE', { minimumFractionDigits: 2 });
 
             return `
                 <div class="constancia-document-paper">
@@ -19690,7 +19840,7 @@
                     </p>
 
                     <p class="constancia-body-p">
-                        El(la) trabajador(a) desempeña actualmente el cargo de <strong>${emp.cargo.toUpperCase()}</strong> en el Departamento de <strong>${emp.departamento ? emp.departamento.toUpperCase() : 'PRODUCCIÓN'}</strong>, devengando un sueldo básico mensual de <strong>$${emp.salarioBaseUSD.toFixed(2)} dólares americanos</strong> (equivalentes a <strong>Bs. ${salarioBs}</strong> según la tasa oficial vigente del Banco Central de Venezuela), más los beneficios correspondientes de ley (LOTTT).
+                        El(la) trabajador(a) desempeña actualmente el cargo de <strong>${emp.cargo.toUpperCase()}</strong> en el Departamento de <strong>${emp.departamento ? emp.departamento.toUpperCase() : 'PRODUCCIÓN'}</strong>, devengando un sueldo básico mensual de <strong>$${salarioVal.toFixed(2)} dólares americanos</strong> (equivalentes a <strong>Bs. ${salarioBs}</strong> según la tasa oficial vigente del Banco Central de Venezuela), más los beneficios correspondientes de ley (LOTTT).
                     </p>
 
                     <p class="constancia-body-p">
@@ -20319,7 +20469,7 @@
             const ant = this.calcularAntiguedadLOTTT(emp.fechaIngreso);
             const diasDisfrute = this.calcularDiasVacacionesLOTTT(ant.anios);
             const diasBono = this.calcularBonoVacacionalLOTTT(ant.anios);
-            const salarioDiario = emp.salarioBaseUSD / 30;
+            const salarioDiario = Number(emp.salarioBaseUSD || 0) / 30;
             const montoSalarioVac = diasDisfrute * salarioDiario;
             const montoBonoVac = diasBono * salarioDiario;
             const granTotal = montoSalarioVac + montoBonoVac;
@@ -20341,7 +20491,7 @@
                 </div>
                 <div style="margin-top: 8px; border-top: 1px solid #1e3a8a; padding-top: 6px; display: flex; justify-content: space-between; font-size: 0.85rem;">
                     <span style="color: #cbd5e1;">Liquidación Anticipada Total:</span>
-                    <strong style="color: #4ade80;">$${granTotal.toFixed(2)} (Bs. ${(granTotal * this.tasaBCV).toLocaleString('es-VE', { minimumFractionDigits: 2 })})</strong>
+                    <strong style="color: #4ade80;">$${granTotal.toFixed(2)} (Bs. ${(granTotal * (this.tasaBCV || 36.85)).toLocaleString('es-VE', { minimumFractionDigits: 2 })})</strong>
                 </div>
             `;
         },
@@ -20366,7 +20516,7 @@
 
             const ant = this.calcularAntiguedadLOTTT(emp.fechaIngreso);
             const diasBono = this.calcularBonoVacacionalLOTTT(ant.anios);
-            const salarioDiario = emp.salarioBaseUSD / 30;
+            const salarioDiario = Number(emp.salarioBaseUSD || 0) / 30;
             const montoSalarioVac = diasSolicitados * salarioDiario;
             const montoBonoVac = diasBono * salarioDiario;
             const totalUSD = montoSalarioVac + montoBonoVac;
@@ -20536,7 +20686,7 @@
             const horaActual = new Date().toLocaleTimeString('es-VE', { hour: '2-digit', minute: '2-digit', hour12: true });
             const fechaActual = new Date().toISOString().split('T')[0];
             const esMadrugada = emp.turno === 'nocturno_madrugada';
-            const salarioDiario = emp.salarioBaseUSD / 30;
+            const salarioDiario = Number(emp.salarioBaseUSD || 0) / 30;
             const recargoNocturno = esMadrugada ? (salarioDiario / 7) * 7 * 0.30 : 0.00;
 
             const nuevaMarca = {
@@ -20631,7 +20781,7 @@
             <tr><td class="lbl">Cargo:</td><td>${emp.cargo}</td></tr>
             <tr><td class="lbl">Departamento:</td><td>${emp.departamento}</td></tr>
             <tr><td class="lbl">Fecha de Ingreso:</td><td>${emp.fechaIngreso}</td></tr>
-            <tr><td class="lbl">Sueldo Base Mensual:</td><td>$${emp.salarioBaseUSD.toFixed(2)}</td></tr>
+            <tr><td class="lbl">Sueldo Base Mensual:</td><td>$${Number(emp.salarioBaseUSD || 0).toFixed(2)}</td></tr>
             <tr><td class="lbl">Turno:</td><td>${emp.turno}</td></tr>
             <tr><td class="lbl">Certificado de Salud:</td><td>${emp.certificadoSalud ? emp.certificadoSalud.numeroFolio : 'Vigente'}</td></tr>
             <tr><td class="lbl">Manipulación Alimentos:</td><td>${emp.manipulacionAlimentos ? emp.manipulacionAlimentos.numeroRegistro : 'Vigente'}</td></tr>
@@ -20682,11 +20832,11 @@
             const emp = (this.empleados || []).find(e => e.id === empId);
             if (!emp) return;
 
-            const quincenaBase = emp.salarioBaseUSD / 2;
+            const quincenaBase = Number(emp.salarioBaseUSD || 0) / 2;
             const bono = emp.bonoPuntualidadUSD || 35.00;
             const comision = emp.rol === 'caja' ? 18.50 : (emp.rol === 'panadero' ? 28.00 : 35.00);
             const totalUSD = quincenaBase + bono + comision;
-            const totalBs = totalUSD * this.tasaBCV;
+            const totalBs = totalUSD * (this.tasaBCV || 36.85);
 
             alert(`📋 RECIBO DE PAGO QUINCENAL - PANADERÍA NUEVA VIASA\n\n- Empleado: ${emp.nombreCompleto} (${emp.cargo})\n- Cédula: ${emp.cedula}\n- Período: 1ra Quincena Septiembre 2026\n------------------------------------\n- Sueldo Base Quincenal: $${quincenaBase.toFixed(2)}\n- Bono Puntualidad: $${bono.toFixed(2)}\n- Incentivo / Comisión Operativa: $${comision.toFixed(2)}\n------------------------------------\nTOTAL NETO A PAGAR: $${totalUSD.toFixed(2)} (Bs. ${totalBs.toLocaleString('es-VE', { minimumFractionDigits: 2 })})\n\nCustodiado en: C:\\Users\\Usuario\\VIASA System\\Expedientes_Personal\\`);
         },
