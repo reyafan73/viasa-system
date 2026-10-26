@@ -231,6 +231,10 @@
                         <i class="fa-solid fa-users-gear" style="color: #a78bfa;"></i>
                         <span style="color: #c4b5fd; font-weight: 700;">Personal (RRHH)</span>
                     </div>
+                    <div class="nav-item" data-view="carnets-personal" id="nav-item-carnets-personal" style="border-left: 2px solid #d97706; background: rgba(217, 119, 6, 0.08);">
+                        <i class="fa-solid fa-id-card-clip" style="color: #fbbf24;"></i>
+                        <span style="color: #fde68a; font-weight: 800;">Carnets y Control QR</span>
+                    </div>
                     <div class="nav-item" data-view="usuarios" id="nav-item-usuarios" style="border-left: 2px solid #f59e0b; background: rgba(245, 158, 11, 0.08);">
                         <i class="fa-solid fa-user-lock" style="color: #fbbf24;"></i>
                         <span style="color: #fde68a; font-weight: 800;">Gestión de Usuarios</span>
@@ -679,6 +683,11 @@
             <!-- VISTA 10: CONTROL DE ASISTENCIA, PRODUCTIVIDAD Y NÓMINA -->
             <section class="view-container" id="view-rrhh">
                 <div id="rrhh-content"></div>
+            </section>
+
+            <!-- VISTA 10.1: IDENTIFICACIÓN CORPORATIVA, CONTROL DE PERSONAL Y GENERADOR DE CARNETS QR CR80 -->
+            <section class="view-container" id="view-carnets-personal">
+                <div id="carnets-personal-content"></div>
             </section>
 
             <!-- VISTA 11: LOGÍSTICA Y DESPACHOS (DELIVERY) -->
@@ -5831,6 +5840,9 @@
                 <button type="button" class="btn-secondary" onclick="ViasaGuardiasEngine.cerrarModalCredencial()" style="font-size: 0.8rem; padding: 8px 16px;">
                     Cerrar
                 </button>
+                <button type="button" class="btn btn-outline" onclick="if(window.ViasaCarnetsEngine && window.ViasaGuardiasEngine){ window.ViasaCarnetsEngine.trabajadorSeleccionadoId = window.ViasaGuardiasEngine.empleadoCredencialActivoId; } if(window.ViasaApp){ window.ViasaApp.cambiarVista('carnets-personal'); } ViasaGuardiasEngine.cerrarModalCredencial();" style="font-size: 0.8rem; padding: 8px 14px; border: 1px solid #fbbf24; color: #fbbf24; background: rgba(251, 191, 36, 0.1); cursor: pointer;">
+                    <i class="fa-solid fa-id-card-clip"></i> Abrir en Estudio CR80
+                </button>
                 <button type="button" class="btn-gold" onclick="window.print()" style="font-size: 0.82rem; font-weight: 800; padding: 8px 20px;">
                     <i class="fa-solid fa-print"></i> Imprimir Carnet
                 </button>
@@ -6229,6 +6241,7 @@
     <script src="assets/js/contabilidad-seniat-engine.js?v=2.9.5"></script>
     <script src="assets/js/contabilidad-crud-engine.js?v=2.9.5"></script>
     <script src="assets/js/productos-nueva-viasa-engine.js?v=3.0.0"></script>
+    <script src="assets/js/carnets-personal-engine.js?v=1.0.0"></script>
     <script src="assets/js/supabase-cloud.js"></script>
     <script src="assets/js/auth.js"></script>
     <script src="assets/js/app.js?v=2.9.5"></script>

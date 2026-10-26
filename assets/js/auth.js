@@ -337,6 +337,12 @@
                 return ['productos-nueva-viasa', 'inventario', 'produccion', 'pos', 'contabilidad', 'caja', 'reportes']
                     .some(p => rolInfo.permisos.includes(p));
             }
+
+            // Carnets y Control de Personal: accesible para RRHH, administración, guardias y roles operativos
+            if (permiso === 'carnets-personal') {
+                return ['carnets-personal', 'rrhh', 'guardias-hub', 'configuracion', 'reportes', 'usuarios']
+                    .some(p => rolInfo.permisos.includes(p));
+            }
             return rolInfo.permisos.includes(permiso);
         }
 

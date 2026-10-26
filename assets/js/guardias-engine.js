@@ -527,6 +527,8 @@
             const emp = emps.find(e => e.id === empId);
             if (!emp) return;
 
+            this.empleadoCredencialActivoId = empId;
+
             const modal = document.getElementById('modal-credencial-digital');
             if (!modal) return;
 
@@ -545,8 +547,15 @@
             
             const qrImg = document.getElementById('cred-qr-img');
             if (qrImg) {
-                const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(emp.qrToken || `VIASA-EMP-${emp.cedula}`)}&color=0f172a`;
-                qrImg.src = qrUrl;
+                if (emp.qrCustomImage) {
+                    qrImg.src = emp.qrCustomImage;
+                } else if (window.ViasaCodeEngine && window.ViasaCodeEngine.qr && typeof window.ViasaCodeEngine.qr.renderQRCanvas === 'function') {
+                    const canvas = window.ViasaCodeEngine.qr.renderQRCanvas(emp.qrToken || `NV-EMP-PROD-${emp.cedula}-8F2A`, { size: 180, colorDark: '#0f172a' });
+                    qrImg.src = canvas.toDataURL('image/png');
+                } else {
+                    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(emp.qrToken || `VIASA-EMP-${emp.cedula}`)}&color=0f172a`;
+                    qrImg.src = qrUrl;
+                }
             }
 
             modal.style.display = 'flex';
