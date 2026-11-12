@@ -5489,11 +5489,18 @@
                 }
 
                 if (this.filtroBusquedaPRV) {
+                    const q = this.filtroBusquedaPRV.toLowerCase();
                     lista = lista.filter(p => 
-                        (p.nombreEmpresa || '').toLowerCase().includes(this.filtroBusquedaPRV) ||
-                        (p.rif || '').toLowerCase().includes(this.filtroBusquedaPRV) ||
-                        (p.contacto || '').toLowerCase().includes(this.filtroBusquedaPRV) ||
-                        (p.telefono || '').toLowerCase().includes(this.filtroBusquedaPRV)
+                        (p.nombreEmpresa || '').toLowerCase().includes(q) ||
+                        (p.rif || '').toLowerCase().includes(q) ||
+                        (p.contacto || '').toLowerCase().includes(q) ||
+                        (p.vendedor || '').toLowerCase().includes(q) ||
+                        (p.telefono || '').toLowerCase().includes(q) ||
+                        (p.telefonoEmpresa1 || '').toLowerCase().includes(q) ||
+                        (p.telefonoEmpresa2 || '').toLowerCase().includes(q) ||
+                        (p.telefonoEmpresa3 || '').toLowerCase().includes(q) ||
+                        (p.telefonoRep1 || '').toLowerCase().includes(q) ||
+                        (p.telefonoRep2 || '').toLowerCase().includes(q)
                     );
                 }
 
@@ -5504,7 +5511,7 @@
                         <div style="display: flex; gap: 10px; flex: 1; min-width: 280px;">
                             <div style="position: relative; flex: 1;">
                                 <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 10px; top: 11px; color: var(--text-muted); font-size: 0.85rem;"></i>
-                                <input type="text" class="pos-search-input" placeholder="Buscar proveedor por nombre, RIF o contacto..." value="${this.filtroBusquedaPRV}" oninput="ViasaApp.filtrarProveedores(this.value)" style="padding-left: 32px; width: 100%;">
+                                <input type="text" class="pos-search-input" placeholder="Buscar proveedor por nombre, RIF, contacto o teléfono..." value="${this.filtroBusquedaPRV}" oninput="ViasaApp.filtrarProveedores(this.value)" style="padding-left: 32px; width: 100%;">
                             </div>
                             <select class="pos-search-input" onchange="ViasaApp.filtrarCategoriaPRV(this.value)" style="width: 190px;">
                                 ${categoriasUnicas.map(cat => `<option value="${cat}" ${this.filtroCategoriaPRV === cat ? 'selected' : ''}>${cat === 'todas' ? '🏷️ Todas las categorías' : cat}</option>`).join('')}
@@ -5524,8 +5531,10 @@
                     ` : `
                         <div class="prv-grid">
                             ${lista.map(prv => {
-                                const telWhatsapp = (prv.telefono || '').replace(/\D/g, '');
-                                const waUrl = telWhatsapp ? `https://api.whatsapp.com/send?phone=58${telWhatsapp.startsWith('0') ? telWhatsapp.slice(1) : telWhatsapp}&text=${encodeURIComponent('Hola, nos comunicamos de Panadería y Pastelería Nueva Viasa.')}` : '#';
+                                const telsEmp = [prv.telefonoEmpresa1 || prv.telefono, prv.telefonoEmpresa2, prv.telefonoEmpresa3].filter(Boolean);
+                                const telsRep = [prv.telefonoRep1, prv.telefonoRep2].filter(Boolean);
+                                const waNumRep = (prv.telefonoRep1 || prv.telefonoEmpresa1 || prv.telefono || '').replace(/\D/g, '');
+                                const waUrl = waNumRep ? `https://api.whatsapp.com/send?phone=58${waNumRep.startsWith('0') ? waNumRep.slice(1) : waNumRep}&text=${encodeURIComponent('Hola, nos comunicamos de Panadería y Pastelería Nueva Viasa.')}` : '#';
 
                                 return `
                                     <div class="prv-card">
@@ -5549,20 +5558,45 @@
                                                 </span>
                                             </div>
 
-                                            <div class="prv-info-list">
-                                                <div class="prv-info-item">
-                                                    <i class="fa-solid fa-user-tie"></i>
-                                                    <span><strong>Contacto:</strong> ${prv.contacto || 'No asignado'}</span>
+                                            <div class="prv-info-list" style="display: flex; flex-direction: column; gap: 8px;">
+                                                <!-- Teléfonos de la Empresa (Hasta 3 números) -->
+                                                <div style="background: rgba(15, 23, 42, 0.45); border-radius: 6px; padding: 7px 9px; border-left: 3px solid #38bdf8;">
+                                                    <div style="font-size: 0.72rem; color: #38bdf8; font-weight: 700; display: flex; align-items: center; gap: 5px; margin-bottom: 3px;">
+                                                        <i class="fa-solid fa-building"></i> Teléfonos Empresa:
+                                                    </div>
+                                                    <div style="font-size: 0.76rem; color: #cbd5e1; display: flex; flex-wrap: wrap; gap: 5px;">
+                                                        ${telsEmp.length > 0 ? telsEmp.map((t, idx) => `
+                                                            <a href="tel:${t.replace(/\s+/g, '')}" style="color: #e2e8f0; text-decoration: none; background: rgba(255,255,255,0.07); padding: 2px 7px; border-radius: 4px; font-size: 0.73rem; display: inline-flex; align-items: center; gap: 4px;" title="Llamar a la Empresa (${idx + 1})">
+                                                                <i class="fa-solid fa-phone" style="font-size: 0.65rem; color: #38bdf8;"></i> ${t}
+                                                            </a>
+                                                        `).join('') : '<span style="color: #64748b; font-size: 0.72rem;">No registrados</span>'}
+                                                    </div>
                                                 </div>
-                                                <div class="prv-info-item">
-                                                    <i class="fa-solid fa-phone"></i>
-                                                    <span><strong>Tel:</strong> ${prv.telefono || 'N/A'}</span>
-                                                    ${telWhatsapp ? `
-                                                        <a href="${waUrl}" target="_blank" style="margin-left: auto; color: #25d366; font-size: 0.9rem;" title="Chatear por WhatsApp">
-                                                            <i class="fa-brands fa-whatsapp"></i>
-                                                        </a>
-                                                    ` : ''}
+
+                                                <!-- Vendedor / Representante de la Empresa (2 números) -->
+                                                <div style="background: rgba(6, 78, 59, 0.3); border-radius: 6px; padding: 7px 9px; border-left: 3px solid #34d399;">
+                                                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 3px;">
+                                                        <div style="font-size: 0.72rem; color: #34d399; font-weight: 700; display: flex; align-items: center; gap: 5px;">
+                                                            <i class="fa-solid fa-user-tie"></i> Vendedor / Representante:
+                                                        </div>
+                                                        ${waNumRep ? `
+                                                            <a href="${waUrl}" target="_blank" style="color: #25d366; font-size: 0.8rem; text-decoration: none; display: inline-flex; align-items: center; gap: 3px;" title="Chatear por WhatsApp">
+                                                                <i class="fa-brands fa-whatsapp"></i> <strong>WhatsApp</strong>
+                                                            </a>
+                                                        ` : ''}
+                                                    </div>
+                                                    <div style="font-size: 0.8rem; font-weight: 700; color: #ffffff; margin-bottom: 3px;">
+                                                        ${prv.contacto || prv.vendedor || 'Sin representante asignado'}
+                                                    </div>
+                                                    <div style="font-size: 0.74rem; color: #cbd5e1; display: flex; flex-wrap: wrap; gap: 5px;">
+                                                        ${telsRep.length > 0 ? telsRep.map((t, idx) => `
+                                                            <a href="tel:${t.replace(/\s+/g, '')}" style="color: #e2e8f0; text-decoration: none; background: rgba(255,255,255,0.07); padding: 2px 7px; border-radius: 4px; font-size: 0.73rem; display: inline-flex; align-items: center; gap: 4px;" title="Llamar al Vendedor (${idx + 1})">
+                                                                <i class="fa-solid fa-mobile-screen" style="font-size: 0.65rem; color: #34d399;"></i> ${t}
+                                                            </a>
+                                                        `).join('') : '<span style="color: #64748b; font-size: 0.72rem;">Sin teléfonos del vendedor</span>'}
+                                                    </div>
                                                 </div>
+
                                                 <div class="prv-info-item">
                                                     <i class="fa-solid fa-location-dot"></i>
                                                     <span style="font-size: 0.75rem;">${prv.direccion || 'Puerto Ordaz, Venezuela'}</span>
@@ -6115,8 +6149,21 @@
                     document.getElementById('prv-id').value = prv.id;
                     document.getElementById('prv-rif').value = prv.rif || '';
                     document.getElementById('prv-nombre').value = prv.nombreEmpresa || '';
-                    document.getElementById('prv-contacto').value = prv.contacto || '';
-                    document.getElementById('prv-telefono').value = prv.telefono || '';
+                    document.getElementById('prv-contacto').value = prv.contacto || prv.vendedor || '';
+                    
+                    // 3 Teléfonos de la Empresa
+                    document.getElementById('prv-telefono').value = prv.telefonoEmpresa1 || prv.telefono || '';
+                    const telEmp2 = document.getElementById('prv-telefono-empresa-2');
+                    if (telEmp2) telEmp2.value = prv.telefonoEmpresa2 || '';
+                    const telEmp3 = document.getElementById('prv-telefono-empresa-3');
+                    if (telEmp3) telEmp3.value = prv.telefonoEmpresa3 || '';
+
+                    // 2 Teléfonos del Vendedor / Representante
+                    const telRep1 = document.getElementById('prv-telefono-rep-1');
+                    if (telRep1) telRep1.value = prv.telefonoRep1 || '';
+                    const telRep2 = document.getElementById('prv-telefono-rep-2');
+                    if (telRep2) telRep2.value = prv.telefonoRep2 || '';
+
                     document.getElementById('prv-categoria').value = prv.categoria || 'Harinas y Trigo';
                     document.getElementById('prv-direccion').value = prv.direccion || '';
                     document.getElementById('prv-dias-credito').value = prv.diasCredito !== undefined ? prv.diasCredito : 15;
@@ -6143,7 +6190,16 @@
             const rif = document.getElementById('prv-rif').value.trim();
             const nombreEmpresa = document.getElementById('prv-nombre').value.trim();
             const contacto = document.getElementById('prv-contacto').value.trim();
-            const telefono = document.getElementById('prv-telefono').value.trim();
+
+            // 3 Teléfonos de la Empresa Proveedora
+            const telefonoEmpresa1 = (document.getElementById('prv-telefono') ? document.getElementById('prv-telefono').value.trim() : '');
+            const telefonoEmpresa2 = (document.getElementById('prv-telefono-empresa-2') ? document.getElementById('prv-telefono-empresa-2').value.trim() : '');
+            const telefonoEmpresa3 = (document.getElementById('prv-telefono-empresa-3') ? document.getElementById('prv-telefono-empresa-3').value.trim() : '');
+
+            // 2 Teléfonos del Vendedor / Representante
+            const telefonoRep1 = (document.getElementById('prv-telefono-rep-1') ? document.getElementById('prv-telefono-rep-1').value.trim() : '');
+            const telefonoRep2 = (document.getElementById('prv-telefono-rep-2') ? document.getElementById('prv-telefono-rep-2').value.trim() : '');
+
             const categoria = document.getElementById('prv-categoria').value;
             const direccion = document.getElementById('prv-direccion').value.trim();
             const diasCredito = parseInt(document.getElementById('prv-dias-credito').value, 10) || 0;
@@ -6151,8 +6207,10 @@
             const calificacion = parseFloat(document.getElementById('prv-calificacion').value) || 5.0;
             const notas = document.getElementById('prv-notas').value.trim();
 
-            if (!rif || !nombreEmpresa || !telefono) {
-                alert('⚠️ Complete los campos obligatorios: RIF, Nombre de la Empresa y Teléfono.');
+            const telefonoPrincipal = telefonoEmpresa1 || telefonoRep1 || '';
+
+            if (!rif || !nombreEmpresa || !telefonoPrincipal) {
+                alert('⚠️ Complete los campos obligatorios: RIF, Nombre de la Empresa y al menos un Teléfono de contacto (Empresa o Representante).');
                 return;
             }
 
@@ -6161,7 +6219,13 @@
                 rif,
                 nombreEmpresa,
                 contacto,
-                telefono,
+                vendedor: contacto,
+                telefono: telefonoPrincipal,
+                telefonoEmpresa1,
+                telefonoEmpresa2,
+                telefonoEmpresa3,
+                telefonoRep1,
+                telefonoRep2,
                 categoria,
                 direccion,
                 diasCredito,
@@ -6764,7 +6828,8 @@
             const { pago, cxp } = this.ultimoComprobanteCxP;
 
             const prv = this.proveedores.find(p => p.id === cxp.proveedorId);
-            const telWhatsapp = prv && prv.telefono ? prv.telefono.replace(/\D/g, '') : '';
+            const numParaWa = prv ? (prv.telefonoRep1 || prv.telefonoEmpresa1 || prv.telefono || '') : '';
+            const telWhatsapp = numParaWa.replace(/\D/g, '');
 
             const mensaje = `🥖 *PANADERÍA Y PASTELERÍA NUEVA VIASA - COMPROBANTE DE PAGO* 🥖\n` +
                 `-----------------------------------------\n` +
@@ -21075,8 +21140,9 @@
                                     ${prv.categoria || 'Materia Prima / Insumos'}
                                 </div>
                                 <div style="font-size: 0.72rem; color: #cbd5e1; margin-top: 6px;">
-                                    <div><strong>Contacto:</strong> ${prv.contacto || 'Dpto. de Ventas'}</div>
-                                    <div><strong>Teléfono:</strong> ${prv.telefono || '0424-0000000'}</div>
+                                    <div><strong>Contacto / Rep.:</strong> ${prv.contacto || prv.vendedor || 'Dpto. de Ventas'}</div>
+                                    <div><strong>Tels. Empresa:</strong> ${[prv.telefonoEmpresa1 || prv.telefono, prv.telefonoEmpresa2, prv.telefonoEmpresa3].filter(Boolean).join(' | ') || 'N/A'}</div>
+                                    <div><strong>Tels. Vendedor:</strong> ${[prv.telefonoRep1, prv.telefonoRep2].filter(Boolean).join(' | ') || 'N/A'}</div>
                                     <div><strong>Código:</strong> <code>${prv.id}</code></div>
                                 </div>
                             </div>

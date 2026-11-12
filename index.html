@@ -1278,7 +1278,7 @@
 
     <!-- MODAL 8: REGISTRO / EDICIÓN DE PROVEEDOR GOURMET -->
     <div class="viasa-modal" id="modal-proveedor">
-        <div class="viasa-modal-card" style="max-width: 680px;">
+        <div class="viasa-modal-card" style="max-width: 760px; width: 95%;">
             <div class="viasa-modal-header">
                 <h3 style="color: var(--accent-wheat); font-size: 1.1rem; display: flex; align-items: center; gap: 8px;">
                     <i class="fa-solid fa-truck-field"></i> <span id="modal-prv-title">Registrar Proveedor</span>
@@ -1300,15 +1300,7 @@
                         </div>
                     </div>
 
-                    <div style="display: grid; grid-template-columns: 1.5fr 1fr 1fr; gap: 12px; margin-bottom: 12px;">
-                        <div>
-                            <label style="font-size: 0.78rem; color: var(--text-secondary); font-weight: 700; display: block; margin-bottom: 4px;">Persona de Contacto:</label>
-                            <input type="text" id="prv-contacto" class="pos-search-input" placeholder="Ej: Ing. Roberto Morales" style="width: 100%;">
-                        </div>
-                        <div>
-                            <label style="font-size: 0.78rem; color: var(--text-secondary); font-weight: 700; display: block; margin-bottom: 4px;">Teléfono / WhatsApp:</label>
-                            <input type="text" id="prv-telefono" class="pos-search-input" required placeholder="0414-8899221" style="width: 100%;">
-                        </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1.8fr; gap: 12px; margin-bottom: 12px;">
                         <div>
                             <label style="font-size: 0.78rem; color: var(--text-secondary); font-weight: 700; display: block; margin-bottom: 4px;">Categoría Principal:</label>
                             <select id="prv-categoria" class="pos-search-input" style="width: 100%;" required>
@@ -1324,11 +1316,52 @@
                                 <option value="Mejoradores y Sal">🧪 Mejoradores y Sal</option>
                             </select>
                         </div>
+                        <div>
+                            <label style="font-size: 0.78rem; color: var(--text-secondary); font-weight: 700; display: block; margin-bottom: 4px;">Dirección Fiscal / Galpón:</label>
+                            <input type="text" id="prv-direccion" class="pos-search-input" placeholder="Ej: Zona Industrial Matanzas, Galpón 12, Puerto Ordaz" style="width: 100%;">
+                        </div>
                     </div>
 
-                    <div style="margin-bottom: 12px;">
-                        <label style="font-size: 0.78rem; color: var(--text-secondary); font-weight: 700; display: block; margin-bottom: 4px;">Dirección Fiscal / Galpón:</label>
-                        <input type="text" id="prv-direccion" class="pos-search-input" placeholder="Ej: Zona Industrial Matanzas, Galpón 12, Puerto Ordaz" style="width: 100%;">
+                    <!-- SECCIÓN: TELÉFONOS DE LA COMPAÑÍA PROVEEDORA (3 NÚMEROS) -->
+                    <div style="background: rgba(15, 23, 42, 0.7); border: 1.5px solid #0284c7; border-radius: 8px; padding: 12px; margin-bottom: 12px;">
+                        <div style="font-size: 0.8rem; color: #38bdf8; font-weight: 800; display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                            <i class="fa-solid fa-building"></i> Números Telefónicos de la Compañía Proveedora (Hasta 3 Números)
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
+                            <div>
+                                <label style="font-size: 0.72rem; color: var(--text-secondary); font-weight: 700; display: block; margin-bottom: 4px;">Teléfono Empresa 1 (Principal): *</label>
+                                <input type="text" id="prv-telefono" class="pos-search-input" required placeholder="Ej: 0286-9231122" style="width: 100%;">
+                            </div>
+                            <div>
+                                <label style="font-size: 0.72rem; color: var(--text-secondary); font-weight: 700; display: block; margin-bottom: 4px;">Teléfono Empresa 2 (Oficina / Ventas):</label>
+                                <input type="text" id="prv-telefono-empresa-2" class="pos-search-input" placeholder="Ej: 0286-9231123" style="width: 100%;">
+                            </div>
+                            <div>
+                                <label style="font-size: 0.72rem; color: var(--text-secondary); font-weight: 700; display: block; margin-bottom: 4px;">Teléfono Empresa 3 (Planta / Despacho):</label>
+                                <input type="text" id="prv-telefono-empresa-3" class="pos-search-input" placeholder="Ej: 0414-8899220" style="width: 100%;">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SECCIÓN: VENDEDOR O REPRESENTANTE DE LA COMPAÑÍA (2 NÚMEROS) -->
+                    <div style="background: rgba(6, 78, 59, 0.4); border: 1.5px solid #059669; border-radius: 8px; padding: 12px; margin-bottom: 12px;">
+                        <div style="font-size: 0.8rem; color: #34d399; font-weight: 800; display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                            <i class="fa-solid fa-user-tie"></i> Vendedor / Representante de la Compañía (Hasta 2 Números)
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1.2fr 1fr 1fr; gap: 10px;">
+                            <div>
+                                <label style="font-size: 0.72rem; color: var(--text-secondary); font-weight: 700; display: block; margin-bottom: 4px;">Nombre del Vendedor / Representante:</label>
+                                <input type="text" id="prv-contacto" class="pos-search-input" placeholder="Ej: Ing. Roberto Morales" style="width: 100%;">
+                            </div>
+                            <div>
+                                <label style="font-size: 0.72rem; color: var(--text-secondary); font-weight: 700; display: block; margin-bottom: 4px;">Teléfono Vendedor 1 (Móvil / WhatsApp):</label>
+                                <input type="text" id="prv-telefono-rep-1" class="pos-search-input" placeholder="Ej: 0414-8899221" style="width: 100%;">
+                            </div>
+                            <div>
+                                <label style="font-size: 0.72rem; color: var(--text-secondary); font-weight: 700; display: block; margin-bottom: 4px;">Teléfono Vendedor 2 (Alternativo / Personal):</label>
+                                <input type="text" id="prv-telefono-rep-2" class="pos-search-input" placeholder="Ej: 0412-3456789" style="width: 100%;">
+                            </div>
+                        </div>
                     </div>
 
                     <div style="display: grid; grid-template-columns: 1fr 1.5fr 1fr; gap: 12px; margin-bottom: 12px;">
