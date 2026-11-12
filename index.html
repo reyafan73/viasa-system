@@ -1288,6 +1288,36 @@
             <div class="viasa-modal-body">
                 <form id="form-proveedor" onsubmit="ViasaApp.guardarProveedor(event)">
                     <input type="hidden" id="prv-id">
+                    <input type="hidden" id="prv-logo-base64">
+
+                    <!-- SECCIÓN: LOGOTIPO DE LA EMPRESA PROVEEDORA -->
+                    <div style="background: rgba(15, 23, 42, 0.6); border: 1.5px dashed #38bdf8; border-radius: 10px; padding: 12px; margin-bottom: 14px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap;">
+                        <div style="position: relative; width: 84px; height: 84px; min-width: 84px; border-radius: 10px; background: #0b0f19; border: 2px solid #334155; display: flex; align-items: center; justify-content: center; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.4);">
+                            <img id="prv-logo-preview" src="" alt="Logo Proveedor" style="display: none; width: 100%; height: 100%; object-fit: contain; background: #ffffff; padding: 4px;">
+                            <div id="prv-logo-placeholder" style="display: flex; flex-direction: column; align-items: center; justify-content: center; color: #64748b; font-size: 0.68rem; text-align: center; padding: 4px;">
+                                <i class="fa-solid fa-cloud-arrow-up" style="font-size: 1.5rem; color: #38bdf8; margin-bottom: 4px;"></i>
+                                <span>Sin Logo</span>
+                            </div>
+                        </div>
+                        
+                        <div style="flex: 1; min-width: 220px;">
+                            <label style="font-size: 0.82rem; color: #38bdf8; font-weight: 800; display: flex; align-items: center; gap: 6px; margin-bottom: 4px;">
+                                <i class="fa-solid fa-image"></i> Logotipo Oficial de la Empresa Proveedora
+                            </label>
+                            <p style="font-size: 0.72rem; color: var(--text-secondary); margin: 0 0 8px 0;">
+                                Puedes subir, cambiar o eliminar el logo tantas veces como necesites (PNG, JPG, WebP o SVG). Se visualizará en el directorio, órdenes de compra y en la ficha técnica comercial.
+                            </p>
+                            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                                <input type="file" id="prv-logo-file" accept="image/*" style="display: none;" onchange="ViasaApp.cargarLogoProveedor(event)">
+                                <button type="button" class="btn-secondary" onclick="document.getElementById('prv-logo-file').click()" style="font-size: 0.75rem; padding: 5px 12px; color: #38bdf8; border-color: #0284c7;">
+                                    <i class="fa-solid fa-upload"></i> Subir / Cambiar Logo
+                                </button>
+                                <button type="button" id="prv-btn-eliminar-logo" class="btn-secondary" onclick="ViasaApp.eliminarLogoProveedor()" style="font-size: 0.75rem; padding: 5px 12px; color: #f87171; border-color: #ef4444; display: none;">
+                                    <i class="fa-solid fa-trash-can"></i> Quitar Logo
+                                </button>
+                            </div>
+                        </div>
+                    </div>
 
                     <div style="display: grid; grid-template-columns: 1.2fr 2fr; gap: 12px; margin-bottom: 12px;">
                         <div>

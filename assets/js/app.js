@@ -5539,9 +5539,16 @@
                                 return `
                                     <div class="prv-card">
                                         <div>
-                                            <div class="prv-card-header">
-                                                <div>
-                                                    <div class="prv-title">${prv.nombreEmpresa}</div>
+                                            <div class="prv-card-header" style="display: flex; gap: 10px; align-items: center; margin-bottom: 10px;">
+                                                <div class="prv-logo-box" style="width: 48px; height: 48px; min-width: 48px; border-radius: 8px; background: rgba(15, 23, 42, 0.8); border: 1.5px solid #38bdf8; display: flex; align-items: center; justify-content: center; overflow: hidden; box-shadow: 0 2px 6px rgba(0,0,0,0.35);">
+                                                    ${prv.logo ? `
+                                                        <img src="${prv.logo}" alt="Logo ${prv.nombreEmpresa}" style="width: 100%; height: 100%; object-fit: contain; background: #ffffff; padding: 2px;">
+                                                    ` : `
+                                                        <i class="fa-solid fa-truck-field" style="font-size: 1.3rem; color: #38bdf8;"></i>
+                                                    `}
+                                                </div>
+                                                <div style="flex: 1; min-width: 0;">
+                                                    <div class="prv-title" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${prv.nombreEmpresa}">${prv.nombreEmpresa}</div>
                                                     <div class="prv-rif">RIF: ${prv.rif}</div>
                                                 </div>
                                                 <div class="prv-stars" title="Calificación del Proveedor">
@@ -5627,7 +5634,10 @@
                                             <button type="button" class="btn-secondary" onclick="ViasaApp.abrirModalProveedor('${prv.id}')" style="flex: 1; font-size: 0.75rem; padding: 6px 8px;">
                                                 <i class="fa-solid fa-pen-to-square"></i> Editar
                                             </button>
-                                            <button type="button" class="btn-gold" onclick="ViasaApp.abrirModalOrdenCompra('${prv.id}')" style="flex: 1.4; font-size: 0.75rem; padding: 6px 8px;">
+                                            <button type="button" class="btn-secondary" onclick="ViasaApp.abrirModalFichaProveedor('${prv.id}')" style="font-size: 0.75rem; padding: 6px 8px; color: #34d399; border-color: #059669;" title="Ver Ficha Técnica Oficial con Logotipo y QR">
+                                                <i class="fa-solid fa-id-card"></i> Ficha
+                                            </button>
+                                            <button type="button" class="btn-gold" onclick="ViasaApp.abrirModalOrdenCompra('${prv.id}')" style="flex: 1.3; font-size: 0.75rem; padding: 6px 8px;">
                                                 <i class="fa-solid fa-cart-plus"></i> Generar OC
                                             </button>
                                             <button type="button" class="btn-secondary" onclick="ViasaApp.abrirRedactorCorreo({destinatarioEmail: '${prv.email || ''}', destinatarioNombre: '${prv.nombreEmpresa}', entidadId: '${prv.id}', entidadTipo: 'proveedor', plantilla: 'solicitud_cotizacion'})" style="font-size: 0.75rem; padding: 6px 8px; color: #38bdf8; border-color: #0284c7;" title="Redactar Correo al Proveedor">
@@ -6134,6 +6144,86 @@
         // ==============================================================
         // MÓDULO 4: CRUD DE PROVEEDORES
         // ==============================================================
+        cargarLogoProveedor(event) {
+            const file = event?.target?.files?.[0];
+            if (!file) return;
+
+            if (!file.type.startsWith('image/')) {
+                alert('⚠️ Seleccione un archivo de imagen válido (PNG, JPG, SVG o WebP).');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = new Image();
+                img.onload = () => {
+                    const maxDim = 512;
+                    let width = img.width;
+                    let height = img.height;
+
+                    if (width > maxDim || height > maxDim) {
+                        if (width > height) {
+                            height = Math.round((height * maxDim) / width);
+                            width = maxDim;
+                        } else {
+                            width = Math.round((width * maxDim) / height);
+                            height = maxDim;
+                        }
+                    }
+
+                    const canvas = document.createElement('canvas');
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+
+                    const base64Data = canvas.toDataURL('image/png');
+
+                    const preview = document.getElementById('prv-logo-preview');
+                    const placeholder = document.getElementById('prv-logo-placeholder');
+                    const base64Input = document.getElementById('prv-logo-base64');
+                    const btnEliminar = document.getElementById('prv-btn-eliminar-logo');
+
+                    if (preview) {
+                        preview.src = base64Data;
+                        preview.style.display = 'block';
+                    }
+                    if (placeholder) placeholder.style.display = 'none';
+                    if (base64Input) base64Input.value = base64Data;
+                    if (btnEliminar) btnEliminar.style.display = 'inline-block';
+
+                    if (window.ViasaAudio) window.ViasaAudio.playClick();
+                    if (typeof this.mostrarNotificacionToast === 'function') {
+                        this.mostrarNotificacionToast('✅ Logotipo del proveedor cargado correctamente', 'success');
+                    }
+                };
+                img.onerror = () => {
+                    alert('⚠️ Error al decodificar la imagen del logotipo.');
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        },
+
+        eliminarLogoProveedor() {
+            const preview = document.getElementById('prv-logo-preview');
+            const placeholder = document.getElementById('prv-logo-placeholder');
+            const base64Input = document.getElementById('prv-logo-base64');
+            const fileInput = document.getElementById('prv-logo-file');
+            const btnEliminar = document.getElementById('prv-btn-eliminar-logo');
+
+            if (preview) {
+                preview.src = '';
+                preview.style.display = 'none';
+            }
+            if (placeholder) placeholder.style.display = 'flex';
+            if (base64Input) base64Input.value = '';
+            if (fileInput) fileInput.value = '';
+            if (btnEliminar) btnEliminar.style.display = 'none';
+
+            if (window.ViasaAudio) window.ViasaAudio.playClick();
+        },
+
         abrirModalProveedor(prvId = null) {
             const modal = document.getElementById('modal-proveedor');
             const title = document.getElementById('modal-prv-title');
@@ -6141,6 +6231,7 @@
 
             document.getElementById('form-proveedor').reset();
             document.getElementById('prv-id').value = '';
+            this.eliminarLogoProveedor();
 
             if (prvId) {
                 const prv = this.proveedores.find(p => p.id === prvId);
@@ -6150,6 +6241,21 @@
                     document.getElementById('prv-rif').value = prv.rif || '';
                     document.getElementById('prv-nombre').value = prv.nombreEmpresa || '';
                     document.getElementById('prv-contacto').value = prv.contacto || prv.vendedor || '';
+
+                    // Cargar Logotipo si existe
+                    if (prv.logo) {
+                        const preview = document.getElementById('prv-logo-preview');
+                        const placeholder = document.getElementById('prv-logo-placeholder');
+                        const base64Input = document.getElementById('prv-logo-base64');
+                        const btnEliminar = document.getElementById('prv-btn-eliminar-logo');
+                        if (preview) {
+                            preview.src = prv.logo;
+                            preview.style.display = 'block';
+                        }
+                        if (placeholder) placeholder.style.display = 'none';
+                        if (base64Input) base64Input.value = prv.logo;
+                        if (btnEliminar) btnEliminar.style.display = 'inline-block';
+                    }
                     
                     // 3 Teléfonos de la Empresa
                     document.getElementById('prv-telefono').value = prv.telefonoEmpresa1 || prv.telefono || '';
@@ -6190,6 +6296,7 @@
             const rif = document.getElementById('prv-rif').value.trim();
             const nombreEmpresa = document.getElementById('prv-nombre').value.trim();
             const contacto = document.getElementById('prv-contacto').value.trim();
+            const logo = (document.getElementById('prv-logo-base64') ? document.getElementById('prv-logo-base64').value : '') || '';
 
             // 3 Teléfonos de la Empresa Proveedora
             const telefonoEmpresa1 = (document.getElementById('prv-telefono') ? document.getElementById('prv-telefono').value.trim() : '');
@@ -6218,6 +6325,7 @@
                 id,
                 rif,
                 nombreEmpresa,
+                logo,
                 contacto,
                 vendedor: contacto,
                 telefono: telefonoPrincipal,
@@ -21134,8 +21242,17 @@
 
                         <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 14px; align-items: center; margin: 12px 0;">
                             <div>
-                                <div style="font-size: 1.1rem; font-weight: 900; color: #ffffff;">${prv.razonSocial || prv.nombre}</div>
-                                <div style="font-size: 0.8rem; color: #fbbf24; font-weight: 800; margin: 2px 0;">RIF: ${prv.rif}</div>
+                                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
+                                    ${prv.logo ? `
+                                        <div style="width: 52px; height: 52px; min-width: 52px; border-radius: 8px; background: #fff; padding: 3px; display: flex; align-items: center; justify-content: center; border: 1.5px solid #34d399; box-shadow: 0 2px 6px rgba(0,0,0,0.3);">
+                                            <img src="${prv.logo}" alt="Logo" style="max-width: 100%; max-height: 100%; object-fit: contain;">
+                                        </div>
+                                    ` : ''}
+                                    <div>
+                                        <div style="font-size: 1.1rem; font-weight: 900; color: #ffffff;">${prv.nombreEmpresa || prv.razonSocial || prv.nombre}</div>
+                                        <div style="font-size: 0.8rem; color: #fbbf24; font-weight: 800; margin: 2px 0;">RIF: ${prv.rif}</div>
+                                    </div>
+                                </div>
                                 <div class="carnet-cargo-badge" style="background: rgba(52, 211, 153, 0.2); border-color: #34d399; color: #a7f3d0;">
                                     ${prv.categoria || 'Materia Prima / Insumos'}
                                 </div>
@@ -25157,19 +25274,23 @@
             const barcodeEAN = window.ViasaCodeEngine.barcode.formatearEAN13Completo((prv.rif || '00012345').replace(/\D/g, '').slice(-6));
 
             renderArea.innerHTML = `
-                <div class="carnet-card-pvc supplier-card" id="ficha-prv-anverso" style="margin: 0 auto; max-width: 360px;">
+                <div class="carnet-card-pvc supplier-card" id="ficha-prv-anverso" style="margin: 0 auto; max-width: 380px;">
                     <div class="carnet-header-section">
                         <img src="assets/img/viasa_isotipo.png" alt="Logo" class="carnet-header-logo">
                         <div class="carnet-header-title" style="color: #6ee7b7;">CREDENCIAL DE PROVEEDOR VERIFICADO</div>
                         <div class="carnet-header-subtitle">PANADERÍA NUEVA VIASA &bull; ABASTECIMIENTO</div>
                     </div>
 
-                    <div class="carnet-avatar-box">
-                        <i class="fa-solid fa-truck-field" style="color: #34d399;"></i>
+                    <div class="carnet-avatar-box" style="background: ${prv.logo ? '#ffffff' : 'rgba(16, 185, 129, 0.15)'}; border: 1.5px solid #34d399; width: 80px; height: 80px; border-radius: 12px; margin: 12px auto; display: flex; align-items: center; justify-content: center; overflow: hidden; padding: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.35);">
+                        ${prv.logo ? `
+                            <img src="${prv.logo}" alt="Logo ${prv.nombreEmpresa}" style="max-width: 100%; max-height: 100%; object-fit: contain;">
+                        ` : `
+                            <i class="fa-solid fa-truck-field" style="color: #34d399; font-size: 2.2rem;"></i>
+                        `}
                     </div>
 
                     <div class="carnet-identity-info">
-                        <div class="carnet-name">${prv.nombreEmpresa}</div>
+                        <div class="carnet-name" style="font-size: 1.05rem; font-weight: 900;">${prv.nombreEmpresa || prv.razonSocial || prv.nombre}</div>
                         <div class="carnet-cargo-badge" style="background: rgba(16, 185, 129, 0.25); border-color: #10b981; color: #a7f3d0;">
                             ${prv.categoria || 'Materia Prima'} &bull; ${prv.diasCredito || 0} Días Crédito
                         </div>
@@ -25178,10 +25299,15 @@
 
                     <div class="carnet-qr-container" id="ficha-prv-qr-holder"></div>
 
-                    <div class="carnet-footer-meta">
-                        <span>CONTACTO: ${prv.contacto || 'Dpto. Ventas'}</span>
-                        <span style="color: #34d399; font-weight: 800;">VERIFICADO</span>
-                        <span>TEL: ${prv.telefono || 'N/A'}</span>
+                    <div class="carnet-footer-meta" style="flex-direction: column; gap: 4px; font-size: 0.7rem; padding: 8px 10px; background: rgba(0,0,0,0.3); border-radius: 6px; margin-top: 10px;">
+                        <div style="display: flex; justify-content: space-between; width: 100%;">
+                            <span><strong>Vendedor:</strong> ${prv.contacto || prv.vendedor || 'Dpto. Ventas'}</span>
+                            <span style="color: #34d399; font-weight: 800;"><i class="fa-solid fa-circle-check"></i> HOMOLOGADO</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; width: 100%; color: #94a3b8; font-size: 0.67rem;">
+                            <span>Tels. Empresa: ${[prv.telefonoEmpresa1 || prv.telefono, prv.telefonoEmpresa2, prv.telefonoEmpresa3].filter(Boolean).join(' | ') || 'N/A'}</span>
+                            <span>Tel. Vendedor: ${prv.telefonoRep1 || prv.telefono || 'N/A'}</span>
+                        </div>
                     </div>
                 </div>
             `;
