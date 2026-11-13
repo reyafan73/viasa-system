@@ -1475,13 +1475,113 @@
 
                     <!-- Tabla de Ítems a Comprar -->
                     <div style="background: var(--bg-main); border: 1.5px solid var(--border-color); border-radius: 10px; padding: 12px; margin-bottom: 14px;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                            <span style="font-weight: 800; font-size: 0.85rem; color: var(--accent-wheat);">
-                                <i class="fa-solid fa-boxes-stacked"></i> Materias Primas a Solicitar
-                            </span>
-                            <button type="button" class="btn-secondary" onclick="ViasaApp.agregarFilaItemOC()" style="padding: 4px 10px; font-size: 0.75rem;">
-                                <i class="fa-solid fa-plus"></i> Agregar Ítem
-                            </button>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 8px;">
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <span style="font-weight: 800; font-size: 0.88rem; color: var(--accent-wheat);">
+                                    <i class="fa-solid fa-boxes-stacked" style="color: #f59e0b;"></i> Materias Primas a Solicitar
+                                </span>
+                                <span id="oc-proveedor-catalog-count" style="background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid #0284c7; padding: 2px 8px; border-radius: 6px; font-size: 0.72rem; font-weight: 700;">
+                                    <i class="fa-solid fa-tag"></i> Catálogo: 0 insumos
+                                </span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <button type="button" class="btn-secondary" onclick="ViasaApp.abrirSubFormNuevoRubroProveedorOC()" style="padding: 5px 12px; font-size: 0.75rem; background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1.5px solid #059669; font-weight: 700; border-radius: 6px; display: inline-flex; align-items: center; gap: 5px;" title="Agregar o Vincular Producto / Rubro al Catálogo de este Proveedor">
+                                    <i class="fa-solid fa-plus-circle"></i> ➕ Nuevo Producto / Rubro
+                                </button>
+                                <button type="button" class="btn-gold" onclick="ViasaApp.agregarFilaItemOC()" style="padding: 5px 12px; font-size: 0.75rem; border-radius: 6px; display: inline-flex; align-items: center; gap: 5px;">
+                                    <i class="fa-solid fa-plus"></i> + Agregar Fila
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Sub-formulario rápido para Vincular o Crear Producto/Rubro -->
+                        <div id="oc-subform-nuevo-rubro" style="display: none; background: #0f172a; border: 1.5px solid #059669; border-radius: 8px; padding: 12px; margin-bottom: 12px; box-shadow: 0 4px 14px rgba(0,0,0,0.4);">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                <span style="color: #34d399; font-weight: 800; font-size: 0.82rem; display: flex; align-items: center; gap: 6px;">
+                                    <i class="fa-solid fa-boxes-packing"></i> Gestión de Catálogo: Agregar / Vincular Producto a <span id="oc-subform-prv-nombre" style="color: #fbbf24;"></span>
+                                </span>
+                                <button type="button" onclick="ViasaApp.cerrarSubFormNuevoRubroProveedorOC()" style="background: none; border: none; color: #94a3b8; font-size: 1.2rem; cursor: pointer;">&times;</button>
+                            </div>
+                            
+                            <!-- Pestañas rápidas: 1. Vincular Existente / 2. Crear Nuevo -->
+                            <div style="display: flex; gap: 8px; margin-bottom: 10px;">
+                                <button type="button" id="oc-tab-vincular-btn" onclick="ViasaApp.cambiarTabNuevoRubroOC('vincular')" style="background: #1e293b; color: #38bdf8; border: 1px solid #38bdf8; border-radius: 6px; padding: 4px 10px; font-size: 0.75rem; font-weight: 700; cursor: pointer;">
+                                    🔗 Vincular Insumo Existente del Inventario
+                                </button>
+                                <button type="button" id="oc-tab-crear-btn" onclick="ViasaApp.cambiarTabNuevoRubroOC('crear')" style="background: transparent; color: #94a3b8; border: 1px solid #334155; border-radius: 6px; padding: 4px 10px; font-size: 0.75rem; font-weight: 700; cursor: pointer;">
+                                    ✨ Crear Nuevo Insumo / Rubro desde Cero
+                                </button>
+                            </div>
+
+                            <!-- Modo 1: Vincular Insumo Existente -->
+                            <div id="oc-panel-vincular-insumo" style="display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap;">
+                                <div style="flex: 2; min-width: 220px;">
+                                    <label style="font-size: 0.72rem; color: #94a3b8; display: block; margin-bottom: 3px;">Seleccionar Materia Prima del Inventario:</label>
+                                    <select id="oc-vincular-mp-select" class="pos-search-input" style="width: 100%; font-size: 0.8rem; padding: 5px 8px;">
+                                        <!-- Opciones dinámicas -->
+                                    </select>
+                                </div>
+                                <div style="width: 110px;">
+                                    <label style="font-size: 0.72rem; color: #94a3b8; display: block; margin-bottom: 3px;">Costo Unit ($):</label>
+                                    <input type="number" id="oc-vincular-costo" step="0.01" min="0.01" class="pos-search-input" style="width: 100%; font-size: 0.8rem; padding: 5px 8px; color: #10b981; font-weight: bold;">
+                                </div>
+                                <button type="button" class="btn-gold" onclick="ViasaApp.confirmarVincularInsumoProveedorOC()" style="padding: 6px 14px; font-size: 0.78rem; font-weight: 700; background: linear-gradient(135deg, #0284c7, #38bdf8); border-color: #0284c7;">
+                                    <i class="fa-solid fa-link"></i> Vincular a este Proveedor
+                                </button>
+                            </div>
+
+                            <!-- Modo 2: Crear Nuevo Insumo desde Cero -->
+                            <div id="oc-panel-crear-insumo" style="display: none;">
+                                <div style="display: grid; grid-template-columns: 1.5fr 1fr 1fr 1fr 1fr; gap: 8px; align-items: flex-end;">
+                                    <div>
+                                        <label style="font-size: 0.72rem; color: #94a3b8; display: block; margin-bottom: 3px;">Nombre del Producto / Insumo:</label>
+                                        <input type="text" id="oc-nuevo-nombre" class="pos-search-input" placeholder="Ej. Levadura Seca Activa" style="width: 100%; font-size: 0.8rem; padding: 5px 8px;">
+                                    </div>
+                                    <div>
+                                        <label style="font-size: 0.72rem; color: #94a3b8; display: block; margin-bottom: 3px;">Categoría / Rubro:</label>
+                                        <select id="oc-nuevo-categoria" class="pos-search-input" style="width: 100%; font-size: 0.8rem; padding: 5px 8px;">
+                                            <option value="harinas">Harinas y Granos</option>
+                                            <option value="levaduras">Levaduras</option>
+                                            <option value="grasas">Grasas y Mantecas</option>
+                                            <option value="lacteos">Lácteos y Quesos</option>
+                                            <option value="embutidos">Embutidos y Jamones</option>
+                                            <option value="azucares">Azúcares y Melados</option>
+                                            <option value="aditivos">Aditivos y Mejoradores</option>
+                                            <option value="frutos_secos">Frutos Secos</option>
+                                            <option value="dulces">Dulces y Rellenos</option>
+                                            <option value="otros">Otros Insumos</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label style="font-size: 0.72rem; color: #94a3b8; display: block; margin-bottom: 3px;">Unidad Empaque:</label>
+                                        <select id="oc-nuevo-unidad" class="pos-search-input" style="width: 100%; font-size: 0.8rem; padding: 5px 8px;">
+                                            <option value="SACO 45KG">SACO 45KG</option>
+                                            <option value="SACO 50KG">SACO 50KG</option>
+                                            <option value="SACO 25KG">SACO 25KG</option>
+                                            <option value="CAJA 15KG">CAJA 15KG</option>
+                                            <option value="CAJA 10KG">CAJA 10KG</option>
+                                            <option value="KG">KG</option>
+                                            <option value="LITRO">LITRO</option>
+                                            <option value="UNIDAD">UNIDAD</option>
+                                            <option value="PAQUETE">PAQUETE</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label style="font-size: 0.72rem; color: #94a3b8; display: block; margin-bottom: 3px;">Código Insumo:</label>
+                                        <input type="text" id="oc-nuevo-codigo" class="pos-search-input" placeholder="MP-019" style="width: 100%; font-size: 0.8rem; padding: 5px 8px; font-family: monospace; color: #38bdf8;">
+                                    </div>
+                                    <div>
+                                        <label style="font-size: 0.72rem; color: #94a3b8; display: block; margin-bottom: 3px;">Costo Unit ($):</label>
+                                        <input type="number" id="oc-nuevo-costo" step="0.01" min="0.01" class="pos-search-input" placeholder="0.00" style="width: 100%; font-size: 0.8rem; padding: 5px 8px; color: #10b981; font-weight: bold;">
+                                    </div>
+                                </div>
+                                <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 10px;">
+                                    <button type="button" class="btn-secondary" onclick="ViasaApp.cerrarSubFormNuevoRubroProveedorOC()" style="padding: 4px 10px; font-size: 0.75rem;">Cancelar</button>
+                                    <button type="button" class="btn-gold" onclick="ViasaApp.confirmarCrearNuevoInsumoProveedorOC()" style="padding: 4px 14px; font-size: 0.78rem; font-weight: 700; background: linear-gradient(135deg, #059669, #10b981); border-color: #059669;">
+                                        <i class="fa-solid fa-plus"></i> Guardar y Vincular al Proveedor
+                                    </button>
+                                </div>
+                            </div>
                         </div>
 
                         <div style="max-height: 220px; overflow-y: auto;">
@@ -1517,6 +1617,9 @@
 
                     <div style="display: flex; justify-content: flex-end; gap: 10px;">
                         <button type="button" class="btn-secondary" onclick="ViasaApp.cerrarModalOrdenCompra()">Cancelar</button>
+                        <button type="button" class="btn-secondary" onclick="ViasaApp.guardarBorradorOrdenCompra()" style="background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1.5px solid #059669; font-weight: 700; padding: 8px 16px; border-radius: 8px; font-size: 0.85rem; display: flex; align-items: center; gap: 6px;" title="Guardar cambios de catálogo y registrar Orden de Compra como Borrador / Pendiente">
+                            <i class="fa-solid fa-floppy-disk"></i> 💾 Guardar
+                        </button>
                         <button type="submit" class="btn-gold"><i class="fa-solid fa-paper-plane"></i> Emitir Orden de Compra</button>
                     </div>
                 </form>

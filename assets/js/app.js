@@ -5713,6 +5713,8 @@
                                             ? `<span class="oc-pill recibida"><i class="fa-solid fa-circle-check"></i> Recibida</span>`
                                             : oc.estado === 'Anulada'
                                             ? `<span class="oc-pill anulada"><i class="fa-solid fa-circle-xmark"></i> Anulada</span>`
+                                            : oc.estado === 'Guardada / Pendiente'
+                                            ? `<span class="oc-pill pendiente" style="background: rgba(16, 185, 129, 0.2); color: #6ee7b7; border: 1px solid #059669; font-weight: 700; padding: 3px 8px; border-radius: 4px; font-size: 0.72rem;"><i class="fa-solid fa-floppy-disk"></i> Guardada / Pendiente</span>`
                                             : `<span class="oc-pill emitida"><i class="fa-solid fa-clock"></i> Emitida / En Camino</span>`;
 
                                         return `
@@ -5739,7 +5741,14 @@
                                                         <button type="button" class="btn-secondary" onclick="ViasaApp.enviarOrdenCompraPorCorreo('${oc.id}')" style="font-size: 0.72rem; padding: 5px 8px; color: #38bdf8; border-color: #0284c7;" title="Enviar Orden por Correo Electrónico">
                                                             <i class="fa-solid fa-envelope"></i>
                                                         </button>
-                                                        ${oc.estado === 'Emitida' ? `
+                                                        ${oc.estado === 'Guardada / Pendiente' ? `
+                                                            <button type="button" class="btn-gold" onclick="ViasaApp.emitirOrdenGuardada('${oc.id}')" style="font-size: 0.72rem; padding: 5px 9px;" title="Emitir Orden de Compra Guardada">
+                                                                <i class="fa-solid fa-paper-plane"></i> Emitir
+                                                            </button>
+                                                            <button type="button" class="btn-secondary" onclick="ViasaApp.anularOrdenCompra('${oc.id}')" style="font-size: 0.72rem; padding: 5px 8px; color: #f87171;" title="Descartar Orden">
+                                                                <i class="fa-solid fa-trash"></i>
+                                                            </button>
+                                                        ` : oc.estado === 'Emitida' ? `
                                                             <button type="button" class="btn-gold" onclick="ViasaApp.recibirMercanciaOC('${oc.id}')" style="font-size: 0.72rem; padding: 5px 9px;" title="Ingresar mercancía a inventario y generar CxP">
                                                                 <i class="fa-solid fa-box-archive"></i> Recibir
                                                             </button>
@@ -7288,6 +7297,7 @@
                 fechaInput.value = entregaDate.toISOString().slice(0, 10);
             }
 
+            this.cerrarSubFormNuevoRubroProveedorOC();
             this.actualizarProveedorEnOC();
 
             // Limpiar tabla de ítems y agregar 1 fila inicial
@@ -7301,11 +7311,14 @@
         cerrarModalOrdenCompra() {
             const modal = document.getElementById('modal-orden-compra');
             if (modal) modal.classList.remove('active');
+            this.cerrarSubFormNuevoRubroProveedorOC();
         },
 
         actualizarProveedorEnOC() {
-            const prvId = document.getElementById('oc-proveedor-id').value;
-            const prv = this.proveedores.find(p => p.id === prvId);
+            const prvSelect = document.getElementById('oc-proveedor-id');
+            if (!prvSelect) return;
+            const prvId = prvSelect.value;
+            const prv = (this.proveedores || []).find(p => p.id === prvId);
             const condSelect = document.getElementById('oc-condicion-pago');
             if (prv && condSelect) {
                 if (prv.diasCredito === 21) condSelect.value = 'Crédito 21 Días';
@@ -7313,6 +7326,84 @@
                 else if (prv.diasCredito === 7) condSelect.value = 'Crédito 7 Días';
                 else if (prv.diasCredito === 0) condSelect.value = 'Contado / Contra Entrega';
             }
+
+            // Actualizar indicador de catálogo en la cabecera
+            const catalogCountEl = document.getElementById('oc-proveedor-catalog-count');
+            if (catalogCountEl && prv) {
+                const insumosCodigos = Array.isArray(prv.insumosSuministrados) ? prv.insumosSuministrados : [];
+                const insumosProveedor = (this.materiaPrima || []).filter(mp => 
+                    insumosCodigos.includes(mp.id) ||
+                    (mp.proveedor && prv.nombreEmpresa && mp.proveedor.toLowerCase().includes(prv.nombreEmpresa.toLowerCase().slice(0, 8))) ||
+                    insumosCodigos.some(ins => (mp.nombre || '').toLowerCase().includes(ins.toLowerCase()))
+                );
+                catalogCountEl.innerHTML = `<i class="fa-solid fa-tag"></i> Catálogo: <strong>${insumosProveedor.length} insumos</strong>`;
+            }
+
+            // Actualizar nombre en sub-formulario si está abierto
+            const subPrvName = document.getElementById('oc-subform-prv-nombre');
+            if (subPrvName && prv) {
+                subPrvName.textContent = prv.nombreEmpresa;
+            }
+
+            // Actualizar selects de insumos en las filas abiertas
+            this.actualizarTodosLosSelectsOC();
+        },
+
+        obtenerOpcionesInsumosOC(prvId, selectedMpId = '') {
+            const prv = (this.proveedores || []).find(p => p.id === prvId);
+            const insumosCodigos = prv && Array.isArray(prv.insumosSuministrados) ? prv.insumosSuministrados : [];
+
+            // Insumos que pertenecen al catálogo exclusivo de este proveedor
+            const insumosProveedor = (this.materiaPrima || []).filter(mp => 
+                insumosCodigos.includes(mp.id) ||
+                (mp.proveedor && prv && prv.nombreEmpresa && mp.proveedor.toLowerCase().includes(prv.nombreEmpresa.toLowerCase().slice(0, 8))) ||
+                insumosCodigos.some(ins => (mp.nombre || '').toLowerCase().includes(ins.toLowerCase()))
+            );
+
+            // Otros insumos del inventario que no están en su catálogo
+            const otrosInsumos = (this.materiaPrima || []).filter(mp => !insumosProveedor.some(p => p.id === mp.id));
+
+            let html = '';
+
+            if (insumosProveedor.length > 0) {
+                html += `<optgroup label="⭐ Catálogo de ${prv ? prv.nombreEmpresa : 'Proveedor'} (${insumosProveedor.length} insumos)">`;
+                html += insumosProveedor.map(m => `
+                    <option value="${m.id}" data-costo="${m.costoUSD || 1}" data-unidad="${m.unidad || 'kg'}" data-es-catalogo="true" ${m.id === selectedMpId ? 'selected' : ''}>
+                        ⭐ ${m.nombre} (${m.unidad}) - $${(m.costoUSD || 1).toFixed(2)}
+                    </option>
+                `).join('');
+                html += `</optgroup>`;
+            } else {
+                html += `<optgroup label="⚠️ Sin catálogo exclusivo registrado para este proveedor">`;
+                html += `</optgroup>`;
+            }
+
+            if (otrosInsumos.length > 0) {
+                html += `<optgroup label="📦 Otros Insumos del Inventario General (${otrosInsumos.length})">`;
+                html += otrosInsumos.map(m => `
+                    <option value="${m.id}" data-costo="${m.costoUSD || 1}" data-unidad="${m.unidad || 'kg'}" data-es-catalogo="false" ${m.id === selectedMpId ? 'selected' : ''}>
+                        📦 ${m.nombre} (${m.unidad}) - $${(m.costoUSD || 1).toFixed(2)}
+                    </option>
+                `).join('');
+                html += `</optgroup>`;
+            }
+
+            return html;
+        },
+
+        actualizarTodosLosSelectsOC() {
+            const prvId = document.getElementById('oc-proveedor-id') ? document.getElementById('oc-proveedor-id').value : null;
+            if (!prvId) return;
+
+            const rows = document.querySelectorAll('.oc-item-row');
+            rows.forEach(tr => {
+                const select = tr.querySelector('.oc-item-select');
+                if (select) {
+                    const currentVal = select.value;
+                    select.innerHTML = this.obtenerOpcionesInsumosOC(prvId, currentVal);
+                    if (currentVal) select.value = currentVal;
+                }
+            });
         },
 
         sugerirInsumosCriticosEnOC() {
@@ -7344,31 +7435,47 @@
             const tbody = document.getElementById('oc-items-tbody');
             if (!tbody) return;
 
+            const prvId = document.getElementById('oc-proveedor-id') ? document.getElementById('oc-proveedor-id').value : (this.proveedores[0] ? this.proveedores[0].id : '');
+            const prv = (this.proveedores || []).find(p => p.id === prvId);
+            const insumosCodigos = prv && Array.isArray(prv.insumosSuministrados) ? prv.insumosSuministrados : [];
+
+            // Insumo por defecto: primer insumo del catálogo del proveedor si existe, o el primero general
+            let defaultMp = null;
+            if (itemData && itemData.materiaPrimaId) {
+                defaultMp = this.materiaPrima.find(m => m.id === itemData.materiaPrimaId);
+            } else {
+                defaultMp = this.materiaPrima.find(m => insumosCodigos.includes(m.id)) || this.materiaPrima[0];
+            }
+
+            const defaultMpId = defaultMp ? defaultMp.id : '';
+            const defaultCost = itemData ? itemData.costoUnitarioUSD : (defaultMp ? defaultMp.costoUSD : 1.00);
+            const defaultQty = itemData ? itemData.cantidad : (defaultMp && (defaultMp.unidad || '').includes('SACO') ? 5 : 10);
+
             const tr = document.createElement('tr');
             tr.className = 'oc-item-row';
 
-            const defaultMpId = itemData ? itemData.materiaPrimaId : (this.materiaPrima[0] ? this.materiaPrima[0].id : '');
-            const mpObj = this.materiaPrima.find(m => m.id === defaultMpId);
-            const defaultCost = itemData ? itemData.costoUnitarioUSD : (mpObj ? mpObj.costoUSD : 1.00);
-            const defaultQty = itemData ? itemData.cantidad : (mpObj && mpObj.unidad === 'kg' ? 10 : 5);
-
             tr.innerHTML = `
                 <td style="padding: 6px;">
-                    <select class="pos-search-input oc-item-select" onchange="ViasaApp.cambiarInsumoEnFilaOC(this)" style="width: 100%; font-size: 0.8rem; padding: 4px 6px;">
-                        ${this.materiaPrima.map(m => `<option value="${m.id}" data-costo="${m.costoUSD || 1}" data-unidad="${m.unidad || 'kg'}" ${m.id === defaultMpId ? 'selected' : ''}>${m.nombre} (${m.unidad})</option>`).join('')}
-                    </select>
+                    <div style="display: flex; align-items: center; gap: 4px;">
+                        <select class="pos-search-input oc-item-select" onchange="ViasaApp.cambiarInsumoEnFilaOC(this)" style="flex: 1; font-size: 0.8rem; padding: 5px 6px;">
+                            ${this.obtenerOpcionesInsumosOC(prvId, defaultMpId)}
+                        </select>
+                        <button type="button" class="btn-secondary oc-btn-desvincular-item" onclick="ViasaApp.desvincularInsumoDeProveedorOC(this)" style="padding: 4px 7px; color: #f59e0b; border-color: #d97706; font-size: 0.72rem; white-space: nowrap; border-radius: 4px;" title="Quitar este producto del catálogo exclusivo de este proveedor">
+                            <i class="fa-solid fa-link-slash"></i>
+                        </button>
+                    </div>
                 </td>
                 <td style="padding: 6px; width: 110px;">
-                    <input type="number" step="0.01" min="0.1" class="pos-search-input oc-item-qty" value="${defaultQty}" oninput="ViasaApp.recalcularGranTotalOC()" style="width: 100%; font-size: 0.8rem; padding: 4px 6px;">
+                    <input type="number" step="0.01" min="0.1" class="pos-search-input oc-item-qty" value="${defaultQty}" oninput="ViasaApp.recalcularGranTotalOC()" style="width: 100%; font-size: 0.8rem; padding: 5px 6px;">
                 </td>
                 <td style="padding: 6px; width: 110px;">
-                    <input type="number" step="0.01" min="0.01" class="pos-search-input oc-item-cost" value="${defaultCost}" oninput="ViasaApp.recalcularGranTotalOC()" style="width: 100%; font-size: 0.8rem; padding: 4px 6px; color: #10b981; font-weight: bold;">
+                    <input type="number" step="0.01" min="0.01" class="pos-search-input oc-item-cost" value="${defaultCost}" oninput="ViasaApp.recalcularGranTotalOC()" style="width: 100%; font-size: 0.8rem; padding: 5px 6px; color: #10b981; font-weight: bold;">
                 </td>
                 <td style="padding: 6px; width: 140px;">
                     <span class="oc-item-subtotal" style="font-weight: 800; color: var(--accent-wheat); font-size: 0.85rem;">$0.00</span>
                 </td>
                 <td style="padding: 6px; text-align: right; width: 40px;">
-                    <button type="button" class="btn-secondary" onclick="ViasaApp.eliminarFilaItemOC(this)" style="padding: 3px 6px; color: #f87171; font-size: 0.75rem;">
+                    <button type="button" class="btn-secondary" onclick="ViasaApp.eliminarFilaItemOC(this)" style="padding: 4px 8px; color: #f87171; border-color: #ef4444; font-size: 0.75rem; border-radius: 4px;" title="Eliminar fila de la Orden de Compra">
                         <i class="fa-solid fa-trash"></i>
                     </button>
                 </td>
@@ -7382,7 +7489,7 @@
             const tr = selectEl.closest('tr');
             if (!tr) return;
             const selectedOpt = selectEl.options[selectEl.selectedIndex];
-            const costo = parseFloat(selectedOpt.getAttribute('data-costo')) || 1.00;
+            const costo = parseFloat(selectedOpt ? selectedOpt.getAttribute('data-costo') : 1.00) || 1.00;
             const costInput = tr.querySelector('.oc-item-cost');
             if (costInput) costInput.value = costo.toFixed(2);
             this.recalcularGranTotalOC();
@@ -7392,6 +7499,268 @@
             const tr = btn.closest('tr');
             if (tr) tr.remove();
             this.recalcularGranTotalOC();
+        },
+
+        // -------------------------------------------------------------
+        // GESTIÓN DE CATÁLOGO EXCLUSIVO DEL PROVEEDOR EN LA OC
+        // -------------------------------------------------------------
+        abrirSubFormNuevoRubroProveedorOC() {
+            const subform = document.getElementById('oc-subform-nuevo-rubro');
+            if (!subform) return;
+            const prvId = document.getElementById('oc-proveedor-id').value;
+            const prv = (this.proveedores || []).find(p => p.id === prvId);
+
+            const nameSpan = document.getElementById('oc-subform-prv-nombre');
+            if (nameSpan) nameSpan.textContent = prv ? prv.nombreEmpresa : 'Proveedor';
+
+            // Generar siguiente código sugerido (ej. MP-019)
+            const codigosNum = (this.materiaPrima || [])
+                .map(m => parseInt((m.id || '').replace(/\D/g, ''), 10))
+                .filter(n => !isNaN(n));
+            const maxNum = codigosNum.length > 0 ? Math.max(...codigosNum) : 0;
+            const nextCode = `MP-${String(maxNum + 1).padStart(3, '0')}`;
+            const codeInput = document.getElementById('oc-nuevo-codigo');
+            if (codeInput) codeInput.value = nextCode;
+
+            // Poblar select de insumos vinculables
+            this.poblarSelectVincularInsumosOC(prvId);
+
+            subform.style.display = 'block';
+            if (window.ViasaAudio) window.ViasaAudio.playClick();
+        },
+
+        cerrarSubFormNuevoRubroProveedorOC() {
+            const subform = document.getElementById('oc-subform-nuevo-rubro');
+            if (subform) subform.style.display = 'none';
+        },
+
+        cambiarTabNuevoRubroOC(tab) {
+            const panelVincular = document.getElementById('oc-panel-vincular-insumo');
+            const panelCrear = document.getElementById('oc-panel-crear-insumo');
+            const tabVincularBtn = document.getElementById('oc-tab-vincular-btn');
+            const tabCrearBtn = document.getElementById('oc-tab-crear-btn');
+
+            if (tab === 'vincular') {
+                if (panelVincular) panelVincular.style.display = 'flex';
+                if (panelCrear) panelCrear.style.display = 'none';
+                if (tabVincularBtn) {
+                    tabVincularBtn.style.background = '#1e293b';
+                    tabVincularBtn.style.color = '#38bdf8';
+                    tabVincularBtn.style.borderColor = '#38bdf8';
+                }
+                if (tabCrearBtn) {
+                    tabCrearBtn.style.background = 'transparent';
+                    tabCrearBtn.style.color = '#94a3b8';
+                    tabCrearBtn.style.borderColor = '#334155';
+                }
+            } else {
+                if (panelVincular) panelVincular.style.display = 'none';
+                if (panelCrear) panelCrear.style.display = 'block';
+                if (tabCrearBtn) {
+                    tabCrearBtn.style.background = '#1e293b';
+                    tabCrearBtn.style.color = '#34d399';
+                    tabCrearBtn.style.borderColor = '#059669';
+                }
+                if (tabVincularBtn) {
+                    tabVincularBtn.style.background = 'transparent';
+                    tabVincularBtn.style.color = '#94a3b8';
+                    tabVincularBtn.style.borderColor = '#334155';
+                }
+            }
+            if (window.ViasaAudio) window.ViasaAudio.playClick();
+        },
+
+        poblarSelectVincularInsumosOC(prvId) {
+            const select = document.getElementById('oc-vincular-mp-select');
+            if (!select) return;
+            const prv = (this.proveedores || []).find(p => p.id === prvId);
+            const insumosCodigos = prv && Array.isArray(prv.insumosSuministrados) ? prv.insumosSuministrados : [];
+
+            const noVinculados = (this.materiaPrima || []).filter(mp => !insumosCodigos.includes(mp.id));
+            
+            if (noVinculados.length === 0) {
+                select.innerHTML = '<option value="">Todos los insumos del inventario ya están vinculados</option>';
+                return;
+            }
+
+            select.innerHTML = noVinculados.map(m => `
+                <option value="${m.id}" data-costo="${m.costoUSD || 1}" data-unidad="${m.unidad}">
+                    ${m.nombre} (${m.unidad}) - Actual: $${(m.costoUSD || 1).toFixed(2)}
+                </option>
+            `).join('');
+
+            const costoInput = document.getElementById('oc-vincular-costo');
+            if (costoInput && noVinculados[0]) {
+                costoInput.value = (noVinculados[0].costoUSD || 1.00).toFixed(2);
+            }
+
+            select.onchange = () => {
+                const selOpt = select.options[select.selectedIndex];
+                if (selOpt && costoInput) {
+                    costoInput.value = parseFloat(selOpt.getAttribute('data-costo') || 1.00).toFixed(2);
+                }
+            };
+        },
+
+        async confirmarVincularInsumoProveedorOC() {
+            const prvId = document.getElementById('oc-proveedor-id').value;
+            const prv = (this.proveedores || []).find(p => p.id === prvId);
+            const select = document.getElementById('oc-vincular-mp-select');
+            const costoInput = document.getElementById('oc-vincular-costo');
+
+            if (!prv || !select || !select.value) {
+                alert('⚠️ Seleccione una materia prima para vincular.');
+                return;
+            }
+
+            const mpId = select.value;
+            const mp = (this.materiaPrima || []).find(m => m.id === mpId);
+            if (!mp) return;
+
+            const nuevoCosto = parseFloat(costoInput.value) || mp.costoUSD || 1.00;
+
+            if (!Array.isArray(prv.insumosSuministrados)) {
+                prv.insumosSuministrados = [];
+            }
+            if (!prv.insumosSuministrados.includes(mp.id)) {
+                prv.insumosSuministrados.push(mp.id);
+            }
+
+            mp.costoUSD = nuevoCosto;
+            mp.proveedor = prv.nombreEmpresa;
+
+            await window.ViasaStorage.guardarRegistro('proveedores', prv);
+            await window.ViasaStorage.guardarRegistro('materia_prima', mp);
+            await this.cargarProveedores();
+            await this.cargarMateriaPrima();
+
+            this.agregarFilaItemOC({
+                materiaPrimaId: mp.id,
+                cantidad: (mp.unidad || '').includes('SACO') ? 5 : 10,
+                costoUnitarioUSD: nuevoCosto
+            });
+
+            this.actualizarTodosLosSelectsOC();
+            this.actualizarProveedorEnOC();
+            this.cerrarSubFormNuevoRubroProveedorOC();
+            this.renderProveedores();
+
+            if (this.fichaTecnicaProveedorActivoId === prv.id) {
+                this.renderFichaTecnicaIntegralContent(prv, this.fichaTecnicaTabActiva || 'insumos');
+            }
+
+            if (window.ViasaAudio) window.ViasaAudio.playCashChime();
+            this.mostrarNotificacionToast(`🔗 Insumo "${mp.nombre}" vinculado exitosamente al catálogo de ${prv.nombreEmpresa}`, 'success');
+        },
+
+        async confirmarCrearNuevoInsumoProveedorOC() {
+            const prvId = document.getElementById('oc-proveedor-id').value;
+            const prv = (this.proveedores || []).find(p => p.id === prvId);
+            if (!prv) return;
+
+            const nombre = document.getElementById('oc-nuevo-nombre').value.trim();
+            const categoria = document.getElementById('oc-nuevo-categoria').value;
+            const unidad = document.getElementById('oc-nuevo-unidad').value;
+            const codigo = document.getElementById('oc-nuevo-codigo').value.trim() || `MP-${Date.now().toString().slice(-4)}`;
+            const costoUSD = parseFloat(document.getElementById('oc-nuevo-costo').value) || 1.00;
+
+            if (!nombre) {
+                alert('⚠️ Ingrese el nombre del nuevo producto/rubro.');
+                return;
+            }
+
+            const codigoExiste = (this.materiaPrima || []).some(m => m.id.toLowerCase() === codigo.toLowerCase());
+            if (codigoExiste) {
+                alert(`⚠️ El código de insumo "${codigo}" ya existe en el inventario. Ingrese un código diferente.`);
+                return;
+            }
+
+            const nuevoMP = {
+                id: codigo,
+                nombre,
+                categoria,
+                unidad,
+                stockActual: 0,
+                stockMinimo: unidad.includes('SACO') ? 5 : 10,
+                costoUSD,
+                lote: `LOT-${new Date().toISOString().slice(2, 7).replace('-', '')}`,
+                fechaCaducidad: new Date(Date.now() + 90 * 24 * 3600 * 1000).toISOString().slice(0, 10),
+                proveedor: prv.nombreEmpresa,
+                icono: categoria === 'harinas' ? 'fa-wheat-awn' : (categoria === 'levaduras' ? 'fa-cubes-stacked' : (categoria === 'lacteos' ? 'fa-cheese' : (categoria === 'embutidos' ? 'fa-bacon' : 'fa-jar')))
+            };
+
+            if (!Array.isArray(prv.insumosSuministrados)) {
+                prv.insumosSuministrados = [];
+            }
+            if (!prv.insumosSuministrados.includes(codigo)) {
+                prv.insumosSuministrados.push(codigo);
+            }
+
+            await window.ViasaStorage.guardarRegistro('materia_prima', nuevoMP);
+            await window.ViasaStorage.guardarRegistro('proveedores', prv);
+            await this.cargarMateriaPrima();
+            await this.cargarProveedores();
+
+            this.agregarFilaItemOC({
+                materiaPrimaId: nuevoMP.id,
+                cantidad: unidad.includes('SACO') ? 5 : 10,
+                costoUnitarioUSD: costoUSD
+            });
+
+            document.getElementById('oc-nuevo-nombre').value = '';
+            document.getElementById('oc-nuevo-costo').value = '';
+
+            this.actualizarTodosLosSelectsOC();
+            this.actualizarProveedorEnOC();
+            this.cerrarSubFormNuevoRubroProveedorOC();
+            this.renderProveedores();
+
+            if (this.fichaTecnicaProveedorActivoId === prv.id) {
+                this.renderFichaTecnicaIntegralContent(prv, this.fichaTecnicaTabActiva || 'insumos');
+            }
+
+            if (window.ViasaAudio) window.ViasaAudio.playCashChime();
+            this.mostrarNotificacionToast(`✨ Producto "${nombre}" (${codigo}) creado y vinculado a ${prv.nombreEmpresa}`, 'success');
+        },
+
+        async desvincularInsumoDeProveedorOC(btn) {
+            const tr = btn.closest('tr');
+            if (!tr) return;
+            const select = tr.querySelector('.oc-item-select');
+            if (!select) return;
+            const mpId = select.value;
+            const mp = (this.materiaPrima || []).find(m => m.id === mpId);
+            const prvId = document.getElementById('oc-proveedor-id').value;
+            const prv = (this.proveedores || []).find(p => p.id === prvId);
+
+            if (!prv || !mp) return;
+
+            if (!confirm(`¿Está seguro de quitar el insumo "${mp.nombre}" (${mp.id}) del catálogo de suministros de "${prv.nombreEmpresa}"?`)) {
+                return;
+            }
+
+            if (Array.isArray(prv.insumosSuministrados)) {
+                prv.insumosSuministrados = prv.insumosSuministrados.filter(code => code !== mp.id && code !== mp.nombre);
+            }
+            if (mp.proveedor && prv.nombreEmpresa && mp.proveedor.toLowerCase().includes(prv.nombreEmpresa.toLowerCase().slice(0, 8))) {
+                mp.proveedor = 'Sin proveedor asignado';
+                await window.ViasaStorage.guardarRegistro('materia_prima', mp);
+            }
+
+            await window.ViasaStorage.guardarRegistro('proveedores', prv);
+            await this.cargarProveedores();
+            await this.cargarMateriaPrima();
+
+            this.actualizarTodosLosSelectsOC();
+            this.actualizarProveedorEnOC();
+            this.renderProveedores();
+
+            if (this.fichaTecnicaProveedorActivoId === prv.id) {
+                this.renderFichaTecnicaIntegralContent(prv, this.fichaTecnicaTabActiva || 'insumos');
+            }
+
+            if (window.ViasaAudio) window.ViasaAudio.playClick();
+            this.mostrarNotificacionToast(`🗑️ Insumo "${mp.nombre}" desvinculado del catálogo de ${prv.nombreEmpresa}`, 'warning');
         },
 
         recalcularGranTotalOC() {
@@ -7406,45 +7775,51 @@
                 const qty = parseFloat(qtyInput ? qtyInput.value : 0) || 0;
                 const cost = parseFloat(costInput ? costInput.value : 0) || 0;
                 const subtotalUSD = qty * cost;
-                const subtotalBs = subtotalUSD * this.tasaBCV;
+                const subtotalBs = subtotalUSD * (this.tasaBCV || 36.85);
 
                 if (subtotalSpan) {
-                    subtotalSpan.innerHTML = `$${subtotalUSD.toFixed(2)} <span style="font-size: 0.7rem; color: #38bdf8;">(Bs. ${subtotalBs.toFixed(2)})</span>`;
+                    subtotalSpan.innerHTML = `$${subtotalUSD.toFixed(2)} <span style="font-size: 0.7rem; color: #38bdf8;">(Bs. ${subtotalBs.toLocaleString('es-VE', {minimumFractionDigits: 2, maximumFractionDigits: 2})})</span>`;
                 }
 
                 granTotalUSD += subtotalUSD;
             });
 
-            const granTotalBs = granTotalUSD * this.tasaBCV;
+            const granTotalBs = granTotalUSD * (this.tasaBCV || 36.85);
             const usdEl = document.getElementById('oc-gran-total-usd');
             const bsEl = document.getElementById('oc-gran-total-bs');
             const tasaEl = document.getElementById('oc-tasa-bcv-val');
 
             if (usdEl) usdEl.textContent = `$${granTotalUSD.toFixed(2)}`;
-            if (bsEl) bsEl.textContent = `Bs. ${granTotalBs.toFixed(2)}`;
-            if (tasaEl) tasaEl.textContent = this.tasaBCV.toFixed(2);
+            if (bsEl) bsEl.textContent = `Bs. ${granTotalBs.toLocaleString('es-VE', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+            if (tasaEl) tasaEl.textContent = (this.tasaBCV || 36.85).toFixed(2);
         },
 
-        async guardarOrdenCompra(e) {
-            if (e) e.preventDefault();
-
+        // -------------------------------------------------------------
+        // GUARDADO DUAL: BORRADOR / REGISTRO INTERNO Y PERSISTENCIA DE CATÁLOGO
+        // -------------------------------------------------------------
+        async guardarBorradorOrdenCompra() {
             const proveedorId = document.getElementById('oc-proveedor-id').value;
-            const prv = this.proveedores.find(p => p.id === proveedorId);
-            const fechaEntrega = document.getElementById('oc-fecha-entrega').value;
+            const prv = (this.proveedores || []).find(p => p.id === proveedorId);
+            const fechaEntrega = document.getElementById('oc-fecha-entrega').value || new Date().toISOString().slice(0, 10);
             const condicionPago = document.getElementById('oc-condicion-pago').value;
 
             const rows = document.querySelectorAll('.oc-item-row');
             const items = [];
             let granTotalUSD = 0;
 
-            rows.forEach(tr => {
+            let catalogoActualizado = false;
+            if (prv && !Array.isArray(prv.insumosSuministrados)) {
+                prv.insumosSuministrados = [];
+            }
+
+            for (const tr of rows) {
                 const sel = tr.querySelector('.oc-item-select');
                 const qty = parseFloat(tr.querySelector('.oc-item-qty').value) || 0;
                 const cost = parseFloat(tr.querySelector('.oc-item-cost').value) || 0;
 
-                if (sel && qty > 0) {
+                if (sel && sel.value && qty > 0) {
                     const mpId = sel.value;
-                    const mp = this.materiaPrima.find(m => m.id === mpId);
+                    const mp = (this.materiaPrima || []).find(m => m.id === mpId);
                     const subtotal = qty * cost;
                     granTotalUSD += subtotal;
 
@@ -7456,12 +7831,122 @@
                         costoUnitarioUSD: cost,
                         subtotalUSD: subtotal
                     });
+
+                    // 1. Persistencia de Catálogo: vincular insumo a la ficha del proveedor si no estaba
+                    if (prv && !prv.insumosSuministrados.includes(mpId)) {
+                        prv.insumosSuministrados.push(mpId);
+                        catalogoActualizado = true;
+                    }
+
+                    // Actualizar costo unitario en materiaPrima si varió
+                    if (mp && cost > 0 && mp.costoUSD !== cost) {
+                        mp.costoUSD = cost;
+                        await window.ViasaStorage.guardarRegistro('materia_prima', mp);
+                    }
                 }
-            });
+            }
+
+            if (items.length === 0) {
+                alert('⚠️ Ingrese al menos una materia prima con cantidad mayor a 0 para guardar la orden.');
+                return;
+            }
+
+            if (catalogoActualizado && prv) {
+                await window.ViasaStorage.guardarRegistro('proveedores', prv);
+                await this.cargarProveedores();
+            }
+
+            // 2. Guardado de Orden de Compra (Borrador / Registro Interno)
+            const nuevaOC = {
+                id: `OC-${Date.now().toString().slice(-4)}`,
+                fechaEmision: new Date().toISOString(),
+                proveedorId,
+                proveedorNombre: prv ? prv.nombreEmpresa : 'Proveedor',
+                proveedorRif: prv ? prv.rif : '',
+                fechaEntregaEstimada: fechaEntrega,
+                condicionPago,
+                items,
+                totalUSD: parseFloat(granTotalUSD.toFixed(2)),
+                totalBs: parseFloat((granTotalUSD * (this.tasaBCV || 36.85)).toFixed(2)),
+                tasaBCVAplicada: this.tasaBCV || 36.85,
+                estado: 'Guardada / Pendiente',
+                responsable: window.ViasaAuth.getCurrentUser() ? window.ViasaAuth.getCurrentUser().nombreCompleto : 'Gerencia'
+            };
+
+            await window.ViasaStorage.guardarRegistro('ordenes_compra', nuevaOC);
+            await this.cargarOrdenesCompra();
+
+            this.cerrarModalOrdenCompra();
+            this.renderProveedores();
+
+            if (this.fichaTecnicaProveedorActivoId === proveedorId) {
+                this.renderFichaTecnicaIntegralContent(prv, this.fichaTecnicaTabActiva || 'ordenes');
+            }
+
+            if (window.ViasaAudio) window.ViasaAudio.playCashChime();
+            this.mostrarNotificacionToast('✅ Cambios y Orden de Compra guardados exitosamente en la ficha del proveedor', 'success');
+        },
+
+        async guardarOrdenCompra(e) {
+            if (e) e.preventDefault();
+
+            const proveedorId = document.getElementById('oc-proveedor-id').value;
+            const prv = (this.proveedores || []).find(p => p.id === proveedorId);
+            const fechaEntrega = document.getElementById('oc-fecha-entrega').value;
+            const condicionPago = document.getElementById('oc-condicion-pago').value;
+
+            const rows = document.querySelectorAll('.oc-item-row');
+            const items = [];
+            let granTotalUSD = 0;
+
+            // 1. Persistencia de Catálogo de Proveedor al Emitir
+            if (prv && !Array.isArray(prv.insumosSuministrados)) {
+                prv.insumosSuministrados = [];
+            }
+            let catalogoActualizado = false;
+
+            for (const tr of rows) {
+                const sel = tr.querySelector('.oc-item-select');
+                const qty = parseFloat(tr.querySelector('.oc-item-qty').value) || 0;
+                const cost = parseFloat(tr.querySelector('.oc-item-cost').value) || 0;
+
+                if (sel && qty > 0) {
+                    const mpId = sel.value;
+                    const mp = (this.materiaPrima || []).find(m => m.id === mpId);
+                    const subtotal = qty * cost;
+                    granTotalUSD += subtotal;
+
+                    items.push({
+                        materiaPrimaId: mpId,
+                        nombre: mp ? mp.nombre : 'Insumo',
+                        unidad: mp ? mp.unidad : 'kg',
+                        cantidad: qty,
+                        costoUnitarioUSD: cost,
+                        subtotalUSD: subtotal
+                    });
+
+                    // Vincular al catálogo del proveedor si no estaba
+                    if (prv && !prv.insumosSuministrados.includes(mpId)) {
+                        prv.insumosSuministrados.push(mpId);
+                        catalogoActualizado = true;
+                    }
+
+                    // Actualizar costo unitario si fue editado en la fila
+                    if (mp && cost > 0 && mp.costoUSD !== cost) {
+                        mp.costoUSD = cost;
+                        await window.ViasaStorage.guardarRegistro('materia_prima', mp);
+                    }
+                }
+            }
 
             if (items.length === 0) {
                 alert('⚠️ Debe agregar al menos una materia prima a la orden de compra.');
                 return;
+            }
+
+            if (catalogoActualizado && prv) {
+                await window.ViasaStorage.guardarRegistro('proveedores', prv);
+                await this.cargarProveedores();
             }
 
             const nuevaOC = {
@@ -7474,8 +7959,8 @@
                 condicionPago,
                 items,
                 totalUSD: parseFloat(granTotalUSD.toFixed(2)),
-                totalBs: parseFloat((granTotalUSD * this.tasaBCV).toFixed(2)),
-                tasaBCVAplicada: this.tasaBCV,
+                totalBs: parseFloat((granTotalUSD * (this.tasaBCV || 36.85)).toFixed(2)),
+                tasaBCVAplicada: this.tasaBCV || 36.85,
                 estado: 'Emitida',
                 responsable: window.ViasaAuth.getCurrentUser() ? window.ViasaAuth.getCurrentUser().nombreCompleto : 'Gerencia'
             };
@@ -7486,8 +7971,31 @@
             this.cerrarModalOrdenCompra();
             this.renderProveedores();
 
+            if (this.fichaTecnicaProveedorActivoId === proveedorId) {
+                this.renderFichaTecnicaIntegralContent(prv, this.fichaTecnicaTabActiva || 'ordenes');
+            }
+
             if (window.ViasaAudio) window.ViasaAudio.playCashChime();
-            alert(`📋 ¡Orden de Compra ${nuevaOC.id} emitida con éxito!\n\nProveedor: ${nuevaOC.proveedorNombre}\nTotal: $${nuevaOC.totalUSD.toFixed(2)} (Bs. ${nuevaOC.totalBs.toFixed(2)})\nCondición: ${condicionPago}`);
+            this.mostrarNotificacionToast(`📋 ¡Orden de Compra ${nuevaOC.id} emitida con éxito a ${nuevaOC.proveedorNombre}!`, 'success');
+        },
+
+        async emitirOrdenGuardada(ocId) {
+            const oc = this.ordenesCompra.find(o => o.id === ocId);
+            if (!oc) return;
+            if (confirm(`¿Desea emitir formalmente la Orden de Compra ${oc.id} al proveedor "${oc.proveedorNombre}"?`)) {
+                oc.estado = 'Emitida';
+                await window.ViasaStorage.guardarRegistro('ordenes_compra', oc);
+                await this.cargarOrdenesCompra();
+                this.renderProveedores();
+
+                if (this.fichaTecnicaProveedorActivoId === oc.proveedorId) {
+                    const prv = this.proveedores.find(p => p.id === oc.proveedorId);
+                    if (prv) this.renderFichaTecnicaIntegralContent(prv, this.fichaTecnicaTabActiva || 'ordenes');
+                }
+
+                if (window.ViasaAudio) window.ViasaAudio.playCashChime();
+                this.mostrarNotificacionToast(`🚀 Orden de Compra ${oc.id} emitida con éxito`, 'success');
+            }
         },
 
         async anularOrdenCompra(ocId) {
