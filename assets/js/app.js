@@ -2726,149 +2726,191 @@
             const modal = document.getElementById('modal-pos-agregar-producto-rubro');
             if (!modal) return;
 
-            // 1. Actualizar tasas en tiempo real en la cabecera del modal
-            const lblBcv = document.getElementById('pos-modal-tasa-bcv-lbl');
-            if (lblBcv) lblBcv.textContent = `Bs. ${(this.tasaBCV || 36.85).toFixed(2)}`;
-            const lblUsdt = document.getElementById('pos-modal-tasa-usdt-lbl');
-            if (lblUsdt) lblUsdt.textContent = `Bs. ${(this.tasaParalelo || 39.50).toFixed(2)}`;
+            try {
+                // 1. Actualizar tasas en tiempo real en la cabecera del modal
+                const lblBcv = document.getElementById('pos-modal-tasa-bcv-lbl');
+                if (lblBcv) lblBcv.textContent = `Bs. ${(this.tasaBCV || 36.85).toFixed(2)}`;
+                const lblUsdt = document.getElementById('pos-modal-tasa-usdt-lbl');
+                if (lblUsdt) lblUsdt.textContent = `Bs. ${(this.tasaParalelo || 39.50).toFixed(2)}`;
 
-            // 2. Poblar selector de rubros/categorías
-            const selCat = document.getElementById('pos-prod-categoria');
-            const cats = (this.categorias && this.categorias.length > 0) ? this.categorias : (window.ViasaDatabase?.categorias || []);
-            if (selCat) {
-                selCat.innerHTML = cats.filter(c => c.activo !== false && c.estado !== 'oculto' && c.estado !== 'inactivo').map(c => `
-                    <option value="${c.id}">${c.nombre}</option>
-                `).join('');
-            }
+                // 2. Poblar selector de rubros/categorías
+                const selCat = document.getElementById('pos-prod-categoria');
+                const cats = (this.categorias && this.categorias.length > 0) ? this.categorias : (window.ViasaDatabase?.categorias || []);
+                if (selCat) {
+                    selCat.innerHTML = cats.filter(c => c.activo !== false && c.estado !== 'oculto' && c.estado !== 'inactivo').map(c => `
+                        <option value="${c.id}">${c.nombre}</option>
+                    `).join('');
+                }
 
-            if (productoId) {
-                // Modo Edición de Producto existente
-                const p = this.productos.find(x => x.id === productoId);
-                if (p) {
-                    this._editandoProductoIdPOS = p.id;
+                if (productoId) {
+                    // Modo Edición de Producto existente
+                    const p = (this.productos || []).find(x => x.id === productoId);
+                    if (p) {
+                        this._editandoProductoIdPOS = p.id;
+                        const titleEl = document.getElementById('pos-add-modal-title');
+                        if (titleEl) titleEl.innerHTML = `<i class="fa-solid fa-pen-to-square"></i> Modificar Producto: <span style="color:#fff;">${p.nombre}</span>`;
+                        const btnLbl = document.getElementById('pos-prod-btn-submit-lbl');
+                        if (btnLbl) btnLbl.textContent = '💾 Guardar Cambios';
+
+                        const elId = document.getElementById('pos-prod-id');
+                        if (elId) elId.value = p.id;
+                        const elSku = document.getElementById('pos-prod-sku');
+                        if (elSku) elSku.value = p.sku || p.codigoBarras || p.id;
+                        
+                        let codExistente = p.codigoBarras || p.barcode || p.sku || '';
+                        if (typeof codExistente === 'object' && codExistente !== null) {
+                            codExistente = codExistente.ean13 || codExistente.codigo || codExistente.code || '';
+                        }
+                        codExistente = String(codExistente).replace(/\[object Object\]/g, '').trim();
+
+                        const barcodeInput = document.getElementById('pos-prod-barcode');
+                        if (barcodeInput) barcodeInput.value = codExistente;
+                        this.actualizarPrevisualizacionCodigoFormularioPOS(codExistente);
+
+                        const elNom = document.getElementById('pos-prod-nombre');
+                        if (elNom) elNom.value = p.nombre || '';
+                        if (selCat) selCat.value = p.categoria || (cats[0]?.id || '');
+                        
+                        const costo = p.costoUSD !== undefined ? p.costoUSD : (p.precioUSD * 0.6);
+                        const elCosto = document.getElementById('pos-prod-costo');
+                        if (elCosto) elCosto.value = costo ? costo.toFixed(2) : '';
+                        const elPUsd = document.getElementById('pos-prod-precio-usd');
+                        if (elPUsd) elPUsd.value = (p.precioUSD || 0).toFixed(2);
+                        const elPBs = document.getElementById('pos-prod-precio-bs');
+                        if (elPBs) elPBs.value = ((p.precioUSD || 0) * (this.tasaBCV || 36.85)).toFixed(2);
+                        
+                        const margen = (p.precioUSD > 0 && costo > 0) ? Math.round(((p.precioUSD - costo) / p.precioUSD) * 100) : 40;
+                        const elMargen = document.getElementById('pos-prod-margen');
+                        if (elMargen) elMargen.value = margen;
+                        
+                        const usdtRef = document.getElementById('pos-prod-ref-usdt-badge');
+                        if (usdtRef) usdtRef.textContent = `Bs. ${((p.precioUSD || 0) * (this.tasaParalelo || 39.50)).toFixed(2)}`;
+
+                        const selSeniat = document.getElementById('pos-prod-seniat');
+                        if (selSeniat) {
+                            selSeniat.value = p.exentoIVA ? 'EXENTO' : (p.condicionFiscal === 'REDUCIDO_8' ? 'REDUCIDO_8' : 'IVA_16');
+                        }
+
+                        const selUnidad = document.getElementById('pos-prod-unidad');
+                        if (selUnidad) selUnidad.value = p.unidad || 'UND';
+
+                        const selTipoStock = document.getElementById('pos-prod-tipo-stock');
+                        if (selTipoStock) selTipoStock.value = p.tipoExistencia || 'stock';
+
+                        const elStock = document.getElementById('pos-prod-stock');
+                        if (elStock) elStock.value = p.stock !== undefined ? p.stock : 100;
+                        const elStockMin = document.getElementById('pos-prod-stock-min');
+                        if (elStockMin) elStockMin.value = p.stockMinimo !== undefined ? p.stockMinimo : 10;
+                        
+                        const selDestino = document.getElementById('pos-prod-destino');
+                        if (selDestino) selDestino.value = p.destino || 'pos';
+
+                        const chkActivo = document.getElementById('pos-prod-activo');
+                        if (chkActivo) chkActivo.checked = p.activo !== false;
+
+                        this._tempProdEmoji = p.icono || '🥖';
+                        this._tempProdImage = p.imagen || null;
+                        this._actualizarPreviewImagenPOS();
+                    }
+                } else {
+                    // Modo Crear Nuevo Producto
+                    this._editandoProductoIdPOS = null;
                     const titleEl = document.getElementById('pos-add-modal-title');
-                    if (titleEl) titleEl.innerHTML = `<i class="fa-solid fa-pen-to-square"></i> Modificar Producto: <span style="color:#fff;">${p.nombre}</span>`;
+                    if (titleEl) titleEl.innerHTML = `<i class="fa-solid fa-cart-flatbed"></i> Gestión Rápida: Producto / Rubro`;
                     const btnLbl = document.getElementById('pos-prod-btn-submit-lbl');
-                    if (btnLbl) btnLbl.textContent = '💾 Guardar Cambios';
+                    if (btnLbl) btnLbl.textContent = '💾 Guardar Producto';
 
-                    document.getElementById('pos-prod-id').value = p.id;
-                    document.getElementById('pos-prod-sku').value = p.sku || p.codigoBarras || p.id;
+                    const elId = document.getElementById('pos-prod-id');
+                    if (elId) elId.value = '';
+                    const proximoNum = (this.productos ? this.productos.length : 0) + 1;
+                    const elSku = document.getElementById('pos-prod-sku');
+                    if (elSku) elSku.value = `PRD-${String(proximoNum).padStart(3, '0')}`;
                     
                     const barcodeInput = document.getElementById('pos-prod-barcode');
-                    if (barcodeInput) barcodeInput.value = p.codigoBarras || p.barcode || p.sku || '';
-                    this.actualizarPrevisualizacionCodigoFormularioPOS(p.codigoBarras || p.barcode || p.sku || '');
+                    let codeParaAsignar = '';
+                    if (nuevoCodigo) {
+                        codeParaAsignar = typeof nuevoCodigo === 'object' && nuevoCodigo !== null ? (nuevoCodigo.ean13 || nuevoCodigo.codigo || '') : String(nuevoCodigo);
+                        codeParaAsignar = codeParaAsignar.replace(/\[object Object\]/g, '').trim();
+                        if (barcodeInput) barcodeInput.value = codeParaAsignar;
+                        if (elSku) elSku.value = codeParaAsignar;
+                        setTimeout(() => {
+                            const nomInput = document.getElementById('pos-prod-nombre');
+                            if (nomInput) nomInput.focus();
+                        }, 200);
+                    } else {
+                        codeParaAsignar = this.generarCodigoViasaEAN13Auto();
+                        if (barcodeInput) barcodeInput.value = codeParaAsignar;
+                    }
+                    this.actualizarPrevisualizacionCodigoFormularioPOS(codeParaAsignar);
 
-                    document.getElementById('pos-prod-nombre').value = p.nombre || '';
-                    if (selCat) selCat.value = p.categoria || (cats[0]?.id || '');
+                    const elNom = document.getElementById('pos-prod-nombre');
+                    if (elNom) elNom.value = '';
                     
-                    const costo = p.costoUSD !== undefined ? p.costoUSD : (p.precioUSD * 0.6);
-                    document.getElementById('pos-prod-costo').value = costo ? costo.toFixed(2) : '';
-                    document.getElementById('pos-prod-precio-usd').value = (p.precioUSD || 0).toFixed(2);
-                    document.getElementById('pos-prod-precio-bs').value = ((p.precioUSD || 0) * (this.tasaBCV || 36.85)).toFixed(2);
-                    
-                    const margen = (p.precioUSD > 0 && costo > 0) ? Math.round(((p.precioUSD - costo) / p.precioUSD) * 100) : 40;
-                    document.getElementById('pos-prod-margen').value = margen;
+                    if (selCat) {
+                        if (this.categoriaActiva && this.categoriaActiva !== 'todas') {
+                            selCat.value = this.categoriaActiva;
+                        } else if (cats[0]) {
+                            selCat.value = cats[0].id;
+                        }
+                    }
+
+                    const elCosto = document.getElementById('pos-prod-costo');
+                    if (elCosto) elCosto.value = '0.50';
+                    const elMargen = document.getElementById('pos-prod-margen');
+                    if (elMargen) elMargen.value = '40';
+                    const elPUsd = document.getElementById('pos-prod-precio-usd');
+                    if (elPUsd) elPUsd.value = '0.85';
+                    const elPBs = document.getElementById('pos-prod-precio-bs');
+                    if (elPBs) elPBs.value = (0.85 * (this.tasaBCV || 36.85)).toFixed(2);
                     
                     const usdtRef = document.getElementById('pos-prod-ref-usdt-badge');
-                    if (usdtRef) usdtRef.textContent = `Bs. ${((p.precioUSD || 0) * (this.tasaParalelo || 39.50)).toFixed(2)}`;
+                    if (usdtRef) usdtRef.textContent = `Bs. ${(0.85 * (this.tasaParalelo || 39.50)).toFixed(2)}`;
 
-                    const selSeniat = document.getElementById('pos-prod-seniat');
-                    if (selSeniat) {
-                        selSeniat.value = p.exentoIVA ? 'EXENTO' : (p.condicionFiscal === 'REDUCIDO_8' ? 'REDUCIDO_8' : 'IVA_16');
-                    }
-
-                    const selUnidad = document.getElementById('pos-prod-unidad');
-                    if (selUnidad) selUnidad.value = p.unidad || 'UND';
-
-                    const selTipoStock = document.getElementById('pos-prod-tipo-stock');
-                    if (selTipoStock) selTipoStock.value = p.tipoExistencia || 'stock';
-
-                    document.getElementById('pos-prod-stock').value = p.stock !== undefined ? p.stock : 100;
-                    document.getElementById('pos-prod-stock-min').value = p.stockMinimo !== undefined ? p.stockMinimo : 10;
-                    
-                    const selDestino = document.getElementById('pos-prod-destino');
-                    if (selDestino) selDestino.value = p.destino || 'pos';
-
+                    const elStock = document.getElementById('pos-prod-stock');
+                    if (elStock) elStock.value = '100';
+                    const elStockMin = document.getElementById('pos-prod-stock-min');
+                    if (elStockMin) elStockMin.value = '10';
                     const chkActivo = document.getElementById('pos-prod-activo');
-                    if (chkActivo) chkActivo.checked = p.activo !== false;
+                    if (chkActivo) chkActivo.checked = true;
 
-                    this._tempProdEmoji = p.icono || '🥖';
-                    this._tempProdImage = p.imagen || null;
+                    this._tempProdEmoji = '🥖';
+                    this._tempProdImage = null;
                     this._actualizarPreviewImagenPOS();
-                }
-            } else {
-                // Modo Crear Nuevo Producto
-                this._editandoProductoIdPOS = null;
-                const titleEl = document.getElementById('pos-add-modal-title');
-                if (titleEl) titleEl.innerHTML = `<i class="fa-solid fa-cart-flatbed"></i> Gestión Rápida: Producto / Rubro`;
-                const btnLbl = document.getElementById('pos-prod-btn-submit-lbl');
-                if (btnLbl) btnLbl.textContent = '💾 Guardar Producto';
 
-                document.getElementById('pos-prod-id').value = '';
-                const proximoNum = this.productos.length + 1;
-                document.getElementById('pos-prod-sku').value = `PRD-${String(proximoNum).padStart(3, '0')}`;
-                
-                const barcodeInput = document.getElementById('pos-prod-barcode');
-                let codeParaAsignar = '';
-                if (nuevoCodigo) {
-                    codeParaAsignar = nuevoCodigo;
-                    if (barcodeInput) barcodeInput.value = nuevoCodigo;
-                    document.getElementById('pos-prod-sku').value = nuevoCodigo;
-                    setTimeout(() => {
-                        const nomInput = document.getElementById('pos-prod-nombre');
-                        if (nomInput) nomInput.focus();
-                    }, 200);
-                } else {
-                    codeParaAsignar = this.generarCodigoViasaEAN13Auto();
-                    if (barcodeInput) barcodeInput.value = codeParaAsignar;
-                }
-                this.actualizarPrevisualizacionCodigoFormularioPOS(codeParaAsignar);
-
-                document.getElementById('pos-prod-nombre').value = '';
-                
-                if (selCat) {
-                    if (this.categoriaActiva && this.categoriaActiva !== 'todas') {
-                        selCat.value = this.categoriaActiva;
-                    } else if (cats[0]) {
-                        selCat.value = cats[0].id;
-                    }
+                    // Inicializar formulario de nuevo rubro con valores por defecto
+                    const rubroCount = cats.length + 1;
+                    const rId = document.getElementById('pos-rubro-id');
+                    if (rId) rId.value = `cat_${Date.now().toString(36)}`;
+                    const rNom = document.getElementById('pos-rubro-nombre');
+                    if (rNom) rNom.value = '';
+                    const rDesc = document.getElementById('pos-rubro-desc');
+                    if (rDesc) rDesc.value = '';
+                    const rColor = document.getElementById('pos-rubro-color');
+                    if (rColor) rColor.value = '#f59e0b';
+                    const rIcono = document.getElementById('pos-rubro-icono');
+                    if (rIcono) rIcono.value = 'fa-bread-slice';
+                    const rOrden = document.getElementById('pos-rubro-orden');
+                    if (rOrden) rOrden.value = rubroCount * 10;
+                    const rEstado = document.getElementById('pos-rubro-estado');
+                    if (rEstado) rEstado.value = 'activo';
                 }
 
-                document.getElementById('pos-prod-costo').value = '0.50';
-                document.getElementById('pos-prod-margen').value = '40';
-                document.getElementById('pos-prod-precio-usd').value = '0.85';
-                document.getElementById('pos-prod-precio-bs').value = (0.85 * (this.tasaBCV || 36.85)).toFixed(2);
-                
-                const usdtRef = document.getElementById('pos-prod-ref-usdt-badge');
-                if (usdtRef) usdtRef.textContent = `Bs. ${(0.85 * (this.tasaParalelo || 39.50)).toFixed(2)}`;
-
-                document.getElementById('pos-prod-stock').value = '100';
-                document.getElementById('pos-prod-stock-min').value = '10';
-                document.getElementById('pos-prod-activo').checked = true;
-
-                this._tempProdEmoji = '🥖';
-                this._tempProdImage = null;
-                this._actualizarPreviewImagenPOS();
-
-                // Inicializar formulario de nuevo rubro con valores por defecto
-                const rubroCount = cats.length + 1;
-                document.getElementById('pos-rubro-id').value = `cat_${Date.now().toString(36)}`;
-                document.getElementById('pos-rubro-nombre').value = '';
-                document.getElementById('pos-rubro-desc').value = '';
-                document.getElementById('pos-rubro-color').value = '#f59e0b';
-                document.getElementById('pos-rubro-icono').value = 'fa-bread-slice';
-                document.getElementById('pos-rubro-orden').value = rubroCount * 10;
-                document.getElementById('pos-rubro-estado').value = 'activo';
+                this.cambiarTabModalPOSAgregar(tab);
+            } catch (err) {
+                console.error('Error al preparar modal Agregar Producto/Rubro:', err);
             }
 
-            this.cambiarTabModalPOSAgregar(tab);
             modal.classList.add('active');
+            modal.style.display = 'flex';
             if (window.ViasaAudio) window.ViasaAudio.playClick();
         },
 
         cerrarModalPOSAgregarProductoRubro() {
             const modal = document.getElementById('modal-pos-agregar-producto-rubro');
-            if (modal) modal.classList.remove('active');
+            if (modal) {
+                modal.classList.remove('active');
+                modal.style.display = 'none';
+            }
             this._editandoProductoIdPOS = null;
         },
 
@@ -3677,19 +3719,19 @@
 
             this.productos.forEach((p, idx) => {
                 let code = p.codigoBarras || p.barcode;
-                if (!code || String(code).trim() === '') {
-                    if (window.ViasaCodeEngine && typeof window.ViasaCodeEngine.generarEAN13UnicoProductoViasa === 'function') {
-                        code = window.ViasaCodeEngine.generarEAN13UnicoProductoViasa(this.productos);
-                    } else {
-                        const sec = String(idx + 1).padStart(6, '0');
-                        code = '759800' + sec;
-                    }
+                if (typeof code === 'object' && code !== null) {
+                    code = code.ean13 || code.codigo || code.code || '';
+                }
+                code = String(code || '').trim();
+
+                if (!code || code === '' || code.includes('[object Object]')) {
+                    code = this.generarCodigoViasaEAN13Auto();
                     p.codigoBarras = code;
                     p.barcode = code;
                     cambios = true;
                 } else {
-                    p.codigoBarras = String(code).trim();
-                    p.barcode = p.codigoBarras;
+                    p.codigoBarras = code;
+                    p.barcode = code;
                 }
             });
 
@@ -3942,17 +3984,28 @@
         },
 
         renderGraficosEtiquetaProducto(p) {
-            const codigo = p.codigoBarras || p.barcode || p.sku || '759800000001';
+            let codigo = p.codigoBarras || p.barcode || p.sku || '759800000001';
+            if (typeof codigo === 'object' && codigo !== null) {
+                codigo = codigo.ean13 || codigo.codigo || codigo.code || '759800000001';
+            }
+            codigo = String(codigo).trim();
+            if (!codigo || codigo.includes('[object Object]')) {
+                codigo = '759800000001';
+            }
 
             // 1. Código de Barras 1D en Canvas
             const barcodeCanvas = document.getElementById('sticker-barcode-canvas');
             if (barcodeCanvas) {
                 if (window.ViasaCodeEngine && window.ViasaCodeEngine.barcode) {
-                    window.ViasaCodeEngine.barcode.renderBarcodeCanvas(barcodeCanvas, codigo, {
-                        height: 60,
-                        scale: 2,
-                        displayValue: true
-                    });
+                    try {
+                        window.ViasaCodeEngine.barcode.renderBarcodeCanvas(barcodeCanvas, codigo, {
+                            height: 60,
+                            scale: 2,
+                            displayValue: true
+                        });
+                    } catch (e) {
+                        console.warn('Error renderizando código de barras en etiqueta:', e);
+                    }
                 }
             }
 
@@ -3960,10 +4013,14 @@
             const qrCanvas = document.getElementById('sticker-qr-canvas');
             if (qrCanvas) {
                 if (window.ViasaCodeEngine && window.ViasaCodeEngine.qr) {
-                    const payload = `NV|${codigo}|${p.nombre}|USD:${(p.precioUSD || 0).toFixed(2)}|BS:${((p.precioUSD || 0) * (this.tasaBCV || 36.85)).toFixed(2)}|${p.exentoIVA ? 'E' : 'G'}`;
-                    window.ViasaCodeEngine.qr.renderQRCanvas(qrCanvas, payload, {
-                        size: 160
-                    });
+                    try {
+                        const payload = `NV|${codigo}|${p.nombre}|USD:${(p.precioUSD || 0).toFixed(2)}|BS:${((p.precioUSD || 0) * (this.tasaBCV || 36.85)).toFixed(2)}|${p.exentoIVA ? 'E' : 'G'}`;
+                        window.ViasaCodeEngine.qr.renderQRCanvas(qrCanvas, payload, {
+                            size: 160
+                        });
+                    } catch (e) {
+                        console.warn('Error renderizando código QR en etiqueta:', e);
+                    }
                 }
             }
         },
@@ -4134,7 +4191,11 @@
 
         generarCodigoViasaEAN13Auto() {
             if (window.ViasaCodeEngine && typeof window.ViasaCodeEngine.generarEAN13UnicoProductoViasa === 'function') {
-                return window.ViasaCodeEngine.generarEAN13UnicoProductoViasa(this.productos);
+                const res = window.ViasaCodeEngine.generarEAN13UnicoProductoViasa(this.productos || []);
+                if (typeof res === 'object' && res !== null) {
+                    return String(res.ean13 || res.codigo || res.code || '');
+                }
+                return String(res || '');
             }
             const sec = String(Math.floor(100000 + Math.random() * 900000));
             const raw12 = '759800' + sec;
@@ -4170,22 +4231,38 @@
         },
 
         actualizarPrevisualizacionCodigoFormularioPOS(codigo) {
-            const code = (codigo || '').trim() || '759800000001';
+            let code = '';
+            if (typeof codigo === 'object' && codigo !== null) {
+                code = String(codigo.ean13 || codigo.codigo || codigo.code || '');
+            } else {
+                code = String(codigo || '').trim();
+            }
+            if (!code || code.includes('[object Object]')) {
+                code = '759800000001';
+            }
 
             const barcodeCanvas = document.getElementById('pos-form-barcode-canvas');
             if (barcodeCanvas && window.ViasaCodeEngine && window.ViasaCodeEngine.barcode) {
-                window.ViasaCodeEngine.barcode.renderBarcodeCanvas(barcodeCanvas, code, {
-                    height: 40,
-                    scale: 1.5,
-                    displayValue: true
-                });
+                try {
+                    window.ViasaCodeEngine.barcode.renderBarcodeCanvas(barcodeCanvas, code, {
+                        height: 40,
+                        scale: 1.5,
+                        displayValue: true
+                    });
+                } catch (e) {
+                    console.warn('Error renderizando código de barras en formulario:', e);
+                }
             }
 
             const qrCanvas = document.getElementById('pos-form-qr-canvas');
             if (qrCanvas && window.ViasaCodeEngine && window.ViasaCodeEngine.qr) {
-                window.ViasaCodeEngine.qr.renderQRCanvas(qrCanvas, `NV|${code}`, {
-                    size: 80
-                });
+                try {
+                    window.ViasaCodeEngine.qr.renderQRCanvas(qrCanvas, `NV|${code}`, {
+                        size: 80
+                    });
+                } catch (e) {
+                    console.warn('Error renderizando QR en formulario:', e);
+                }
             }
         },
 
