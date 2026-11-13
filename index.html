@@ -553,6 +553,18 @@
                         <div class="pos-top-toolbar">
                             <input type="text" class="pos-search-input" id="pos-search" placeholder="🔍 Buscar por nombre, pan, dulce o escanear código de barras..." oninput="ViasaApp.filtrarPorBusqueda(this.value)" onkeydown="ViasaApp.handleBarcodeInput(event)">
                             
+                            <!-- Indicador LED Estado Escáner Láser Hardware USB / Bluetooth -->
+                            <div class="pos-scanner-status-led" title="Escáner Láser USB/Bluetooth Activo en todo momento (Lectura Automática)">
+                                <span class="scanner-led-dot pulse-green"></span>
+                                <span>Láser / QR Listo</span>
+                            </div>
+
+                            <!-- Botón Lector Óptico con Cámara en Vivo (Barras 1D / QR 2D) -->
+                            <button type="button" class="btn-scanner-cam-pos" onclick="ViasaApp.abrirLectorCamaraPOS()" title="Escanear Código de Barras o QR con la Cámara del Dispositivo">
+                                <i class="fa-solid fa-expand"></i>
+                                <span>📷 Lector Barras / QR</span>
+                            </button>
+
                             <!-- Botón de Reconocimiento Visual con Cámara (IA Local) -->
                             <button type="button" class="btn-vision-ai-pos" onclick="ViasaApp.abrirReconocimientoVisual()" title="Reconocimiento Visual IA de Panes y Dulces con Cámara">
                                 <i class="fa-solid fa-camera-retro"></i>
@@ -6440,6 +6452,36 @@
                                 </div>
                             </div>
 
+                            <!-- Identificación por Código de Barras (1D) y Código QR (2D) -->
+                            <div style="margin-top: 14px; padding: 12px; background: rgba(15, 23, 42, 0.7); border: 1px solid #334155; border-radius: 10px;">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 6px;">
+                                    <label style="font-size: 0.74rem; color: #38bdf8; font-weight: 800; text-transform: uppercase; display: flex; align-items: center; gap: 6px;">
+                                        <i class="fa-solid fa-barcode"></i> Identificación por Código de Barras (1D) y Código QR (2D)
+                                    </label>
+                                    <div style="display: flex; gap: 6px;">
+                                        <button type="button" onclick="ViasaApp.activarEscuchaEmpaqueFormularioPOS()" class="btn-secondary" style="font-size: 0.72rem; padding: 4px 10px; border-color: #06b6d4; color: #38bdf8;" title="Escanear con pistola o cámara directamente a este campo">
+                                            <i class="fa-solid fa-volume-high"></i> 🔊 Escanear del Empaque
+                                        </button>
+                                        <button type="button" onclick="ViasaApp.autogenerarCodigoViasaFormularioPOS()" class="btn-gold" style="font-size: 0.72rem; padding: 4px 10px;" title="Generar código EAN-13 oficial venezolano/Viasa irrepetible">
+                                            <i class="fa-solid fa-bolt"></i> ⚡ Autogenerar Código Viasa
+                                        </button>
+                                    </div>
+                                </div>
+                                <div style="display: grid; grid-template-columns: 1.4fr 1.6fr; gap: 12px; align-items: center;">
+                                    <div>
+                                        <input type="text" id="pos-prod-barcode" class="pos-search-input" placeholder="Ej. 759800010012" oninput="ViasaApp.actualizarPrevisualizacionCodigoFormularioPOS(this.value)" style="width: 100%; font-family: monospace; font-size: 0.95rem; font-weight: 800; color: #fbbf24; background: #0b1120; border-color: #0284c7;">
+                                        <span style="font-size: 0.68rem; color: #94a3b8; display: block; margin-top: 3px;">
+                                            EAN-13 / Code-128 compatible con pistolas láser USB/Bluetooth y lectores QR.
+                                        </span>
+                                    </div>
+                                    <!-- Previsualizador Gráfico en Vivo (Barras + QR) -->
+                                    <div id="pos-form-code-preview" style="background: #ffffff; padding: 6px 12px; border-radius: 8px; display: flex; align-items: center; justify-content: space-around; gap: 8px; min-height: 52px; border: 1.5px solid #cbd5e1; box-shadow: 0 2px 6px rgba(0,0,0,0.3);">
+                                        <canvas id="pos-form-barcode-canvas" style="max-height: 48px; max-width: 170px;"></canvas>
+                                        <canvas id="pos-form-qr-canvas" style="max-height: 48px; max-width: 48px;"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+
                             <!-- Selector Visual de Imagen / Emoji del Producto -->
                             <div style="margin-top: 14px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.06); display: grid; grid-template-columns: 64px 1fr 1.5fr; gap: 14px; align-items: center;">
                                 <div id="pos-prod-preview-box" style="width: 64px; height: 64px; border-radius: 10px; background: #0f172a; border: 1.5px dashed #f59e0b; display: flex; align-items: center; justify-content: center; font-size: 2rem; color: #fbbf24; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.4);">
@@ -6922,6 +6964,223 @@
                     </button>
                     <button type="button" onclick="ViasaApp.confirmarEliminarRubroPOS()" class="btn-gold" style="padding: 10px 24px; font-weight: 900; font-size: 0.92rem; background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%); color: #ffffff; border: none; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4); display: flex; align-items: center; gap: 8px;">
                         <i class="fa-solid fa-trash-can"></i> 🗑️ Confirmar Eliminación
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL POS 4: ETIQUETA TÉCNICA (VISOR CÓDIGO BARRAS 1D + QR 2D + IMPRESIÓN) -->
+    <div class="viasa-modal" id="modal-pos-etiqueta-producto" style="z-index: 2300; backdrop-filter: blur(8px); background: rgba(15, 23, 42, 0.88);">
+        <div class="viasa-modal-card" style="max-width: 650px; width: 95vw; max-height: 94vh; background: #0f172a; border: 1.5px solid #f59e0b; border-radius: 16px; overflow: hidden; box-shadow: 0 25px 60px -15px rgba(0,0,0,0.95), 0 0 35px rgba(245, 158, 11, 0.2);">
+            
+            <div class="viasa-modal-header" style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); border-bottom: 1.5px solid #334155; padding: 16px 20px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                    <div>
+                        <h3 style="color: #f59e0b; font-size: 1.15rem; margin: 0; font-weight: 900; display: flex; align-items: center; gap: 8px;">
+                            <i class="fa-solid fa-tags"></i> Etiqueta de Producto Viasa &bull; Códigos 1D / 2D
+                        </h3>
+                        <span style="font-size: 0.73rem; color: #94a3b8;">Panadería Nueva Viasa, C.A. &bull; RIF: J-31163165-8 &bull; La Sabanita</span>
+                    </div>
+                    <button type="button" onclick="ViasaApp.cerrarModalEtiquetaProducto()" style="background:none; border:none; color:#cbd5e1; font-size:1.4rem; cursor:pointer; line-height: 1;" title="Cerrar">&times;</button>
+                </div>
+            </div>
+
+            <div class="viasa-modal-body" style="padding: 20px; background: #0b1120; overflow-y: auto; max-height: calc(94vh - 130px);">
+                
+                <!-- Resumen Superior del Producto -->
+                <div style="background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 14px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                    <div>
+                        <div id="lbl-etiqueta-prod-nombre" style="font-size: 1.1rem; font-weight: 900; color: #ffffff;">Pan Canilla Tradicional</div>
+                        <div style="display: flex; align-items: center; gap: 8px; margin-top: 4px;">
+                            <span id="lbl-etiqueta-prod-categoria" style="font-size: 0.72rem; background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid #f59e0b; padding: 2px 8px; border-radius: 4px; font-weight: 700;">Panadería Salada</span>
+                            <span id="lbl-etiqueta-prod-fiscal" style="font-size: 0.72rem; background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid #10b981; padding: 2px 8px; border-radius: 4px; font-weight: 700;">(E) Exento</span>
+                        </div>
+                    </div>
+                    <div style="text-align: right;">
+                        <div id="lbl-etiqueta-prod-precio-usd" style="font-size: 1.35rem; font-weight: 900; color: #f59e0b;">$0.85</div>
+                        <div id="lbl-etiqueta-prod-precio-bs" style="font-size: 0.95rem; font-weight: 800; color: #38bdf8;">Bs. 31.32</div>
+                    </div>
+                </div>
+
+                <!-- CONTENEDOR DEL STICKER IMPRIMIBLE (FONDO BLANCO DE ALTO CONTRASTE) -->
+                <div id="printable-sticker-area" style="background: #ffffff; color: #000000; border: 2px solid #000000; border-radius: 12px; padding: 18px; box-shadow: 0 4px 20px rgba(0,0,0,0.5); max-width: 480px; margin: 0 auto;">
+                    
+                    <!-- Membrete de Panadería Nueva Viasa -->
+                    <div style="border-bottom: 2px solid #000; padding-bottom: 6px; margin-bottom: 8px; text-align: center;">
+                        <div style="font-family: Arial, sans-serif; font-size: 0.82rem; font-weight: 900; letter-spacing: 0.5px;">
+                            PANADERÍA Y PASTELERÍA NUEVA VIASA, C.A.
+                        </div>
+                        <div style="font-family: Arial, sans-serif; font-size: 0.68rem; font-weight: 700;">
+                            RIF: J-31163165-8 &bull; LA SABANITA, CIUDAD BOLÍVAR
+                        </div>
+                    </div>
+
+                    <!-- Nombre del Producto en Etiqueta -->
+                    <div id="sticker-prod-nombre" style="font-family: Arial, sans-serif; font-size: 1.05rem; font-weight: 900; text-transform: uppercase; text-align: center; margin: 6px 0; color: #000;">
+                        PAN CANILLA TRADICIONAL
+                    </div>
+
+                    <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.72rem; font-weight: 700; margin-bottom: 8px; border-bottom: 1px dashed #666; padding-bottom: 4px;">
+                        <span>RUBRO: <strong id="sticker-prod-rubro">PANADERÍA</strong></span>
+                        <span>UNIDAD: <strong id="sticker-prod-unidad">1 UND</strong></span>
+                        <span id="sticker-prod-seniat">EXENTO SENIAT</span>
+                    </div>
+
+                    <!-- Bloque de Precios en Divisas y Bolívares -->
+                    <div style="background: #f1f5f9; border: 1.5px solid #000; border-radius: 6px; padding: 6px 12px; display: flex; justify-content: space-around; align-items: center; margin-bottom: 12px;">
+                        <div style="text-align: center;">
+                            <div style="font-size: 0.65rem; font-weight: 800; color: #475569;">PRECIO VENTA:</div>
+                            <div id="sticker-precio-usd" style="font-size: 1.35rem; font-weight: 900; color: #000;">$0.85</div>
+                        </div>
+                        <div style="width: 1px; height: 32px; background: #cbd5e1;"></div>
+                        <div style="text-align: center;">
+                            <div style="font-size: 0.65rem; font-weight: 800; color: #475569;">BOLÍVARES (BCV):</div>
+                            <div id="sticker-precio-bs" style="font-size: 1.2rem; font-weight: 900; color: #000;">Bs. 31.32</div>
+                        </div>
+                    </div>
+
+                    <!-- CÓDIGOS GRÁFICOS: 1D BARRAS + 2D QR -->
+                    <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-top: 4px;">
+                        
+                        <!-- Gráfico 1D Código de Barras -->
+                        <div style="flex: 1; text-align: center; overflow: hidden;">
+                            <canvas id="sticker-barcode-canvas" style="max-width: 100%; height: 70px;"></canvas>
+                        </div>
+
+                        <!-- Gráfico 2D Código QR -->
+                        <div style="width: 80px; height: 80px; flex-shrink: 0; text-align: center;">
+                            <canvas id="sticker-qr-canvas" style="width: 80px; height: 80px;"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Pie de Etiqueta -->
+                    <div style="margin-top: 6px; font-size: 0.6rem; text-align: center; color: #475569; border-top: 1px dotted #ccc; padding-top: 4px;">
+                        FECHA: <span id="sticker-fecha-impresion"></span> &bull; TRAZABILIDAD GS1 VENEZUELA
+                    </div>
+                </div>
+
+                <!-- Botones de Acción del Modal -->
+                <div class="no-print-sticker" style="display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-top: 20px; flex-wrap: wrap;">
+                    <div style="display: flex; gap: 8px;">
+                        <button type="button" onclick="ViasaApp.copiarCodigoProducto()" class="btn-secondary" style="font-size: 0.78rem; padding: 8px 14px; border-color: #06b6d4; color: #38bdf8;" title="Copiar dígitos del código al portapapeles">
+                            <i class="fa-solid fa-copy"></i> 📋 Copiar Código
+                        </button>
+                        <button type="button" onclick="ViasaApp.regenerarCodigoProducto()" class="btn-secondary" style="font-size: 0.78rem; padding: 8px 14px; border-color: #f59e0b; color: #fbbf24;" title="Regenerar un código de barras EAN-13 oficial Viasa">
+                            <i class="fa-solid fa-arrows-rotate"></i> 🔄 Regenerar Código
+                        </button>
+                    </div>
+                    <div style="display: flex; gap: 8px;">
+                        <button type="button" onclick="ViasaApp.cerrarModalEtiquetaProducto()" class="btn-secondary" style="padding: 8px 16px; font-weight: 700;">
+                            Cerrar
+                        </button>
+                        <button type="button" onclick="ViasaApp.imprimirStickerProducto()" class="btn-gold" style="padding: 8px 20px; font-weight: 900; font-size: 0.88rem; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: #fff; border: none; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4); display: flex; align-items: center; gap: 8px;">
+                            <i class="fa-solid fa-print"></i> 🖨️ Imprimir Sticker
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL POS 5: LECTOR ÓPTICO POR CÁMARA (BARRAS 1D Y QR 2D) -->
+    <div class="viasa-modal" id="modal-pos-lector-camara" style="z-index: 2300; backdrop-filter: blur(8px); background: rgba(15, 23, 42, 0.9);">
+        <div class="viasa-modal-card" style="max-width: 520px; width: 95vw; background: #0f172a; border: 1.5px solid #06b6d4; border-radius: 16px; overflow: hidden; box-shadow: 0 25px 60px -15px rgba(0,0,0,0.95), 0 0 35px rgba(6, 182, 212, 0.25);">
+            
+            <div class="viasa-modal-header" style="background: linear-gradient(135deg, #0f172a 0%, #164e63 100%); border-bottom: 1.5px solid #0891b2; padding: 14px 18px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                    <div>
+                        <h3 style="color: #38bdf8; font-size: 1.1rem; margin: 0; font-weight: 900; display: flex; align-items: center; gap: 8px;">
+                            <i class="fa-solid fa-camera"></i> Lector Óptico de Barras &amp; QR
+                        </h3>
+                        <span style="font-size: 0.72rem; color: #a5f3fc;">Apunta la cámara al código del empaque o utiliza el simulador rápido</span>
+                    </div>
+                    <button type="button" onclick="ViasaApp.cerrarLectorCamaraPOS()" style="background:none; border:none; color:#cbd5e1; font-size:1.4rem; cursor:pointer; line-height: 1;" title="Cerrar">&times;</button>
+                </div>
+            </div>
+
+            <div class="viasa-modal-body" style="padding: 18px; background: #0b1120;">
+                
+                <!-- Visor de Cámara con Línea Láser Animada -->
+                <div class="camera-viewfinder-box">
+                    <video id="pos-camera-video" playsinline autoplay muted></video>
+                    <div class="laser-scan-line"></div>
+                    <div style="position: absolute; bottom: 8px; left: 0; right: 0; text-align: center; font-size: 0.72rem; color: #ffffff; background: rgba(0,0,0,0.6); padding: 4px 8px;">
+                        <i class="fa-solid fa-expand"></i> Encuadre el código dentro de las líneas
+                    </div>
+                </div>
+
+                <div id="pos-cam-status-msg" style="text-align: center; font-size: 0.76rem; color: #94a3b8; margin-top: 10px;">
+                    Iniciando sensor óptico de cámara...
+                </div>
+
+                <!-- Simulador Rápido de Escaneo para Mostrador / Pruebas -->
+                <div style="margin-top: 16px; padding: 12px; background: #1e293b; border: 1px solid #334155; border-radius: 10px;">
+                    <div style="font-size: 0.75rem; font-weight: 800; color: #fbbf24; text-transform: uppercase; margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
+                        <i class="fa-solid fa-bolt"></i> Simular Escaneo Rápido (Prueba en Mostrador)
+                    </div>
+                    <div style="display: flex; gap: 8px;">
+                        <select id="pos-cam-sim-producto-select" class="pos-search-input" style="flex: 1; background: #0f172a; font-size: 0.8rem;">
+                            <!-- Inyectado dinámicamente con productos activos -->
+                        </select>
+                        <button type="button" onclick="ViasaApp.simularEscaneoSeleccionadoPOS()" class="btn-gold" style="font-size: 0.76rem; padding: 6px 14px; font-weight: 800; white-space: nowrap;">
+                            <i class="fa-solid fa-barcode"></i> Simular Escaneo
+                        </button>
+                    </div>
+                </div>
+
+                <div style="display: flex; justify-content: flex-end; margin-top: 16px;">
+                    <button type="button" onclick="ViasaApp.cerrarLectorCamaraPOS()" class="btn-secondary" style="padding: 8px 18px; font-weight: 700;">
+                        Cerrar Cámara
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL POS 6: CÓDIGO NO REGISTRADO DETECTADO (REGISTRO RÁPIDO DE MERCANCÍA) -->
+    <div class="viasa-modal" id="modal-pos-codigo-no-registrado" style="z-index: 2400; backdrop-filter: blur(8px); background: rgba(15, 23, 42, 0.9);">
+        <div class="viasa-modal-card" style="max-width: 540px; width: 95vw; background: #0f172a; border: 1.5px solid #f59e0b; border-radius: 16px; overflow: hidden; box-shadow: 0 25px 60px -15px rgba(0,0,0,0.95), 0 0 35px rgba(245, 158, 11, 0.25);">
+            
+            <div class="viasa-modal-header" style="background: linear-gradient(135deg, #78350f 0%, #0f172a 100%); border-bottom: 1.5px solid #d97706; padding: 16px 20px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                    <div>
+                        <h3 style="color: #fbbf24; font-size: 1.15rem; margin: 0; font-weight: 900; display: flex; align-items: center; gap: 8px;">
+                            <i class="fa-solid fa-magnifying-glass-plus"></i> Código Nuevo Detectado
+                        </h3>
+                        <span style="font-size: 0.73rem; color: #fed7aa;">Flujo Inteligente de Registro de Mercancía en Mostrador</span>
+                    </div>
+                    <button type="button" onclick="ViasaApp.cerrarModalCodigoNoRegistrado()" style="background:none; border:none; color:#cbd5e1; font-size:1.4rem; cursor:pointer; line-height: 1;" title="Cerrar">&times;</button>
+                </div>
+            </div>
+
+            <div class="viasa-modal-body" style="padding: 20px; background: #0b1120;">
+                
+                <div style="background: rgba(245, 158, 11, 0.12); border: 1.5px solid #f59e0b; border-radius: 12px; padding: 16px; margin-bottom: 18px; display: flex; align-items: center; gap: 14px;">
+                    <div style="width: 48px; height: 48px; border-radius: 10px; background: #78350f; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; color: #fbbf24; flex-shrink: 0;">
+                        <i class="fa-solid fa-barcode"></i>
+                    </div>
+                    <div>
+                        <div style="font-size: 0.74rem; text-transform: uppercase; font-weight: 800; color: #fed7aa;">Código Escaneado:</div>
+                        <div id="pos-nuevo-codigo-detectado-val" style="font-family: monospace; font-size: 1.25rem; font-weight: 900; color: #ffffff; letter-spacing: 1px;">7590000000000</div>
+                    </div>
+                </div>
+
+                <div style="font-size: 0.86rem; color: #e2e8f0; line-height: 1.5; margin-bottom: 20px;">
+                    Este código de barras / QR no coincide con ningún producto existente en el catálogo de Panadería Nueva Viasa.
+                    <br><br>
+                    <strong>¿Deseas registrar este nuevo producto ahora mismo?</strong> El código quedará automáticamente asignado y listo para que ingreses el nombre y precio en segundos.
+                </div>
+
+                <div style="display: flex; justify-content: flex-end; gap: 10px;">
+                    <button type="button" onclick="ViasaApp.cerrarModalCodigoNoRegistrado()" class="btn-secondary" style="padding: 10px 18px; font-weight: 700;">
+                        Cancelar
+                    </button>
+                    <button type="button" onclick="ViasaApp.registrarProductoDesdeCodigoNuevoDetectado()" class="btn-gold" style="padding: 10px 22px; font-weight: 900; font-size: 0.92rem; background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: #000; border: none; box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4); display: flex; align-items: center; gap: 8px;">
+                        <i class="fa-solid fa-circle-plus"></i> ➕ Sí, Registrar Producto Ahora
                     </button>
                 </div>
 

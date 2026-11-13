@@ -1056,6 +1056,196 @@ body {
     transform: scale(0.97);
 }
 
+/* Barcode & QR Pill on POS Product Card */
+.pos-product-barcode-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 6px;
+    padding: 3px 8px;
+    background: rgba(15, 23, 42, 0.9);
+    border: 1px solid rgba(148, 163, 184, 0.25);
+    border-radius: 6px;
+    font-size: 0.68rem;
+    color: #e2e8f0;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    width: fit-content;
+}
+
+.pos-product-barcode-pill:hover {
+    border-color: #f59e0b;
+    background: rgba(245, 158, 11, 0.12);
+    color: #fbbf24;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(245, 158, 11, 0.25);
+}
+
+.pos-product-barcode-pill .barcode-digits {
+    font-family: 'Consolas', 'Courier New', monospace;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    color: #f1f5f9;
+}
+
+.pos-product-barcode-pill .barcode-sep {
+    color: #475569;
+    font-weight: 400;
+}
+
+.pos-product-card .btn-card-mini-action.barcode:hover {
+    background: #0284c7;
+    color: #ffffff;
+    border-color: #38bdf8;
+    box-shadow: 0 0 8px rgba(56, 189, 248, 0.6);
+}
+
+/* Flash Highlight when Scanned */
+@keyframes posScanFlash {
+    0% {
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.8), 0 0 20px rgba(245, 158, 11, 0.8);
+        border-color: #10b981;
+        transform: scale(1.03);
+    }
+    50% {
+        box-shadow: 0 0 25px rgba(16, 185, 129, 0.6);
+        border-color: #f59e0b;
+        transform: scale(1.02);
+    }
+    100% {
+        box-shadow: none;
+        transform: scale(1);
+    }
+}
+
+.pos-product-card.scan-highlight {
+    animation: posScanFlash 0.75s ease-out;
+}
+
+/* Scanner LED Status Indicator */
+.pos-scanner-status-led {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 6px 12px;
+    background: rgba(15, 23, 42, 0.85);
+    border: 1px solid #1e293b;
+    border-radius: 8px;
+    font-size: 0.73rem;
+    font-weight: 800;
+    color: #94a3b8;
+    user-select: none;
+}
+
+.scanner-led-dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.scanner-led-dot.pulse-green {
+    background: #10b981;
+    box-shadow: 0 0 8px #10b981, 0 0 12px rgba(16, 185, 129, 0.6);
+    animation: ledPulse 1.8s infinite;
+}
+
+@keyframes ledPulse {
+    0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+        box-shadow: 0 0 8px #10b981;
+    }
+    50% {
+        opacity: 0.5;
+        transform: scale(0.9);
+        box-shadow: 0 0 2px #10b981;
+    }
+}
+
+/* Botón Cámara Escáner en Cabecera */
+.btn-scanner-cam-pos {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    border: 1.5px solid #0284c7;
+    color: #38bdf8;
+    padding: 7px 12px;
+    border-radius: 8px;
+    font-size: 0.76rem;
+    font-weight: 800;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.btn-scanner-cam-pos:hover {
+    background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+    color: #ffffff;
+    box-shadow: 0 0 12px rgba(2, 132, 199, 0.45);
+    transform: translateY(-1px);
+}
+
+/* Animación de línea láser en visor de cámara */
+.camera-viewfinder-box {
+    position: relative;
+    width: 100%;
+    max-width: 420px;
+    height: 280px;
+    margin: 0 auto;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #000;
+    border: 2px solid #06b6d4;
+    box-shadow: 0 0 25px rgba(6, 182, 212, 0.3);
+}
+
+.camera-viewfinder-box video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.laser-scan-line {
+    position: absolute;
+    left: 5%;
+    right: 5%;
+    height: 2.5px;
+    background: linear-gradient(90deg, transparent, #ef4444, #f59e0b, #ef4444, transparent);
+    box-shadow: 0 0 10px #ef4444, 0 0 18px #f59e0b;
+    animation: laserScanMove 2s infinite ease-in-out;
+}
+
+@keyframes laserScanMove {
+    0% { top: 10%; opacity: 0.8; }
+    50% { top: 88%; opacity: 1; }
+    100% { top: 10%; opacity: 0.8; }
+}
+
+/* Estilos de impresión térmica para sticker */
+@media print {
+    body * {
+        visibility: hidden;
+    }
+    #printable-sticker-area, #printable-sticker-area * {
+        visibility: visible;
+    }
+    #printable-sticker-area {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        background: #fff !important;
+        color: #000 !important;
+    }
+    .no-print-sticker {
+        display: none !important;
+    }
+}
+
 .pos-product-name {
     font-size: 0.92rem;
     font-weight: 800;

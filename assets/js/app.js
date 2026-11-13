@@ -306,6 +306,7 @@
             // 3. Cargar colecciones desde IndexedDB / Sandbox
             await this.cargarCategorias();
             await this.cargarProductos();
+            this.inicializarEscuchadorGlobalScanner();
             await this.cargarMateriaPrima();
             await this.cargarRecetasFormulas();
             await this.cargarOrdenesProduccion();
@@ -1080,6 +1081,7 @@
             if (!this.productos || this.productos.length === 0) {
                 this.productos = window.ViasaDatabase.productos;
             }
+            this.garantizarCodigosBarrasUniversal();
         },
 
         async cargarMateriaPrima() {
@@ -2618,54 +2620,7 @@
             if (e.key === 'Enter') {
                 const rawQuery = (e.target ? e.target.value : String(e)).trim();
                 if (!rawQuery) return;
-
-                // 1. Sincronizar catálogo Productos Nueva Viasa si está disponible
-                if (window.ViasaProductosExclusivosEngine && typeof window.ViasaProductosExclusivosEngine.sincronizarTodosConPOS === 'function') {
-                    window.ViasaProductosExclusivosEngine.sincronizarTodosConPOS();
-                }
-
-                // 2. Extraer código si es un QR (JSON o texto estructurado con pipes)
-                let query = rawQuery;
-                if (rawQuery.startsWith('{') && rawQuery.endsWith('}')) {
-                    try {
-                        const parsed = JSON.parse(rawQuery);
-                        query = parsed.ean || parsed.codigoBarras || parsed.barcode || parsed.sku || parsed.id || parsed.s || rawQuery;
-                    } catch (err) {}
-                } else if (rawQuery.includes('|')) {
-                    const parts = rawQuery.split('|').map(s => s.trim());
-                    const eanPart = parts.find(p => /^\d{8,14}$/.test(p));
-                    const skuPart = parts.find(p => /^PNV-[A-Z0-9-]+$/i.test(p) || /^NV-\d+$/i.test(p) || /^PRD-\d+$/i.test(p));
-                    if (eanPart) query = eanPart;
-                    else if (skuPart) query = skuPart;
-                    else if (parts[1]) query = parts[1];
-                }
-
-                const qLower = query.toLowerCase();
-                let found = this.productos.find(p => 
-                    (p.codigoBarras && p.codigoBarras === query) ||
-                    (p.barcode && p.barcode === query) ||
-                    p.id.toLowerCase() === qLower ||
-                    (p.sku && p.sku.toLowerCase() === qLower)
-                );
-
-                // Si no está en this.productos, buscar en Productos Nueva Viasa y sincronizar
-                if (!found && window.ViasaProductosExclusivosEngine && typeof window.ViasaProductosExclusivosEngine.buscarProducto === 'function') {
-                    const pnv = window.ViasaProductosExclusivosEngine.buscarProducto(query);
-                    if (pnv) {
-                        window.ViasaProductosExclusivosEngine.sincronizarConPOS(pnv);
-                        found = this.productos.find(p => p.id === pnv.id);
-                    }
-                }
-
-                if (found) {
-                    this.agregarAlCarrito(found.id);
-                    if (e.target) e.target.value = '';
-                    this.filtroBusqueda = '';
-                    this.renderPOSProducts();
-                    if (window.ViasaAudio) window.ViasaAudio.playScanBeep();
-                } else {
-                    if (window.ViasaAudio) window.ViasaAudio.playError();
-                }
+                this.procesarCodigoEscaneadoPOS(rawQuery);
             }
         },
 
@@ -2723,10 +2678,15 @@
                     iconDisplay = `<span style="font-size: 1.35rem; line-height: 1; flex-shrink: 0;">${p.icono}</span>`;
                 }
 
+                const codigoVisible = p.codigoBarras || p.barcode || p.sku || 'SIN CÓDIGO';
+
                 return `
-                    <div class="pos-product-card" onclick="ViasaApp.agregarAlCarrito('${p.id}')">
+                    <div class="pos-product-card" id="pos-card-${p.id}" onclick="ViasaApp.agregarAlCarrito('${p.id}')">
                         ${taxBadge}
                         <div class="pos-card-quick-actions" onclick="event.stopPropagation()">
+                            <button type="button" class="btn-card-mini-action barcode" onclick="event.stopPropagation(); ViasaApp.abrirModalEtiquetaProducto('${p.id}')" title="Ver código de barras, QR e imprimir etiqueta">
+                                <i class="fa-solid fa-barcode"></i>
+                            </button>
                             <button type="button" class="btn-card-mini-action edit" onclick="event.stopPropagation(); ViasaApp.abrirModalPOSEditarProducto('${p.id}')" title="Modificar ${p.nombre}">
                                 <i class="fa-solid fa-pen"></i>
                             </button>
@@ -2740,6 +2700,15 @@
                                 <div class="pos-product-name" style="margin-bottom: 0;">${p.nombre}</div>
                             </div>
                             <div class="pos-product-stock">Stock: <strong>${p.stock} ${p.unidad || 'UND'}</strong></div>
+                            
+                            <!-- Badge / Píldora Elegante de Código de Barras y QR -->
+                            <div class="pos-product-barcode-pill" onclick="event.stopPropagation(); ViasaApp.abrirModalEtiquetaProducto('${p.id}')" title="Ver código de barras 1D, QR 2D e imprimir etiqueta térmica">
+                                <i class="fa-solid fa-barcode"></i>
+                                <span class="barcode-digits">${codigoVisible}</span>
+                                <span class="barcode-sep">|</span>
+                                <i class="fa-solid fa-qrcode" style="color: #38bdf8;"></i>
+                                <span style="color: #7dd3fc; font-weight: 800; font-size: 0.65rem;">QR</span>
+                            </div>
                         </div>
                         <div class="pos-product-price-box">
                             ${priceDisplay}
@@ -2753,7 +2722,7 @@
         // MÓDULO PUNTO DE VENTA: GESTIÓN RÁPIDA DE PRODUCTOS Y RUBROS (CATEGORÍAS)
         // ====================================================================
 
-        abrirModalPOSAgregarProductoRubro(tab = 'producto', productoId = null) {
+        abrirModalPOSAgregarProductoRubro(tab = 'producto', productoId = null, nuevoCodigo = null) {
             const modal = document.getElementById('modal-pos-agregar-producto-rubro');
             if (!modal) return;
 
@@ -2784,6 +2753,11 @@
 
                     document.getElementById('pos-prod-id').value = p.id;
                     document.getElementById('pos-prod-sku').value = p.sku || p.codigoBarras || p.id;
+                    
+                    const barcodeInput = document.getElementById('pos-prod-barcode');
+                    if (barcodeInput) barcodeInput.value = p.codigoBarras || p.barcode || p.sku || '';
+                    this.actualizarPrevisualizacionCodigoFormularioPOS(p.codigoBarras || p.barcode || p.sku || '');
+
                     document.getElementById('pos-prod-nombre').value = p.nombre || '';
                     if (selCat) selCat.value = p.categoria || (cats[0]?.id || '');
                     
@@ -2833,6 +2807,23 @@
                 document.getElementById('pos-prod-id').value = '';
                 const proximoNum = this.productos.length + 1;
                 document.getElementById('pos-prod-sku').value = `PRD-${String(proximoNum).padStart(3, '0')}`;
+                
+                const barcodeInput = document.getElementById('pos-prod-barcode');
+                let codeParaAsignar = '';
+                if (nuevoCodigo) {
+                    codeParaAsignar = nuevoCodigo;
+                    if (barcodeInput) barcodeInput.value = nuevoCodigo;
+                    document.getElementById('pos-prod-sku').value = nuevoCodigo;
+                    setTimeout(() => {
+                        const nomInput = document.getElementById('pos-prod-nombre');
+                        if (nomInput) nomInput.focus();
+                    }, 200);
+                } else {
+                    codeParaAsignar = this.generarCodigoViasaEAN13Auto();
+                    if (barcodeInput) barcodeInput.value = codeParaAsignar;
+                }
+                this.actualizarPrevisualizacionCodigoFormularioPOS(codeParaAsignar);
+
                 document.getElementById('pos-prod-nombre').value = '';
                 
                 if (selCat) {
@@ -3015,6 +3006,7 @@
 
             const editId = (document.getElementById('pos-prod-id').value || '').trim();
             const sku = (document.getElementById('pos-prod-sku').value || '').trim();
+            const barcodeVal = (document.getElementById('pos-prod-barcode')?.value || '').trim();
             const nombre = (document.getElementById('pos-prod-nombre').value || '').trim();
             const categoria = document.getElementById('pos-prod-categoria').value;
             const costoUSD = parseFloat(document.getElementById('pos-prod-costo').value) || 0;
@@ -3038,12 +3030,13 @@
 
             const id = editId || ('PRD-' + (sku.replace(/^PRD-/i, '') || Date.now().toString(36).toUpperCase()));
             const exentoIVA = seniat === 'EXENTO';
+            const codigoFinal = barcodeVal || sku || id;
 
             const prodObj = {
                 id: id,
                 sku: sku || id,
-                codigoBarras: sku || id,
-                barcode: sku || id,
+                codigoBarras: codigoFinal,
+                barcode: codigoFinal,
                 nombre: nombre,
                 categoria: categoria,
                 costoUSD: costoUSD,
@@ -3672,6 +3665,528 @@
             }
 
             if (btnCheckout) btnCheckout.disabled = false;
+        },
+
+        // ====================================================================
+        // SISTEMA INTEGRAL DE CÓDIGOS DE BARRAS (1D), QR (2D), ETIQUETADO Y MOTOR DE ESCANEO DUAL
+        // ====================================================================
+
+        garantizarCodigosBarrasUniversal() {
+            if (!this.productos || !Array.isArray(this.productos)) return;
+            let cambios = false;
+
+            this.productos.forEach((p, idx) => {
+                let code = p.codigoBarras || p.barcode;
+                if (!code || String(code).trim() === '') {
+                    if (window.ViasaCodeEngine && typeof window.ViasaCodeEngine.generarEAN13UnicoProductoViasa === 'function') {
+                        code = window.ViasaCodeEngine.generarEAN13UnicoProductoViasa(this.productos);
+                    } else {
+                        const sec = String(idx + 1).padStart(6, '0');
+                        code = '759800' + sec;
+                    }
+                    p.codigoBarras = code;
+                    p.barcode = code;
+                    cambios = true;
+                } else {
+                    p.codigoBarras = String(code).trim();
+                    p.barcode = p.codigoBarras;
+                }
+            });
+
+            if (cambios && window.ViasaStorage) {
+                this.productos.forEach(p => {
+                    window.ViasaStorage.guardarRegistro('productos', p);
+                });
+            }
+        },
+
+        inicializarEscuchadorGlobalScanner() {
+            if (this._globalScannerInitialized) return;
+            this._globalScannerInitialized = true;
+
+            this._scannerBuffer = '';
+            this._lastScanKeyTime = 0;
+            this._scannerBufferFastKeystrokes = 0;
+            this._scannerStartTime = 0;
+
+            window.addEventListener('keydown', (e) => {
+                const now = Date.now();
+                const activeTag = document.activeElement ? document.activeElement.tagName.toUpperCase() : '';
+                const activeId = document.activeElement ? document.activeElement.id : '';
+                const isWritingInOtherInput = (activeTag === 'INPUT' || activeTag === 'TEXTAREA' || activeTag === 'SELECT') && 
+                                              activeId !== 'pos-search' && 
+                                              activeId !== 'pos-prod-barcode' &&
+                                              activeId !== 'pos-quick-barcode';
+
+                if (e.key === 'Enter') {
+                    const elapsed = now - this._scannerStartTime;
+                    // Condición de hardware scanner: buffer acumulado con ráfagas ultrarrápidas (<600ms total o múltiples pulsaciones rápidas)
+                    if (this._scannerBuffer.length >= 3 && (this._scannerBufferFastKeystrokes >= 2 || elapsed < 700)) {
+                        const scannedCode = this._scannerBuffer;
+                        this._scannerBuffer = '';
+                        this._scannerBufferFastKeystrokes = 0;
+                        e.preventDefault();
+                        e.stopPropagation();
+                        this.procesarCodigoEscaneadoPOS(scannedCode);
+                        return;
+                    }
+                    this._scannerBuffer = '';
+                    this._scannerBufferFastKeystrokes = 0;
+                    return;
+                }
+
+                if (e.key.length === 1 && !e.ctrlKey && !e.altKey && !e.metaKey) {
+                    const diff = now - this._lastScanKeyTime;
+                    
+                    if (diff < 65) {
+                        this._scannerBufferFastKeystrokes++;
+                    }
+
+                    if (diff > 250) {
+                        this._scannerBuffer = '';
+                        this._scannerBufferFastKeystrokes = 0;
+                        this._scannerStartTime = now;
+                    }
+
+                    // Si el usuario está escribiendo lentamente en un campo ajeno al POS, no interferir
+                    if (isWritingInOtherInput && diff > 100) {
+                        this._scannerBuffer = '';
+                        this._scannerBufferFastKeystrokes = 0;
+                        return;
+                    }
+
+                    this._scannerBuffer += e.key;
+                    this._lastScanKeyTime = now;
+                }
+            }, true);
+        },
+
+        normalizarCodigoEscaneado(rawQuery) {
+            if (!rawQuery) return '';
+            let query = String(rawQuery).trim();
+
+            // 1. Desempaquetar JSON de código QR si aplica
+            if (query.startsWith('{') && query.endsWith('}')) {
+                try {
+                    const parsed = JSON.parse(query);
+                    query = parsed.ean || parsed.codigoBarras || parsed.barcode || parsed.sku || parsed.id || parsed.s || query;
+                } catch (err) {}
+            } else if (query.includes('|')) {
+                // Formato de QR estructurado: EJ: NV|759800010012|PAN CANILLA...
+                const parts = query.split('|').map(s => s.trim());
+                const eanPart = parts.find(p => /^\d{8,14}$/.test(p));
+                const skuPart = parts.find(p => /^PNV-[A-Z0-9-]+$/i.test(p) || /^NV-\d+$/i.test(p) || /^PRD-\d+$/i.test(p));
+                if (eanPart) query = eanPart;
+                else if (skuPart) query = skuPart;
+                else if (parts[1]) query = parts[1];
+                else if (parts[0]) query = parts[0];
+            }
+
+            return query.trim();
+        },
+
+        procesarCodigoEscaneadoPOS(rawQuery) {
+            const query = this.normalizarCodigoEscaneado(rawQuery);
+            if (!query) return;
+
+            // CASO ESPECIAL: Si está abierto el modal de Agregar/Editar Producto y escuchando empaque
+            const modalAdd = document.getElementById('modal-pos-agregar-producto-rubro');
+            const isModalAddOpen = modalAdd && (modalAdd.classList.contains('active') || modalAdd.style.display === 'flex');
+            const barcodeInput = document.getElementById('pos-prod-barcode');
+
+            if (isModalAddOpen && (this._escuchandoEmpaqueFormularioPOS || document.activeElement === barcodeInput)) {
+                if (barcodeInput) {
+                    barcodeInput.value = query;
+                    this.actualizarPrevisualizacionCodigoFormularioPOS(query);
+                }
+                this._escuchandoEmpaqueFormularioPOS = false;
+                if (window.ViasaAudio) window.ViasaAudio.playScanBeep();
+                this.mostrarNotificacionToast(`🔊 Código capturado del empaque: ${query}`, 'success');
+                return;
+            }
+
+            // Sincronizar catálogo Productos Nueva Viasa si está disponible
+            if (window.ViasaProductosExclusivosEngine && typeof window.ViasaProductosExclusivosEngine.sincronizarTodosConPOS === 'function') {
+                window.ViasaProductosExclusivosEngine.sincronizarTodosConPOS();
+            }
+
+            const qLower = query.toLowerCase();
+            const cleanDigits = query.replace(/^0+/, '');
+
+            let found = this.productos.find(p => {
+                const b1 = (p.codigoBarras || '').trim();
+                const b2 = (p.barcode || '').trim();
+                const s = (p.sku || '').trim().toLowerCase();
+                const pid = (p.id || '').trim().toLowerCase();
+
+                return b1 === query || 
+                       b2 === query || 
+                       s === qLower || 
+                       pid === qLower ||
+                       (cleanDigits && b1.replace(/^0+/, '') === cleanDigits) ||
+                       (cleanDigits && b2.replace(/^0+/, '') === cleanDigits);
+            });
+
+            // Si no está en this.productos, buscar en motor de Productos Nueva Viasa
+            if (!found && window.ViasaProductosExclusivosEngine && typeof window.ViasaProductosExclusivosEngine.buscarProducto === 'function') {
+                const pnv = window.ViasaProductosExclusivosEngine.buscarProducto(query);
+                if (pnv) {
+                    window.ViasaProductosExclusivosEngine.sincronizarConPOS(pnv);
+                    found = this.productos.find(p => p.id === pnv.id);
+                }
+            }
+
+            if (found) {
+                // Producto Existente -> Agregar al ticket de venta
+                this.agregarAlCarrito(found.id);
+                this.resaltarTarjetaProductoEscaneado(found.id);
+
+                const sInput = document.getElementById('pos-search');
+                if (sInput) {
+                    sInput.value = '';
+                    this.filtroBusqueda = '';
+                }
+
+                this.mostrarNotificacionToast(`➕ ${found.nombre} agregado al ticket`, 'info');
+            } else {
+                // Producto No Encontrado -> Alerta sonora dual y apertura de registro inteligente
+                if (window.ViasaAudio && typeof window.ViasaAudio.playDualAlert === 'function') {
+                    window.ViasaAudio.playDualAlert();
+                } else if (window.ViasaAudio) {
+                    window.ViasaAudio.playError();
+                }
+
+                this.abrirModalCodigoNoRegistrado(query);
+            }
+        },
+
+        resaltarTarjetaProductoEscaneado(prodId) {
+            const card = document.getElementById(`pos-card-${prodId}`);
+            if (card) {
+                card.classList.add('scan-highlight');
+                card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                setTimeout(() => {
+                    card.classList.remove('scan-highlight');
+                }, 1200);
+            }
+        },
+
+        abrirModalEtiquetaProducto(prodId) {
+            const p = this.productos.find(x => x.id === prodId) || (window.ViasaDatabase?.productos || []).find(x => x.id === prodId);
+            if (!p) return;
+
+            this._productoEtiquetaActual = p;
+
+            const cats = (this.categorias && this.categorias.length > 0) ? this.categorias : (window.ViasaDatabase?.categorias || []);
+            const catObj = cats.find(c => c.id === p.categoria);
+            const rubroNombre = (catObj ? catObj.nombre : (p.categoria || 'PANADERÍA')).toUpperCase();
+
+            // Poblar Cabecera del Modal
+            const elNom = document.getElementById('lbl-etiqueta-prod-nombre');
+            if (elNom) elNom.textContent = p.nombre;
+
+            const elCat = document.getElementById('lbl-etiqueta-prod-categoria');
+            if (elCat) elCat.textContent = catObj ? catObj.nombre : p.categoria;
+
+            const elFisc = document.getElementById('lbl-etiqueta-prod-fiscal');
+            if (elFisc) {
+                elFisc.textContent = p.exentoIVA ? '(E) Exento de IVA' : '(G) Gravado +16%';
+                elFisc.style.borderColor = p.exentoIVA ? '#10b981' : '#f59e0b';
+                elFisc.style.color = p.exentoIVA ? '#34d399' : '#fbbf24';
+            }
+
+            const usdStr = `$${(p.precioUSD || 0).toFixed(2)}`;
+            const bsStr = `Bs. ${((p.precioUSD || 0) * (this.tasaBCV || 36.85)).toFixed(2)}`;
+
+            const elUsd = document.getElementById('lbl-etiqueta-prod-precio-usd');
+            if (elUsd) elUsd.textContent = usdStr;
+
+            const elBs = document.getElementById('lbl-etiqueta-prod-precio-bs');
+            if (elBs) elBs.textContent = bsStr;
+
+            // Poblar Sticker Imprimible
+            const stNom = document.getElementById('sticker-prod-nombre');
+            if (stNom) stNom.textContent = p.nombre.toUpperCase();
+
+            const stRub = document.getElementById('sticker-prod-rubro');
+            if (stRub) stRub.textContent = rubroNombre;
+
+            const stUnd = document.getElementById('sticker-prod-unidad');
+            if (stUnd) stUnd.textContent = `1 ${p.unidad || 'UND'}`;
+
+            const stSen = document.getElementById('sticker-prod-seniat');
+            if (stSen) stSen.textContent = p.exentoIVA ? 'EXENTO SENIAT' : 'GRAVADO IVA 16%';
+
+            const stUsd = document.getElementById('sticker-precio-usd');
+            if (stUsd) stUsd.textContent = usdStr;
+
+            const stBs = document.getElementById('sticker-precio-bs');
+            if (stBs) stBs.textContent = bsStr;
+
+            const stFecha = document.getElementById('sticker-fecha-impresion');
+            if (stFecha) stFecha.textContent = new Date().toLocaleDateString('es-VE');
+
+            // Renderizar Gráficos de Códigos 1D y 2D
+            this.renderGraficosEtiquetaProducto(p);
+
+            const modal = document.getElementById('modal-pos-etiqueta-producto');
+            if (modal) modal.classList.add('active');
+
+            if (window.ViasaAudio) window.ViasaAudio.playClick();
+        },
+
+        cerrarModalEtiquetaProducto() {
+            const modal = document.getElementById('modal-pos-etiqueta-producto');
+            if (modal) modal.classList.remove('active');
+            this._productoEtiquetaActual = null;
+        },
+
+        renderGraficosEtiquetaProducto(p) {
+            const codigo = p.codigoBarras || p.barcode || p.sku || '759800000001';
+
+            // 1. Código de Barras 1D en Canvas
+            const barcodeCanvas = document.getElementById('sticker-barcode-canvas');
+            if (barcodeCanvas) {
+                if (window.ViasaCodeEngine && window.ViasaCodeEngine.barcode) {
+                    window.ViasaCodeEngine.barcode.renderBarcodeCanvas(barcodeCanvas, codigo, {
+                        height: 60,
+                        scale: 2,
+                        displayValue: true
+                    });
+                }
+            }
+
+            // 2. Código QR 2D en Canvas
+            const qrCanvas = document.getElementById('sticker-qr-canvas');
+            if (qrCanvas) {
+                if (window.ViasaCodeEngine && window.ViasaCodeEngine.qr) {
+                    const payload = `NV|${codigo}|${p.nombre}|USD:${(p.precioUSD || 0).toFixed(2)}|BS:${((p.precioUSD || 0) * (this.tasaBCV || 36.85)).toFixed(2)}|${p.exentoIVA ? 'E' : 'G'}`;
+                    window.ViasaCodeEngine.qr.renderQRCanvas(qrCanvas, payload, {
+                        size: 160
+                    });
+                }
+            }
+        },
+
+        copiarCodigoProducto() {
+            const p = this._productoEtiquetaActual;
+            if (!p) return;
+            const code = p.codigoBarras || p.barcode || p.sku || '';
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(code).then(() => {
+                    this.mostrarNotificacionToast(`📋 Código ${code} copiado al portapapeles.`, 'info');
+                });
+            } else {
+                this.mostrarNotificacionToast(`📋 Código: ${code}`, 'info');
+            }
+            if (window.ViasaAudio) window.ViasaAudio.playSuccess();
+        },
+
+        async regenerarCodigoProducto() {
+            const p = this._productoEtiquetaActual;
+            if (!p) return;
+
+            const confirmar = confirm(`¿Desea generar un nuevo código EAN-13 Viasa oficial para "${p.nombre}"?`);
+            if (!confirmar) return;
+
+            const nuevoCodigo = this.generarCodigoViasaEAN13Auto();
+            p.codigoBarras = nuevoCodigo;
+            p.barcode = nuevoCodigo;
+
+            // Actualizar en array en memoria
+            const idx = this.productos.findIndex(x => x.id === p.id);
+            if (idx !== -1) {
+                this.productos[idx] = { ...this.productos[idx], codigoBarras: nuevoCodigo, barcode: nuevoCodigo };
+            }
+
+            // Guardar permanentemente
+            await window.ViasaStorage.guardarRegistro('productos', p);
+
+            // Sincronizar con motor exclusivo si existe
+            if (window.ViasaProductosExclusivosEngine && typeof window.ViasaProductosExclusivosEngine.sincronizarConPOS === 'function') {
+                window.ViasaProductosExclusivosEngine.sincronizarConPOS(p);
+            }
+
+            this.renderGraficosEtiquetaProducto(p);
+            this.renderPOSProducts();
+
+            if (window.ViasaAudio) window.ViasaAudio.playSuccess();
+            this.mostrarNotificacionToast(`🔄 Nuevo código asignado: ${nuevoCodigo}`, 'success');
+        },
+
+        imprimirStickerProducto() {
+            if (window.ViasaAudio) window.ViasaAudio.playClick();
+            window.print();
+        },
+
+        abrirLectorCamaraPOS() {
+            const modal = document.getElementById('modal-pos-lector-camara');
+            if (modal) modal.classList.add('active');
+
+            // Poblar selector de simulación rápida con productos activos
+            const sel = document.getElementById('pos-cam-sim-producto-select');
+            if (sel) {
+                sel.innerHTML = this.productos.map(p => `
+                    <option value="${p.codigoBarras || p.barcode || p.id}">
+                        ${p.nombre} &bull; ${p.codigoBarras || p.barcode} ($${(p.precioUSD || 0).toFixed(2)})
+                    </option>
+                `).join('');
+            }
+
+            // Inicializar video cámara WebRTC
+            const video = document.getElementById('pos-camera-video-stream');
+            const errBox = document.getElementById('pos-camera-error-msg');
+            if (errBox) errBox.style.display = 'none';
+
+            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+                    .then(stream => {
+                        this._posCameraStream = stream;
+                        if (video) {
+                            video.srcObject = stream;
+                            video.play().catch(() => {});
+                        }
+                        this._iniciarDeteccionOpticaCamara();
+                    })
+                    .catch(err => {
+                        console.warn('Cámara no accesible o permiso denegado:', err);
+                        if (errBox) {
+                            errBox.style.display = 'block';
+                            errBox.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> Cámara no disponible o permiso denegado. Puede usar el <strong>Simulador Rápido</strong> de abajo o su lector láser USB.';
+                        }
+                    });
+            } else {
+                if (errBox) {
+                    errBox.style.display = 'block';
+                    errBox.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> Navegador no soporta captura de video WebRTC. Use el simulador de mostrador o pistola USB.';
+                }
+            }
+
+            if (window.ViasaAudio) window.ViasaAudio.playClick();
+        },
+
+        cerrarLectorCamaraPOS() {
+            if (this._posCameraInterval) {
+                clearInterval(this._posCameraInterval);
+                this._posCameraInterval = null;
+            }
+            if (this._posCameraStream) {
+                this._posCameraStream.getTracks().forEach(t => t.stop());
+                this._posCameraStream = null;
+            }
+            const modal = document.getElementById('modal-pos-lector-camara');
+            if (modal) modal.classList.remove('active');
+        },
+
+        _iniciarDeteccionOpticaCamara() {
+            if (window.BarcodeDetector) {
+                try {
+                    const detector = new window.BarcodeDetector({ formats: ['ean_13', 'code_128', 'qr_code', 'ean_8', 'upc_a'] });
+                    const video = document.getElementById('pos-camera-video-stream');
+
+                    this._posCameraInterval = setInterval(async () => {
+                        if (!video || video.readyState < 2) return;
+                        try {
+                            const barcodes = await detector.detect(video);
+                            if (barcodes && barcodes.length > 0) {
+                                const detectedValue = barcodes[0].rawValue;
+                                if (detectedValue) {
+                                    this.cerrarLectorCamaraPOS();
+                                    this.procesarCodigoEscaneadoPOS(detectedValue);
+                                }
+                            }
+                        } catch (e) {}
+                    }, 250);
+                } catch (err) {
+                    console.warn('BarcodeDetector no admitido:', err);
+                }
+            }
+        },
+
+        simularEscaneoSeleccionadoPOS() {
+            const sel = document.getElementById('pos-cam-sim-producto-select');
+            const codigo = sel ? sel.value : null;
+            if (!codigo) return;
+
+            this.cerrarLectorCamaraPOS();
+            this.procesarCodigoEscaneadoPOS(codigo);
+        },
+
+        abrirModalCodigoNoRegistrado(codigo) {
+            this._ultimoCodigoNuevoDetectado = codigo;
+            const valEl = document.getElementById('pos-nuevo-codigo-detectado-val');
+            if (valEl) valEl.textContent = codigo;
+
+            const modal = document.getElementById('modal-pos-codigo-no-registrado');
+            if (modal) modal.classList.add('active');
+        },
+
+        cerrarModalCodigoNoRegistrado() {
+            const modal = document.getElementById('modal-pos-codigo-no-registrado');
+            if (modal) modal.classList.remove('active');
+        },
+
+        registrarProductoDesdeCodigoNuevoDetectado() {
+            const code = this._ultimoCodigoNuevoDetectado;
+            this.cerrarModalCodigoNoRegistrado();
+            this.abrirModalPOSAgregarProductoRubro('producto', null, code);
+        },
+
+        generarCodigoViasaEAN13Auto() {
+            if (window.ViasaCodeEngine && typeof window.ViasaCodeEngine.generarEAN13UnicoProductoViasa === 'function') {
+                return window.ViasaCodeEngine.generarEAN13UnicoProductoViasa(this.productos);
+            }
+            const sec = String(Math.floor(100000 + Math.random() * 900000));
+            const raw12 = '759800' + sec;
+            let sum = 0;
+            for (let i = 0; i < 12; i++) {
+                const digit = parseInt(raw12[i], 10);
+                sum += (i % 2 === 0) ? digit : digit * 3;
+            }
+            const check = (10 - (sum % 10)) % 10;
+            return raw12 + String(check);
+        },
+
+        autogenerarCodigoViasaFormularioPOS() {
+            const code = this.generarCodigoViasaEAN13Auto();
+            const input = document.getElementById('pos-prod-barcode');
+            if (input) input.value = code;
+
+            this.actualizarPrevisualizacionCodigoFormularioPOS(code);
+
+            if (window.ViasaAudio) window.ViasaAudio.playClick();
+            this.mostrarNotificacionToast(`⚡ Código EAN-13 generado: ${code}`, 'info');
+        },
+
+        activarEscuchaEmpaqueFormularioPOS() {
+            const input = document.getElementById('pos-prod-barcode');
+            if (input) {
+                input.focus();
+                input.select();
+            }
+            this._escuchandoEmpaqueFormularioPOS = true;
+            if (window.ViasaAudio) window.ViasaAudio.playClick();
+            this.mostrarNotificacionToast('🔊 Listo. Dispare el lector láser al empaque o escriba el código.', 'info');
+        },
+
+        actualizarPrevisualizacionCodigoFormularioPOS(codigo) {
+            const code = (codigo || '').trim() || '759800000001';
+
+            const barcodeCanvas = document.getElementById('pos-form-barcode-canvas');
+            if (barcodeCanvas && window.ViasaCodeEngine && window.ViasaCodeEngine.barcode) {
+                window.ViasaCodeEngine.barcode.renderBarcodeCanvas(barcodeCanvas, code, {
+                    height: 40,
+                    scale: 1.5,
+                    displayValue: true
+                });
+            }
+
+            const qrCanvas = document.getElementById('pos-form-qr-canvas');
+            if (qrCanvas && window.ViasaCodeEngine && window.ViasaCodeEngine.qr) {
+                window.ViasaCodeEngine.qr.renderQRCanvas(qrCanvas, `NV|${code}`, {
+                    size: 80
+                });
+            }
         },
 
         // ==============================================================
