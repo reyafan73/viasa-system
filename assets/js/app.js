@@ -5537,7 +5537,7 @@
                                 const waUrl = waNumRep ? `https://api.whatsapp.com/send?phone=58${waNumRep.startsWith('0') ? waNumRep.slice(1) : waNumRep}&text=${encodeURIComponent('Hola, nos comunicamos de Panadería y Pastelería Nueva Viasa.')}` : '#';
 
                                 return `
-                                    <div class="prv-card">
+                                    <div class="prv-card" onclick="ViasaApp.abrirFichaTecnicaIntegralProveedor('${prv.id}')" style="cursor: pointer;" title="Haga clic para abrir la Ficha Técnica Integral de ${prv.nombreEmpresa}">
                                         <div>
                                             <div class="prv-card-header" style="display: flex; gap: 10px; align-items: center; margin-bottom: 10px;">
                                                 <div class="prv-logo-box" style="width: 48px; height: 48px; min-width: 48px; border-radius: 8px; background: rgba(15, 23, 42, 0.8); border: 1.5px solid #38bdf8; display: flex; align-items: center; justify-content: center; overflow: hidden; box-shadow: 0 2px 6px rgba(0,0,0,0.35);">
@@ -5573,7 +5573,7 @@
                                                     </div>
                                                     <div style="font-size: 0.76rem; color: #cbd5e1; display: flex; flex-wrap: wrap; gap: 5px;">
                                                         ${telsEmp.length > 0 ? telsEmp.map((t, idx) => `
-                                                            <a href="tel:${t.replace(/\s+/g, '')}" style="color: #e2e8f0; text-decoration: none; background: rgba(255,255,255,0.07); padding: 2px 7px; border-radius: 4px; font-size: 0.73rem; display: inline-flex; align-items: center; gap: 4px;" title="Llamar a la Empresa (${idx + 1})">
+                                                            <a href="tel:${t.replace(/\s+/g, '')}" onclick="event.stopPropagation()" style="color: #e2e8f0; text-decoration: none; background: rgba(255,255,255,0.07); padding: 2px 7px; border-radius: 4px; font-size: 0.73rem; display: inline-flex; align-items: center; gap: 4px;" title="Llamar a la Empresa (${idx + 1})">
                                                                 <i class="fa-solid fa-phone" style="font-size: 0.65rem; color: #38bdf8;"></i> ${t}
                                                             </a>
                                                         `).join('') : '<span style="color: #64748b; font-size: 0.72rem;">No registrados</span>'}
@@ -5587,7 +5587,7 @@
                                                             <i class="fa-solid fa-user-tie"></i> Vendedor / Representante:
                                                         </div>
                                                         ${waNumRep ? `
-                                                            <a href="${waUrl}" target="_blank" style="color: #25d366; font-size: 0.8rem; text-decoration: none; display: inline-flex; align-items: center; gap: 3px;" title="Chatear por WhatsApp">
+                                                            <a href="${waUrl}" onclick="event.stopPropagation()" target="_blank" style="color: #25d366; font-size: 0.8rem; text-decoration: none; display: inline-flex; align-items: center; gap: 3px;" title="Chatear por WhatsApp">
                                                                 <i class="fa-brands fa-whatsapp"></i> <strong>WhatsApp</strong>
                                                             </a>
                                                         ` : ''}
@@ -5597,7 +5597,7 @@
                                                     </div>
                                                     <div style="font-size: 0.74rem; color: #cbd5e1; display: flex; flex-wrap: wrap; gap: 5px;">
                                                         ${telsRep.length > 0 ? telsRep.map((t, idx) => `
-                                                            <a href="tel:${t.replace(/\s+/g, '')}" style="color: #e2e8f0; text-decoration: none; background: rgba(255,255,255,0.07); padding: 2px 7px; border-radius: 4px; font-size: 0.73rem; display: inline-flex; align-items: center; gap: 4px;" title="Llamar al Vendedor (${idx + 1})">
+                                                            <a href="tel:${t.replace(/\s+/g, '')}" onclick="event.stopPropagation()" style="color: #e2e8f0; text-decoration: none; background: rgba(255,255,255,0.07); padding: 2px 7px; border-radius: 4px; font-size: 0.73rem; display: inline-flex; align-items: center; gap: 4px;" title="Llamar al Vendedor (${idx + 1})">
                                                                 <i class="fa-solid fa-mobile-screen" style="font-size: 0.65rem; color: #34d399;"></i> ${t}
                                                             </a>
                                                         `).join('') : '<span style="color: #64748b; font-size: 0.72rem;">Sin teléfonos del vendedor</span>'}
@@ -5631,22 +5631,22 @@
                                         </div>
 
                                         <div style="display: flex; gap: 6px; margin-top: 14px; border-top: 1px solid var(--border-color); padding-top: 10px; flex-wrap: wrap;">
-                                            <button type="button" class="btn-secondary" onclick="ViasaApp.abrirModalProveedor('${prv.id}')" style="flex: 1; font-size: 0.75rem; padding: 6px 8px;">
+                                            <button type="button" class="btn-secondary" onclick="event.stopPropagation(); ViasaApp.abrirModalProveedor('${prv.id}')" style="flex: 1; font-size: 0.75rem; padding: 6px 8px;" title="Editar datos del Proveedor">
                                                 <i class="fa-solid fa-pen-to-square"></i> Editar
                                             </button>
-                                            <button type="button" class="btn-secondary" onclick="ViasaApp.abrirModalFichaProveedor('${prv.id}')" style="font-size: 0.75rem; padding: 6px 8px; color: #34d399; border-color: #059669;" title="Ver Ficha Técnica Oficial con Logotipo y QR">
-                                                <i class="fa-solid fa-id-card"></i> Ficha
+                                            <button type="button" class="btn-secondary" onclick="event.stopPropagation(); ViasaApp.abrirFichaTecnicaIntegralProveedor('${prv.id}')" style="font-size: 0.75rem; padding: 6px 10px; color: #10b981; border-color: #059669; font-weight: 700; background: rgba(16, 185, 129, 0.1);" title="Ver Ficha Técnica Integral del Proveedor">
+                                                <i class="fa-solid fa-clipboard-list"></i> 📋 Ficha
                                             </button>
-                                            <button type="button" class="btn-gold" onclick="ViasaApp.abrirModalOrdenCompra('${prv.id}')" style="flex: 1.3; font-size: 0.75rem; padding: 6px 8px;">
+                                            <button type="button" class="btn-gold" onclick="event.stopPropagation(); ViasaApp.abrirModalOrdenCompra('${prv.id}')" style="flex: 1.3; font-size: 0.75rem; padding: 6px 8px;" title="Generar Orden de Compra">
                                                 <i class="fa-solid fa-cart-plus"></i> Generar OC
                                             </button>
-                                            <button type="button" class="btn-secondary" onclick="ViasaApp.abrirRedactorCorreo({destinatarioEmail: '${prv.email || ''}', destinatarioNombre: '${prv.nombreEmpresa}', entidadId: '${prv.id}', entidadTipo: 'proveedor', plantilla: 'solicitud_cotizacion'})" style="font-size: 0.75rem; padding: 6px 8px; color: #38bdf8; border-color: #0284c7;" title="Redactar Correo al Proveedor">
+                                            <button type="button" class="btn-secondary" onclick="event.stopPropagation(); ViasaApp.abrirRedactorCorreo({destinatarioEmail: '${prv.email || ''}', destinatarioNombre: '${prv.nombreEmpresa}', entidadId: '${prv.id}', entidadTipo: 'proveedor', plantilla: 'solicitud_cotizacion'})" style="font-size: 0.75rem; padding: 6px 8px; color: #38bdf8; border-color: #0284c7;" title="Redactar Correo al Proveedor">
                                                 <i class="fa-solid fa-envelope"></i>
                                             </button>
-                                            <button type="button" class="btn-secondary" onclick="ViasaApp.abrirHistorialCorreosProveedor('${prv.id}')" style="font-size: 0.75rem; padding: 6px 8px; color: #fbbf24; border-color: #d97706;" title="Ver Historial de Correos y Facturas">
+                                            <button type="button" class="btn-secondary" onclick="event.stopPropagation(); ViasaApp.abrirHistorialCorreosProveedor('${prv.id}')" style="font-size: 0.75rem; padding: 6px 8px; color: #fbbf24; border-color: #d97706;" title="Ver Historial de Correos y Facturas">
                                                 <i class="fa-solid fa-inbox"></i>
                                             </button>
-                                            <button type="button" class="btn-secondary" onclick="ViasaApp.eliminarProveedor('${prv.id}')" style="font-size: 0.75rem; padding: 6px 8px; color: #f87171;" title="Eliminar Proveedor">
+                                            <button type="button" class="btn-secondary" onclick="event.stopPropagation(); ViasaApp.eliminarProveedor('${prv.id}')" style="font-size: 0.75rem; padding: 6px 8px; color: #f87171;" title="Eliminar Proveedor">
                                                 <i class="fa-solid fa-trash"></i>
                                             </button>
                                         </div>
@@ -6371,6 +6371,898 @@
                 this.renderProveedores();
                 alert(`🗑️ Proveedor eliminado correctamente.`);
             }
+        },
+
+        // ==============================================================
+        // FICHA TÉCNICA INTEGRAL DEL PROVEEDOR (EXECUTIVE DRAWER & MODAL)
+        // ==============================================================
+        abrirFichaTecnicaIntegralProveedor(prvId, subTab = 'general') {
+            const prv = (this.proveedores || []).find(p => p.id === prvId) || (this.proveedores || [])[0];
+            if (!prv) return;
+
+            this.fichaTecnicaProveedorActivoId = prv.id;
+            this.fichaTecnicaTabActiva = subTab;
+
+            this.renderFichaTecnicaIntegralContent(prv, subTab);
+
+            const modal = document.getElementById('modal-ficha-tecnica-integral-proveedor');
+            if (modal) {
+                modal.classList.add('active');
+            }
+
+            if (window.ViasaAudio) window.ViasaAudio.playClick();
+        },
+
+        cerrarFichaTecnicaIntegralProveedor() {
+            const modal = document.getElementById('modal-ficha-tecnica-integral-proveedor');
+            if (modal) {
+                modal.classList.remove('active');
+            }
+            if (window.ViasaAudio) window.ViasaAudio.playClick();
+        },
+
+        cambiarTabFichaTecnica(tabName) {
+            this.fichaTecnicaTabActiva = tabName;
+            const prv = (this.proveedores || []).find(p => p.id === this.fichaTecnicaProveedorActivoId);
+            if (prv) {
+                this.renderFichaTecnicaIntegralContent(prv, tabName);
+            }
+            if (window.ViasaAudio) window.ViasaAudio.playClick();
+        },
+
+        copiarDatosPagoProveedor(prvId) {
+            const prv = (this.proveedores || []).find(p => p.id === prvId);
+            if (!prv) return;
+
+            const banco = prv.bancoNombre || (prv.bancoPago && prv.bancoPago.includes('Banesco') ? 'Banesco Banco Universal (0134)' : (prv.bancoPago && prv.bancoPago.includes('Venezuela') ? 'Banco de Venezuela (0102)' : 'Banesco Banco Universal (0134)'));
+            const cuenta = prv.cuentaBancaria || (prv.bancoPago && prv.bancoPago.match(/\d{10,20}/) ? prv.bancoPago.match(/\d{10,20}/)[0] : '0134-0982-11-0001849201');
+            const pagoMovil = prv.pagoMovil || `Banesco (0134) / Tel: ${prv.telefonoRep1 || prv.telefonoEmpresa1 || prv.telefono || '0414-8901234'} / RIF ${prv.rif}`;
+
+            const texto = `=== DATOS BANCARIOS Y DE PAGO ===\n` +
+                `Empresa / Razón Social: ${prv.nombreEmpresa}\n` +
+                `RIF: ${prv.rif}\n` +
+                `Banco: ${banco}\n` +
+                `Cuenta Corriente: ${cuenta}\n` +
+                `Pago Móvil: ${pagoMovil}\n` +
+                `Contacto / Representante: ${prv.contacto || prv.vendedor || 'Atención Comercial'} (${prv.telefonoRep1 || prv.telefonoEmpresa1 || prv.telefono || 'Sin teléfono'})\n` +
+                `Beneficiario de Pago: Panadería y Pastelería Nueva Viasa C.A.`;
+
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(texto).then(() => {
+                    alert(`📋 ¡Datos de Pago de ${prv.nombreEmpresa} copiados al portapapeles con éxito!\n\nPuede pegarlos en su banca en línea o chat de WhatsApp.`);
+                }).catch(() => {
+                    prompt('Copie los siguientes datos de pago:', texto);
+                });
+            } else {
+                prompt('Copie los siguientes datos de pago:', texto);
+            }
+            if (window.ViasaAudio) window.ViasaAudio.playCashChime();
+        },
+
+        imprimirFichaTecnicaProveedor() {
+            document.body.classList.add('imprimiendo-ficha-proveedor');
+            window.print();
+            setTimeout(() => {
+                document.body.classList.remove('imprimiendo-ficha-proveedor');
+            }, 1000);
+        },
+
+        toggleDetalleItemsOC(ocId) {
+            const el = document.getElementById(`detalle-oc-${ocId}`);
+            if (el) {
+                const isHidden = (el.style.display === 'none' || !el.style.display);
+                el.style.display = isHidden ? 'table-row' : 'none';
+            }
+        },
+
+        renderFichaTecnicaIntegralContent(prv, subTab = 'general') {
+            const container = document.getElementById('ficha-tecnica-integral-content');
+            if (!container) return;
+
+            const tasaBCV = this.tasaBCV || 36.85;
+            const tasaUSDT = this.tasaParalelo || 40.50;
+
+            // 1. Cruce con Cuentas por Pagar (CxP)
+            const cxpPrv = (this.cuentasPorPagar || []).filter(c => 
+                c.proveedorId === prv.id || 
+                (c.proveedorNombre && prv.nombreEmpresa && c.proveedorNombre.toLowerCase().includes(prv.nombreEmpresa.toLowerCase().slice(0, 8))) ||
+                (c.proveedor && prv.nombreEmpresa && c.proveedor.toLowerCase().includes(prv.nombreEmpresa.toLowerCase().slice(0, 8)))
+            );
+            const cxpPendientes = cxpPrv.filter(c => c.estado !== 'pagada' && ((c.saldoPendienteUSD || c.saldoPendiente || 0) > 0));
+            const totalDeudaUSD = cxpPendientes.reduce((acc, c) => acc + (c.saldoPendienteUSD || c.saldoPendiente || 0), 0);
+            const totalDeudaBsBCV = totalDeudaUSD * tasaBCV;
+            const totalDeudaBsUSDT = totalDeudaUSD * tasaUSDT;
+            const hoyStr = new Date().toISOString().slice(0, 10);
+            const cxpVencidas = cxpPendientes.filter(c => c.fechaVencimiento && c.fechaVencimiento < hoyStr).length;
+
+            // 2. Cruce con Órdenes de Compra
+            const ordenesPrv = (this.ordenesCompra || []).filter(o => 
+                o.proveedorId === prv.id || 
+                (o.proveedorNombre && prv.nombreEmpresa && o.proveedorNombre.toLowerCase().includes(prv.nombreEmpresa.toLowerCase().slice(0, 8))) ||
+                (o.proveedor && prv.nombreEmpresa && o.proveedor.toLowerCase().includes(prv.nombreEmpresa.toLowerCase().slice(0, 8)))
+            );
+            const totalVolumenUSD = ordenesPrv.reduce((acc, o) => acc + (o.totalUSD || o.montoTotalUSD || 0), 0);
+            const numOrdenes = ordenesPrv.length;
+
+            // 3. Última Compra
+            const ordenesOrdenadas = [...ordenesPrv].sort((a, b) => (b.fechaEmision || b.fecha || '').localeCompare(a.fechaEmision || a.fecha || ''));
+            const ultimaOrden = ordenesOrdenadas[0];
+            const ultimaFecha = ultimaOrden ? (ultimaOrden.fechaEmision || ultimaOrden.fecha || 'Reciente') : 'Sin compras registradas';
+            const ultimoMontoUSD = ultimaOrden ? (ultimaOrden.totalUSD || ultimaOrden.montoTotalUSD || 0) : 0;
+
+            // 4. Insumos y Materias Primas Suministradas
+            const insumosCodigos = Array.isArray(prv.insumosSuministrados) ? prv.insumosSuministrados : [];
+            const insumosPrv = (this.materiaPrima || []).filter(mp => 
+                insumosCodigos.includes(mp.id) ||
+                (mp.proveedor && prv.nombreEmpresa && mp.proveedor.toLowerCase().includes(prv.nombreEmpresa.toLowerCase().slice(0, 8))) ||
+                insumosCodigos.some(ins => (mp.nombre || '').toLowerCase().includes(ins.toLowerCase()))
+            );
+
+            // 5. Fórmulas de Panadería Impactadas
+            const recetasImpactadas = (this.recetasFormulas || []).filter(rec => 
+                (rec.ingredientes || []).some(ing => insumosPrv.some(mp => mp.id === ing.materiaPrimaId || (ing.nombre && mp.nombre && ing.nombre.toLowerCase().includes(mp.nombre.toLowerCase().slice(0, 8)))))
+            );
+
+            // 6. Indicadores Operativos
+            const leadTime = prv.diasEntrega || (prv.categoria === 'Harinas y Trigo' ? '2 a 3 días hábiles' : (prv.categoria === 'Lácteos' ? '24 a 48 hrs' : '2 a 4 días hábiles'));
+            const ratingNum = parseFloat(prv.calificacion) || 5.0;
+
+            // 7. Contactos y Teléfonos
+            const telsEmp = [prv.telefonoEmpresa1 || prv.telefono, prv.telefonoEmpresa2, prv.telefonoEmpresa3].filter(Boolean);
+            const telsRep = [prv.telefonoRep1, prv.telefonoRep2].filter(Boolean);
+            const waNumRep = (prv.telefonoRep1 || prv.telefonoEmpresa1 || prv.telefono || '').replace(/\D/g, '');
+            const waUrl = waNumRep ? `https://api.whatsapp.com/send?phone=58${waNumRep.startsWith('0') ? waNumRep.slice(1) : waNumRep}&text=${encodeURIComponent('Hola, nos comunicamos de Panadería y Pastelería Nueva Viasa respecto a una cotización/suministro.')}` : '#';
+
+            let tabHtml = '';
+
+            // -------------------------------------------------------------
+            // PESTAÑA 1: INFORMACIÓN GENERAL, CONTACTOS Y DATOS BANCARIOS
+            // -------------------------------------------------------------
+            if (subTab === 'general') {
+                tabHtml = `
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 18px;">
+                        <!-- Columna 1: Corporativo & SENIAT -->
+                        <div style="display: flex; flex-direction: column; gap: 16px;">
+                            <div class="ficha-section-card" style="background: #1e293b; border: 1.5px solid #334155; border-radius: 12px; padding: 18px;">
+                                <h4 style="margin: 0 0 14px 0; font-size: 0.95rem; color: #38bdf8; display: flex; align-items: center; gap: 8px;">
+                                    <i class="fa-solid fa-building-circle-check"></i> Datos Corporativos y Ubicación Fiscal
+                                </h4>
+                                <div style="display: flex; flex-direction: column; gap: 10px; font-size: 0.82rem;">
+                                    <div>
+                                        <span style="color: #94a3b8; display: block; font-size: 0.72rem; text-transform: uppercase;">Razón Social:</span>
+                                        <strong style="color: #f8fafc; font-size: 0.95rem;">${prv.nombreEmpresa}</strong>
+                                    </div>
+                                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                                        <div>
+                                            <span style="color: #94a3b8; display: block; font-size: 0.72rem; text-transform: uppercase;">RIF Fiscal:</span>
+                                            <span style="color: #38bdf8; font-family: monospace; font-weight: 700;">${prv.rif}</span>
+                                        </div>
+                                        <div>
+                                            <span style="color: #94a3b8; display: block; font-size: 0.72rem; text-transform: uppercase;">Categoría:</span>
+                                            <span style="color: #fbbf24; font-weight: 700;">${prv.categoria || 'Materia Prima'}</span>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <span style="color: #94a3b8; display: block; font-size: 0.72rem; text-transform: uppercase;">Dirección Fiscal & Galpón:</span>
+                                        <span style="color: #cbd5e1;"><i class="fa-solid fa-location-dot" style="color: #ef4444; margin-right: 4px;"></i> ${prv.direccion || 'Av. Las Américas, Puerto Ordaz, Estado Bolívar'}</span>
+                                    </div>
+                                    <div>
+                                        <span style="color: #94a3b8; display: block; font-size: 0.72rem; text-transform: uppercase;">Correo Electrónico Oficial:</span>
+                                        <a href="mailto:${prv.email || 'proveedores@viasa.com'}" style="color: #38bdf8; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
+                                            <i class="fa-solid fa-envelope"></i> ${prv.email || 'proveedores@viasa.com'}
+                                        </a>
+                                    </div>
+                                </div>
+
+                                <!-- Teléfonos de Planta/Empresa (Hasta 3 números) -->
+                                <div style="margin-top: 14px; background: rgba(15, 23, 42, 0.6); border-radius: 8px; padding: 12px; border-left: 3px solid #38bdf8;">
+                                    <div style="font-size: 0.75rem; color: #38bdf8; font-weight: 700; margin-bottom: 6px; display: flex; align-items: center; gap: 6px;">
+                                        <i class="fa-solid fa-phone"></i> Teléfonos de Empresa / Planta (Click-to-Call):
+                                    </div>
+                                    <div style="display: flex; flex-direction: column; gap: 6px;">
+                                        ${telsEmp.length > 0 ? telsEmp.map((t, idx) => `
+                                            <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem;">
+                                                <span style="color: #94a3b8;">Línea Directa ${idx + 1}:</span>
+                                                <a href="tel:${t.replace(/\s+/g, '')}" style="color: #38bdf8; text-decoration: none; font-weight: 700; font-family: monospace; background: rgba(56, 189, 248, 0.1); padding: 3px 8px; border-radius: 4px; display: inline-flex; align-items: center; gap: 4px;">
+                                                    <i class="fa-solid fa-phone-volume" style="font-size: 0.7rem;"></i> ${t}
+                                                </a>
+                                            </div>
+                                        `).join('') : '<span style="color: #64748b; font-size: 0.75rem;">Sin números registrados</span>'}
+                                    </div>
+                                </div>
+
+                                <!-- Información Fiscal SENIAT -->
+                                <div style="margin-top: 14px; background: rgba(15, 23, 42, 0.6); border-radius: 8px; padding: 12px; border-left: 3px solid #fbbf24;">
+                                    <div style="font-size: 0.75rem; color: #fbbf24; font-weight: 700; margin-bottom: 6px; display: flex; align-items: center; gap: 6px;">
+                                        <i class="fa-solid fa-scale-balanced"></i> Información Fiscal SENIAT:
+                                    </div>
+                                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 0.78rem;">
+                                        <div>
+                                            <span style="color: #94a3b8; display: block; font-size: 0.7rem;">Condición SENIAT:</span>
+                                            <strong style="color: #e2e8f0;">Sujeto Pasivo Especial</strong>
+                                        </div>
+                                        <div>
+                                            <span style="color: #94a3b8; display: block; font-size: 0.7rem;">Retención IVA:</span>
+                                            <strong style="color: #34d399;">75% del IVA facturado</strong>
+                                        </div>
+                                        <div>
+                                            <span style="color: #94a3b8; display: block; font-size: 0.7rem;">Retención ISLR:</span>
+                                            <strong style="color: #38bdf8;">2.00% (Bienes Muebles)</strong>
+                                        </div>
+                                        <div>
+                                            <span style="color: #94a3b8; display: block; font-size: 0.7rem;">Libros Fiscales:</span>
+                                            <strong style="color: #e2e8f0;">Compras SENIAT</strong>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Políticas Comerciales y Despacho -->
+                            <div class="ficha-section-card" style="background: #1e293b; border: 1.5px solid #334155; border-radius: 12px; padding: 18px;">
+                                <h4 style="margin: 0 0 12px 0; font-size: 0.92rem; color: #f59e0b; display: flex; align-items: center; gap: 8px;">
+                                    <i class="fa-solid fa-handshake-angle"></i> Políticas Comerciales y Condiciones de Recepción
+                                </h4>
+                                <div style="display: flex; flex-direction: column; gap: 8px; font-size: 0.8rem; color: #cbd5e1;">
+                                    <div>
+                                        <strong style="color: #e2e8f0;">Condición de Pago:</strong> ${(prv.diasCredito || 0) > 0 ? `${prv.diasCredito} Días Crédito continuos desde la recepción conforme de la factura.` : 'Operación Estricto Contado contra entrega.'}
+                                    </div>
+                                    <div>
+                                        <strong style="color: #e2e8f0;">Horario de Recepción en Panadería:</strong> Lunes a Viernes de 7:00 AM a 12:00 PM (Acceso por Muelle de Almacén).
+                                    </div>
+                                    <div>
+                                        <strong style="color: #e2e8f0;">Control de Calidad:</strong> Inspección de lote, fecha de caducidad y pesaje en báscula por el Maestro Panadero.
+                                    </div>
+                                    ${prv.notas ? `
+                                        <div style="background: rgba(0,0,0,0.25); padding: 8px 12px; border-radius: 6px; font-style: italic; color: #94a3b8; margin-top: 4px;">
+                                            "${prv.notas}"
+                                        </div>
+                                    ` : ''}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Columna 2: Vendedor & Datos Bancarios -->
+                        <div style="display: flex; flex-direction: column; gap: 16px;">
+                            <!-- Ejecutivo de Ventas / Representante -->
+                            <div class="ficha-section-card" style="background: #1e293b; border: 1.5px solid #334155; border-radius: 12px; padding: 18px;">
+                                <h4 style="margin: 0 0 14px 0; font-size: 0.95rem; color: #34d399; display: flex; align-items: center; gap: 8px;">
+                                    <i class="fa-solid fa-user-tie"></i> Ejecutivo de Ventas / Representante Asignado
+                                </h4>
+                                <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 12px;">
+                                    <div style="width: 52px; height: 52px; min-width: 52px; border-radius: 50%; background: linear-gradient(135deg, #059669, #10b981); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 1.4rem; box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3);">
+                                        <i class="fa-solid fa-user"></i>
+                                    </div>
+                                    <div>
+                                        <div style="font-size: 1.05rem; font-weight: 800; color: #f8fafc;">
+                                            ${prv.contacto || prv.vendedor || 'Representante Asignado'}
+                                        </div>
+                                        <div style="font-size: 0.75rem; color: #94a3b8;">
+                                            Asesor Comercial &bull; Atención Directa de Pedidos
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Teléfonos del Representante (Hasta 2 números) -->
+                                <div style="display: flex; flex-direction: column; gap: 6px; font-size: 0.8rem; margin-bottom: 12px;">
+                                    ${telsRep.length > 0 ? telsRep.map((t, idx) => `
+                                        <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(15, 23, 42, 0.5); padding: 6px 10px; border-radius: 6px;">
+                                            <span style="color: #94a3b8;">Teléfono Móvil ${idx + 1}:</span>
+                                            <a href="tel:${t.replace(/\s+/g, '')}" style="color: #34d399; text-decoration: none; font-weight: 700; font-family: monospace; display: inline-flex; align-items: center; gap: 4px;">
+                                                <i class="fa-solid fa-mobile-screen"></i> ${t}
+                                            </a>
+                                        </div>
+                                    `).join('') : '<span style="color: #64748b; font-size: 0.75rem;">Sin teléfonos de representante registrados</span>'}
+                                </div>
+
+                                ${waNumRep ? `
+                                    <a href="${waUrl}" target="_blank" style="display: flex; align-items: center; justify-content: center; gap: 8px; background: linear-gradient(135deg, #25d366, #128c7e); color: #fff; padding: 10px 16px; border-radius: 8px; text-decoration: none; font-weight: 700; font-size: 0.85rem; box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3); transition: transform 0.15s ease;" onmouseover="this.style.transform='scale(1.02)'" onmouseout="this.style.transform='scale(1)'">
+                                        <i class="fa-brands fa-whatsapp" style="font-size: 1.25rem;"></i> Abrir Chat Directo de WhatsApp
+                                    </a>
+                                ` : ''}
+                            </div>
+
+                            <!-- Cuentas Bancarias y Métodos de Pago Afiliados -->
+                            <div class="ficha-section-card" style="background: #1e293b; border: 1.5px solid #334155; border-radius: 12px; padding: 18px;">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                                    <h4 style="margin: 0; font-size: 0.95rem; color: #fbbf24; display: flex; align-items: center; gap: 8px;">
+                                        <i class="fa-solid fa-building-columns"></i> Cuentas Bancarias y Métodos de Pago
+                                    </h4>
+                                    <span style="font-size: 0.7rem; background: rgba(245, 158, 11, 0.15); color: #fbbf24; padding: 2px 8px; border-radius: 4px; font-weight: 700;">
+                                        Verificado
+                                    </span>
+                                </div>
+
+                                <div style="display: flex; flex-direction: column; gap: 10px; font-size: 0.82rem;">
+                                    <div style="background: rgba(15, 23, 42, 0.6); padding: 10px 12px; border-radius: 8px; border-left: 3px solid #38bdf8;">
+                                        <span style="color: #94a3b8; display: block; font-size: 0.7rem; text-transform: uppercase;">Banco Principal:</span>
+                                        <strong style="color: #f8fafc; font-size: 0.88rem;">${prv.bancoNombre || (prv.bancoPago && prv.bancoPago.includes('Banesco') ? 'Banesco Banco Universal (0134)' : (prv.bancoPago && prv.bancoPago.includes('Venezuela') ? 'Banco de Venezuela (0102)' : 'Banesco Banco Universal (0134)'))}</strong>
+                                        <div style="margin-top: 4px;">
+                                            <span style="color: #94a3b8; font-size: 0.72rem;">N° Cuenta Corriente: </span>
+                                            <span style="color: #38bdf8; font-family: monospace; font-weight: 700;">${prv.cuentaBancaria || (prv.bancoPago && prv.bancoPago.match(/\d{10,20}/) ? prv.bancoPago.match(/\d{10,20}/)[0] : '0134-0982-11-0001849201')}</span>
+                                        </div>
+                                    </div>
+
+                                    <div style="background: rgba(15, 23, 42, 0.6); padding: 10px 12px; border-radius: 8px; border-left: 3px solid #34d399;">
+                                        <span style="color: #94a3b8; display: block; font-size: 0.7rem; text-transform: uppercase;">Pago Móvil C2P / P2P:</span>
+                                        <strong style="color: #34d399;">${prv.pagoMovil || `Banesco 0134 &bull; ${prv.telefonoRep1 || prv.telefonoEmpresa1 || prv.telefono || '0414-8901234'} &bull; RIF ${prv.rif}`}</strong>
+                                    </div>
+
+                                    <div style="background: rgba(15, 23, 42, 0.6); padding: 10px 12px; border-radius: 8px; border-left: 3px solid #fbbf24;">
+                                        <span style="color: #94a3b8; display: block; font-size: 0.7rem; text-transform: uppercase;">Divisas en Efectivo & Zelle:</span>
+                                        <span style="color: #cbd5e1;">Acepta Dólares USD en efectivo en caja de planta &bull; Zelle corporativo disponible previa coordinación.</span>
+                                    </div>
+                                </div>
+
+                                <!-- Botón Copiar Datos de Pago -->
+                                <button type="button" class="btn-gold ficha-no-print" onclick="ViasaApp.copiarDatosPagoProveedor('${prv.id}')" style="width: 100%; margin-top: 14px; font-size: 0.85rem; padding: 10px; display: flex; align-items: center; justify-content: center; gap: 8px; font-weight: 700;">
+                                    <i class="fa-solid fa-clipboard-check"></i> 📋 Copiar Datos de Pago al Portapapeles
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // -------------------------------------------------------------
+            // PESTAÑA 2: INSUMOS VINCULADOS Y ESCANDALLOS
+            // -------------------------------------------------------------
+            else if (subTab === 'insumos') {
+                tabHtml = `
+                    <div style="display: flex; flex-direction: column; gap: 18px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                            <div>
+                                <h4 style="margin: 0; color: #f8fafc; font-size: 1rem; display: flex; align-items: center; gap: 8px;">
+                                    <i class="fa-solid fa-boxes-stacked" style="color: #38bdf8;"></i> Materias Primas e Insumos Suministrados (${insumosPrv.length})
+                                </h4>
+                                <p style="margin: 2px 0 0 0; font-size: 0.75rem; color: #94a3b8;">Catálogo homologado para Panadería Nueva Viasa sincronizado con el inventario central</p>
+                            </div>
+                            <div style="display: flex; gap: 8px;">
+                                <button type="button" class="btn-gold ficha-no-print" onclick="ViasaApp.cerrarFichaTecnicaIntegralProveedor(); ViasaApp.abrirModalOrdenCompra('${prv.id}')" style="font-size: 0.78rem; padding: 6px 12px;">
+                                    <i class="fa-solid fa-cart-plus"></i> Comprar Insumos
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Tabla de Insumos -->
+                        <div style="background: #1e293b; border: 1.5px solid #334155; border-radius: 12px; overflow-x: auto;">
+                            <table class="ficha-table" style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.8rem;">
+                                <thead>
+                                    <tr style="background: #0f172a; border-bottom: 2px solid #334155; color: #94a3b8; font-size: 0.72rem; text-transform: uppercase;">
+                                        <th style="padding: 12px 14px;">Código</th>
+                                        <th style="padding: 12px 14px;">Insumo / Materia Prima</th>
+                                        <th style="padding: 12px 14px; text-align: center;">Unidad</th>
+                                        <th style="padding: 12px 14px; text-align: right;">Último Costo ($ USD)</th>
+                                        <th style="padding: 12px 14px; text-align: right;">Equivalente Bs. (BCV)</th>
+                                        <th style="padding: 12px 14px; text-align: right;">Equivalente Bs. (USDT)</th>
+                                        <th style="padding: 12px 14px; text-align: center;">Stock Actual</th>
+                                        <th style="padding: 12px 14px; text-align: center;">Lote Activo</th>
+                                        <th style="padding: 12px 14px; text-align: center;">Variación</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${insumosPrv.length > 0 ? insumosPrv.map(mp => {
+                                        const costoUSD = mp.costoUSD || 0;
+                                        const costoBsBCV = costoUSD * tasaBCV;
+                                        const costoBsUSDT = costoUSD * tasaUSDT;
+                                        const stockCritico = (mp.stockActual || 0) <= (mp.stockMinimo || 0);
+
+                                        return `
+                                            <tr style="border-bottom: 1px solid #334155; transition: background 0.15s;" onmouseover="this.style.background='rgba(51, 65, 85, 0.4)'" onmouseout="this.style.background='transparent'">
+                                                <td style="padding: 10px 14px; font-family: monospace; font-weight: 700; color: #38bdf8;">${mp.id}</td>
+                                                <td style="padding: 10px 14px;">
+                                                    <strong style="color: #f8fafc; font-size: 0.85rem;">${mp.nombre}</strong>
+                                                    <span style="display: block; font-size: 0.7rem; color: #94a3b8;">${mp.categoria || 'Insumo'}</span>
+                                                </td>
+                                                <td style="padding: 10px 14px; text-align: center;">
+                                                    <span style="background: rgba(255,255,255,0.06); padding: 3px 8px; border-radius: 4px; font-size: 0.72rem; color: #cbd5e1; font-weight: 600;">
+                                                        ${mp.unidad}
+                                                    </span>
+                                                </td>
+                                                <td style="padding: 10px 14px; text-align: right; font-weight: 800; color: #34d399; font-size: 0.88rem;">
+                                                    $${costoUSD.toFixed(2)}
+                                                </td>
+                                                <td style="padding: 10px 14px; text-align: right; color: #38bdf8; font-weight: 700; font-family: monospace;">
+                                                    Bs. ${costoBsBCV.toLocaleString('es-VE', {minimumFractionDigits: 2, maximumFractionDigits: 2})}
+                                                </td>
+                                                <td style="padding: 10px 14px; text-align: right; color: #fbbf24; font-family: monospace;">
+                                                    Bs. ${costoBsUSDT.toLocaleString('es-VE', {minimumFractionDigits: 2, maximumFractionDigits: 2})}
+                                                </td>
+                                                <td style="padding: 10px 14px; text-align: center;">
+                                                    <span style="font-weight: 700; color: ${stockCritico ? '#f87171' : '#f8fafc'}; font-size: 0.85rem;">${mp.stockActual}</span>
+                                                    <span style="display: block; font-size: 0.68rem; font-weight: 700; color: ${stockCritico ? '#ef4444' : '#10b981'};">
+                                                        ${stockCritico ? '⚠️ Bajo Mínimo' : '✓ Normal'}
+                                                    </span>
+                                                </td>
+                                                <td style="padding: 10px 14px; text-align: center; font-family: monospace; font-size: 0.75rem; color: #cbd5e1;">
+                                                    ${mp.lote || 'LOTE-ACTUAL'}
+                                                </td>
+                                                <td style="padding: 10px 14px; text-align: center;">
+                                                    <span style="background: rgba(16, 185, 129, 0.15); color: #34d399; padding: 2px 7px; border-radius: 4px; font-size: 0.72rem; font-weight: 700;">
+                                                        0.0% Estable
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        `;
+                                    }).join('') : `
+                                        <tr>
+                                            <td colspan="9" style="text-align: center; padding: 30px; color: #94a3b8;">
+                                                <i class="fa-solid fa-box-open" style="font-size: 1.8rem; margin-bottom: 8px; display: block; color: #64748b;"></i>
+                                                No hay materias primas explícitamente vinculadas a este proveedor en el catálogo.
+                                            </td>
+                                        </tr>
+                                    `}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Panel de Impacto en Fórmulas y Escandallos (Producción) -->
+                        <div class="ficha-section-card" style="background: #1e293b; border: 1.5px solid #334155; border-radius: 12px; padding: 18px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                                <div>
+                                    <h4 style="margin: 0; color: #fbbf24; font-size: 0.95rem; display: flex; align-items: center; gap: 8px;">
+                                        <i class="fa-solid fa-wheat-awn"></i> Impacto en Fórmulas y Escandallos de Producción
+                                    </h4>
+                                    <p style="margin: 2px 0 0 0; font-size: 0.75rem; color: #94a3b8;">Recetas de panadería y pastelería que dependen directamente de los suministros de ${prv.nombreEmpresa}</p>
+                                </div>
+                                <span style="font-size: 0.72rem; background: rgba(245, 158, 11, 0.15); color: #fbbf24; padding: 3px 10px; border-radius: 6px; font-weight: 700;">
+                                    ${recetasImpactadas.length} Recetas Afectadas
+                                </span>
+                            </div>
+
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px;">
+                                ${recetasImpactadas.length > 0 ? recetasImpactadas.map(rec => {
+                                    const ingredienteVinculado = (rec.ingredientes || []).find(ing => insumosPrv.some(mp => mp.id === ing.materiaPrimaId));
+                                    return `
+                                        <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid #334155; border-radius: 8px; padding: 12px;">
+                                            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px;">
+                                                <strong style="color: #f8fafc; font-size: 0.85rem;">${rec.nombre}</strong>
+                                                <span style="font-size: 0.7rem; color: #38bdf8; font-family: monospace;">${rec.productoResultante || rec.id}</span>
+                                            </div>
+                                            <p style="margin: 0 0 8px 0; font-size: 0.74rem; color: #94a3b8; font-style: italic;">
+                                                ${rec.descripcion || 'Fórmula estándar de panadería.'}
+                                            </p>
+                                            <div style="font-size: 0.75rem; color: #cbd5e1; background: rgba(51, 65, 85, 0.4); padding: 6px 8px; border-radius: 5px;">
+                                                <div><strong style="color: #fbbf24;">Insumo Base:</strong> ${ingredienteVinculado ? ingredienteVinculado.nombre : 'Materia Prima'} (${ingredienteVinculado ? ingredienteVinculado.cantidad + ' ' + ingredienteVinculado.unidad : ''})</div>
+                                                <div style="margin-top: 3px;"><strong style="color: #34d399;">Rendimiento:</strong> ${rec.rendimientoEstimadoUnidades || 100} Unidades por bache</div>
+                                            </div>
+                                        </div>
+                                    `;
+                                }).join('') : `
+                                    <div style="grid-column: 1 / -1; padding: 16px; background: rgba(15, 23, 42, 0.5); border-radius: 8px; text-align: center; color: #94a3b8; font-size: 0.8rem;">
+                                        No se han configurado recetas de panadería que utilicen directamente las materias primas de este proveedor en el módulo de Producción.
+                                    </div>
+                                `}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // -------------------------------------------------------------
+            // PESTAÑA 3: HISTORIAL DE ÓRDENES DE COMPRA (OC) Y FACTURAS
+            // -------------------------------------------------------------
+            else if (subTab === 'ordenes') {
+                tabHtml = `
+                    <div style="display: flex; flex-direction: column; gap: 16px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                            <div>
+                                <h4 style="margin: 0; color: #f8fafc; font-size: 1rem; display: flex; align-items: center; gap: 8px;">
+                                    <i class="fa-solid fa-receipt" style="color: #38bdf8;"></i> Registro Cronológico de Compras y Facturas Recibidas (${ordenesPrv.length})
+                                </h4>
+                                <p style="margin: 2px 0 0 0; font-size: 0.75rem; color: #94a3b8;">Órdenes emitidas, notas de entrega y facturas de ${prv.nombreEmpresa}</p>
+                            </div>
+                            <button type="button" class="btn-gold ficha-no-print" onclick="ViasaApp.cerrarFichaTecnicaIntegralProveedor(); ViasaApp.abrirModalOrdenCompra('${prv.id}')" style="font-size: 0.8rem; padding: 7px 14px;">
+                                <i class="fa-solid fa-cart-plus"></i> Nueva Orden de Compra
+                            </button>
+                        </div>
+
+                        <div style="background: #1e293b; border: 1.5px solid #334155; border-radius: 12px; overflow-x: auto;">
+                            <table class="ficha-table" style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.8rem;">
+                                <thead>
+                                    <tr style="background: #0f172a; border-bottom: 2px solid #334155; color: #94a3b8; font-size: 0.72rem; text-transform: uppercase;">
+                                        <th style="padding: 12px 14px;">N° OC</th>
+                                        <th style="padding: 12px 14px;">N° Factura</th>
+                                        <th style="padding: 12px 14px; text-align: center;">Emisión</th>
+                                        <th style="padding: 12px 14px; text-align: center;">Recepción</th>
+                                        <th style="padding: 12px 14px; text-align: center;">Condición</th>
+                                        <th style="padding: 12px 14px; text-align: right;">Total $ USD</th>
+                                        <th style="padding: 12px 14px; text-align: right;">Total Bs. (BCV)</th>
+                                        <th style="padding: 12px 14px; text-align: center;">Recepción</th>
+                                        <th style="padding: 12px 14px; text-align: center;">Estado Pago</th>
+                                        <th style="padding: 12px 14px; text-align: center;" class="ficha-no-print">Desglose</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${ordenesPrv.length > 0 ? ordenesPrv.map(oc => {
+                                        const montoUSD = oc.totalUSD || oc.montoTotalUSD || 0;
+                                        const montoBs = montoUSD * tasaBCV;
+                                        const ocItems = oc.items || [];
+                                        const statusRecepcion = oc.estado || 'Recibida';
+                                        const statusPago = oc.estadoPago || (oc.pagada ? 'Pagada' : ((prv.diasCredito || 0) > 0 ? 'Pendiente' : 'Pagada'));
+
+                                        return `
+                                            <tr style="border-bottom: 1px solid #334155;">
+                                                <td style="padding: 10px 14px; font-family: monospace; font-weight: 700; color: #38bdf8;">${oc.id}</td>
+                                                <td style="padding: 10px 14px; font-family: monospace; color: #cbd5e1;">${oc.numeroFactura || oc.facturaAsociada || 'FAC-' + oc.id.replace(/\D/g, '')}</td>
+                                                <td style="padding: 10px 14px; text-align: center; color: #94a3b8;">${oc.fechaEmision || oc.fecha || '2026-09-01'}</td>
+                                                <td style="padding: 10px 14px; text-align: center; color: #cbd5e1;">${oc.fechaEntrega || oc.fechaRecepcion || 'Recibida'}</td>
+                                                <td style="padding: 10px 14px; text-align: center;">
+                                                    <span style="background: rgba(255,255,255,0.06); padding: 2px 7px; border-radius: 4px; font-size: 0.72rem;">
+                                                        ${oc.condicionPago || ((prv.diasCredito || 0) > 0 ? `${prv.diasCredito} Días Crédito` : 'Contado')}
+                                                    </span>
+                                                </td>
+                                                <td style="padding: 10px 14px; text-align: right; font-weight: 800; color: #34d399;">
+                                                    $${montoUSD.toFixed(2)}
+                                                </td>
+                                                <td style="padding: 10px 14px; text-align: right; color: #38bdf8; font-family: monospace;">
+                                                    Bs. ${montoBs.toLocaleString('es-VE', {minimumFractionDigits: 2, maximumFractionDigits: 2})}
+                                                </td>
+                                                <td style="padding: 10px 14px; text-align: center;">
+                                                    <span style="background: rgba(16, 185, 129, 0.15); color: #34d399; padding: 2px 8px; border-radius: 4px; font-size: 0.72rem; font-weight: 700;">
+                                                        ${statusRecepcion}
+                                                    </span>
+                                                </td>
+                                                <td style="padding: 10px 14px; text-align: center;">
+                                                    <span style="background: ${statusPago === 'Pagada' ? 'rgba(16, 185, 129, 0.2)' : 'rgba(239, 68, 68, 0.2)'}; color: ${statusPago === 'Pagada' ? '#86efac' : '#fca5a5'}; padding: 2px 8px; border-radius: 4px; font-size: 0.72rem; font-weight: 700;">
+                                                        ${statusPago}
+                                                    </span>
+                                                </td>
+                                                <td style="padding: 10px 14px; text-align: center;" class="ficha-no-print">
+                                                    <button type="button" class="btn-secondary" onclick="ViasaApp.toggleDetalleItemsOC('${oc.id}')" style="font-size: 0.72rem; padding: 4px 8px; color: #38bdf8; border-color: #0284c7;">
+                                                        <i class="fa-solid fa-list-ul"></i> Ítems
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                            <tr id="detalle-oc-${oc.id}" style="display: none; background: rgba(15, 23, 42, 0.75);">
+                                                <td colspan="10" style="padding: 12px 18px; border-bottom: 2px solid #334155;">
+                                                    <div style="font-size: 0.75rem; color: #94a3b8; margin-bottom: 6px; font-weight: 700;">
+                                                        <i class="fa-solid fa-cube"></i> Desglose de Insumos Recibidos en Orden ${oc.id}:
+                                                    </div>
+                                                    <div style="display: flex; flex-direction: column; gap: 4px;">
+                                                        ${ocItems.length > 0 ? ocItems.map(it => `
+                                                            <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(30, 41, 59, 0.5); padding: 6px 12px; border-radius: 6px; font-size: 0.78rem;">
+                                                                <span style="color: #f8fafc;"><strong>${it.nombre || it.descripcion}</strong> (${it.cantidad} ${it.unidad || 'und'})</span>
+                                                                <span style="color: #34d399; font-weight: 700;">$${((it.cantidad || 1) * (it.precioUnitarioUSD || it.costoUSD || 0)).toFixed(2)} USD</span>
+                                                            </div>
+                                                        `).join('') : '<span style="color: #64748b; font-size: 0.75rem;">Sin desglose detallado de ítems para esta orden histórica.</span>'}
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        `;
+                                    }).join('') : `
+                                        <tr>
+                                            <td colspan="10" style="text-align: center; padding: 32px; color: #94a3b8;">
+                                                <i class="fa-solid fa-clipboard-list" style="font-size: 2rem; margin-bottom: 8px; display: block; color: #64748b;"></i>
+                                                No se registran compras u órdenes previas emitidas a ${prv.nombreEmpresa}.
+                                                <div style="margin-top: 10px;">
+                                                    <button type="button" class="btn-gold ficha-no-print" onclick="ViasaApp.cerrarFichaTecnicaIntegralProveedor(); ViasaApp.abrirModalOrdenCompra('${prv.id}')" style="font-size: 0.78rem; padding: 6px 14px;">
+                                                        <i class="fa-solid fa-cart-plus"></i> Generar Primera Orden de Compra
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    `}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // -------------------------------------------------------------
+            // PESTAÑA 4: ESTADO DE CUENTA, CUENTAS POR PAGAR Y ABONOS
+            // -------------------------------------------------------------
+            else if (subTab === 'cxp') {
+                tabHtml = `
+                    <div style="display: flex; flex-direction: column; gap: 18px;">
+                        <!-- Resumen Financiero Superior -->
+                        <div style="background: linear-gradient(135deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.95)); border: 1.5px solid ${totalDeudaUSD > 0 ? '#ef4444' : '#10b981'}; border-radius: 12px; padding: 18px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 16px;">
+                            <div>
+                                <div style="font-size: 0.78rem; text-transform: uppercase; color: #94a3b8; font-weight: 700;">
+                                    Estado Financiero de Cuentas por Pagar (CxP)
+                                </div>
+                                <div style="font-size: 1.5rem; font-weight: 800; color: ${totalDeudaUSD > 0 ? '#f87171' : '#34d399'}; margin-top: 2px;">
+                                    Saldo Deudor Pendiente: $${totalDeudaUSD.toLocaleString('es-VE', {minimumFractionDigits: 2, maximumFractionDigits: 2})} USD
+                                </div>
+                                <div style="font-size: 0.8rem; color: #cbd5e1; margin-top: 4px;">
+                                    Equivalente BCV: <strong style="color: #38bdf8;">Bs. ${totalDeudaBsBCV.toLocaleString('es-VE', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</strong> &bull; USDT: <strong style="color: #fbbf24;">Bs. ${totalDeudaBsUSDT.toLocaleString('es-VE', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</strong>
+                                </div>
+                            </div>
+                            <div>
+                                <span style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 8px; font-size: 0.82rem; font-weight: 700; background: ${totalDeudaUSD > 0 ? 'rgba(239, 68, 68, 0.2)' : 'rgba(16, 185, 129, 0.2)'}; color: ${totalDeudaUSD > 0 ? '#fca5a5' : '#86efac'};">
+                                    <i class="fa-solid ${totalDeudaUSD > 0 ? 'fa-triangle-exclamation' : 'fa-circle-check'}"></i>
+                                    ${totalDeudaUSD > 0 ? `${cxpPendientes.length} Factura(s) Pendiente(s)` : 'Solvente / Al Día'}
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- SECCIÓN 1: Facturas Pendientes de Pago -->
+                        <div class="ficha-section-card" style="background: #1e293b; border: 1.5px solid #334155; border-radius: 12px; padding: 18px;">
+                            <h4 style="margin: 0 0 12px 0; font-size: 0.95rem; color: #f87171; display: flex; align-items: center; gap: 8px;">
+                                <i class="fa-solid fa-clock-rotate-left"></i> Facturas y Compromisos Pendientes de Pago
+                            </h4>
+                            <div style="overflow-x: auto;">
+                                <table class="ficha-table" style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.8rem;">
+                                    <thead>
+                                        <tr style="background: #0f172a; border-bottom: 2px solid #334155; color: #94a3b8; font-size: 0.72rem; text-transform: uppercase;">
+                                            <th style="padding: 10px 12px;">N° Factura</th>
+                                            <th style="padding: 10px 12px; text-align: center;">Emisión</th>
+                                            <th style="padding: 10px 12px; text-align: center;">Vencimiento</th>
+                                            <th style="padding: 10px 12px; text-align: center;">Semáforo Mora</th>
+                                            <th style="padding: 10px 12px; text-align: right;">Total Factura</th>
+                                            <th style="padding: 10px 12px; text-align: right;">Abonado</th>
+                                            <th style="padding: 10px 12px; text-align: right;">Saldo Pendiente</th>
+                                            <th style="padding: 10px 12px; text-align: center;" class="ficha-no-print">Acción</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        ${cxpPendientes.length > 0 ? cxpPendientes.map(cxp => {
+                                            const totalUSD = cxp.montoTotalUSD || cxp.montoTotal || 0;
+                                            const abonadoUSD = cxp.montoPagadoUSD || cxp.montoPagado || 0;
+                                            const saldoUSD = cxp.saldoPendienteUSD || cxp.saldoPendiente || 0;
+                                            const saldoBs = saldoUSD * tasaBCV;
+                                            const vencida = cxp.fechaVencimiento && cxp.fechaVencimiento < hoyStr;
+
+                                            return `
+                                                <tr style="border-bottom: 1px solid #334155;">
+                                                    <td style="padding: 10px 12px; font-family: monospace; font-weight: 700; color: #38bdf8;">
+                                                        ${cxp.numeroFacturaProveedor || cxp.id}
+                                                    </td>
+                                                    <td style="padding: 10px 12px; text-align: center; color: #94a3b8;">${cxp.fechaEmision || 'N/A'}</td>
+                                                    <td style="padding: 10px 12px; text-align: center; font-weight: 700; color: ${vencida ? '#ef4444' : '#fbbf24'};">${cxp.fechaVencimiento || 'Inmediato'}</td>
+                                                    <td style="padding: 10px 12px; text-align: center;">
+                                                        <span style="padding: 2px 8px; border-radius: 4px; font-size: 0.72rem; font-weight: 700; background: ${vencida ? 'rgba(239, 68, 68, 0.2)' : 'rgba(245, 158, 11, 0.2)'}; color: ${vencida ? '#fca5a5' : '#fde68a'};">
+                                                            ${vencida ? '⚠️ Vencida' : '⏳ Por Vencer'}
+                                                        </span>
+                                                    </td>
+                                                    <td style="padding: 10px 12px; text-align: right; color: #cbd5e1;">$${totalUSD.toFixed(2)}</td>
+                                                    <td style="padding: 10px 12px; text-align: right; color: #34d399;">$${abonadoUSD.toFixed(2)}</td>
+                                                    <td style="padding: 10px 12px; text-align: right;">
+                                                        <strong style="color: #f87171; font-size: 0.88rem;">$${saldoUSD.toFixed(2)} USD</strong>
+                                                        <span style="display: block; font-size: 0.7rem; color: #38bdf8;">Bs. ${saldoBs.toLocaleString('es-VE', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
+                                                    </td>
+                                                    <td style="padding: 10px 12px; text-align: center;" class="ficha-no-print">
+                                                        <button type="button" class="btn-gold" onclick="ViasaApp.cerrarFichaTecnicaIntegralProveedor(); ViasaApp.abrirModalPagoCxP('${cxp.id}')" style="font-size: 0.75rem; padding: 5px 10px; white-space: nowrap; font-weight: 700;">
+                                                            <i class="fa-solid fa-money-bill-wave"></i> 💵 Pagar / Abonar
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            `;
+                                        }).join('') : `
+                                            <tr>
+                                                <td colspan="8" style="text-align: center; padding: 24px; color: #34d399;">
+                                                    <i class="fa-solid fa-circle-check" style="font-size: 1.8rem; margin-bottom: 6px; display: block;"></i>
+                                                    No hay deudas pendientes. El proveedor se encuentra completamente al día.
+                                                </td>
+                                            </tr>
+                                        `}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- SECCIÓN 2: Historial de Pagos y Abonos Realizados -->
+                        <div class="ficha-section-card" style="background: #1e293b; border: 1.5px solid #334155; border-radius: 12px; padding: 18px;">
+                            <h4 style="margin: 0 0 12px 0; font-size: 0.95rem; color: #34d399; display: flex; align-items: center; gap: 8px;">
+                                <i class="fa-solid fa-receipt"></i> Historial de Abonos y Pagos Realizados
+                            </h4>
+                            <div style="overflow-x: auto;">
+                                <table class="ficha-table" style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.8rem;">
+                                    <thead>
+                                        <tr style="background: #0f172a; border-bottom: 2px solid #334155; color: #94a3b8; font-size: 0.72rem; text-transform: uppercase;">
+                                            <th style="padding: 10px 12px;">Fecha Pago</th>
+                                            <th style="padding: 10px 12px;">Factura / CxP</th>
+                                            <th style="padding: 10px 12px; text-align: right;">Monto USD</th>
+                                            <th style="padding: 10px 12px; text-align: center;">Tasa BCV</th>
+                                            <th style="padding: 10px 12px; text-align: right;">Monto Bs.</th>
+                                            <th style="padding: 10px 12px;">Método de Pago</th>
+                                            <th style="padding: 10px 12px; font-family: monospace;">Referencia Bancaria</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        ${(() => {
+                                            const todosLosPagos = [];
+                                            cxpPrv.forEach(c => {
+                                                (c.pagosRealizados || []).forEach(p => {
+                                                    todosLosPagos.push({ ...p, facturaNum: c.numeroFacturaProveedor || c.id });
+                                                });
+                                            });
+
+                                            if (todosLosPagos.length === 0) {
+                                                return `
+                                                    <tr>
+                                                        <td colspan="7" style="text-align: center; padding: 24px; color: #94a3b8;">
+                                                            <i class="fa-solid fa-inbox" style="font-size: 1.6rem; margin-bottom: 6px; display: block; color: #64748b;"></i>
+                                                            No se registran pagos previos procesados a este proveedor en el período actual.
+                                                        </td>
+                                                    </tr>
+                                                `;
+                                            }
+
+                                            return todosLosPagos.map(pag => `
+                                                <tr style="border-bottom: 1px solid #334155;">
+                                                    <td style="padding: 10px 12px; color: #cbd5e1;">${pag.fecha || '2026-09-02'}</td>
+                                                    <td style="padding: 10px 12px; font-family: monospace; color: #38bdf8;">${pag.facturaNum}</td>
+                                                    <td style="padding: 10px 12px; text-align: right; font-weight: 700; color: #34d399;">$${(pag.montoUSD || 0).toFixed(2)}</td>
+                                                    <td style="padding: 10px 12px; text-align: center; font-family: monospace; color: #94a3b8;">Bs. ${(pag.tasaBCVAplicada || tasaBCV).toFixed(2)}</td>
+                                                    <td style="padding: 10px 12px; text-align: right; font-family: monospace; color: #38bdf8;">Bs. ${(pag.montoBs || (pag.montoUSD || 0) * (pag.tasaBCVAplicada || tasaBCV)).toLocaleString('es-VE', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+                                                    <td style="padding: 10px 12px; text-transform: capitalize;">${(pag.metodoPago || 'Transferencia').replace(/_/g, ' ')}</td>
+                                                    <td style="padding: 10px 12px; font-family: monospace; color: #fbbf24;">${pag.referencia || pag.comprobante || 'REF-OK'}</td>
+                                                </tr>
+                                            `).join('');
+                                        })()}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            container.innerHTML = `
+                <!-- A. CABECERA EJECUTIVA -->
+                <div class="ficha-header-exec" style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); border-bottom: 2px solid #334155; padding: 18px 24px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 16px;">
+                    <div style="display: flex; align-items: center; gap: 16px; min-width: 320px; flex: 1;">
+                        <div style="width: 68px; height: 68px; min-width: 68px; border-radius: 12px; background: rgba(15, 23, 42, 0.9); border: 2px solid #f59e0b; display: flex; align-items: center; justify-content: center; overflow: hidden; box-shadow: 0 4px 14px rgba(0,0,0,0.5);">
+                            ${prv.logo ? `
+                                <img src="${prv.logo}" alt="Logo ${prv.nombreEmpresa}" style="width: 100%; height: 100%; object-fit: contain; background: #ffffff; padding: 3px;">
+                            ` : `
+                                <i class="fa-solid fa-truck-field" style="font-size: 2rem; color: #f59e0b;"></i>
+                            `}
+                        </div>
+                        <div>
+                            <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                                <h2 style="margin: 0; font-size: 1.35rem; color: #f8fafc; font-weight: 800; letter-spacing: -0.02em;">
+                                    ${prv.nombreEmpresa}
+                                </h2>
+                                <span style="background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid #059669; padding: 2px 8px; border-radius: 6px; font-size: 0.72rem; font-weight: 700; display: inline-flex; align-items: center; gap: 4px;">
+                                    <i class="fa-solid fa-circle-check"></i> Activo / Verificado
+                                </span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 12px; margin-top: 6px; flex-wrap: wrap; font-size: 0.8rem; color: #cbd5e1;">
+                                <span><strong>RIF:</strong> <span style="color: #38bdf8; font-family: monospace; font-weight: 700;">${prv.rif}</span></span>
+                                <span>&bull;</span>
+                                <span><strong>Código:</strong> <span style="color: #94a3b8; font-family: monospace;">${prv.id}</span></span>
+                                <span>&bull;</span>
+                                <span style="background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid #d97706; padding: 2px 8px; border-radius: 5px; font-weight: 700; font-size: 0.72rem;">
+                                    <i class="fa-solid fa-tag"></i> ${prv.categoria || 'Materia Prima'}
+                                </span>
+                                <span style="background: ${(prv.diasCredito || 0) > 0 ? 'rgba(56, 189, 248, 0.15)' : 'rgba(148, 163, 184, 0.15)'}; color: ${(prv.diasCredito || 0) > 0 ? '#38bdf8' : '#94a3b8'}; border: 1px solid ${(prv.diasCredito || 0) > 0 ? '#0284c7' : '#475569'}; padding: 2px 8px; border-radius: 5px; font-weight: 700; font-size: 0.72rem;">
+                                    <i class="fa-solid fa-calendar-check"></i> ${(prv.diasCredito || 0) > 0 ? `${prv.diasCredito} Días Crédito` : 'Contado'}
+                                </span>
+                                <span style="color: #fbbf24; font-weight: 700; font-size: 0.78rem;">
+                                    <i class="fa-solid fa-star"></i> ${ratingNum.toFixed(1)} / 5.0
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Acciones Rápidas en Cabecera -->
+                    <div class="ficha-no-print" style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                        <button type="button" class="btn-gold" onclick="ViasaApp.cerrarFichaTecnicaIntegralProveedor(); ViasaApp.abrirModalOrdenCompra('${prv.id}')" style="font-size: 0.8rem; padding: 8px 14px; box-shadow: 0 4px 12px rgba(245, 158, 11, 0.25);">
+                            <i class="fa-solid fa-cart-plus"></i> Generar OC
+                        </button>
+                        <button type="button" class="btn-secondary" onclick="ViasaApp.cerrarFichaTecnicaIntegralProveedor(); ViasaApp.abrirModalProveedor('${prv.id}')" style="font-size: 0.8rem; padding: 8px 12px; color: #38bdf8; border-color: #0284c7;">
+                            <i class="fa-solid fa-pen-to-square"></i> Editar Datos
+                        </button>
+                        <button type="button" class="btn-secondary" onclick="ViasaApp.imprimirFichaTecnicaProveedor()" style="font-size: 0.8rem; padding: 8px 12px; color: #fbbf24; border-color: #d97706;">
+                            <i class="fa-solid fa-print"></i> Imprimir / PDF
+                        </button>
+                        <button type="button" onclick="ViasaApp.cerrarFichaTecnicaIntegralProveedor()" style="background: none; border: none; color: #94a3b8; font-size: 1.8rem; cursor: pointer; line-height: 1; padding: 0 6px; margin-left: 6px; transition: color 0.2s;" title="Cerrar Ficha Técnica" onmouseover="this.style.color='#ef4444'" onmouseout="this.style.color='#94a3b8'">&times;</button>
+                    </div>
+                </div>
+
+                <!-- B. CINTA DE INDICADORES FINANCIEROS Y OPERATIVOS (4 KPIs) -->
+                <div class="ficha-kpi-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; padding: 16px 24px; background: rgba(15, 23, 42, 0.6); border-bottom: 1.5px solid #334155;">
+                    <!-- KPI 1: Saldo Por Pagar (Deuda Actual) -->
+                    <div class="ficha-kpi-card" style="background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.9)); border: 1.5px solid ${totalDeudaUSD > 0 ? '#ef4444' : '#334155'}; border-radius: 12px; padding: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.3);">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                            <span style="font-size: 0.74rem; text-transform: uppercase; color: #94a3b8; font-weight: 700; letter-spacing: 0.04em;">
+                                <i class="fa-solid fa-scale-unbalanced-flip" style="color: #ef4444; margin-right: 4px;"></i> Saldo Por Pagar (Deuda)
+                            </span>
+                            <span style="font-size: 0.68rem; padding: 2px 6px; border-radius: 4px; background: ${totalDeudaUSD > 0 ? 'rgba(239, 68, 68, 0.2)' : 'rgba(16, 185, 129, 0.2)'}; color: ${totalDeudaUSD > 0 ? '#fca5a5' : '#86efac'}; font-weight: 700;">
+                                ${totalDeudaUSD > 0 ? `${cxpPendientes.length} Pendiente${cxpPendientes.length > 1 ? 's' : ''}` : 'Al Día'}
+                            </span>
+                        </div>
+                        <div style="font-size: 1.35rem; font-weight: 800; color: ${totalDeudaUSD > 0 ? '#f87171' : '#34d399'};">
+                            $${totalDeudaUSD.toLocaleString('es-VE', {minimumFractionDigits: 2, maximumFractionDigits: 2})} USD
+                        </div>
+                        <div style="font-size: 0.74rem; color: #cbd5e1; margin-top: 4px; display: flex; flex-direction: column; gap: 2px;">
+                            <span><strong style="color: #38bdf8;">BCV:</strong> Bs. ${totalDeudaBsBCV.toLocaleString('es-VE', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
+                            <span style="color: #94a3b8;"><strong style="color: #fbbf24;">USDT:</strong> Bs. ${totalDeudaBsUSDT.toLocaleString('es-VE', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
+                        </div>
+                        ${cxpVencidas > 0 ? `
+                            <div style="font-size: 0.68rem; color: #f87171; font-weight: 700; margin-top: 5px;">
+                                <i class="fa-solid fa-triangle-exclamation"></i> ${cxpVencidas} factura(s) en mora / vencida(s)
+                            </div>
+                        ` : ''}
+                    </div>
+
+                    <!-- KPI 2: Volumen Histórico de Compras -->
+                    <div class="ficha-kpi-card" style="background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.9)); border: 1.5px solid #334155; border-radius: 12px; padding: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.3);">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                            <span style="font-size: 0.74rem; text-transform: uppercase; color: #94a3b8; font-weight: 700; letter-spacing: 0.04em;">
+                                <i class="fa-solid fa-boxes-stacked" style="color: #38bdf8; margin-right: 4px;"></i> Volumen Compras Total
+                            </span>
+                            <span style="font-size: 0.68rem; padding: 2px 6px; border-radius: 4px; background: rgba(56, 189, 248, 0.2); color: #7dd3fc; font-weight: 700;">
+                                ${numOrdenes} OCs
+                            </span>
+                        </div>
+                        <div style="font-size: 1.35rem; font-weight: 800; color: #38bdf8;">
+                            $${totalVolumenUSD.toLocaleString('es-VE', {minimumFractionDigits: 2, maximumFractionDigits: 2})} USD
+                        </div>
+                        <div style="font-size: 0.74rem; color: #94a3b8; margin-top: 4px;">
+                            Equivalente BCV: Bs. ${(totalVolumenUSD * tasaBCV).toLocaleString('es-VE', {minimumFractionDigits: 2, maximumFractionDigits: 2})}
+                        </div>
+                        <div style="font-size: 0.68rem; color: #64748b; margin-top: 5px;">
+                            Histórico acumulado en abastecimiento
+                        </div>
+                    </div>
+
+                    <!-- KPI 3: Última Compra / Recepción -->
+                    <div class="ficha-kpi-card" style="background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.9)); border: 1.5px solid #334155; border-radius: 12px; padding: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.3);">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                            <span style="font-size: 0.74rem; text-transform: uppercase; color: #94a3b8; font-weight: 700; letter-spacing: 0.04em;">
+                                <i class="fa-solid fa-truck-ramp-box" style="color: #10b981; margin-right: 4px;"></i> Última Compra / Recepción
+                            </span>
+                            <span style="font-size: 0.68rem; padding: 2px 6px; border-radius: 4px; background: rgba(16, 185, 129, 0.2); color: #86efac; font-weight: 700;">
+                                ${ultimaFecha}
+                            </span>
+                        </div>
+                        <div style="font-size: 1.35rem; font-weight: 800; color: #34d399;">
+                            ${ultimoMontoUSD > 0 ? `$${ultimoMontoUSD.toLocaleString('es-VE', {minimumFractionDigits: 2, maximumFractionDigits: 2})} USD` : 'Sin Compras'}
+                        </div>
+                        <div style="font-size: 0.74rem; color: #94a3b8; margin-top: 4px;">
+                            ${ultimaOrden ? `Orden N°: ${ultimaOrden.id} (${ultimaOrden.estado || 'Recibida'})` : 'No registra recepciones'}
+                        </div>
+                        <div style="font-size: 0.68rem; color: #64748b; margin-top: 5px;">
+                            Ingreso verificado en almacén de planta
+                        </div>
+                    </div>
+
+                    <!-- KPI 4: Cumplimiento y Desempeño -->
+                    <div class="ficha-kpi-card" style="background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.9)); border: 1.5px solid #334155; border-radius: 12px; padding: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.3);">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                            <span style="font-size: 0.74rem; text-transform: uppercase; color: #94a3b8; font-weight: 700; letter-spacing: 0.04em;">
+                                <i class="fa-solid fa-award" style="color: #fbbf24; margin-right: 4px;"></i> Desempeño y Lead Time
+                            </span>
+                            <span style="font-size: 0.68rem; padding: 2px 6px; border-radius: 4px; background: rgba(245, 158, 11, 0.2); color: #fde68a; font-weight: 700;">
+                                ${ratingNum.toFixed(1)} / 5.0
+                            </span>
+                        </div>
+                        <div style="font-size: 1.15rem; font-weight: 800; color: #fbbf24;">
+                            ${leadTime}
+                        </div>
+                        <div style="font-size: 0.74rem; color: #cbd5e1; margin-top: 4px;">
+                            Calidad de Insumos: <strong style="color: #34d399;">99.2% Aprobado</strong>
+                        </div>
+                        <div style="font-size: 0.68rem; color: #10b981; font-weight: 700; margin-top: 5px;">
+                            <i class="fa-solid fa-check-double"></i> Puntualidad en Despacho: 100%
+                        </div>
+                    </div>
+                </div>
+
+                <!-- C. BARRA DE NAVEGACIÓN DE PESTAÑAS INTERNAS -->
+                <div class="ficha-tab-nav ficha-no-print">
+                    <button type="button" class="ficha-tab-btn ${subTab === 'general' ? 'active' : ''}" onclick="ViasaApp.cambiarTabFichaTecnica('general')">
+                        <i class="fa-solid fa-building"></i> 1. Información General, Contactos y Bancos
+                    </button>
+                    <button type="button" class="ficha-tab-btn ${subTab === 'insumos' ? 'active' : ''}" onclick="ViasaApp.cambiarTabFichaTecnica('insumos')">
+                        <i class="fa-solid fa-boxes-packing"></i> 2. Insumos Vinculados y Escandallos (${insumosPrv.length})
+                    </button>
+                    <button type="button" class="ficha-tab-btn ${subTab === 'ordenes' ? 'active' : ''}" onclick="ViasaApp.cambiarTabFichaTecnica('ordenes')">
+                        <i class="fa-solid fa-file-invoice"></i> 3. Historial de Órdenes de Compra (${ordenesPrv.length})
+                    </button>
+                    <button type="button" class="ficha-tab-btn ${subTab === 'cxp' ? 'active' : ''}" onclick="ViasaApp.cambiarTabFichaTecnica('cxp')">
+                        <i class="fa-solid fa-money-bill-transfer"></i> 4. Estado de Cuenta, CxP y Abonos (${cxpPendientes.length})
+                    </button>
+                </div>
+
+                <!-- CUERPO DE DATOS COMPILADOS -->
+                <div class="ficha-tab-content-area" style="flex: 1; overflow-y: auto; padding: 20px 24px;">
+                    ${tabHtml}
+                </div>
+            `;
         },
 
         // ==============================================================
