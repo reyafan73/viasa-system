@@ -7721,6 +7721,381 @@ button, input, select, textarea, .pos-product-card, .cat-pill, .nav-item, .role-
     color: #ef4444;
 }
 
+/* ============================================================== */
+/* ESTILOS EVOLUCIONADOS: MATRIZ DE GUARDIAS Y TURNOS DINÁMICOS   */
+/* ============================================================== */
+
+/* Barra de Comandos y Filtros de Matriz */
+.guardias-matrix-toolbar {
+    background: #0f172a;
+    border: 1px solid #334155;
+    border-radius: 12px;
+    padding: 12px 16px;
+    margin-bottom: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+
+.guardias-matrix-top-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.guardias-matrix-cmd-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.btn-cmd-guardia {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 7px 13px;
+    border-radius: 8px;
+    font-size: 0.78rem;
+    font-weight: 800;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
+    text-decoration: none;
+    line-height: 1.2;
+}
+
+.btn-cmd-guardia.emerald {
+    background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+    color: #ffffff;
+    border-color: #34d399;
+}
+.btn-cmd-guardia.emerald:hover {
+    background: linear-gradient(135deg, #047857 0%, #059669 100%);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35);
+    transform: translateY(-1px);
+}
+
+.btn-cmd-guardia.cyan {
+    background: linear-gradient(135deg, #0891b2 0%, #06b6d4 100%);
+    color: #ffffff;
+    border-color: #38bdf8;
+}
+.btn-cmd-guardia.cyan:hover {
+    background: linear-gradient(135deg, #0e7490 0%, #0891b2 100%);
+    box-shadow: 0 4px 12px rgba(6, 182, 212, 0.35);
+    transform: translateY(-1px);
+}
+
+.btn-cmd-guardia.red {
+    background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
+    color: #ffffff;
+    border-color: #f87171;
+}
+.btn-cmd-guardia.red:hover {
+    background: linear-gradient(135deg, #b91c1c 0%, #dc2626 100%);
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.35);
+    transform: translateY(-1px);
+}
+
+.btn-cmd-guardia.purple {
+    background: linear-gradient(135deg, #7e22ce 0%, #9333ea 100%);
+    color: #ffffff;
+    border-color: #c084fc;
+}
+.btn-cmd-guardia.purple:hover {
+    background: linear-gradient(135deg, #6b21a8 0%, #7e22ce 100%);
+    box-shadow: 0 4px 12px rgba(168, 85, 247, 0.35);
+    transform: translateY(-1px);
+}
+
+.btn-cmd-guardia.gold {
+    background: linear-gradient(135deg, #d97706 0%, #f59e0b 100%);
+    color: #0b0f19;
+    border-color: #fbbf24;
+}
+.btn-cmd-guardia.gold:hover {
+    background: linear-gradient(135deg, #b45309 0%, #d97706 100%);
+    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
+    transform: translateY(-1px);
+}
+
+.btn-cmd-guardia.anales-lottt {
+    background: linear-gradient(135deg, #b45309 0%, #7e22ce 50%, #9333ea 100%);
+    color: #ffffff;
+    border: 1.5px solid #fbbf24;
+    box-shadow: 0 2px 10px rgba(251, 191, 36, 0.25);
+}
+.btn-cmd-guardia.anales-lottt:hover {
+    background: linear-gradient(135deg, #92400e 0%, #6b21a8 50%, #7e22ce 100%);
+    box-shadow: 0 4px 18px rgba(251, 191, 36, 0.45);
+    transform: translateY(-1px);
+}
+
+/* Conmutador de Semanas y Meses */
+.guardias-nav-pills-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #090d16;
+    border: 1px solid #1e293b;
+    border-radius: 10px;
+    padding: 5px 8px;
+    overflow-x: auto;
+    flex-wrap: wrap;
+}
+
+.nav-pill-guardia {
+    background: transparent;
+    border: 1px solid transparent;
+    color: #94a3b8;
+    padding: 5px 11px;
+    border-radius: 7px;
+    font-size: 0.74rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.18s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+}
+
+.nav-pill-guardia:hover {
+    color: #f1f5f9;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.nav-pill-guardia.active {
+    background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+    color: #fbbf24;
+    border-color: #f59e0b;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+}
+
+/* Botones de acción en la cabecera de columna de turno */
+.turno-hdr-actions {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.btn-turno-mini {
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid #334155;
+    color: #cbd5e1;
+    width: 24px;
+    height: 24px;
+    border-radius: 6px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 0.68rem;
+    transition: all 0.15s ease;
+    padding: 0;
+}
+
+.btn-turno-mini:hover {
+    background: #1e293b;
+    color: #ffffff;
+    border-color: #64748b;
+    transform: scale(1.05);
+}
+
+.btn-turno-mini.edit:hover {
+    color: #38bdf8;
+    border-color: #06b6d4;
+    background: rgba(6, 182, 212, 0.15);
+}
+
+.btn-turno-mini.del:hover {
+    color: #f87171;
+    border-color: #ef4444;
+    background: rgba(239, 68, 68, 0.15);
+}
+
+.btn-turno-mini.add:hover {
+    color: #4ade80;
+    border-color: #10b981;
+    background: rgba(16, 185, 129, 0.15);
+}
+
+/* Ficha del trabajador en turno */
+.guardia-worker-card {
+    background: linear-gradient(145deg, #1e293b 0%, #0f172a 100%);
+    border: 1px solid #334155;
+    border-radius: 10px;
+    padding: 9px 11px;
+    transition: all 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.guardia-worker-card:hover {
+    border-color: #475569;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+.worker-card-top {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+}
+
+.worker-card-avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    object-fit: cover;
+    border: 1.5px solid #64748b;
+    background: #0b0f19;
+    flex-shrink: 0;
+}
+
+.worker-card-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.worker-card-name {
+    font-size: 0.84rem;
+    font-weight: 800;
+    color: #ffffff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin: 0;
+}
+
+.worker-card-cargo {
+    font-size: 0.72rem;
+    color: #94a3b8;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.worker-card-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.7rem;
+    color: #cbd5e1;
+    border-top: 1px dashed rgba(255, 255, 255, 0.08);
+    padding-top: 5px;
+    margin-top: 2px;
+}
+
+.badge-dias-pills {
+    display: flex;
+    gap: 3px;
+    align-items: center;
+}
+
+.dia-dot {
+    width: 17px;
+    height: 17px;
+    border-radius: 4px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.62rem;
+    font-weight: 800;
+}
+
+.dia-dot.activo {
+    background: #059669;
+    color: #ffffff;
+    border: 1px solid #10b981;
+}
+
+.dia-dot.descanso {
+    background: rgba(100, 116, 139, 0.25);
+    color: #64748b;
+    border: 1px solid #334155;
+}
+
+.pautas-box-turno {
+    background: rgba(0, 0, 0, 0.35);
+    border-left: 3px solid #f59e0b;
+    padding: 6px 10px;
+    border-radius: 0 6px 6px 0;
+    font-size: 0.72rem;
+    color: #e2e8f0;
+    margin-bottom: 8px;
+    line-height: 1.35;
+}
+
+/* Modales LOTTT y Anales */
+.lottt-kpi-summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 10px;
+    margin-bottom: 14px;
+}
+
+.lottt-kpi-box {
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 10px;
+    padding: 10px 12px;
+    display: flex;
+    flex-direction: column;
+}
+
+.lottt-kpi-box .lbl {
+    font-size: 0.7rem;
+    color: #94a3b8;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.lottt-kpi-box .val {
+    font-size: 1.15rem;
+    font-weight: 900;
+    color: #ffffff;
+    margin-top: 2px;
+}
+
+.lottt-kpi-box .sub {
+    font-size: 0.68rem;
+    color: #38bdf8;
+    margin-top: 2px;
+}
+
+.table-lottt-analitica {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.76rem;
+    text-align: left;
+}
+
+.table-lottt-analitica th {
+    background: #0b0f19;
+    color: #fbbf24;
+    font-weight: 800;
+    padding: 10px 12px;
+    border-bottom: 2px solid #334155;
+    position: sticky;
+    top: 0;
+    z-index: 2;
+}
+
+.table-lottt-analitica td {
+    padding: 9px 12px;
+    border-bottom: 1px solid #1e293b;
+    color: #cbd5e1;
+}
+
+.table-lottt-analitica tr:hover td {
+    background: rgba(255, 255, 255, 0.03);
+}
+
 /* Cruce CRM Layout */
 .cruce-crm-layout {
     display: grid;

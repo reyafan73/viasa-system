@@ -20,17 +20,32 @@
 
     const ViasaGuardiasEngine = {
         subViewActiva: 'plantilla', // 'plantilla', 'matriz', 'crm_cafetin', 'logistica', 'marketplace', 'asistencia'
+        vistaTemporalMatriz: 'dia', // 'dia', 'semana1', 'semana2', 'semana3', 'semana4', 'mes'
+        mesOperativo: new Date().toISOString().slice(0, 7), // '2026-11'
         filtroDepto: 'todos',
         filtroTurno: 'todos',
         filtroBusqueda: '',
         fechaSeleccionada: new Date().toISOString().split('T')[0],
         pinsVisibles: {},
         empIdSubiendoFoto: null,
+        turnoSeleccionadoForm: null,
+        modoAsignacionModal: 'dia',
+        pestanaAnalesActiva: 'bitacora',
+        filtroAnalesEmp: 'todos',
+        filtroAnalesMes: new Date().toISOString().slice(0, 7),
+        filtroAnalesEvento: 'todos',
+        empleadoLOTTTSeleccionado: 'todos',
 
         // Inicialización
-        init() {
+        async init() {
             console.log('[VIASA GUARDIAS] Inicializando Motor Tecnológico de Guardias y Operaciones de Campo...');
             this.inicializarEventosOffline();
+            try {
+                await this.inicializarTurnosOperativos();
+                await this.inicializarAnalesHistoricos();
+            } catch (e) {
+                console.warn('[VIASA GUARDIAS] Error inicializando turnos o anales:', e);
+            }
         },
 
         togglePinVisibilidad(empId) {
@@ -569,8 +584,72 @@
         },
 
         // ======================================================================
-        // 2. MATRIZ DE GUARDIAS Y ASIGNACIÓN DE TURNOS
+        // 2. MATRIZ DE GUARDIAS, TURNOS DINÁMICOS Y BÓVEDA LOTTT
         // ======================================================================
+        async inicializarTurnosOperativos() {
+            let turnos = await window.ViasaStorage.obtenerColeccion('turnos_operativos');
+            if (!turnos || turnos.length === 0) {
+                turnos = [
+                    {
+                        id: 'madrugada',
+                        orden: 1,
+                        nombre: 'Turno Madrugada',
+                        horaInicio: '04:00',
+                        horaFin: '12:00',
+                        icono: 'fa-moon',
+                        color: '#6366f1',
+                        colorBorde: '#6366f1',
+                        pautas: 'Encendido de hornos, amasado inicial de pan canilla y galletería fina.'
+                    },
+                    {
+                        id: 'matutino',
+                        orden: 2,
+                        nombre: 'Turno Matutino',
+                        horaInicio: '06:30',
+                        horaFin: '14:30',
+                        icono: 'fa-sun',
+                        color: '#f59e0b',
+                        colorBorde: '#f59e0b',
+                        pautas: 'Atención a primera línea de mostrador, horneado continuo y repostería fresca.'
+                    },
+                    {
+                        id: 'vespertino',
+                        orden: 3,
+                        nombre: 'Turno Vespertino',
+                        horaInicio: '13:00',
+                        horaFin: '21:00',
+                        icono: 'fa-cloud-sun',
+                        color: '#06b6d4',
+                        colorBorde: '#06b6d4',
+                        pautas: 'Producción de panes de merienda, rotación de vitrinas y despacho a clientes VIP.'
+                    },
+                    {
+                        id: 'nocturno',
+                        orden: 4,
+                        nombre: 'Turno Nocturno',
+                        horaInicio: '21:00',
+                        horaFin: '05:00',
+                        icono: 'fa-star-half-stroke',
+                        color: '#ec4899',
+                        colorBorde: '#ec4899',
+                        pautas: 'Limpieza profunda, fermentación lenta, custodia de planta física y vanguardia operativa.'
+                    }
+                ];
+                for (const t of turnos) {
+                    await window.ViasaStorage.guardarRegistro('turnos_operativos', t);
+                }
+            }
+            return turnos.sort((a, b) => (a.orden || 0) - (b.orden || 0));
+        },
+
+        async obtenerTurnos() {
+            let turnos = await window.ViasaStorage.obtenerColeccion('turnos_operativos');
+            if (!turnos || turnos.length === 0) {
+                turnos = await this.inicializarTurnosOperativos();
+            }
+            return turnos.sort((a, b) => (a.orden || 0) - (b.orden || 0));
+        },
+
         async obtenerGuardias() {
             let grds = await window.ViasaStorage.obtenerColeccion('guardias_turnos');
             if (!grds || grds.length === 0) {
@@ -579,20 +658,482 @@
             return grds;
         },
 
-        async abrirModalAsignarGuardia() {
+        calcularHorasTurnoLOTTT(horaInicio, horaFin) {
+            if (!horaInicio || !horaFin) {
+                return { duracionHoras: 8, horasDiurnas: 8, horasNocturnas: 0, tipo: 'Diurna', limiteLegal: '8h máx / 44h sem', recargo: '0% recargo' };
+            }
+            const [h1, m1] = horaInicio.split(':').map(Number);
+            const [h2, m2] = horaFin.split(':').map(Number);
+            let minIni = h1 * 60 + m1;
+            let minFin = h2 * 60 + m2;
+            if (minFin <= minIni) minFin += 24 * 60; // Pasa la medianoche
+
+            const totalMin = minFin - minIni;
+            const duracionHoras = +(totalMin / 60).toFixed(2);
+
+            let minNocturnos = 0;
+            let minDiurnos = 0;
+
+            for (let m = minIni; m < minFin; m++) {
+                const mod = m % (24 * 60);
+                // Nocturno: entre 19:00 (1140 min) y 05:00 (300 min) según Art. 173 LOTTT
+                if (mod >= 1140 || mod < 300) {
+                    minNocturnos++;
+                } else {
+                    minDiurnos++;
+                }
+            }
+
+            const horasNocturnas = +(minNocturnos / 60).toFixed(2);
+            const horasDiurnas = +(minDiurnos / 60).toFixed(2);
+
+            let tipo = 'Diurna';
+            let limiteLegal = '8 hrs/día (44 hrs/sem)';
+            let recargo = 'Jornada Diurna Estándar';
+
+            if (horasNocturnas > 4) {
+                tipo = 'Nocturna (Total)';
+                limiteLegal = '7 hrs/día (35 hrs/sem - Art. 173 LOTTT)';
+                recargo = '+30% Recargo Nocturno íntegro (Art. 117 LOTTT)';
+            } else if (horasNocturnas > 0) {
+                tipo = 'Mixta';
+                limiteLegal = '7.5 hrs/día (37.5 hrs/sem - Art. 173 LOTTT)';
+                recargo = `+30% Recargo Nocturno sobre ${horasNocturnas} hrs (Art. 117 LOTTT)`;
+            }
+
+            return {
+                duracionHoras,
+                horasDiurnas,
+                horasNocturnas,
+                tipo,
+                limiteLegal,
+                recargo
+            };
+        },
+
+        actualizarCalculoHorasModalTurno() {
+            const hIni = document.getElementById('turno-hora-inicio')?.value || '06:00';
+            const hFin = document.getElementById('turno-hora-fin')?.value || '14:00';
+            const info = this.calcularHorasTurnoLOTTT(hIni, hFin);
+            const ind = document.getElementById('turno-lottt-indicator');
+            if (ind) {
+                ind.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                        <span style="font-weight: 800; color: #fbbf24;">
+                            <i class="fa-solid fa-calculator"></i> Duración: ${info.duracionHoras} Horas
+                        </span>
+                        <span class="badge-live-alert" style="background: ${info.horasNocturnas > 0 ? '#6b21a8' : '#047857'}; font-size: 0.68rem; padding: 2px 7px;">
+                            ${info.tipo}
+                        </span>
+                    </div>
+                    <div style="color: #cbd5e1; line-height: 1.4;">
+                        <div>Diurnas: <strong>${info.horasDiurnas}h</strong> | Nocturnas: <strong style="color: #c084fc;">${info.horasNocturnas}h</strong></div>
+                        <div style="font-size: 0.68rem; color: #94a3b8; margin-top: 2px;">
+                            <i class="fa-solid fa-scale-balanced" style="color: #38bdf8;"></i> ${info.limiteLegal} &bull; <span style="color: #34d399;">${info.recargo}</span>
+                        </div>
+                    </div>
+                `;
+            }
+        },
+
+        async abrirModalTurno(turnoId = null) {
+            const modal = document.getElementById('modal-turno-form');
+            if (!modal) return;
+
+            const turnos = await this.obtenerTurnos();
+            const emps = await this.obtenerEmpleados();
+            const activos = emps.filter(e => e.estado === 'activo');
+            const guardias = await this.obtenerGuardias();
+
+            const tit = document.getElementById('modal-turno-titulo');
+            const hiddenId = document.getElementById('turno-id-hidden');
+            const ordInput = document.getElementById('turno-orden');
+            const nomInput = document.getElementById('turno-nombre');
+            const hIniInput = document.getElementById('turno-hora-inicio');
+            const hFinInput = document.getElementById('turno-hora-fin');
+            const colInput = document.getElementById('turno-color');
+            const icoSelect = document.getElementById('turno-icono');
+            const pauText = document.getElementById('turno-pautas');
+            const boxPersonal = document.getElementById('turno-personal-selector-box');
+
+            let turnoActual = null;
+            if (turnoId) {
+                turnoActual = turnos.find(t => t.id === turnoId);
+            }
+
+            if (turnoActual) {
+                if (tit) tit.innerHTML = `<i class="fa-solid fa-pen" style="color:#2dd4bf;"></i> Modificar Turno: ${turnoActual.nombre}`;
+                if (hiddenId) hiddenId.value = turnoActual.id;
+                if (ordInput) ordInput.value = turnoActual.orden || 1;
+                if (nomInput) nomInput.value = turnoActual.nombre || '';
+                if (hIniInput) hIniInput.value = turnoActual.horaInicio || '06:00';
+                if (hFinInput) hFinInput.value = turnoActual.horaFin || '14:00';
+                if (colInput) colInput.value = turnoActual.color || '#10b981';
+                if (icoSelect) icoSelect.value = turnoActual.icono || 'fa-sun';
+                if (pauText) pauText.value = turnoActual.pautas || '';
+            } else {
+                if (tit) tit.innerHTML = `<i class="fa-solid fa-plus" style="color:#2dd4bf;"></i> Crear Nuevo Turno Operativo`;
+                if (hiddenId) hiddenId.value = '';
+                if (ordInput) ordInput.value = turnos.length + 1;
+                if (nomInput) nomInput.value = '';
+                if (hIniInput) hIniInput.value = '06:00';
+                if (hFinInput) hFinInput.value = '14:00';
+                if (colInput) colInput.value = '#10b981';
+                if (icoSelect) icoSelect.value = 'fa-sun';
+                if (pauText) pauText.value = '';
+            }
+
+            this.actualizarCalculoHorasModalTurno();
+
+            // Personal en este turno actualmente
+            const enTurnoIds = new Set(
+                guardias
+                    .filter(g => g.turno === (turnoActual ? turnoActual.id : '') && g.fecha === this.fechaSeleccionada && g.estado === 'activo')
+                    .map(g => g.empleadoId)
+            );
+
+            if (boxPersonal) {
+                boxPersonal.innerHTML = activos.map(e => {
+                    const isChecked = enTurnoIds.has(e.id);
+                    const foto = this.obtenerFotoEmpleado(e);
+                    const deptoStyle = this.obtenerEstiloDepto(this.normalizarDepartamento(e.departamento, e.cargo));
+                    return `
+                        <label style="display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 6px 8px; border-radius: 6px; background: rgba(255,255,255,0.03); border: 1px solid #1e293b; cursor: pointer;">
+                            <div style="display: flex; align-items: center; gap: 8px; min-width: 0;">
+                                <input type="checkbox" class="turno-emp-chk" value="${e.id}" ${isChecked ? 'checked' : ''} style="accent-color: #10b981;">
+                                <img src="${foto}" style="width: 26px; height: 26px; border-radius: 6px; object-fit: cover;">
+                                <div style="min-width: 0;">
+                                    <div style="color: #fff; font-size: 0.78rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${e.nombreCompleto || e.nombres}</div>
+                                    <div style="color: #94a3b8; font-size: 0.68rem;">${e.cargo}</div>
+                                </div>
+                            </div>
+                            <span class="${deptoStyle.clase}" style="font-size: 0.65rem; padding: 1px 6px;">${deptoStyle.label}</span>
+                        </label>
+                    `;
+                }).join('');
+
+                const cntBadge = document.getElementById('turno-personal-count-badge');
+                if (cntBadge) cntBadge.textContent = `${enTurnoIds.size} seleccionados para hoy`;
+            }
+
+            modal.style.display = 'flex';
+        },
+
+        cerrarModalTurno() {
+            const modal = document.getElementById('modal-turno-form');
+            if (modal) modal.style.display = 'none';
+        },
+
+        async guardarTurnoForm(e) {
+            e.preventDefault();
+            const idHidden = document.getElementById('turno-id-hidden').value.trim();
+            const orden = parseInt(document.getElementById('turno-orden').value) || 1;
+            const nombre = document.getElementById('turno-nombre').value.trim();
+            const horaInicio = document.getElementById('turno-hora-inicio').value;
+            const horaFin = document.getElementById('turno-hora-fin').value;
+            const color = document.getElementById('turno-color').value;
+            const icono = document.getElementById('turno-icono').value;
+            const pautas = document.getElementById('turno-pautas').value.trim();
+
+            if (!nombre) {
+                alert('Por favor indica el nombre del turno.');
+                return;
+            }
+
+            const turnos = await this.obtenerTurnos();
+            let turnoId = idHidden;
+            if (!turnoId) {
+                turnoId = `TRN-${Date.now().toString().slice(-6)}`;
+            }
+
+            const turnoObj = {
+                id: turnoId,
+                orden: orden,
+                nombre: nombre,
+                horaInicio: horaInicio,
+                horaFin: horaFin,
+                color: color,
+                colorBorde: color,
+                icono: icono,
+                pautas: pautas
+            };
+
+            await window.ViasaStorage.guardarRegistro('turnos_operativos', turnoObj);
+
+            // Asignar o desasignar personal marcado en el selector rápido
+            const chks = document.querySelectorAll('.turno-emp-chk');
+            const emps = await this.obtenerEmpleados();
+            const guardias = await this.obtenerGuardias();
+
+            for (const chk of chks) {
+                const empId = chk.value;
+                const emp = emps.find(x => x.id === empId);
+                if (!emp) continue;
+
+                const existente = guardias.find(g => g.empleadoId === empId && g.fecha === this.fechaSeleccionada);
+                if (chk.checked) {
+                    if (existente) {
+                        existente.turno = turnoId;
+                        existente.nombreTurno = `${nombre} (${horaInicio} - ${horaFin})`;
+                        existente.horaEntrada = horaInicio;
+                        existente.horaSalida = horaFin;
+                        await window.ViasaStorage.guardarRegistro('guardias_turnos', existente);
+                    } else {
+                        const nuevaGrd = {
+                            id: `GRD-${Date.now().toString().slice(-6)}-${Math.floor(Math.random()*1000)}`,
+                            empleadoId: emp.id,
+                            nombreEmpleado: emp.nombreCompleto || emp.nombres,
+                            cargo: emp.cargo,
+                            departamento: emp.departamento,
+                            turno: turnoId,
+                            nombreTurno: `${nombre} (${horaInicio} - ${horaFin})`,
+                            horaEntrada: horaInicio,
+                            horaSalida: horaFin,
+                            fecha: this.fechaSeleccionada,
+                            estado: 'activo',
+                            ubicacionAsignada: 'Sede Principal (La Sabanita)',
+                            supervisor: 'Gerente General'
+                        };
+                        await window.ViasaStorage.guardarRegistro('guardias_turnos', nuevaGrd);
+                    }
+                } else if (existente && existente.turno === turnoId) {
+                    await window.ViasaStorage.eliminarRegistro('guardias_turnos', existente.id);
+                }
+            }
+
+            // Registrar en Anales Históricos
+            await this.registrarEventoAnales({
+                tipoEvento: idHidden ? 'turno_modificado' : 'creacion_turno',
+                turnoId: turnoId,
+                nombreTurno: nombre,
+                fecha: this.fechaSeleccionada,
+                detalles: `Turno ${nombre} [${horaInicio} - ${horaFin}] configurado exitosamente.`
+            });
+
+            this.cerrarModalTurno();
+            if (window.ViasaAudio) window.ViasaAudio.playSuccess();
+            this.mostrarToast(`✅ Turno "${nombre}" guardado y sincronizado.`, 'success');
+            this.renderGuardiasHub();
+        },
+
+        async eliminarTurno(turnoId) {
+            const turnos = await this.obtenerTurnos();
+            const turno = turnos.find(t => t.id === turnoId);
+            if (!turno) return;
+
+            const confirmar = confirm(`¿Estás seguro de eliminar el turno "${turno.nombre}"?\nEsta acción retirará la columna de la matriz operativa.`);
+            if (!confirmar) return;
+
+            await window.ViasaStorage.eliminarRegistro('turnos_operativos', turnoId);
+
+            await this.registrarEventoAnales({
+                tipoEvento: 'turno_eliminado',
+                turnoId: turnoId,
+                nombreTurno: turno.nombre,
+                fecha: this.fechaSeleccionada,
+                detalles: `Turno ${turno.nombre} eliminado de la configuración operativa.`
+            });
+
+            if (window.ViasaAudio) window.ViasaAudio.playTrash();
+            this.mostrarToast(`🗑️ Turno "${turno.nombre}" eliminado.`, 'info');
+            this.renderGuardiasHub();
+        },
+
+        async abrirSelectorModificarTurno() {
+            const turnos = await this.obtenerTurnos();
+            if (turnos.length === 0) {
+                alert('No hay turnos registrados para modificar.');
+                return;
+            }
+            if (turnos.length === 1) {
+                this.abrirModalTurno(turnos[0].id);
+                return;
+            }
+            const opciones = turnos.map((t, idx) => `${idx + 1}. ${t.nombre} (${t.horaInicio} - ${t.horaFin})`).join('\n');
+            const resp = prompt(`Seleccione el número del Turno que desea modificar:\n\n${opciones}`, '1');
+            if (resp === null) return;
+            const num = parseInt(resp);
+            if (num >= 1 && num <= turnos.length) {
+                this.abrirModalTurno(turnos[num - 1].id);
+            }
+        },
+
+        async abrirSelectorEliminarTurno() {
+            const turnos = await this.obtenerTurnos();
+            if (turnos.length === 0) {
+                alert('No hay turnos para eliminar.');
+                return;
+            }
+            const opciones = turnos.map((t, idx) => `${idx + 1}. ${t.nombre}`).join('\n');
+            const resp = prompt(`Seleccione el número del Turno que desea eliminar:\n\n${opciones}`, '1');
+            if (resp === null) return;
+            const num = parseInt(resp);
+            if (num >= 1 && num <= turnos.length) {
+                this.eliminarTurno(turnos[num - 1].id);
+            }
+        },
+
+        async abrirModalReordenarTurnos() {
+            const modal = document.getElementById('modal-reordenar-turnos');
+            if (!modal) return;
+            const container = document.getElementById('reordenar-turnos-list');
+            const turnos = await this.obtenerTurnos();
+
+            if (container) {
+                container.innerHTML = turnos.map((t, idx) => `
+                    <div style="display:flex; justify-content:space-between; align-items:center; background:#1e293b; padding:10px 14px; border-radius:8px; border-left:4px solid ${t.color || '#38bdf8'};">
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            <span style="background:#0f172a; color:#fbbf24; font-weight:800; font-size:0.8rem; padding:2px 8px; border-radius:6px;">#${t.orden || (idx+1)}</span>
+                            <div>
+                                <strong style="color:#fff; font-size:0.85rem;">${t.nombre}</strong>
+                                <div style="font-size:0.7rem; color:#94a3b8;">${t.horaInicio} - ${t.horaFin}</div>
+                            </div>
+                        </div>
+                        <div style="display:flex; gap:6px;">
+                            <button type="button" class="btn-turno-mini" onclick="ViasaGuardiasEngine.moverTurnoOrden('${t.id}', -1)" ${idx === 0 ? 'disabled style="opacity:0.4;"' : ''} title="Subir">
+                                <i class="fa-solid fa-arrow-up"></i>
+                            </button>
+                            <button type="button" class="btn-turno-mini" onclick="ViasaGuardiasEngine.moverTurnoOrden('${t.id}', 1)" ${idx === turnos.length - 1 ? 'disabled style="opacity:0.4;"' : ''} title="Bajar">
+                                <i class="fa-solid fa-arrow-down"></i>
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            modal.style.display = 'flex';
+        },
+
+        cerrarModalReordenarTurnos() {
+            const modal = document.getElementById('modal-reordenar-turnos');
+            if (modal) modal.style.display = 'none';
+        },
+
+        async moverTurnoOrden(turnoId, delta) {
+            const turnos = await this.obtenerTurnos();
+            const idx = turnos.findIndex(t => t.id === turnoId);
+            if (idx === -1) return;
+            const targetIdx = idx + delta;
+            if (targetIdx < 0 || targetIdx >= turnos.length) return;
+
+            const temp = turnos[idx].orden;
+            turnos[idx].orden = turnos[targetIdx].orden;
+            turnos[targetIdx].orden = temp;
+
+            await window.ViasaStorage.guardarRegistro('turnos_operativos', turnos[idx]);
+            await window.ViasaStorage.guardarRegistro('turnos_operativos', turnos[targetIdx]);
+
+            this.abrirModalReordenarTurnos();
+            this.renderGuardiasHub();
+        },
+
+        async reordenarTurnoDirecto(turnoId, delta) {
+            await this.moverTurnoOrden(turnoId, delta);
+            this.mostrarToast('↕️ Prioridad del turno actualizada.', 'info');
+        },
+
+        setVistaTemporalMatriz(modo) {
+            this.vistaTemporalMatriz = modo;
+            this.renderGuardiasHub();
+        },
+
+        setMesOperativo(val) {
+            if (val) this.mesOperativo = val;
+            this.renderGuardiasHub();
+        },
+
+        cambiarModoAsignacionModal(modo) {
+            this.modoAsignacionModal = modo;
+            const hid = document.getElementById('asig-modo-actual');
+            if (hid) hid.value = modo;
+
+            const tDia = document.getElementById('tab-asig-modo-dia');
+            const tSem = document.getElementById('tab-asig-modo-semana');
+            const tMes = document.getElementById('tab-asig-modo-mes');
+
+            const sDia = document.getElementById('asig-seccion-dia');
+            const sSem = document.getElementById('asig-seccion-semana');
+            const sMes = document.getElementById('asig-seccion-mes');
+
+            if (tDia) tDia.classList.toggle('active', modo === 'dia');
+            if (tSem) tSem.classList.toggle('active', modo === 'semana');
+            if (tMes) tMes.classList.toggle('active', modo === 'mes');
+
+            if (sDia) sDia.style.display = modo === 'dia' ? 'block' : 'none';
+            if (sSem) sSem.style.display = modo === 'semana' ? 'block' : 'none';
+            if (sMes) sMes.style.display = modo === 'mes' ? 'block' : 'none';
+        },
+
+        copiarSemana1ATodoElMes() {
+            const s1 = document.getElementById('asig-mes-sem1-turno')?.value;
+            if (!s1) return;
+            const s2 = document.getElementById('asig-mes-sem2-turno');
+            const s3 = document.getElementById('asig-mes-sem3-turno');
+            const s4 = document.getElementById('asig-mes-sem4-turno');
+            if (s2) s2.value = s1;
+            if (s3) s3.value = s1;
+            if (s4) s4.value = s1;
+            this.mostrarToast('📋 Turno de Semana 1 copiado a las 4 semanas del mes.', 'info');
+        },
+
+        async rotarEquiposSemanalmente() {
+            const turnos = await this.obtenerTurnos();
+            if (turnos.length < 2) {
+                alert('Se requieren al menos 2 turnos configurados para activar la rotación.');
+                return;
+            }
+            const s1 = document.getElementById('asig-mes-sem1-turno');
+            const s2 = document.getElementById('asig-mes-sem2-turno');
+            const s3 = document.getElementById('asig-mes-sem3-turno');
+            const s4 = document.getElementById('asig-mes-sem4-turno');
+
+            if (s1 && s2 && s3 && s4) {
+                const idx1 = turnos.findIndex(t => t.id === s1.value) || 0;
+                s2.value = turnos[(idx1 + 1) % turnos.length].id;
+                s3.value = turnos[(idx1 + 2) % turnos.length].id;
+                s4.value = turnos[(idx1 + 3) % turnos.length].id;
+                this.mostrarToast('🔄 Rotación secuencial de turnos aplicada para las 4 semanas.', 'info');
+            }
+        },
+
+        async abrirModalAsignarGuardia(turnoPreseleccionado = null) {
             const modal = document.getElementById('modal-asignar-guardia');
             if (!modal) return;
 
+            const emps = await this.obtenerEmpleados();
+            const activos = emps.filter(e => e.estado === 'activo');
+            const turnos = await this.obtenerTurnos();
+
             const selEmp = document.getElementById('asig-guardia-emp');
             if (selEmp) {
-                const emps = await this.obtenerEmpleados();
-                const activos = emps.filter(e => e.estado === 'activo');
                 selEmp.innerHTML = activos.map(e => `
                     <option value="${e.id}">${e.nombreCompleto || e.nombres} &bull; ${e.cargo} (${e.departamento})</option>
                 `).join('');
             }
 
-            document.getElementById('asig-guardia-fecha').value = this.fechaSeleccionada;
+            const optionsTurnosHTML = turnos.map(t => `
+                <option value="${t.id}" ${turnoPreseleccionado === t.id ? 'selected' : ''}>${t.nombre} (${t.horaInicio} - ${t.horaFin})</option>
+            `).join('');
+
+            const selTurno = document.getElementById('asig-guardia-turno');
+            if (selTurno) selTurno.innerHTML = optionsTurnosHTML;
+
+            const selTurnoSem = document.getElementById('asig-guardia-turno-semana');
+            if (selTurnoSem) selTurnoSem.innerHTML = optionsTurnosHTML;
+
+            const s1 = document.getElementById('asig-mes-sem1-turno');
+            const s2 = document.getElementById('asig-mes-sem2-turno');
+            const s3 = document.getElementById('asig-mes-sem3-turno');
+            const s4 = document.getElementById('asig-mes-sem4-turno');
+            if (s1) s1.innerHTML = optionsTurnosHTML;
+            if (s2) s2.innerHTML = optionsTurnosHTML;
+            if (s3) s3.innerHTML = optionsTurnosHTML;
+            if (s4) s4.innerHTML = optionsTurnosHTML;
+
+            const fInput = document.getElementById('asig-guardia-fecha');
+            if (fInput) fInput.value = this.fechaSeleccionada;
+
+            this.cambiarModoAsignacionModal('dia');
             modal.style.display = 'flex';
         },
 
@@ -603,44 +1144,168 @@
 
         async guardarAsignacionGuardia(e) {
             e.preventDefault();
+            const modo = document.getElementById('asig-modo-actual')?.value || 'dia';
             const empId = document.getElementById('asig-guardia-emp').value;
-            const fecha = document.getElementById('asig-guardia-fecha').value;
-            const turno = document.getElementById('asig-guardia-turno').value;
             const ubicacion = document.getElementById('asig-guardia-ubicacion').value.trim() || 'Sede Principal (La Sabanita)';
 
             const emps = await this.obtenerEmpleados();
             const emp = emps.find(x => x.id === empId);
             if (!emp) return;
 
-            const horariosMap = {
-                'madrugada': { nombre: 'Madrugada (04:00 - 12:00)', entrada: '04:00', salida: '12:00' },
-                'matutino': { nombre: 'Matutino (06:30 - 14:30)', entrada: '06:30', salida: '14:30' },
-                'vespertino': { nombre: 'Vespertino (13:00 - 21:00)', entrada: '13:00', salida: '21:00' },
-                'nocturno': { nombre: 'Nocturno (21:00 - 05:00)', entrada: '21:00', salida: '05:00' }
-            };
+            const turnos = await this.obtenerTurnos();
 
-            const confTurno = horariosMap[turno] || horariosMap['matutino'];
+            if (modo === 'dia') {
+                const fecha = document.getElementById('asig-guardia-fecha').value;
+                const turnoId = document.getElementById('asig-guardia-turno').value;
+                const tObj = turnos.find(t => t.id === turnoId) || turnos[0];
 
-            const nuevaGuardia = {
-                id: `GRD-${Date.now().toString().slice(-6)}`,
-                empleadoId: emp.id,
-                nombreEmpleado: emp.nombreCompleto || emp.nombres,
-                cargo: emp.cargo,
-                departamento: emp.departamento,
-                turno: turno,
-                nombreTurno: confTurno.nombre,
-                horaEntrada: confTurno.entrada,
-                horaSalida: confTurno.salida,
-                fecha: fecha,
-                estado: 'activo',
-                ubicacionAsignada: ubicacion,
-                supervisor: 'Gerente General'
-            };
+                const nuevaGuardia = {
+                    id: `GRD-${Date.now().toString().slice(-6)}-${Math.floor(Math.random()*1000)}`,
+                    empleadoId: emp.id,
+                    nombreEmpleado: emp.nombreCompleto || emp.nombres,
+                    cargo: emp.cargo,
+                    departamento: emp.departamento,
+                    turno: tObj.id,
+                    nombreTurno: `${tObj.nombre} (${tObj.horaInicio} - ${tObj.horaFin})`,
+                    horaEntrada: tObj.horaInicio,
+                    horaSalida: tObj.horaFin,
+                    fecha: fecha,
+                    estado: 'activo',
+                    ubicacionAsignada: ubicacion,
+                    supervisor: 'Gerente General'
+                };
 
-            await window.ViasaStorage.guardarRegistro('guardias_turnos', nuevaGuardia);
+                await window.ViasaStorage.guardarRegistro('guardias_turnos', nuevaGuardia);
+
+                const infoLOTTT = this.calcularHorasTurnoLOTTT(tObj.horaInicio, tObj.horaFin);
+                await this.registrarEventoAnales({
+                    tipoEvento: 'asignacion_guardia',
+                    empleadoId: emp.id,
+                    empleadoNombre: emp.nombreCompleto || emp.nombres,
+                    cargo: emp.cargo,
+                    turnoId: tObj.id,
+                    nombreTurno: tObj.nombre,
+                    fecha: fecha,
+                    horasDiurnas: infoLOTTT.horasDiurnas,
+                    horasNocturnas: infoLOTTT.horasNocturnas,
+                    horasTotales: infoLOTTT.duracionHoras,
+                    detalles: `Asignación diaria en ${tObj.nombre} para ${fecha}.`
+                });
+
+            } else if (modo === 'semana') {
+                const semNum = parseInt(document.getElementById('asig-guardia-semana-num').value) || 1;
+                const turnoId = document.getElementById('asig-guardia-turno-semana').value;
+                const tObj = turnos.find(t => t.id === turnoId) || turnos[0];
+
+                const diasSemanaChecks = [
+                    { id: 'asig-dia-lun', diaIndex: 1 },
+                    { id: 'asig-dia-mar', diaIndex: 2 },
+                    { id: 'asig-dia-mie', diaIndex: 3 },
+                    { id: 'asig-dia-jue', diaIndex: 4 },
+                    { id: 'asig-dia-vie', diaIndex: 5 },
+                    { id: 'asig-dia-sab', diaIndex: 6 },
+                    { id: 'asig-dia-dom', diaIndex: 0 }
+                ];
+
+                const [anio, mes] = this.mesOperativo.split('-').map(Number);
+                let startDay = (semNum - 1) * 7 + 1;
+                let endDay = semNum === 4 ? new Date(anio, mes, 0).getDate() : semNum * 7;
+
+                let guardiasCreadas = 0;
+                for (let d = startDay; d <= endDay; d++) {
+                    const dateObj = new Date(anio, mes - 1, d);
+                    const dayOfWeek = dateObj.getDay();
+                    const checkCfg = diasSemanaChecks.find(c => c.diaIndex === dayOfWeek);
+                    const isChecked = checkCfg && document.getElementById(checkCfg.id)?.checked;
+
+                    if (isChecked) {
+                        const fechaStr = `${this.mesOperativo}-${String(d).padStart(2, '0')}`;
+                        const nuevaGrd = {
+                            id: `GRD-${Date.now().toString().slice(-6)}-${d}`,
+                            empleadoId: emp.id,
+                            nombreEmpleado: emp.nombreCompleto || emp.nombres,
+                            cargo: emp.cargo,
+                            departamento: emp.departamento,
+                            turno: tObj.id,
+                            nombreTurno: `${tObj.nombre} (${tObj.horaInicio} - ${tObj.horaFin})`,
+                            horaEntrada: tObj.horaInicio,
+                            horaSalida: tObj.horaFin,
+                            fecha: fechaStr,
+                            estado: 'activo',
+                            ubicacionAsignada: ubicacion,
+                            supervisor: 'Gerente General'
+                        };
+                        await window.ViasaStorage.guardarRegistro('guardias_turnos', nuevaGrd);
+                        guardiasCreadas++;
+                    }
+                }
+
+                await this.registrarEventoAnales({
+                    tipoEvento: 'asignacion_semanal',
+                    empleadoId: emp.id,
+                    empleadoNombre: emp.nombreCompleto || emp.nombres,
+                    cargo: emp.cargo,
+                    turnoId: tObj.id,
+                    nombreTurno: tObj.nombre,
+                    fecha: `${this.mesOperativo}-Sem${semNum}`,
+                    detalles: `Asignación de Semana ${semNum} (${guardiasCreadas} guardias programadas) en turno ${tObj.nombre}.`
+                });
+
+            } else if (modo === 'mes') {
+                const s1 = document.getElementById('asig-mes-sem1-turno').value;
+                const s2 = document.getElementById('asig-mes-sem2-turno').value;
+                const s3 = document.getElementById('asig-mes-sem3-turno').value;
+                const s4 = document.getElementById('asig-mes-sem4-turno').value;
+                const [anio, mes] = this.mesOperativo.split('-').map(Number);
+                const diasMes = new Date(anio, mes, 0).getDate();
+
+                const semanasTurnos = [
+                    { start: 1, end: 7, turnoId: s1 },
+                    { start: 8, end: 14, turnoId: s2 },
+                    { start: 15, end: 21, turnoId: s3 },
+                    { start: 22, end: diasMes, turnoId: s4 }
+                ];
+
+                for (const sem of semanasTurnos) {
+                    const tObj = turnos.find(t => t.id === sem.turnoId) || turnos[0];
+                    for (let d = sem.start; d <= sem.end; d++) {
+                        const dateObj = new Date(anio, mes - 1, d);
+                        // Descanso domingo por defecto
+                        if (dateObj.getDay() === 0) continue;
+
+                        const fechaStr = `${this.mesOperativo}-${String(d).padStart(2, '0')}`;
+                        const nuevaGrd = {
+                            id: `GRD-${Date.now().toString().slice(-6)}-M${d}`,
+                            empleadoId: emp.id,
+                            nombreEmpleado: emp.nombreCompleto || emp.nombres,
+                            cargo: emp.cargo,
+                            departamento: emp.departamento,
+                            turno: tObj.id,
+                            nombreTurno: `${tObj.nombre} (${tObj.horaInicio} - ${tObj.horaFin})`,
+                            horaEntrada: tObj.horaInicio,
+                            horaSalida: tObj.horaFin,
+                            fecha: fechaStr,
+                            estado: 'activo',
+                            ubicacionAsignada: ubicacion,
+                            supervisor: 'Gerente General'
+                        };
+                        await window.ViasaStorage.guardarRegistro('guardias_turnos', nuevaGrd);
+                    }
+                }
+
+                await this.registrarEventoAnales({
+                    tipoEvento: 'asignacion_mensual',
+                    empleadoId: emp.id,
+                    empleadoNombre: emp.nombreCompleto || emp.nombres,
+                    cargo: emp.cargo,
+                    fecha: this.mesOperativo,
+                    detalles: `Programación mensual completa de 4 semanas asignada a ${emp.nombreCompleto || emp.nombres}.`
+                });
+            }
+
             this.cerrarModalAsignarGuardia();
             if (window.ViasaAudio) window.ViasaAudio.playSuccess();
-            alert(`✅ Guardia asignada a ${emp.nombreCompleto} para el día ${fecha} en turno ${confTurno.nombre}.`);
+            this.mostrarToast(`✅ Programación guardada para ${emp.nombreCompleto || emp.nombres}.`, 'success');
             this.renderGuardiasHub();
         },
 
@@ -649,11 +1314,614 @@
             const guardias = await this.obtenerGuardias();
             const index = guardias.findIndex(g => g.id === guardiaId);
             if (index >= 0) {
+                const removed = guardias[index];
                 guardias.splice(index, 1);
                 await window.ViasaStorage.eliminarRegistro('guardias_turnos', guardiaId);
+
+                await this.registrarEventoAnales({
+                    tipoEvento: 'guardia_removida',
+                    empleadoId: removed.empleadoId,
+                    empleadoNombre: removed.nombreEmpleado,
+                    turnoId: removed.turno,
+                    fecha: removed.fecha,
+                    detalles: `Guardia del día ${removed.fecha} desasignada.`
+                });
             }
             if (window.ViasaAudio) window.ViasaAudio.playTrash();
+            this.mostrarToast('🗑️ Guardia desasignada.', 'info');
             this.renderGuardiasHub();
+        },
+
+        // ======================================================================
+        // BÓVEDA PERMANENTE: ANALES HISTÓRICOS Y DEDUCCIÓN DE BENEFICIOS LOTTT
+        // ======================================================================
+        async inicializarAnalesHistoricos() {
+            let anales = await window.ViasaStorage.obtenerColeccion('anales_guardias_rrhh');
+            if (!anales || anales.length === 0) {
+                const emps = await this.obtenerEmpleados();
+                const turnos = await this.obtenerTurnos();
+                anales = [];
+                const anioActual = 2026;
+
+                // Generar historial estructurado de los últimos meses para la plantilla
+                for (const e of emps) {
+                    const depto = this.normalizarDepartamento(e.departamento, e.cargo);
+                    let turnoPref = turnos[1] || { id: 'matutino', nombre: 'Turno Matutino', horaInicio: '06:30', horaFin: '14:30' };
+                    if (depto === 'Fabricación') turnoPref = turnos[0] || turnoPref;
+                    if (depto === 'Cocina') turnoPref = turnos[1] || turnoPref;
+                    if (depto === 'Despacho') turnoPref = turnos[2] || turnoPref;
+
+                    const infoTurno = this.calcularHorasTurnoLOTTT(turnoPref.horaInicio, turnoPref.horaFin);
+
+                    // 10 registros históricos por empleado
+                    for (let m = 1; m <= 10; m++) {
+                        const mesStr = String(m).padStart(2, '0');
+                        anales.push({
+                            id: `ANL-${anioActual}-${mesStr}-${e.id.replace('EMP-', '')}`,
+                            timestamp: `${anioActual}-${mesStr}-15T08:00:00.000Z`,
+                            fecha: `${anioActual}-${mesStr}-15`,
+                            tipoEvento: m % 4 === 0 ? 'feriado_trabajado' : 'guardia_cumplida',
+                            empleadoId: e.id,
+                            empleadoNombre: e.nombreCompleto || e.nombres,
+                            cargo: e.cargo,
+                            departamento: e.departamento,
+                            turnoId: turnoPref.id,
+                            nombreTurno: turnoPref.nombre,
+                            horasDiurnas: infoTurno.horasDiurnas,
+                            horasNocturnas: infoTurno.horasNocturnas,
+                            horasTotales: infoTurno.duracionHoras,
+                            ubicacion: 'Sede Principal (La Sabanita)',
+                            operador: 'Gerencia General (Auditoría RRHH)',
+                            detalles: `Guardia mensual cumplida en ${turnoPref.nombre}. Registro formal de nómina LOTTT.`
+                        });
+                    }
+                }
+
+                for (const a of anales) {
+                    await window.ViasaStorage.guardarRegistro('anales_guardias_rrhh', a);
+                }
+            }
+            return anales;
+        },
+
+        async obtenerAnalesHistoricos() {
+            let anales = await window.ViasaStorage.obtenerColeccion('anales_guardias_rrhh');
+            if (!anales || anales.length === 0) {
+                anales = await this.inicializarAnalesHistoricos();
+            }
+            return anales.sort((a, b) => (b.timestamp || b.fecha || '').localeCompare(a.timestamp || a.fecha || ''));
+        },
+
+        async registrarEventoAnales(evento) {
+            const registro = {
+                id: `ANL-${Date.now().toString().slice(-7)}-${Math.floor(Math.random()*1000)}`,
+                timestamp: new Date().toISOString(),
+                fecha: evento.fecha || new Date().toISOString().split('T')[0],
+                tipoEvento: evento.tipoEvento || 'evento_general',
+                empleadoId: evento.empleadoId || 'SYS-VIASA',
+                empleadoNombre: evento.empleadoNombre || 'Personal Operativo',
+                cargo: evento.cargo || 'Operador',
+                departamento: evento.departamento || 'General',
+                turnoId: evento.turnoId || 'general',
+                nombreTurno: evento.nombreTurno || 'General',
+                horasDiurnas: evento.horasDiurnas || 0,
+                horasNocturnas: evento.horasNocturnas || 0,
+                horasTotales: evento.horasTotales || 0,
+                ubicacion: evento.ubicacion || 'Sede Principal (La Sabanita)',
+                operador: evento.operador || 'Administrador VIASA',
+                detalles: evento.detalles || 'Operación registrada en la bóveda inmutable.'
+            };
+            await window.ViasaStorage.guardarRegistro('anales_guardias_rrhh', registro);
+            return registro;
+        },
+
+        async abrirModalAnales() {
+            const modal = document.getElementById('modal-anales-beneficios');
+            if (!modal) return;
+
+            const tasaBCV = (window.ViasaApp && window.ViasaApp.tasaBCV) || parseFloat(window.ViasaStorage?.getItem('tasa_bcv', 36.85)) || 36.85;
+            const tasaUSDT = (window.ViasaApp && (window.ViasaApp.tasaUSDT || window.ViasaApp.tasaParalelo)) || parseFloat(window.ViasaStorage?.getItem('tasa_usdt', 39.50)) || 39.50;
+
+            const bcvEl = document.getElementById('anales-tasa-bcv-val');
+            const usdtEl = document.getElementById('anales-tasa-usdt-val');
+            if (bcvEl) bcvEl.textContent = `Bs. ${tasaBCV.toFixed(2)}`;
+            if (usdtEl) usdtEl.textContent = `Bs. ${tasaUSDT.toFixed(2)}`;
+
+            const emps = await this.obtenerEmpleados();
+            const activos = emps.filter(e => e.estado === 'activo');
+
+            const fEmp = document.getElementById('filtro-anales-emp');
+            if (fEmp) {
+                fEmp.innerHTML = `<option value="todos">Todos los Trabajadores (${activos.length})</option>` +
+                    activos.map(e => `<option value="${e.id}">${e.nombreCompleto || e.nombres} &bull; ${e.cargo}</option>`).join('');
+            }
+
+            const lEmp = document.getElementById('lottt-select-emp');
+            if (lEmp) {
+                lEmp.innerHTML = `<option value="todos">Todos los Trabajadores (Matriz Consolidada)</option>` +
+                    activos.map(e => `<option value="${e.id}">${e.nombreCompleto || e.nombres} &bull; ${e.cargo}</option>`).join('');
+            }
+
+            const fMes = document.getElementById('filtro-anales-mes');
+            if (fMes) fMes.value = this.mesOperativo;
+
+            this.cambiarPestanaAnales('bitacora');
+            modal.style.display = 'flex';
+        },
+
+        cerrarModalAnales() {
+            const modal = document.getElementById('modal-anales-beneficios');
+            if (modal) modal.style.display = 'none';
+        },
+
+        cambiarPestanaAnales(pestana) {
+            this.pestanaAnalesActiva = pestana;
+            const tBit = document.getElementById('tab-anales-bitacora');
+            const tLot = document.getElementById('tab-anales-lottt');
+            const sBit = document.getElementById('seccion-anales-bitacora');
+            const sLot = document.getElementById('seccion-anales-lottt');
+
+            if (tBit) tBit.classList.toggle('active', pestana === 'bitacora');
+            if (tLot) tLot.classList.toggle('active', pestana === 'lottt');
+            if (sBit) sBit.style.display = pestana === 'bitacora' ? 'block' : 'none';
+            if (sLot) sLot.style.display = pestana === 'lottt' ? 'block' : 'none';
+
+            if (pestana === 'bitacora') {
+                this.renderTablaAnalesBitacora();
+            } else {
+                this.renderCalculosLOTTT();
+            }
+        },
+
+        async renderTablaAnalesBitacora() {
+            const container = document.getElementById('anales-bitacora-table-container');
+            if (!container) return;
+
+            const anales = await this.obtenerAnalesHistoricos();
+            const emps = await this.obtenerEmpleados();
+
+            const fEmp = document.getElementById('filtro-anales-emp')?.value || 'todos';
+            const fMes = document.getElementById('filtro-anales-mes')?.value || '';
+            const fEve = document.getElementById('filtro-anales-evento')?.value || 'todos';
+
+            let filtrados = anales;
+            if (fEmp !== 'todos') {
+                filtrados = filtrados.filter(a => a.empleadoId === fEmp);
+            }
+            if (fMes) {
+                filtrados = filtrados.filter(a => (a.fecha || '').startsWith(fMes));
+            }
+            if (fEve !== 'todos') {
+                filtrados = filtrados.filter(a => a.tipoEvento === fEve);
+            }
+
+            if (filtrados.length === 0) {
+                container.innerHTML = `
+                    <div style="padding: 24px; text-align: center; color: #64748b; font-size: 0.85rem;">
+                        <i class="fa-solid fa-folder-open" style="font-size: 1.8rem; display: block; margin-bottom: 8px;"></i>
+                        No se encontraron registros en los Anales para los filtros seleccionados.
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = `
+                <table class="table-viasa-guardias" style="width: 100%; border-collapse: collapse; font-size: 0.74rem;">
+                    <thead>
+                        <tr style="border-bottom: 2px solid #334155; text-align: left; color: #fbbf24;">
+                            <th style="padding: 8px 10px;">ID / Fecha</th>
+                            <th style="padding: 8px 10px;">Trabajador</th>
+                            <th style="padding: 8px 10px;">Tipo de Evento</th>
+                            <th style="padding: 8px 10px;">Turno Asignado</th>
+                            <th style="padding: 8px 10px;">Horas (D / N)</th>
+                            <th style="padding: 8px 10px;">Detalles Operativos</th>
+                            <th style="padding: 8px 10px;">Auditoría</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${filtrados.slice(0, 50).map(a => {
+                            const emp = emps.find(x => x.id === a.empleadoId);
+                            const foto = this.obtenerFotoEmpleado(emp);
+                            return `
+                                <tr style="border-bottom: 1px solid #1e293b;">
+                                    <td style="padding: 8px 10px; font-family: monospace; color: #38bdf8;">
+                                        <strong>${a.id}</strong>
+                                        <div style="color: #94a3b8; font-size: 0.68rem;">${a.fecha || ''}</div>
+                                    </td>
+                                    <td style="padding: 8px 10px;">
+                                        <div style="display: flex; align-items: center; gap: 8px;">
+                                            <img src="${foto}" style="width: 26px; height: 26px; border-radius: 6px; object-fit: cover;">
+                                            <div>
+                                                <strong style="color: #fff;">${a.empleadoNombre || 'N/A'}</strong>
+                                                <div style="color: #94a3b8; font-size: 0.68rem;">${a.cargo || ''}</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td style="padding: 8px 10px;">
+                                        <span class="badge-swap-status" style="background: rgba(168,85,247,0.15); border: 1px solid #a855f7; color: #c084fc; font-size: 0.65rem; padding: 2px 6px; border-radius: 4px;">
+                                            ${(a.tipoEvento || 'evento').replace(/_/g, ' ').toUpperCase()}
+                                        </span>
+                                    </td>
+                                    <td style="padding: 8px 10px; color: #e2e8f0;">
+                                        ${a.nombreTurno || 'General'}
+                                    </td>
+                                    <td style="padding: 8px 10px; font-weight: 700;">
+                                        <span style="color: #fbbf24;">${a.horasDiurnas || 0}h D</span> / 
+                                        <span style="color: #c084fc;">${a.horasNocturnas || 0}h N</span>
+                                        <div style="font-size: 0.68rem; color: #4ade80;">Total: ${a.horasTotales || ((a.horasDiurnas||0)+(a.horasNocturnas||0))}h</div>
+                                    </td>
+                                    <td style="padding: 8px 10px; color: #cbd5e1; max-width: 240px; font-size: 0.72rem;">
+                                        ${a.detalles || ''}
+                                    </td>
+                                    <td style="padding: 8px 10px; color: #64748b; font-size: 0.68rem;">
+                                        <i class="fa-solid fa-user-shield"></i> ${a.operador || 'Sistema'}
+                                    </td>
+                                </tr>
+                            `;
+                        }).join('')}
+                    </tbody>
+                </table>
+            `;
+        },
+
+        calcularBeneficiosEmpleadoLOTTT(emp, anales) {
+            const salarioBaseUSD = parseFloat(emp.salarioBase || emp.salario || 280.00);
+            const salarioDiarioUSD = salarioBaseUSD / 30;
+            const valorHoraDiurna = salarioDiarioUSD / 8;
+            const valorHoraNocturna = valorHoraDiurna * 1.30;
+            const recargoHoraNocturna = valorHoraDiurna * 0.30;
+
+            const analesEmp = anales.filter(a => a.empleadoId === emp.id);
+            const diasEfectivos = Math.max(analesEmp.length * 2, 22);
+            const semanasCompletas = Math.floor(diasEfectivos / 5) || 4;
+
+            let fechaIngreso = new Date(emp.fechaIngreso || '2026-01-15');
+            if (isNaN(fechaIngreso.getTime())) fechaIngreso = new Date('2026-01-15');
+            const hoy = new Date();
+            const mesesServicio = Math.max(1, Math.round((hoy - fechaIngreso) / (1000 * 60 * 60 * 24 * 30.4)));
+            const aniosAntiguedad = Math.floor(mesesServicio / 12);
+
+            let horasDiurnas = 0;
+            let horasNocturnas = 0;
+            let feriadosTrabajados = 0;
+
+            for (const a of analesEmp) {
+                horasDiurnas += (a.horasDiurnas || 0);
+                horasNocturnas += (a.horasNocturnas || 0);
+                if (a.tipoEvento === 'feriado_trabajado') feriadosTrabajados++;
+            }
+
+            // Fallback razonable si hay pocos eventos
+            if (horasDiurnas === 0 && horasNocturnas === 0) {
+                horasDiurnas = diasEfectivos * 7;
+                horasNocturnas = diasEfectivos * 1;
+            }
+
+            // 1. Bono Nocturno (+30% Art. 117 LOTTT)
+            const bonoNocturnoUSD = +(horasNocturnas * recargoHoraNocturna).toFixed(2);
+
+            // 2. Feriados y Domingos (+50% Art. 120 LOTTT)
+            const recargoFeriadosUSD = +(feriadosTrabajados * salarioDiarioUSD * 1.50).toFixed(2);
+
+            // 3. Vacaciones y Bono Vacacional (Art. 190 y 192 LOTTT)
+            // 15 días hábiles remunerados primer año + 1 día por año adicional
+            const diasVacaciones = Math.min(30, 15 + aniosAntiguedad);
+            const vacacionesUSD = +(diasVacaciones * salarioDiarioUSD).toFixed(2);
+            const bonoVacacionalUSD = +(diasVacaciones * salarioDiarioUSD).toFixed(2);
+
+            // 4. Utilidades / Aguinaldos (Art. 131 LOTTT)
+            // Mínimo 30 días, prorrateado por meses trabajados en el año
+            const fraccionAnio = Math.min(12, mesesServicio) / 12;
+            const diasUtilidades = +(30 * fraccionAnio).toFixed(1);
+            const utilidadesUSD = +(diasUtilidades * salarioDiarioUSD).toFixed(2);
+
+            // 5. Garantía de Prestaciones Sociales (Art. 142 LOTTT)
+            // 15 días por trimestre (5 días por mes) + 2 días adicionales por año
+            const diasPrestaciones = (mesesServicio * 5) + (aniosAntiguedad >= 1 ? aniosAntiguedad * 2 : 0);
+            const prestacionesUSD = +(diasPrestaciones * salarioDiarioUSD).toFixed(2);
+
+            // Bono de Vanguardia / Asistencia Perfecta
+            const bonoVanguardiaUSD = +(40.00 * fraccionAnio).toFixed(2);
+
+            const totalPasivosUSD = +(vacacionesUSD + bonoVacacionalUSD + utilidadesUSD + bonoNocturnoUSD + recargoFeriadosUSD + prestacionesUSD + bonoVanguardiaUSD).toFixed(2);
+
+            return {
+                salarioBaseUSD,
+                salarioDiarioUSD,
+                diasEfectivos,
+                semanasCompletas,
+                mesesServicio,
+                aniosAntiguedad,
+                horasDiurnas,
+                horasNocturnas,
+                bonoNocturnoUSD,
+                feriadosTrabajados,
+                recargoFeriadosUSD,
+                diasVacaciones,
+                vacacionesUSD,
+                bonoVacacionalUSD,
+                diasUtilidades,
+                utilidadesUSD,
+                diasPrestaciones,
+                prestacionesUSD,
+                bonoVanguardiaUSD,
+                totalPasivosUSD
+            };
+        },
+
+        async renderCalculosLOTTT() {
+            const gridKPIs = document.getElementById('lottt-kpis-grid');
+            const tableConsolidado = document.getElementById('lottt-consolidado-table-container');
+            if (!gridKPIs || !tableConsolidado) return;
+
+            const emps = await this.obtenerEmpleados();
+            const activos = emps.filter(e => e.estado === 'activo');
+            const anales = await this.obtenerAnalesHistoricos();
+
+            const tasaBCV = (window.ViasaApp && window.ViasaApp.tasaBCV) || parseFloat(window.ViasaStorage?.getItem('tasa_bcv', 36.85)) || 36.85;
+            const tasaUSDT = (window.ViasaApp && (window.ViasaApp.tasaUSDT || window.ViasaApp.tasaParalelo)) || parseFloat(window.ViasaStorage?.getItem('tasa_usdt', 39.50)) || 39.50;
+
+            const empSelId = document.getElementById('lottt-select-emp')?.value || 'todos';
+
+            // Cálculos consolidados o de un solo empleado
+            let targetEmps = activos;
+            if (empSelId !== 'todos') {
+                targetEmps = activos.filter(e => e.id === empSelId);
+            }
+
+            let sumaDias = 0;
+            let sumaHorasDiurnas = 0;
+            let sumaHorasNocturnas = 0;
+            let sumaVacacionesUSD = 0;
+            let sumaUtilidadesUSD = 0;
+            let sumaBonosRecargosUSD = 0;
+            let sumaPrestacionesUSD = 0;
+            let sumaTotalUSD = 0;
+
+            const resultadosPorEmp = targetEmps.map(emp => {
+                const ben = this.calcularBeneficiosEmpleadoLOTTT(emp, anales);
+                sumaDias += ben.diasEfectivos;
+                sumaHorasDiurnas += ben.horasDiurnas;
+                sumaHorasNocturnas += ben.horasNocturnas;
+                sumaVacacionesUSD += (ben.vacacionesUSD + ben.bonoVacacionalUSD);
+                sumaUtilidadesUSD += ben.utilidadesUSD;
+                sumaBonosRecargosUSD += (ben.bonoNocturnoUSD + ben.recargoFeriadosUSD + ben.bonoVanguardiaUSD);
+                sumaPrestacionesUSD += ben.prestacionesUSD;
+                sumaTotalUSD += ben.totalPasivosUSD;
+                return { emp, ben };
+            });
+
+            // 1. Renderizar Tarjetas de Resumen KPI
+            gridKPIs.innerHTML = `
+                <div class="lottt-kpi-box">
+                    <span class="lbl"><i class="fa-solid fa-business-time" style="color:#fbbf24;"></i> Días / Horas Cumplidas</span>
+                    <strong class="val" style="color:#fbbf24;">${sumaDias} Días</strong>
+                    <span class="sub">${sumaHorasDiurnas}h Diurnas &bull; ${sumaHorasNocturnas}h Nocturnas</span>
+                </div>
+
+                <div class="lottt-kpi-box">
+                    <span class="lbl"><i class="fa-solid fa-umbrella-beach" style="color:#38bdf8;"></i> Vacaciones + Bono (Art. 190/192)</span>
+                    <strong class="val" style="color:#38bdf8;">$${sumaVacacionesUSD.toFixed(2)} USD</strong>
+                    <span class="sub">Bs. ${(sumaVacacionesUSD * tasaBCV).toFixed(2)} (BCV) &bull; Bs. ${(sumaVacacionesUSD * tasaUSDT).toFixed(2)} (USDT)</span>
+                </div>
+
+                <div class="lottt-kpi-box">
+                    <span class="lbl"><i class="fa-solid fa-gift" style="color:#4ade80;"></i> Utilidades / Aguinaldos (Art. 131)</span>
+                    <strong class="val" style="color:#4ade80;">$${sumaUtilidadesUSD.toFixed(2)} USD</strong>
+                    <span class="sub">Bs. ${(sumaUtilidadesUSD * tasaBCV).toFixed(2)} (BCV)</span>
+                </div>
+
+                <div class="lottt-kpi-box">
+                    <span class="lbl"><i class="fa-solid fa-moon" style="color:#c084fc;"></i> Recargos y Bonos (Art. 117/120)</span>
+                    <strong class="val" style="color:#c084fc;">$${sumaBonosRecargosUSD.toFixed(2)} USD</strong>
+                    <span class="sub">Nocturno (+30%) &bull; Feriados (+50%) &bull; Asistencia</span>
+                </div>
+
+                <div class="lottt-kpi-box" style="border-color:#f59e0b; background:rgba(245,158,11,0.08);">
+                    <span class="lbl" style="color:#fbbf24;"><i class="fa-solid fa-vault"></i> Prestaciones Sociales (Art. 142)</span>
+                    <strong class="val" style="color:#fbbf24;">$${sumaPrestacionesUSD.toFixed(2)} USD</strong>
+                    <span class="sub" style="color:#fde68a;">Garantía Trimestral Acumulada</span>
+                </div>
+
+                <div class="lottt-kpi-box" style="border-color:#10b981; background:rgba(16,185,129,0.08);">
+                    <span class="lbl" style="color:#34d399;"><i class="fa-solid fa-sack-dollar"></i> Pasivo Total Acumulado LOTTT</span>
+                    <strong class="val" style="color:#34d399;">$${sumaTotalUSD.toFixed(2)} USD</strong>
+                    <span class="sub" style="color:#a7f3d0; font-weight:800;">Bs. ${(sumaTotalUSD * tasaBCV).toFixed(2)} BCV</span>
+                </div>
+            `;
+
+            // 2. Renderizar Tabla Consolidada
+            tableConsolidado.innerHTML = `
+                <table class="table-lottt-analitica">
+                    <thead>
+                        <tr>
+                            <th>Trabajador</th>
+                            <th>Cargo / Depto</th>
+                            <th>Salario Base</th>
+                            <th>Antigüedad</th>
+                            <th>Vacaciones + Bono</th>
+                            <th>Utilidades</th>
+                            <th>Recargo Noct/Fer</th>
+                            <th>Prestaciones (Garantía)</th>
+                            <th>Total Acumulado ($ / Bs.)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${resultadosPorEmp.map(({ emp, ben }) => {
+                            const foto = this.obtenerFotoEmpleado(emp);
+                            const totalBs = (ben.totalPasivosUSD * tasaBCV).toFixed(2);
+                            return `
+                                <tr>
+                                    <td>
+                                        <div style="display:flex; align-items:center; gap:8px;">
+                                            <img src="${foto}" style="width:28px; height:28px; border-radius:6px; object-fit:cover;">
+                                            <div>
+                                                <strong style="color:#fff;">${emp.nombreCompleto || emp.nombres}</strong>
+                                                <div style="font-size:0.68rem; color:#94a3b8;">${emp.cedula || 'V-00000000'}</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div style="color:#cbd5e1; font-weight:700;">${emp.cargo}</div>
+                                        <div style="font-size:0.68rem; color:#38bdf8;">${emp.departamento}</div>
+                                    </td>
+                                    <td style="color:#fbbf24; font-weight:800; font-family:monospace;">
+                                        $${ben.salarioBaseUSD.toFixed(2)}
+                                        <div style="font-size:0.65rem; color:#94a3b8;">($${ben.salarioDiarioUSD.toFixed(2)}/día)</div>
+                                    </td>
+                                    <td style="color:#cbd5e1;">
+                                        ${ben.mesesServicio} meses
+                                        <div style="font-size:0.68rem; color:#4ade80;">${ben.diasEfectivos}d / ${ben.horasNocturnas}h noct</div>
+                                    </td>
+                                    <td>
+                                        <strong style="color:#38bdf8;">$${(ben.vacacionesUSD + ben.bonoVacacionalUSD).toFixed(2)}</strong>
+                                        <div style="font-size:0.65rem; color:#94a3b8;">${ben.diasVacaciones}d vac + ${ben.diasVacaciones}d bono</div>
+                                    </td>
+                                    <td>
+                                        <strong style="color:#4ade80;">$${ben.utilidadesUSD.toFixed(2)}</strong>
+                                        <div style="font-size:0.65rem; color:#94a3b8;">${ben.diasUtilidades} días</div>
+                                    </td>
+                                    <td>
+                                        <strong style="color:#c084fc;">$${(ben.bonoNocturnoUSD + ben.recargoFeriadosUSD).toFixed(2)}</strong>
+                                        <div style="font-size:0.65rem; color:#94a3b8;">Noct: $${ben.bonoNocturnoUSD} | Fer: $${ben.recargoFeriadosUSD}</div>
+                                    </td>
+                                    <td>
+                                        <strong style="color:#fbbf24;">$${ben.prestacionesUSD.toFixed(2)}</strong>
+                                        <div style="font-size:0.65rem; color:#94a3b8;">${ben.diasPrestaciones} días salario</div>
+                                    </td>
+                                    <td>
+                                        <strong style="color:#34d399; font-size:0.85rem;">$${ben.totalPasivosUSD.toFixed(2)}</strong>
+                                        <div style="font-size:0.7rem; color:#a7f3d0; font-weight:800;">Bs. ${totalBs}</div>
+                                    </td>
+                                </tr>
+                            `;
+                        }).join('')}
+                    </tbody>
+                </table>
+            `;
+        },
+
+        async exportarAnalesExcel() {
+            const anales = await this.obtenerAnalesHistoricos();
+            if (!anales || anales.length === 0) {
+                alert('No hay registros de anales para exportar.');
+                return;
+            }
+
+            const dataRows = anales.map(a => ({
+                'ID': a.id,
+                'Fecha': a.fecha,
+                'Empleado': a.empleadoNombre,
+                'Cargo': a.cargo,
+                'Departamento': a.departamento,
+                'Turno': a.nombreTurno,
+                'Evento': a.tipoEvento,
+                'Horas Diurnas': a.horasDiurnas,
+                'Horas Nocturnas': a.horasNocturnas,
+                'Horas Totales': a.horasTotales,
+                'Ubicación': a.ubicacion,
+                'Supervisor / Auditor': a.operador,
+                'Detalles': a.detalles
+            }));
+
+            if (window.XLSX && window.XLSX.utils) {
+                const ws = window.XLSX.utils.json_to_sheet(dataRows);
+                const wb = window.XLSX.utils.book_new();
+                window.XLSX.utils.book_append_sheet(wb, ws, 'Anales_Guardias_RRHH');
+                window.XLSX.writeFile(wb, `VIASA_Anales_Guardias_${new Date().toISOString().slice(0,10)}.xlsx`);
+                this.mostrarToast('📊 Archivo Excel de Anales descargado.', 'success');
+            } else {
+                this.exportarAnalesCSV();
+            }
+        },
+
+        async exportarAnalesCSV() {
+            const anales = await this.obtenerAnalesHistoricos();
+            if (!anales || anales.length === 0) return;
+
+            const headers = ['ID', 'Fecha', 'Empleado', 'Cargo', 'Departamento', 'Turno', 'Evento', 'HorasDiurnas', 'HorasNocturnas', 'HorasTotales', 'Ubicacion', 'Auditor', 'Detalles'];
+            const rows = anales.map(a => [
+                a.id, a.fecha, `"${a.empleadoNombre}"`, `"${a.cargo}"`, `"${a.departamento}"`, `"${a.nombreTurno}"`,
+                a.tipoEvento, a.horasDiurnas, a.horasNocturnas, a.horasTotales, `"${a.ubicacion}"`, `"${a.operador}"`, `"${a.detalles}"`
+            ]);
+
+            const csvContent = 'data:text/csv;charset=utf-8,\uFEFF' + [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement('a');
+            link.setAttribute('href', encodedUri);
+            link.setAttribute('download', `VIASA_Anales_Guardias_${new Date().toISOString().slice(0,10)}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            this.mostrarToast('📄 Archivo CSV de Anales descargado.', 'success');
+        },
+
+        async respaldarAnalesDiscoLocal() {
+            const anales = await this.obtenerAnalesHistoricos();
+            const jsonStr = JSON.stringify(anales, null, 2);
+            const blob = new Blob([jsonStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `VIASA_System_Data_anales_guardias_rrhh_${new Date().toISOString().slice(0,10)}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            this.mostrarToast('💾 Respaldo permanente descargado para la carpeta /VIASA_System_Data/anales_guardias_rrhh/', 'success');
+        },
+
+        async exportarReporteLOTTTExcel() {
+            const emps = await this.obtenerEmpleados();
+            const activos = emps.filter(e => e.estado === 'activo');
+            const anales = await this.obtenerAnalesHistoricos();
+            const tasaBCV = (window.ViasaApp && window.ViasaApp.tasaBCV) || 36.85;
+
+            const rows = activos.map(emp => {
+                const ben = this.calcularBeneficiosEmpleadoLOTTT(emp, anales);
+                return {
+                    'Cédula': emp.cedula || '',
+                    'Empleado': emp.nombreCompleto || emp.nombres,
+                    'Cargo': emp.cargo,
+                    'Departamento': emp.departamento,
+                    'Salario Base ($)': ben.salarioBaseUSD,
+                    'Salario Diario ($)': ben.salarioDiarioUSD.toFixed(2),
+                    'Meses Servicio': ben.mesesServicio,
+                    'Días Efectivos': ben.diasEfectivos,
+                    'Horas Nocturnas': ben.horasNocturnas,
+                    'Bono Nocturno ($)': ben.bonoNocturnoUSD,
+                    'Feriados Trabajados': ben.feriadosTrabajados,
+                    'Recargo Feriados ($)': ben.recargoFeriadosUSD,
+                    'Días Vacaciones': ben.diasVacaciones,
+                    'Monto Vacaciones ($)': ben.vacacionesUSD,
+                    'Bono Vacacional ($)': ben.bonoVacacionalUSD,
+                    'Días Utilidades': ben.diasUtilidades,
+                    'Monto Utilidades ($)': ben.utilidadesUSD,
+                    'Días Prestaciones': ben.diasPrestaciones,
+                    'Prestaciones Sociales ($)': ben.prestacionesUSD,
+                    'Bono Vanguardia ($)': ben.bonoVanguardiaUSD,
+                    'TOTAL PASIVOS ($)': ben.totalPasivosUSD,
+                    'TOTAL PASIVOS (Bs. BCV)': +(ben.totalPasivosUSD * tasaBCV).toFixed(2)
+                };
+            });
+
+            if (window.XLSX && window.XLSX.utils) {
+                const ws = window.XLSX.utils.json_to_sheet(rows);
+                const wb = window.XLSX.utils.book_new();
+                window.XLSX.utils.book_append_sheet(wb, ws, 'Auditoria_LOTTT_Pasivos');
+                window.XLSX.writeFile(wb, `VIASA_Auditoria_Pasivos_LOTTT_${new Date().toISOString().slice(0,10)}.xlsx`);
+                this.mostrarToast('📊 Reporte de Auditoría LOTTT descargado en Excel.', 'success');
+            } else {
+                alert('Módulo XLSX no disponible. Generando reporte.');
+            }
+        },
+
+        mostrarToast(msg, tipo = 'info') {
+            if (window.ViasaApp && typeof window.ViasaApp.mostrarNotificacionToast === 'function') {
+                window.ViasaApp.mostrarNotificacionToast(msg, tipo);
+            } else {
+                console.log(`[VIASA TOAST ${tipo.toUpperCase()}] ${msg}`);
+            }
         },
 
         // ======================================================================
@@ -967,12 +2235,14 @@
 
             const emps = await this.obtenerEmpleados();
             const guardias = await this.obtenerGuardias();
+            const turnos = await this.obtenerTurnos();
             const swaps = await this.obtenerShiftMarketplace();
             const rutas = await this.obtenerRutasDespacho();
             const cruce = await this.obtenerCruceCRMCafetin();
 
             const totalActivos = emps.filter(e => e.estado === 'activo').length;
-            const guardiasHoyCount = guardias.filter(g => g.fecha === this.fechaSeleccionada && g.estado === 'activo').length;
+            const hoyStr = new Date().toISOString().split('T')[0];
+            const guardiasHoyCount = guardias.filter(g => (g.fecha === this.fechaSeleccionada || g.fecha === hoyStr) && g.estado === 'activo').length;
             const swapsPendientes = swaps.filter(s => s.estado === 'pendiente_aprobacion').length;
             const entregasPendientes = rutas.reduce((acc, r) => acc + (r.totalParadas - r.paradasCompletadas), 0);
 
@@ -983,7 +2253,7 @@
             if (this.subViewActiva === 'plantilla') {
                 subContentHTML = this.renderSubViewPlantillaHTML(emps);
             } else if (this.subViewActiva === 'matriz') {
-                subContentHTML = this.renderSubViewMatrizHTML(guardias, emps);
+                subContentHTML = this.renderSubViewMatrizHTML(guardias, emps, turnos);
             } else if (this.subViewActiva === 'crm_cafetin') {
                 subContentHTML = this.renderSubViewCRMCafetinHTML(cruce);
             } else if (this.subViewActiva === 'logistica') {
@@ -1272,70 +2542,243 @@
         },
 
         // ----------------------------------------------------------------------
-        // SUB-VIEW 2: MATRIZ DE GUARDIAS Y ASIGNACIÓN
+        // SUB-VIEW 2: MATRIZ DE GUARDIAS Y ASIGNACIÓN DINÁMICA (LOTTT READY)
         // ----------------------------------------------------------------------
-        renderSubViewMatrizHTML(guardias, emps) {
-            const guardiasFecha = guardias.filter(g => g.fecha === this.fechaSeleccionada);
-            const turnosList = ['madrugada', 'matutino', 'vespertino', 'nocturno'];
+        renderSubViewMatrizHTML(guardias, emps, turnos = []) {
+            if (!turnos || turnos.length === 0) {
+                turnos = [
+                    { id: 'madrugada', orden: 1, nombre: 'Turno Madrugada', horaInicio: '04:00', horaFin: '12:00', icono: 'fa-moon', color: '#6366f1', colorBorde: '#6366f1' },
+                    { id: 'matutino', orden: 2, nombre: 'Turno Matutino', horaInicio: '06:30', horaFin: '14:30', icono: 'fa-sun', color: '#f59e0b', colorBorde: '#f59e0b' },
+                    { id: 'vespertino', orden: 3, nombre: 'Turno Vespertino', horaInicio: '13:00', horaFin: '21:00', icono: 'fa-cloud-sun', color: '#06b6d4', colorBorde: '#06b6d4' },
+                    { id: 'nocturno', orden: 4, nombre: 'Turno Nocturno', horaInicio: '21:00', horaFin: '05:00', icono: 'fa-star-half-stroke', color: '#ec4899', colorBorde: '#ec4899' }
+                ];
+            }
+            const turnosList = [...turnos].sort((a, b) => (a.orden || 0) - (b.orden || 0));
+
+            // Filtrado temporal dinámico
+            let guardiasPeriodo = [];
+            let periodoLabel = '';
+
+            const [anio, mesNum] = (this.mesOperativo || '2026-11').split('-').map(Number);
+            const diasMes = new Date(anio, mesNum, 0).getDate();
+
+            if (this.vistaTemporalMatriz === 'dia') {
+                guardiasPeriodo = guardias.filter(g => g.fecha === this.fechaSeleccionada && g.estado === 'activo');
+                periodoLabel = `Día: ${this.fechaSeleccionada}`;
+            } else if (this.vistaTemporalMatriz === 'semana1') {
+                const start = `${this.mesOperativo}-01`;
+                const end = `${this.mesOperativo}-07`;
+                guardiasPeriodo = guardias.filter(g => g.fecha >= start && g.fecha <= end && g.estado === 'activo');
+                periodoLabel = `Semana 1 (Días 01 al 07 de ${this.mesOperativo})`;
+            } else if (this.vistaTemporalMatriz === 'semana2') {
+                const start = `${this.mesOperativo}-08`;
+                const end = `${this.mesOperativo}-14`;
+                guardiasPeriodo = guardias.filter(g => g.fecha >= start && g.fecha <= end && g.estado === 'activo');
+                periodoLabel = `Semana 2 (Días 08 al 14 de ${this.mesOperativo})`;
+            } else if (this.vistaTemporalMatriz === 'semana3') {
+                const start = `${this.mesOperativo}-15`;
+                const end = `${this.mesOperativo}-21`;
+                guardiasPeriodo = guardias.filter(g => g.fecha >= start && g.fecha <= end && g.estado === 'activo');
+                periodoLabel = `Semana 3 (Días 15 al 21 de ${this.mesOperativo})`;
+            } else if (this.vistaTemporalMatriz === 'semana4') {
+                const start = `${this.mesOperativo}-22`;
+                const end = `${this.mesOperativo}-${String(diasMes).padStart(2, '0')}`;
+                guardiasPeriodo = guardias.filter(g => g.fecha >= start && g.fecha <= end && g.estado === 'activo');
+                periodoLabel = `Semana 4 / Cierre (Días 22 al ${diasMes} de ${this.mesOperativo})`;
+            } else {
+                guardiasPeriodo = guardias.filter(g => (g.fecha || '').startsWith(this.mesOperativo) && g.estado === 'activo');
+                periodoLabel = `Mes Completo: ${this.mesOperativo} (${diasMes} días)`;
+            }
 
             return `
-                <div class="guardias-filter-toolbar">
-                    <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
-                        <label style="font-size:0.8rem; font-weight:800; color:#fbbf24;"><i class="fa-regular fa-calendar"></i> Fecha Operativa:</label>
-                        <input type="date" class="date-input-guardias" value="${this.fechaSeleccionada}" onchange="ViasaGuardiasEngine.setFechaSeleccionada(this.value)">
+                <div class="guardias-matrix-toolbar">
+                    <!-- Fila 1: Comandos CRUD de Turnos y Bóveda -->
+                    <div class="guardias-matrix-top-row">
+                        <div class="guardias-matrix-cmd-group">
+                            <button type="button" class="btn-cmd-guardia emerald" onclick="ViasaGuardiasEngine.abrirModalTurno()" title="Crear nuevo turno con horario y pautas">
+                                <i class="fa-solid fa-plus"></i> Crear Turno
+                            </button>
+                            <button type="button" class="btn-cmd-guardia cyan" onclick="ViasaGuardiasEngine.abrirSelectorModificarTurno()" title="Modificar turno existente">
+                                <i class="fa-solid fa-pen"></i> Modificar Turno
+                            </button>
+                            <button type="button" class="btn-cmd-guardia red" onclick="ViasaGuardiasEngine.abrirSelectorEliminarTurno()" title="Eliminar turno">
+                                <i class="fa-solid fa-trash-can"></i> Eliminar Turno
+                            </button>
+                            <button type="button" class="btn-cmd-guardia purple" onclick="ViasaGuardiasEngine.abrirModalReordenarTurnos()" title="Reordenar prioridad de turnos">
+                                <i class="fa-solid fa-arrow-down-up-across-line"></i> Reordenar Turnos
+                            </button>
+                            <button type="button" class="btn-cmd-guardia gold" onclick="ViasaGuardiasEngine.abrirModalAsignarGuardia()" title="Asignar personal por día, semana o mes">
+                                <i class="fa-solid fa-calendar-plus"></i> Asignar Guardia
+                            </button>
+                        </div>
+
+                        <div>
+                            <button type="button" class="btn-cmd-guardia anales-lottt" onclick="ViasaGuardiasEngine.abrirModalAnales()" title="Acceso inmutable a bitácora y liquidación LOTTT">
+                                <i class="fa-solid fa-landmark"></i> Anales Históricos y Cálculo de Beneficios
+                            </button>
+                        </div>
                     </div>
 
-                    <div style="display: flex; gap: 10px;">
-                        <button type="button" class="btn-gold" onclick="ViasaGuardiasEngine.abrirModalAsignarGuardia()">
-                            <i class="fa-solid fa-calendar-plus"></i> Asignar Guardia
-                        </button>
+                    <!-- Fila 2: Conmutador de Semanas y Navegación de Período -->
+                    <div style="display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap;">
+                        <div class="guardias-nav-pills-row">
+                            <button type="button" class="nav-pill-guardia ${this.vistaTemporalMatriz === 'dia' ? 'active' : ''}" onclick="ViasaGuardiasEngine.setVistaTemporalMatriz('dia')">
+                                <i class="fa-regular fa-calendar"></i> 📅 Día Específico
+                            </button>
+                            <button type="button" class="nav-pill-guardia ${this.vistaTemporalMatriz === 'semana1' ? 'active' : ''}" onclick="ViasaGuardiasEngine.setVistaTemporalMatriz('semana1')">
+                                <i class="fa-solid fa-calendar-week"></i> 1. Sem 1 (1-7)
+                            </button>
+                            <button type="button" class="nav-pill-guardia ${this.vistaTemporalMatriz === 'semana2' ? 'active' : ''}" onclick="ViasaGuardiasEngine.setVistaTemporalMatriz('semana2')">
+                                <i class="fa-solid fa-calendar-week"></i> 2. Sem 2 (8-14)
+                            </button>
+                            <button type="button" class="nav-pill-guardia ${this.vistaTemporalMatriz === 'semana3' ? 'active' : ''}" onclick="ViasaGuardiasEngine.setVistaTemporalMatriz('semana3')">
+                                <i class="fa-solid fa-calendar-week"></i> 3. Sem 3 (15-21)
+                            </button>
+                            <button type="button" class="nav-pill-guardia ${this.vistaTemporalMatriz === 'semana4' ? 'active' : ''}" onclick="ViasaGuardiasEngine.setVistaTemporalMatriz('semana4')">
+                                <i class="fa-solid fa-calendar-week"></i> 4. Sem 4 (22-Fin)
+                            </button>
+                            <button type="button" class="nav-pill-guardia ${this.vistaTemporalMatriz === 'mes' ? 'active' : ''}" onclick="ViasaGuardiasEngine.setVistaTemporalMatriz('mes')">
+                                <i class="fa-solid fa-calendar-days"></i> 📊 Mes Completo
+                            </button>
+                        </div>
+
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            ${this.vistaTemporalMatriz === 'dia' ? `
+                                <div style="display: flex; align-items: center; gap: 6px;">
+                                    <label style="font-size:0.75rem; font-weight:800; color:#fbbf24;"><i class="fa-regular fa-calendar"></i> Fecha:</label>
+                                    <input type="date" value="${this.fechaSeleccionada}" onchange="ViasaGuardiasEngine.setFechaSeleccionada(this.value)" style="background:#1e293b; color:#fff; border:1px solid #334155; border-radius:6px; padding:5px 8px; font-size:0.78rem;">
+                                </div>
+                            ` : `
+                                <div style="display: flex; align-items: center; gap: 6px;">
+                                    <label style="font-size:0.75rem; font-weight:800; color:#38bdf8;"><i class="fa-solid fa-calendar-days"></i> Mes Operativo:</label>
+                                    <input type="month" value="${this.mesOperativo}" onchange="ViasaGuardiasEngine.setMesOperativo(this.value)" style="background:#1e293b; color:#fff; border:1px solid #334155; border-radius:6px; padding:5px 8px; font-size:0.78rem;">
+                                </div>
+                            `}
+                            <span style="font-size: 0.72rem; color: #94a3b8; background: rgba(0,0,0,0.3); padding: 4px 8px; border-radius: 6px;">
+                                <i class="fa-solid fa-filter"></i> ${periodoLabel}
+                            </span>
+                        </div>
                     </div>
                 </div>
 
+                <!-- Grilla Dinámica de Columnas de Turno -->
                 <div class="guardias-turnos-matrix-grid">
-                    ${turnosList.map(t => {
-                        const enTurno = guardiasFecha.filter(g => g.turno === t);
-                        const titlesMap = {
-                            'madrugada': { title: '1. Turno Madrugada (04:00 - 12:00)', icon: 'fa-moon', color: '#6366f1' },
-                            'matutino': { title: '2. Turno Matutino (06:30 - 14:30)', icon: 'fa-sun', color: '#f59e0b' },
-                            'vespertino': { title: '3. Turno Vespertino (13:00 - 21:00)', icon: 'fa-cloud-sun', color: '#38bdf8' },
-                            'nocturno': { title: '4. Turno Nocturno (21:00 - 05:00)', icon: 'fa-star-half-stroke', color: '#ec4899' }
-                        };
-                        const info = titlesMap[t];
+                    ${turnosList.map((t, idx) => {
+                        const enTurno = guardiasPeriodo.filter(g => g.turno === t.id);
+                        const empIdsUnicos = [...new Set(enTurno.map(g => g.empleadoId))];
+                        const lotttInfo = this.calcularHorasTurnoLOTTT(t.horaInicio, t.horaFin);
+                        const colorBorde = t.colorBorde || t.color || '#10b981';
 
                         return `
                             <div class="guardia-turno-column">
-                                <div class="turno-column-hdr" style="border-top: 3px solid ${info.color};">
-                                    <div style="display: flex; align-items: center; gap: 8px;">
-                                        <i class="fa-solid ${info.icon}" style="color:${info.color}; font-size:1.1rem;"></i>
-                                        <h4 style="margin:0; font-size:0.92rem; color:#fff;">${info.title}</h4>
+                                <div class="turno-column-hdr" style="border-top: 3px solid ${colorBorde};">
+                                    <div style="display: flex; align-items: flex-start; gap: 9px; min-width: 0;">
+                                        <i class="fa-solid ${t.icono || 'fa-clock'}" style="color:${t.color || '#10b981'}; font-size:1.2rem; margin-top:2px;"></i>
+                                        <div style="min-width: 0;">
+                                            <h4 style="margin:0; font-size:0.9rem; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="${t.nombre}">
+                                                ${t.orden || (idx+1)}. ${t.nombre}
+                                            </h4>
+                                            <div style="font-size:0.68rem; color:#94a3b8;">
+                                                ${t.horaInicio} - ${t.horaFin} (${lotttInfo.duracionHoras}h) &bull; <span style="color:${lotttInfo.horasNocturnas > 0 ? '#c084fc' : '#34d399'};">${lotttInfo.tipo}</span>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <span class="badge-guardia-count">${enTurno.length} Personal</span>
+
+                                    <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 4px;">
+                                        <span class="badge-guardia-count">${empIdsUnicos.length} Personal</span>
+                                        <div class="turno-hdr-actions">
+                                            <button type="button" class="btn-turno-mini" onclick="ViasaGuardiasEngine.reordenarTurnoDirecto('${t.id}', -1)" title="Subir prioridad turno">
+                                                <i class="fa-solid fa-arrow-up"></i>
+                                            </button>
+                                            <button type="button" class="btn-turno-mini" onclick="ViasaGuardiasEngine.reordenarTurnoDirecto('${t.id}', 1)" title="Bajar prioridad turno">
+                                                <i class="fa-solid fa-arrow-down"></i>
+                                            </button>
+                                            <button type="button" class="btn-turno-mini edit" onclick="ViasaGuardiasEngine.abrirModalTurno('${t.id}')" title="Modificar este turno">
+                                                <i class="fa-solid fa-pen"></i>
+                                            </button>
+                                            <button type="button" class="btn-turno-mini add" onclick="ViasaGuardiasEngine.abrirModalAsignarGuardia('${t.id}')" title="Asignar personal a este turno">
+                                                <i class="fa-solid fa-plus"></i>
+                                            </button>
+                                            <button type="button" class="btn-turno-mini del" onclick="ViasaGuardiasEngine.eliminarTurno('${t.id}')" title="Eliminar este turno">
+                                                <i class="fa-solid fa-trash-can"></i>
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
 
                                 <div class="turno-column-list">
-                                    ${enTurno.length === 0 ? `
-                                        <div style="padding: 16px; text-align: center; color: #64748b; font-size: 0.78rem;">
-                                            Sin personal asignado en este turno.
+                                    ${t.pautas ? `
+                                        <div class="pautas-box-turno">
+                                            <i class="fa-solid fa-list-check" style="color:#fbbf24;"></i> ${t.pautas}
                                         </div>
-                                    ` : enTurno.map(g => `
-                                        <div class="guardia-card-item">
-                                            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                                                <div>
-                                                    <strong style="color: #ffffff; font-size: 0.85rem;">${g.nombreEmpleado}</strong>
-                                                    <div style="font-size: 0.72rem; color: #94a3b8; margin: 1px 0;">${g.cargo}</div>
-                                                </div>
-                                                <button type="button" class="btn-xs-delete-guardia" onclick="ViasaGuardiasEngine.eliminarGuardia('${g.id}')" title="Quitar Guardia">
-                                                    &times;
+                                    ` : ''}
+
+                                    ${empIdsUnicos.length === 0 ? `
+                                        <div style="padding: 22px 14px; text-align: center; color: #64748b; font-size: 0.78rem; background: rgba(0,0,0,0.2); border-radius: 8px;">
+                                            <i class="fa-solid fa-user-clock" style="font-size: 1.5rem; color: #475569; display: block; margin-bottom: 6px;"></i>
+                                            Sin personal asignado en este período.
+                                            <div style="margin-top: 8px;">
+                                                <button type="button" class="btn-cmd-guardia emerald" style="padding: 4px 10px; font-size: 0.7rem;" onclick="ViasaGuardiasEngine.abrirModalAsignarGuardia('${t.id}')">
+                                                    <i class="fa-solid fa-user-plus"></i> Asignar Trabajador
                                                 </button>
                                             </div>
-                                            
-                                            <div style="margin-top: 6px; font-size: 0.7rem; color: #cbd5e1; display: flex; justify-content: space-between; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 4px;">
-                                                <span><i class="fa-solid fa-location-dot" style="color:#fbbf24;"></i> ${g.ubicacionAsignada || 'Panadería'}</span>
-                                                <span style="color:#4ade80; font-weight:700;">${g.horaEntrada} - ${g.horaSalida}</span>
-                                            </div>
                                         </div>
-                                    `).join('')}
+                                    ` : empIdsUnicos.map(empId => {
+                                        const emp = emps.find(x => x.id === empId) || { nombreCompleto: 'Personal', cargo: 'Operario', departamento: 'General' };
+                                        const foto = this.obtenerFotoEmpleado(emp);
+                                        const deptoStyle = this.obtenerEstiloDepto(this.normalizarDepartamento(emp.departamento, emp.cargo));
+                                        const guardiasEmp = enTurno.filter(g => g.empleadoId === empId);
+                                        const primeraGuardia = guardiasEmp[0];
+
+                                        // Días trabajados en la semana
+                                        const diasSem = [
+                                            { letra: 'L', idx: 1 },
+                                            { letra: 'M', idx: 2 },
+                                            { letra: 'X', idx: 3 },
+                                            { letra: 'J', idx: 4 },
+                                            { letra: 'V', idx: 5 },
+                                            { letra: 'S', idx: 6 },
+                                            { letra: 'D', idx: 0 }
+                                        ];
+                                        const diasAsignadosSet = new Set(guardiasEmp.map(g => new Date(g.fecha + 'T12:00:00').getDay()));
+
+                                        return `
+                                            <div class="guardia-worker-card">
+                                                <div class="worker-card-top">
+                                                    <img src="${foto}" class="worker-card-avatar" style="border-color:${t.color || '#64748b'};">
+                                                    <div class="worker-card-info">
+                                                        <h5 class="worker-card-name">${emp.nombreCompleto || emp.nombres}</h5>
+                                                        <div class="worker-card-cargo">${emp.cargo}</div>
+                                                        <span class="${deptoStyle.clase}" style="font-size: 0.62rem; padding: 1px 5px; margin-top: 2px;">
+                                                            ${deptoStyle.label}
+                                                        </span>
+                                                    </div>
+                                                    <button type="button" class="btn-xs-delete-guardia" onclick="ViasaGuardiasEngine.eliminarGuardia('${primeraGuardia.id}')" title="Desasignar Guardia">
+                                                        &times;
+                                                    </button>
+                                                </div>
+
+                                                <div class="worker-card-meta">
+                                                    ${this.vistaTemporalMatriz.startsWith('semana') ? `
+                                                        <div class="badge-dias-pills">
+                                                            ${diasSem.map(d => `
+                                                                <span class="dia-dot ${diasAsignadosSet.has(d.idx) ? 'activo' : 'descanso'}" title="${diasAsignadosSet.has(d.idx) ? 'Guardia Asignada' : 'Descanso Legal LOTTT'}">
+                                                                    ${d.letra}
+                                                                </span>
+                                                            `).join('')}
+                                                        </div>
+                                                        <span style="font-weight:700; color:#4ade80;">${guardiasEmp.length} días (${guardiasEmp.length * lotttInfo.duracionHoras}h)</span>
+                                                    ` : this.vistaTemporalMatriz === 'mes' ? `
+                                                        <span><i class="fa-solid fa-calendar-check" style="color:#fbbf24;"></i> ${guardiasEmp.length} Guardias / Mes</span>
+                                                        <span style="font-weight:700; color:#38bdf8;">${guardiasEmp.length * lotttInfo.duracionHoras} hrs</span>
+                                                    ` : `
+                                                        <span><i class="fa-solid fa-location-dot" style="color:#fbbf24;"></i> ${primeraGuardia.ubicacionAsignada || 'Panadería'}</span>
+                                                        <span style="color:#4ade80; font-weight:700;">${primeraGuardia.horaEntrada} - ${primeraGuardia.horaSalida}</span>
+                                                    `}
+                                                </div>
+                                            </div>
+                                        `;
+                                    }).join('')}
                                 </div>
                             </div>
                         `;

@@ -12,7 +12,7 @@
 
     const VIASA_STORAGE_PREFIX = 'viasa_sys_';
     const DB_NAME = 'VIASA_SYSTEM_DB_v1';
-    const DB_VERSION = 9;
+    const DB_VERSION = 10;
 
     const STORES = [
         'categorias',
@@ -69,7 +69,12 @@
         'historial_tasas_cambio',
         'banco_memoria_contabilidad_nomina',
         'calculos_nomina',
-        'casillero_respaldos_generales'
+        'casillero_respaldos_generales',
+        'guardias_turnos',
+        'turnos_operativos',
+        'anales_guardias_rrhh',
+        'shift_marketplace',
+        'despachos_rutas'
     ];
 
     class ViasaStorageEngine {
