@@ -2737,7 +2737,7 @@
 
                 return `
                     <div class="pos-product-card" id="pos-card-${p.id}" onclick="ViasaApp.agregarAlCarrito('${p.id}')">
-                        <!-- 1. Cinta Superior Técnica -->
+                        <!-- 1. Cinta Superior Técnica (Adentro de la ficha) -->
                         <div class="pos-card-top-bar">
                             <div class="pos-card-fiscal-sku-group">
                                 ${taxBadge}
@@ -2756,7 +2756,7 @@
                             </div>
                         </div>
 
-                        <!-- 2. Cuerpo Central: Imagen (68x68) + Nombre Completo + Precios Bimonetarios -->
+                        <!-- 2. Cuerpo Central: Imagen (68x68) + Nombre Completo + Precios + Stock Integrado (Adentro de la ficha) -->
                         <div class="pos-card-main-body">
                             <div class="pos-card-media-box">
                                 ${mediaDisplay}
@@ -2765,22 +2765,17 @@
                             <div class="pos-card-info-box">
                                 <h4 class="pos-card-product-title" title="${p.nombre}">${p.nombre}</h4>
                                 ${presentacionTexto ? `<div class="pos-card-product-sub" title="${presentacionTexto}">${presentacionTexto}</div>` : ''}
+                                
+                                <!-- Fila de Precios + Stock Integrado Adentro -->
                                 <div class="pos-card-pricing-row">
-                                    ${priceDisplay}
+                                    <div class="pos-card-price-values">
+                                        ${priceDisplay}
+                                    </div>
+                                    <!-- BADGE DE STOCK ADENTRO DE LA FICHA -->
+                                    <span class="pos-card-stock-indicator ${stockClass}" title="Stock disponible: ${stockVal} ${unidadCorta}">
+                                        📦 Stock: <strong>${stockVal} ${unidadCorta}</strong>
+                                    </span>
                                 </div>
-                            </div>
-                        </div>
-
-                        <!-- 3. Pie de Ficha: Stock + Código de Barras y QR -->
-                        <div class="pos-card-footer-row">
-                            <div class="pos-card-stock-indicator ${stockClass}" title="Stock disponible: ${stockVal} ${unidadCorta}">
-                                <span>📦 Stock: <strong>${stockVal} ${unidadCorta}</strong></span>
-                            </div>
-                            <div class="pos-card-barcode-pill" onclick="event.stopPropagation(); ViasaApp.abrirModalEtiquetaProducto('${p.id}')" title="Ver código de barras 1D y QR">
-                                <i class="fa-solid fa-barcode"></i>
-                                <span class="barcode-digits">${barcodeDigits}</span>
-                                <span class="barcode-sep">&bull;</span>
-                                <span class="barcode-qr-tag">QR</span>
                             </div>
                         </div>
                     </div>

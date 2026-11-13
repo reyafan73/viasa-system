@@ -1180,10 +1180,18 @@ body {
 
 .pos-card-pricing-row {
     display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    margin-top: 8px;
+    width: 100%;
+}
+
+.pos-card-price-values {
+    display: flex;
     align-items: baseline;
     gap: 6px;
     flex-wrap: wrap;
-    margin-top: 2px;
 }
 
 .pos-card-price-usd {
@@ -1199,101 +1207,40 @@ body {
     color: #38bdf8;
 }
 
-/* 3. Pie de Ficha: Stock + Código de Barras y QR */
-.pos-card-footer-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 8px;
-    width: 100%;
-    margin-top: 10px;
-    padding-top: 8px;
-    border-top: 1px solid rgba(255, 255, 255, 0.08);
-    box-sizing: border-box;
-}
-
+/* Badge de Stock Adentro de la Ficha */
 .pos-card-stock-indicator {
     display: inline-flex;
     align-items: center;
     gap: 4px;
-    background: rgba(16, 185, 129, 0.12);
+    background: rgba(16, 185, 129, 0.15);
     color: #10b981;
     padding: 3px 8px;
     border-radius: 6px;
-    font-size: 11.5px;
+    font-size: 12px;
     font-weight: 700;
     white-space: nowrap;
-    border: 1px solid rgba(16, 185, 129, 0.25);
+    border: 1px solid rgba(16, 185, 129, 0.3);
     box-sizing: border-box;
     flex-shrink: 0;
     line-height: 1.2;
 }
 
 .pos-card-stock-indicator.stock-optimo {
-    background: rgba(16, 185, 129, 0.12);
+    background: rgba(16, 185, 129, 0.15);
     color: #10b981;
     border-color: rgba(16, 185, 129, 0.3);
 }
 
 .pos-card-stock-indicator.stock-medio {
-    background: rgba(245, 158, 11, 0.12);
+    background: rgba(245, 158, 11, 0.15);
     color: #f59e0b;
     border-color: rgba(245, 158, 11, 0.3);
 }
 
 .pos-card-stock-indicator.stock-agotado {
-    background: rgba(239, 68, 68, 0.12);
+    background: rgba(239, 68, 68, 0.15);
     color: #ef4444;
     border-color: rgba(239, 68, 68, 0.3);
-}
-
-.pos-card-barcode-pill {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    background: #0f172a;
-    color: #cbd5e1;
-    padding: 3px 8px;
-    border-radius: 6px;
-    font-size: 11px;
-    font-family: 'Consolas', 'Courier New', monospace;
-    white-space: nowrap;
-    border: 1px solid rgba(148, 163, 184, 0.25);
-    cursor: pointer;
-    transition: all 0.2s ease;
-    box-sizing: border-box;
-    flex-shrink: 0;
-    line-height: 1.2;
-}
-
-.pos-card-barcode-pill:hover {
-    border-color: #f59e0b;
-    background: rgba(245, 158, 11, 0.12);
-    color: #fbbf24;
-    transform: translateY(-1px);
-    box-shadow: 0 2px 8px rgba(245, 158, 11, 0.25);
-}
-
-.pos-card-barcode-pill .barcode-digits {
-    font-family: 'Consolas', 'Courier New', monospace;
-    font-weight: 700;
-    letter-spacing: 0.3px;
-    color: #cbd5e1;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-.pos-card-barcode-pill .barcode-sep {
-    color: #64748b;
-    font-size: 9px;
-}
-
-.pos-card-barcode-pill .barcode-qr-tag {
-    color: #38bdf8;
-    font-weight: 800;
-    font-size: 10px;
-    letter-spacing: 0.3px;
 }
 
 .pos-commands-toolbar {
