@@ -332,6 +332,10 @@
                             <i class="fa-solid fa-box-archive" style="color: #fbbf24;"></i>
                             <span>Casillero de Respaldos</span>
                         </button>
+                        <button type="button" class="btn-secondary" id="btn-header-sync-carpetas-laptop" onclick="window.ViasaMediaStorage && window.ViasaMediaStorage.sincronizarConCarpetaLocal()" title="Sincronizar y respaldar todas las imágenes y códigos en las carpetas de la laptop (/VIASA_System_Data/)" style="padding: 6px 12px; font-size: 0.76rem; font-weight: 800; display: flex; align-items: center; gap: 6px; border-color: #38bdf8; color: #bae6fd; background: rgba(56, 189, 248, 0.12); cursor: pointer;">
+                            <i class="fa-solid fa-folder-tree" style="color: #38bdf8;"></i>
+                            <span>Carpetas Laptop</span>
+                        </button>
                     </div>
                     
                     <div class="user-badge-box">
@@ -5854,6 +5858,7 @@
     </div>
 
     <script src="assets/js/storage-engine.js?v=3.1.0"></script>
+    <script src="assets/js/viasa-media-storage-service.js?v=1.0.0"></script>
     <script src="assets/js/database.js?v=3.1.0"></script>
     <script src="assets/js/barcode-qr-engine.js"></script>
     <script src="assets/js/driver-fiscal-multi.js"></script>

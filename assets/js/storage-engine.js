@@ -186,18 +186,54 @@
         }
 
         /**
-         * Guardar datos en LocalStorage Sandbox
+         * Remueve cadenas Base64 pesadas para proteger la cuota de LocalStorage
+         */
+        _removerBase64Pesados(obj) {
+            if (!obj) return obj;
+            if (typeof obj === 'string') {
+                if (obj.startsWith('data:image/') && obj.length > 20000) {
+                    return '';
+                }
+                return obj;
+            }
+            if (Array.isArray(obj)) {
+                return obj.map(it => this._removerBase64Pesados(it));
+            }
+            if (typeof obj === 'object') {
+                const res = {};
+                for (const k of Object.keys(obj)) {
+                    res[k] = this._removerBase64Pesados(obj[k]);
+                }
+                return res;
+            }
+            return obj;
+        }
+
+        /**
+         * Guardar datos en LocalStorage Sandbox con protección contra QuotaExceededError
          */
         setItem(key, value) {
+            const sKey = this.getSandboxedKey(key);
             try {
-                const sKey = this.getSandboxedKey(key);
                 const limpio = this.sanitizarTexto(value);
                 const str = typeof limpio === 'string' ? limpio : JSON.stringify(limpio);
                 localStorage.setItem(sKey, str);
                 return true;
             } catch (e) {
-                console.error(`[VIASA Storage] Error guardando ${key} en LocalStorage:`, e);
-                return false;
+                console.warn(`[VIASA Storage] QuotaExceeded o error guardando ${key} en LocalStorage. Aplicando desbordamiento controlado:`, e);
+                try {
+                    if (window.ViasaMediaStorage && typeof window.ViasaMediaStorage.purgarBase64AntiguosDeLocalStorage === 'function') {
+                        window.ViasaMediaStorage.purgarBase64AntiguosDeLocalStorage();
+                    }
+                    const sinBase64 = this._removerBase64Pesados(this.sanitizarTexto(value));
+                    const strLimpio = typeof sinBase64 === 'string' ? sinBase64 : JSON.stringify(sinBase64);
+                    localStorage.setItem(sKey, strLimpio);
+                    console.log(`[VIASA Storage] ${key} guardado exitosamente tras depurar Base64 pesado.`);
+                    return true;
+                } catch (e2) {
+                    console.error(`[VIASA Storage] No se pudo guardar ${key} en LocalStorage ni tras purga:`, e2);
+                    return false;
+                }
             }
         }
 

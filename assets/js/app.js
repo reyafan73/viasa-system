@@ -19162,6 +19162,10 @@
                         </div>
 
                         <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                            <button type="button" class="btn-secondary" onclick="window.ViasaMediaStorage && window.ViasaMediaStorage.sincronizarConCarpetaLocal()" style="padding: 11px 16px; font-size: 0.82rem; font-weight: 800; display: flex; align-items: center; gap: 8px; border-color: #f59e0b; color: #fbbf24; cursor: pointer; margin: 0;" title="Sincronizar y respaldar todas las imágenes y códigos en las 4 carpetas locales de la laptop (/VIASA_System_Data/)">
+                                <i class="fa-solid fa-folder-tree"></i> 📂 Sincronizar Carpetas Laptop
+                            </button>
+                            
                             <label for="input-importar-respaldo-casillero" class="btn-secondary" style="padding: 11px 16px; font-size: 0.82rem; font-weight: 800; display: flex; align-items: center; gap: 8px; border-color: #38bdf8; color: #7dd3fc; cursor: pointer; margin: 0;">
                                 <i class="fa-solid fa-file-import"></i> Importar Archivo (.JSON) al Casillero
                             </label>

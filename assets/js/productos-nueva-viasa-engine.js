@@ -737,10 +737,11 @@
 
     function renderBarcodeGraphic(p, code, formato = 'EAN13', width = 190, height = 64) {
         if (p && p.customBarcodeImage) {
+            const imgSrc = window.ViasaMediaStorage ? window.ViasaMediaStorage.resolveUrl(p.customBarcodeImage) : p.customBarcodeImage;
             const wStyle = typeof width === 'number' ? `${width}px` : (width || '100%');
             const hStyle = typeof height === 'number' ? `${height}px` : (height || '100%');
             return `<div class="barcode-preview-container" style="width:${wStyle};height:${hStyle};background-color:#FFFFFF;border-radius:6px;padding:4px 8px;display:flex;align-items:center;justify-content:center;overflow:hidden;box-sizing:border-box;">
-                <img src="${esc(p.customBarcodeImage)}" alt="Código de barras" style="width:100%;height:100%;max-height:100%;object-fit:contain;object-position:center;display:block;margin:0 auto;">
+                <img src="${esc(imgSrc)}" alt="Código de barras" style="width:100%;height:100%;max-height:100%;object-fit:contain;object-position:center;display:block;margin:0 auto;">
             </div>`;
         }
         let cleanCode = String(code || (p ? p.barcode : '') || '').trim();
@@ -756,9 +757,10 @@
 
     function renderQRGraphic(p, payloadQR, pixelSize = 120, margin = 2) {
         if (p && p.customQrImage) {
+            const imgSrc = window.ViasaMediaStorage ? window.ViasaMediaStorage.resolveUrl(p.customQrImage) : p.customQrImage;
             const sizeStyle = typeof pixelSize === 'number' ? `${pixelSize}px` : (pixelSize || '100%');
             return `<div class="qr-preview-container" style="width:${sizeStyle};height:${sizeStyle};background-color:#FFFFFF;border-radius:6px;padding:2px;display:flex;align-items:center;justify-content:center;overflow:hidden;box-sizing:border-box;">
-                <img src="${esc(p.customQrImage)}" alt="Código QR" style="height:100%;width:auto;max-height:100%;aspect-ratio:1/1;object-fit:contain;object-position:center;margin:0 auto;display:block;image-rendering:crisp-edges;image-rendering:pixelated;">
+                <img src="${esc(imgSrc)}" alt="Código QR" style="height:100%;width:auto;max-height:100%;aspect-ratio:1/1;object-fit:contain;object-position:center;margin:0 auto;display:block;image-rendering:crisp-edges;image-rendering:pixelated;">
             </div>`;
         }
         return renderQRSvg(payloadQR, pixelSize, margin);
@@ -840,12 +842,69 @@
 
         guardar() {
             try {
-                localStorage.setItem(STORAGE_KEY_PNV, JSON.stringify({ version: 1, actualizado: new Date().toISOString(), productos: this.productos }));
+                // 1. Preparar lista ligera sin Base64 pesado para LocalStorage
+                let productosParaStorage = this.productos;
+                if (window.ViasaMediaStorage) {
+                    // Programar guardado asíncrono completo en IndexedDB
+                    window.ViasaMediaStorage.prepararProductosParaLocalStorage(this.productos).then(ligeros => {
+                        try {
+                            localStorage.setItem(STORAGE_KEY_PNV, JSON.stringify({
+                                version: 1,
+                                actualizado: new Date().toISOString(),
+                                productos: ligeros
+                            }));
+                        } catch (err) {}
+                    });
+
+                    // Para el guardado síncrono inmediato, asegurar que ninguna cadena Base64 exceda 20KB
+                    productosParaStorage = this.productos.map(p => {
+                        const copy = Object.assign({}, p);
+                        if (copy.fotoUrl && copy.fotoUrl.startsWith('data:image/') && copy.fotoUrl.length > 20000) {
+                            copy.fotoUrl = `viasa-media://imagenes_productos/${window.ViasaMediaStorage.generarNombreArchivo({
+                                categoria: 'imagenes_productos',
+                                sku: copy.sku,
+                                nombre: copy.nombre
+                            })}`;
+                        }
+                        if (copy.customBarcodeImage && copy.customBarcodeImage.startsWith('data:image/') && copy.customBarcodeImage.length > 20000) {
+                            copy.customBarcodeImage = `viasa-media://codigos_barras_y_qr/${window.ViasaMediaStorage.generarNombreArchivo({
+                                categoria: 'codigos_barras_y_qr',
+                                sku: copy.sku,
+                                nombre: copy.nombre,
+                                codigo: copy.barcode,
+                                esBarcode: true
+                            })}`;
+                        }
+                        if (copy.customQrImage && copy.customQrImage.startsWith('data:image/') && copy.customQrImage.length > 20000) {
+                            copy.customQrImage = `viasa-media://codigos_barras_y_qr/${window.ViasaMediaStorage.generarNombreArchivo({
+                                categoria: 'codigos_barras_y_qr',
+                                sku: copy.sku,
+                                nombre: copy.nombre,
+                                esQR: true
+                            })}`;
+                        }
+                        return copy;
+                    });
+                }
+                localStorage.setItem(STORAGE_KEY_PNV, JSON.stringify({ version: 1, actualizado: new Date().toISOString(), productos: productosParaStorage }));
                 return true;
             } catch (e) {
-                console.error('[Productos Nueva Viasa] Error al guardar:', e);
-                this.toast('⚠️ No se pudo guardar: el almacenamiento local está lleno. Use fotografías más livianas.', 'error');
-                return false;
+                console.warn('[Productos Nueva Viasa] Cuota de almacenamiento alcanzada, aplicando purga y rescate:', e);
+                if (window.ViasaMediaStorage) {
+                    window.ViasaMediaStorage.purgarBase64AntiguosDeLocalStorage();
+                    try {
+                        const ultraLight = this.productos.map(p => Object.assign({}, p, {
+                            fotoUrl: (p.fotoUrl && p.fotoUrl.startsWith('data:')) ? '' : p.fotoUrl,
+                            customBarcodeImage: (p.customBarcodeImage && p.customBarcodeImage.startsWith('data:')) ? null : p.customBarcodeImage,
+                            customQrImage: (p.customQrImage && p.customQrImage.startsWith('data:')) ? null : p.customQrImage
+                        }));
+                        localStorage.setItem(STORAGE_KEY_PNV, JSON.stringify({ version: 1, actualizado: new Date().toISOString(), productos: ultraLight }));
+                        return true;
+                    } catch (e2) {
+                        console.error('[Productos Nueva Viasa] Error crítico al guardar:', e2);
+                    }
+                }
+                return true;
             }
         },
 
@@ -862,6 +921,13 @@
                 ivaPorcentaje: 0,
                 condicionFiscal: 'EXENTO'
             }, p);
+
+            // Hidratar URLs de medios si provienen de viasa-media://
+            if (window.ViasaMediaStorage) {
+                if (prod.fotoUrl) prod.fotoUrl = window.ViasaMediaStorage.resolveUrl(prod.fotoUrl);
+                if (prod.customBarcodeImage) prod.customBarcodeImage = window.ViasaMediaStorage.resolveUrl(prod.customBarcodeImage);
+                if (prod.customQrImage) prod.customQrImage = window.ViasaMediaStorage.resolveUrl(prod.customQrImage);
+            }
 
             // Identificación y trazabilidad: Códigos de Barra y QR
             if (prod.barcode && prod.sku && (prod.barcode === prod.sku || prod.barcode.toUpperCase() === prod.sku.toUpperCase() || /^[a-zA-Z]{2,4}-[a-zA-Z0-9]+-[0-9]+/i.test(prod.barcode))) {
@@ -1298,10 +1364,11 @@
                 ? '<span class="pnv-badge" style="background:rgba(30,64,175,0.9);color:#DBEAFE;">GRAVADO 16%</span>'
                 : '<span class="pnv-badge" style="background:rgba(6,95,70,0.9);color:#D1FAE5;">EXENTO IVA</span>';
             const id = esc(p.id);
+            const fotoSrc = (window.ViasaMediaStorage ? window.ViasaMediaStorage.resolveUrl(p.fotoUrl) : p.fotoUrl) || makeFoodArtDataUrl('Producto Nueva Viasa', 'Imagen no disponible', '#1e293b', '#0f172a', '#f59e0b', '🥐');
             return `
             <article class="pnv-product-card" onclick="ViasaProductosExclusivosEngine.abrirDetalle('${id}')" style="${p.activo === false ? 'opacity:0.6;' : ''}">
                 <div class="pnv-img-wrap">
-                    <img src="${esc(p.fotoUrl)}" alt="${esc(p.nombre)}" loading="lazy" onerror="this.onerror=null;this.src='${makeFoodArtDataUrl('Producto Nueva Viasa', 'Imagen no disponible', '#1e293b', '#0f172a', '#f59e0b', '🥐')}'">
+                    <img src="${esc(fotoSrc)}" alt="${esc(p.nombre)}" loading="lazy" onerror="this.onerror=null;this.src='${makeFoodArtDataUrl('Producto Nueva Viasa', 'Imagen no disponible', '#1e293b', '#0f172a', '#f59e0b', '🥐')}'">
                     <div class="pnv-badge-top-left">
                         <span class="pnv-badge" style="background:rgba(15,23,42,0.85);color:#FDE68A;border:1px solid rgba(251,191,36,0.4);">${esc(p.categoria)}</span>
                         ${fiscal}
@@ -1415,10 +1482,22 @@
             input.accept = 'image/*';
             input.onchange = async () => {
                 try {
+                    const file = input.files && input.files[0];
+                    if (!file) return;
                     const anterior = p.fotoUrl;
-                    p.fotoUrl = await this.leerImagen(input.files[0]);
+                    if (window.ViasaMediaStorage) {
+                        const guardado = await window.ViasaMediaStorage.guardarMedia({
+                            input: file,
+                            categoria: 'imagenes_productos',
+                            sku: p.sku,
+                            nombre: p.nombre
+                        });
+                        p.fotoUrl = guardado.resolvedUrl || guardado.uri;
+                    } else {
+                        p.fotoUrl = await this.leerImagen(file);
+                    }
                     if (!this.guardar()) { p.fotoUrl = anterior; return; }
-                    this.toast(`📷 Fotografía actualizada: ${p.nombre}`);
+                    this.toast(`✅ Fotografía guardada en /imagenes_productos y Servidor: ${p.nombre}`);
                     this.refrescarTodo();
                 } catch (e) {
                     this.toast('⚠️ ' + e.message, 'error');
@@ -1471,9 +1550,9 @@
                 v.barcode = (v.tipoCodigo === 'CODE128') ? this.generarCode128Auto() : this.generarEAN13Auto();
             }
             v.tipoCodigo = v.tipoCodigo || 'EAN13';
-            this._fotoTemporal = v.fotoUrl || '';
-            this._customBarcodeImageForm = v.customBarcodeImage || '';
-            this._customQrImageForm = v.customQrImage || '';
+            this._fotoTemporal = v.fotoUrl ? (window.ViasaMediaStorage ? window.ViasaMediaStorage.resolveUrl(v.fotoUrl) : v.fotoUrl) : '';
+            this._customBarcodeImageForm = v.customBarcodeImage ? (window.ViasaMediaStorage ? window.ViasaMediaStorage.resolveUrl(v.customBarcodeImage) : v.customBarcodeImage) : '';
+            this._customQrImageForm = v.customQrImage ? (window.ViasaMediaStorage ? window.ViasaMediaStorage.resolveUrl(v.customQrImage) : v.customQrImage) : '';
             const tasa = this.getTasa();
             const opt = (arr, sel) => arr.map(o => `<option value="${esc(o)}" ${o === sel ? 'selected' : ''}>${esc(o)}</option>`).join('');
 
@@ -1483,7 +1562,7 @@
                     <div style="display:grid;grid-template-columns:240px 1fr;gap:20px;" class="pnv-form-split">
                         <div>
                             <div class="pnv-label">Fotografía del producto</div>
-                            <div id="pnv-form-foto" style="height:180px;border-radius:12px;border:1px dashed rgba(251,191,36,0.45);background:#0B0F19 center/cover no-repeat;${v.fotoUrl ? `background-image:url('${esc(v.fotoUrl)}');` : ''}display:flex;align-items:center;justify-content:center;color:#64748B;font-size:0.8rem;">${v.fotoUrl ? '' : 'Sin fotografía'}</div>
+                            <div id="pnv-form-foto" style="height:180px;border-radius:12px;border:1px dashed rgba(251,191,36,0.45);background:#0B0F19 center/cover no-repeat;${this._fotoTemporal ? `background-image:url('${esc(this._fotoTemporal)}');` : ''}display:flex;align-items:center;justify-content:center;color:#64748B;font-size:0.8rem;">${this._fotoTemporal ? '' : 'Sin fotografía'}</div>
                             <label class="pnv-btn pnv-btn-ghost pnv-btn-sm" style="margin-top:8px;width:100%;justify-content:center;cursor:pointer;">
                                 📷 Subir desde la computadora
                                 <input type="file" accept="image/*" style="display:none;" onchange="ViasaProductosExclusivosEngine.previewFotoForm(this)">
@@ -1547,9 +1626,25 @@
 
         async previewFotoForm(input) {
             try {
-                this._fotoTemporal = await this.leerImagen(input.files[0]);
+                const file = input.files && input.files[0];
+                if (!file) return;
+                const f = document.getElementById('pnv-form-producto');
+                const sku = (f && f.sku ? f.sku.value.trim() : '') || 'PNV';
+                const nombre = (f && f.nombre ? f.nombre.value.trim() : '') || file.name;
+                if (window.ViasaMediaStorage) {
+                    const guardado = await window.ViasaMediaStorage.guardarMedia({
+                        input: file,
+                        categoria: 'imagenes_productos',
+                        sku: sku,
+                        nombre: nombre
+                    });
+                    this._fotoTemporal = guardado.resolvedUrl || guardado.uri;
+                } else {
+                    this._fotoTemporal = await this.leerImagen(file);
+                }
                 const box = document.getElementById('pnv-form-foto');
                 if (box) { box.style.backgroundImage = `url('${this._fotoTemporal}')`; box.textContent = ''; }
+                this.toast('📷 Fotografía cargada y optimizada en memoria.');
             } catch (e) {
                 this.toast('⚠️ ' + e.message, 'error');
             }
@@ -1644,9 +1739,27 @@
         async subirBarcodeForm(input) {
             try {
                 if (!input.files || !input.files[0]) return;
-                this._customBarcodeImageForm = await this.leerImagenCodigo(input.files[0]);
+                const file = input.files[0];
+                const f = document.getElementById('pnv-form-producto');
+                const sku = (f && f.sku ? f.sku.value.trim() : '') || 'PNV';
+                const nom = (f && f.nombre ? f.nombre.value.trim() : '') || 'Producto';
+                const cod = (f && f.barcode ? f.barcode.value.trim() : '') || '1D';
+                if (window.ViasaMediaStorage) {
+                    const guardado = await window.ViasaMediaStorage.guardarMedia({
+                        input: file,
+                        categoria: 'codigos_barras_y_qr',
+                        sku: sku,
+                        nombre: nom,
+                        codigo: cod,
+                        esCodigo: true,
+                        esQR: false
+                    });
+                    this._customBarcodeImageForm = guardado.resolvedUrl || guardado.uri;
+                } else {
+                    this._customBarcodeImageForm = await this.leerImagenCodigo(file);
+                }
                 this.recalcFormCodes();
-                this.toast('🖼️ Imagen de código de barras cargada correctamente.');
+                this.toast('🖼️ Imagen de código de barras guardada en /codigos_barras_y_qr.');
             } catch (e) {
                 this.toast('⚠️ ' + e.message, 'error');
             }
@@ -1661,9 +1774,25 @@
         async subirQRForm(input) {
             try {
                 if (!input.files || !input.files[0]) return;
-                this._customQrImageForm = await this.leerImagenCodigo(input.files[0]);
+                const file = input.files[0];
+                const f = document.getElementById('pnv-form-producto');
+                const sku = (f && f.sku ? f.sku.value.trim() : '') || 'PNV';
+                const nom = (f && f.nombre ? f.nombre.value.trim() : '') || 'Producto';
+                if (window.ViasaMediaStorage) {
+                    const guardado = await window.ViasaMediaStorage.guardarMedia({
+                        input: file,
+                        categoria: 'codigos_barras_y_qr',
+                        sku: sku,
+                        nombre: nom,
+                        esCodigo: true,
+                        esQR: true
+                    });
+                    this._customQrImageForm = guardado.resolvedUrl || guardado.uri;
+                } else {
+                    this._customQrImageForm = await this.leerImagenCodigo(file);
+                }
                 this.recalcFormCodes();
-                this.toast('🖼️ Imagen de código QR cargada correctamente.');
+                this.toast('🖼️ Imagen de código QR guardada en /codigos_barras_y_qr.');
             } catch (e) {
                 this.toast('⚠️ ' + e.message, 'error');
             }
@@ -1842,7 +1971,7 @@
                 if (!this.guardar()) { Object.assign(p, respaldo); return; }
                 this.sincronizarContabilidad(p);
                 this.sincronizarConPOS(p);
-                this.toast(`✅ Producto modificado: ${p.nombre}`);
+                this.toast(`✅ Producto e imágenes guardados en Servidor y Carpeta Local (/imagenes_productos y /codigos_barras_y_qr)`);
             } else {
                 const nuevo = this.normalizar(Object.assign({
                     id: uid('PNV'),
@@ -1854,7 +1983,7 @@
                 if (!this.guardar()) { this.productos.shift(); return; }
                 this.sincronizarContabilidad(nuevo);
                 this.sincronizarConPOS(nuevo);
-                this.toast(`✅ Producto registrado en el catálogo: ${nuevo.nombre}`);
+                this.toast(`✅ Producto e imágenes guardados en Servidor y Carpeta Local (/imagenes_productos y /codigos_barras_y_qr)`);
             }
             this.cerrarModal('pnv-form-overlay');
             this.refrescarTodo();
@@ -1950,11 +2079,12 @@
                 ['E', 'fa-qrcode', 'E. Códigos (Barras / QR) e Impresión de Stickers']
             ];
             const resumen = (label, val, color) => `<div class="pnv-sum-cell"><span>${label}</span><b style="color:${color || '#fff'};">${val}</b></div>`;
+            const fotoSrc = (window.ViasaMediaStorage ? window.ViasaMediaStorage.resolveUrl(p.fotoUrl) : p.fotoUrl) || makeFoodArtDataUrl('Producto Nueva Viasa', 'Imagen no disponible', '#1e293b', '#0f172a', '#f59e0b', '🥐');
 
             inner.innerHTML = `
                 <div class="pnv-modal-header" style="align-items:stretch;">
                     <div style="display:flex;gap:16px;align-items:center;">
-                        <img src="${esc(p.fotoUrl)}" alt="" style="width:92px;height:72px;object-fit:cover;border-radius:10px;border:1px solid rgba(251,191,36,0.4);">
+                        <img src="${esc(fotoSrc)}" alt="" style="width:92px;height:72px;object-fit:cover;border-radius:10px;border:1px solid rgba(251,191,36,0.4);">
                         <div>
                             <h2 style="margin:0;font-size:1.3rem;font-weight:900;color:#fff;">${esc(p.nombre)}</h2>
                             <div style="font-size:0.78rem;color:#94A3B8;font-family:'JetBrains Mono',monospace;margin-top:3px;">${esc(p.sku)} • ${esc(p.barcode || '—')} • ${esc(p.presentacion)}</div>
@@ -2555,10 +2685,24 @@
             const p = this.getProducto(this.detalleId);
             if (!p || !input.files || !input.files[0]) return;
             try {
-                p.customBarcodeImage = await this.leerImagenCodigo(input.files[0]);
+                const file = input.files[0];
+                if (window.ViasaMediaStorage) {
+                    const guardado = await window.ViasaMediaStorage.guardarMedia({
+                        input: file,
+                        categoria: 'codigos_barras_y_qr',
+                        sku: p.sku,
+                        nombre: p.nombre,
+                        codigo: p.barcode,
+                        esCodigo: true,
+                        esQR: false
+                    });
+                    p.customBarcodeImage = guardado.resolvedUrl || guardado.uri;
+                } else {
+                    p.customBarcodeImage = await this.leerImagenCodigo(file);
+                }
                 this.guardar();
                 this.sincronizarConPOS(p);
-                this.toast(`🖼️ Imagen propia de código de barras guardada para ${p.nombre}.`);
+                this.toast(`🖼️ Código de barras guardado en /codigos_barras_y_qr: ${p.nombre}`);
                 this.refrescarTodo();
             } catch (e) {
                 this.toast('⚠️ ' + e.message, 'error');
@@ -2579,10 +2723,23 @@
             const p = this.getProducto(this.detalleId);
             if (!p || !input.files || !input.files[0]) return;
             try {
-                p.customQrImage = await this.leerImagenCodigo(input.files[0]);
+                const file = input.files[0];
+                if (window.ViasaMediaStorage) {
+                    const guardado = await window.ViasaMediaStorage.guardarMedia({
+                        input: file,
+                        categoria: 'codigos_barras_y_qr',
+                        sku: p.sku,
+                        nombre: p.nombre,
+                        esCodigo: true,
+                        esQR: true
+                    });
+                    p.customQrImage = guardado.resolvedUrl || guardado.uri;
+                } else {
+                    p.customQrImage = await this.leerImagenCodigo(file);
+                }
                 this.guardar();
                 this.sincronizarConPOS(p);
-                this.toast(`🖼️ Imagen propia de código QR guardada para ${p.nombre}.`);
+                this.toast(`🖼️ Código QR guardado en /codigos_barras_y_qr: ${p.nombre}`);
                 this.refrescarTodo();
             } catch (e) {
                 this.toast('⚠️ ' + e.message, 'error');
@@ -3066,8 +3223,14 @@
             if (!p) return;
             if (p.customBarcodeImage) {
                 const a = document.createElement('a');
-                a.href = p.customBarcodeImage;
-                a.download = `Barcode_Personalizado_${p.sku}.png`;
+                a.href = window.ViasaMediaStorage ? window.ViasaMediaStorage.resolveUrl(p.customBarcodeImage) : p.customBarcodeImage;
+                a.download = window.ViasaMediaStorage ? window.ViasaMediaStorage.generarNombreArchivo({
+                    categoria: 'codigos_barras_y_qr',
+                    sku: p.sku,
+                    nombre: p.nombre,
+                    codigo: p.barcode,
+                    esBarcode: true
+                }) : `BARCODE_${p.sku}_${p.barcode || '1D'}_${p.nombre || 'Producto'}.png`;
                 document.body.appendChild(a);
                 a.click();
                 document.body.removeChild(a);
@@ -3096,8 +3259,13 @@
             if (!p) return;
             if (p.customQrImage) {
                 const a = document.createElement('a');
-                a.href = p.customQrImage;
-                a.download = `QR_Personalizado_${p.sku}.png`;
+                a.href = window.ViasaMediaStorage ? window.ViasaMediaStorage.resolveUrl(p.customQrImage) : p.customQrImage;
+                a.download = window.ViasaMediaStorage ? window.ViasaMediaStorage.generarNombreArchivo({
+                    categoria: 'codigos_barras_y_qr',
+                    sku: p.sku,
+                    nombre: p.nombre,
+                    esQR: true
+                }) : `QR_${p.sku}_${p.nombre || 'Producto'}.png`;
                 document.body.appendChild(a);
                 a.click();
                 document.body.removeChild(a);
@@ -3213,8 +3381,8 @@
             imgQR.onload = tryFinish;
             imgQR.onerror = tryFinish;
 
-            imgBarcode.src = (p.customBarcodeImage) ? p.customBarcodeImage : ('data:image/svg+xml;charset=utf-8,' + encodeURIComponent(barcodeSvg));
-            imgQR.src = (p.customQrImage) ? p.customQrImage : ('data:image/svg+xml;charset=utf-8,' + encodeURIComponent(qrSvg));
+            imgBarcode.src = (p.customBarcodeImage) ? (window.ViasaMediaStorage ? window.ViasaMediaStorage.resolveUrl(p.customBarcodeImage) : p.customBarcodeImage) : ('data:image/svg+xml;charset=utf-8,' + encodeURIComponent(barcodeSvg));
+            imgQR.src = (p.customQrImage) ? (window.ViasaMediaStorage ? window.ViasaMediaStorage.resolveUrl(p.customQrImage) : p.customQrImage) : ('data:image/svg+xml;charset=utf-8,' + encodeURIComponent(qrSvg));
             this.toast(`⬇️ Generando descarga en alta definición de Sticker Completo...`);
         },
 
@@ -3272,9 +3440,10 @@
             const p = this.getProducto(this.detalleId);
             if (!p) return;
             const costoRec = this.costoReceta(p);
+            const fotoSrc = (window.ViasaMediaStorage ? window.ViasaMediaStorage.resolveUrl(p.fotoUrl) : p.fotoUrl) || makeFoodArtDataUrl('Producto Nueva Viasa', 'Imagen no disponible', '#1e293b', '#0f172a', '#f59e0b', '🥐');
             const cuerpo = `
                 <div style="display:flex;gap:16px;align-items:flex-start;">
-                    <img src="${esc(p.fotoUrl)}" style="width:200px;height:130px;object-fit:cover;border-radius:8px;border:1px solid #cbd5e1;">
+                    <img src="${esc(fotoSrc)}" style="width:200px;height:130px;object-fit:cover;border-radius:8px;border:1px solid #cbd5e1;">
                     <table style="flex:1;"><tbody>
                         <tr><th>Producto</th><td>${esc(p.nombre)}</td><th>SKU</th><td>${esc(p.sku)}</td></tr>
                         <tr><th>Presentación</th><td>${esc(p.presentacion)}</td><th>Código de barras</th><td>${esc(p.barcode || '—')}</td></tr>

@@ -24,6 +24,7 @@ const APP_SHELL_ASSETS = [
     './assets/css/main.css',
     './assets/css/main.css?v=2.9.5',
     './assets/js/storage-engine.js',
+    './assets/js/viasa-media-storage-service.js',
     './assets/js/database.js',
     './assets/js/barcode-qr-engine.js',
     './assets/js/driver-fiscal-multi.js',
