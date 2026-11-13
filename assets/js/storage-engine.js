@@ -12,9 +12,10 @@
 
     const VIASA_STORAGE_PREFIX = 'viasa_sys_';
     const DB_NAME = 'VIASA_SYSTEM_DB_v1';
-    const DB_VERSION = 8;
+    const DB_VERSION = 9;
 
     const STORES = [
+        'categorias',
         'productos',
         'materia_prima',
         'recetas_formulas',

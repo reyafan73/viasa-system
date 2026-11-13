@@ -957,12 +957,56 @@ body {
 
 .pos-tax-tag {
     position: absolute;
-    top: 10px;
-    right: 10px;
+    top: 8px;
+    left: 8px;
     font-size: 0.65rem;
     font-weight: 800;
     padding: 2px 6px;
     border-radius: 4px;
+    z-index: 2;
+}
+
+.pos-product-card .pos-card-quick-actions {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    z-index: 5;
+}
+
+.pos-product-card .btn-card-mini-action {
+    background: rgba(30, 41, 59, 0.85);
+    border: 1px solid rgba(148, 163, 184, 0.25);
+    width: 24px;
+    height: 24px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 0.68rem;
+    color: #cbd5e1;
+    transition: all 0.2s ease;
+}
+
+.pos-product-card .btn-card-mini-action:hover {
+    transform: scale(1.15);
+}
+
+.pos-product-card .btn-card-mini-action.edit:hover {
+    background: #0284c7;
+    color: #ffffff;
+    border-color: #38bdf8;
+    box-shadow: 0 0 8px rgba(56, 189, 248, 0.6);
+}
+
+.pos-product-card .btn-card-mini-action.delete:hover {
+    background: #ef4444;
+    color: #ffffff;
+    border-color: #f87171;
+    box-shadow: 0 0 8px rgba(239, 68, 68, 0.6);
 }
 
 .pos-tax-tag.exento {
@@ -975,6 +1019,41 @@ body {
     background: rgba(245, 158, 11, 0.2);
     color: #fbbf24;
     border: 1px solid rgba(245, 158, 11, 0.4);
+}
+
+.pos-commands-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 8px;
+    padding: 6px 12px;
+    background: rgba(15, 23, 42, 0.75);
+    border: 1px solid #334155;
+    border-radius: 10px;
+    flex-wrap: wrap;
+}
+
+.btn-pos-cmd-action {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.76rem;
+    font-weight: 800;
+    padding: 6px 12px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-pos-cmd-action:hover {
+    transform: translateY(-1px);
+    filter: brightness(1.12);
+}
+
+.btn-pos-cmd-action:active {
+    transform: scale(0.97);
 }
 
 .pos-product-name {

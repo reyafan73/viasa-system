@@ -5113,7 +5113,15 @@
             window.ViasaStorage.setItem('empresa_fiscal', VIASA_CATALOGO_INICIAL.empresa);
         }
 
-        // 3. Cargar Productos, Materia Prima, Fórmulas, Proveedores, CxP, Clientes y Encargos
+        // 3. Cargar Categorías, Productos, Materia Prima, Fórmulas, Proveedores, CxP, Clientes y Encargos
+        const catExistentes = await window.ViasaStorage.obtenerColeccion('categorias');
+        if (!catExistentes || catExistentes.length === 0) {
+            console.log('[VIASA DB] Sembrando catálogo inicial de categorías/rubros...');
+            for (const cat of VIASA_CATALOGO_INICIAL.categorias) {
+                await window.ViasaStorage.guardarRegistro('categorias', cat);
+            }
+        }
+
         const productosExistentes = await window.ViasaStorage.obtenerColeccion('productos');
         if (!productosExistentes || productosExistentes.length === 0) {
             console.log('[VIASA DB] Sembrando catálogo inicial de productos...');

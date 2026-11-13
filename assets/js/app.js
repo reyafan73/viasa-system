@@ -18,6 +18,7 @@
         historialTasas: [],
         filtroBusquedaHistTasas: '',
         ivaPorcentaje: 16.0,
+        categorias: [],
         productos: [],
         materiaPrima: [],
         recetasFormulas: [],
@@ -303,6 +304,7 @@
             }
 
             // 3. Cargar colecciones desde IndexedDB / Sandbox
+            await this.cargarCategorias();
             await this.cargarProductos();
             await this.cargarMateriaPrima();
             await this.cargarRecetasFormulas();
@@ -1058,6 +1060,19 @@
                     </div>
                 </div>
             `).join('');
+        },
+
+        async cargarCategorias() {
+            this.categorias = await window.ViasaStorage.obtenerColeccion('categorias');
+            if (!this.categorias || !Array.isArray(this.categorias) || this.categorias.length === 0) {
+                this.categorias = (window.ViasaDatabase && window.ViasaDatabase.categorias) ? [...window.ViasaDatabase.categorias] : [];
+                if (this.categorias.length > 0) {
+                    await window.ViasaStorage.guardarColeccion('categorias', this.categorias);
+                }
+            }
+            if (window.ViasaDatabase) {
+                window.ViasaDatabase.categorias = this.categorias;
+            }
         },
 
         async cargarProductos() {
@@ -2573,11 +2588,13 @@
 
             let html = `<button class="pos-cat-pill ${this.categoriaActiva === 'todas' ? 'active' : ''}" onclick="ViasaApp.filtrarCategoria('todas')"><i class="fa-solid fa-border-all"></i> Todos</button>`;
             
-            window.ViasaDatabase.categorias.forEach(cat => {
+            const cats = (this.categorias && this.categorias.length > 0) ? this.categorias : (window.ViasaDatabase?.categorias || []);
+            cats.filter(cat => cat.activo !== false && cat.estado !== 'oculto' && cat.estado !== 'inactivo').forEach(cat => {
                 const isActive = this.categoriaActiva === cat.id;
+                const borderStyle = cat.color ? `border-left: 3.5px solid ${cat.color};` : '';
                 html += `
-                    <button class="pos-cat-pill ${isActive ? 'active' : ''}" onclick="ViasaApp.filtrarCategoria('${cat.id}')">
-                        <i class="fa-solid ${cat.icono}"></i> ${cat.nombre}
+                    <button class="pos-cat-pill ${isActive ? 'active' : ''}" style="${borderStyle}" onclick="ViasaApp.filtrarCategoria('${cat.id}')">
+                        <i class="fa-solid ${cat.icono || 'fa-tag'}"></i> ${cat.nombre}
                     </button>
                 `;
             });
@@ -2699,12 +2716,30 @@
                     `;
                 }
 
+                let iconDisplay = '';
+                if (p.imagen) {
+                    iconDisplay = `<img src="${p.imagen}" alt="${p.nombre}" style="width: 32px; height: 32px; border-radius: 6px; object-fit: cover; flex-shrink: 0; border: 1px solid rgba(255,255,255,0.1);">`;
+                } else if (p.icono) {
+                    iconDisplay = `<span style="font-size: 1.35rem; line-height: 1; flex-shrink: 0;">${p.icono}</span>`;
+                }
+
                 return `
                     <div class="pos-product-card" onclick="ViasaApp.agregarAlCarrito('${p.id}')">
                         ${taxBadge}
-                        <div>
-                            <div class="pos-product-name">${p.nombre}</div>
-                            <div class="pos-product-stock">Stock: <strong>${p.stock} ${p.unidad}</strong></div>
+                        <div class="pos-card-quick-actions" onclick="event.stopPropagation()">
+                            <button type="button" class="btn-card-mini-action edit" onclick="event.stopPropagation(); ViasaApp.abrirModalPOSEditarProducto('${p.id}')" title="Modificar ${p.nombre}">
+                                <i class="fa-solid fa-pen"></i>
+                            </button>
+                            <button type="button" class="btn-card-mini-action delete" onclick="event.stopPropagation(); ViasaApp.eliminarProductoPOS('${p.id}')" title="Eliminar ${p.nombre}">
+                                <i class="fa-solid fa-trash-can"></i>
+                            </button>
+                        </div>
+                        <div style="margin-top: 18px;">
+                            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+                                ${iconDisplay}
+                                <div class="pos-product-name" style="margin-bottom: 0;">${p.nombre}</div>
+                            </div>
+                            <div class="pos-product-stock">Stock: <strong>${p.stock} ${p.unidad || 'UND'}</strong></div>
                         </div>
                         <div class="pos-product-price-box">
                             ${priceDisplay}
@@ -2712,6 +2747,739 @@
                     </div>
                 `;
             }).join('');
+        },
+
+        // ====================================================================
+        // MÓDULO PUNTO DE VENTA: GESTIÓN RÁPIDA DE PRODUCTOS Y RUBROS (CATEGORÍAS)
+        // ====================================================================
+
+        abrirModalPOSAgregarProductoRubro(tab = 'producto', productoId = null) {
+            const modal = document.getElementById('modal-pos-agregar-producto-rubro');
+            if (!modal) return;
+
+            // 1. Actualizar tasas en tiempo real en la cabecera del modal
+            const lblBcv = document.getElementById('pos-modal-tasa-bcv-lbl');
+            if (lblBcv) lblBcv.textContent = `Bs. ${(this.tasaBCV || 36.85).toFixed(2)}`;
+            const lblUsdt = document.getElementById('pos-modal-tasa-usdt-lbl');
+            if (lblUsdt) lblUsdt.textContent = `Bs. ${(this.tasaParalelo || 39.50).toFixed(2)}`;
+
+            // 2. Poblar selector de rubros/categorías
+            const selCat = document.getElementById('pos-prod-categoria');
+            const cats = (this.categorias && this.categorias.length > 0) ? this.categorias : (window.ViasaDatabase?.categorias || []);
+            if (selCat) {
+                selCat.innerHTML = cats.filter(c => c.activo !== false && c.estado !== 'oculto' && c.estado !== 'inactivo').map(c => `
+                    <option value="${c.id}">${c.nombre}</option>
+                `).join('');
+            }
+
+            if (productoId) {
+                // Modo Edición de Producto existente
+                const p = this.productos.find(x => x.id === productoId);
+                if (p) {
+                    this._editandoProductoIdPOS = p.id;
+                    const titleEl = document.getElementById('pos-add-modal-title');
+                    if (titleEl) titleEl.innerHTML = `<i class="fa-solid fa-pen-to-square"></i> Modificar Producto: <span style="color:#fff;">${p.nombre}</span>`;
+                    const btnLbl = document.getElementById('pos-prod-btn-submit-lbl');
+                    if (btnLbl) btnLbl.textContent = '💾 Guardar Cambios';
+
+                    document.getElementById('pos-prod-id').value = p.id;
+                    document.getElementById('pos-prod-sku').value = p.sku || p.codigoBarras || p.id;
+                    document.getElementById('pos-prod-nombre').value = p.nombre || '';
+                    if (selCat) selCat.value = p.categoria || (cats[0]?.id || '');
+                    
+                    const costo = p.costoUSD !== undefined ? p.costoUSD : (p.precioUSD * 0.6);
+                    document.getElementById('pos-prod-costo').value = costo ? costo.toFixed(2) : '';
+                    document.getElementById('pos-prod-precio-usd').value = (p.precioUSD || 0).toFixed(2);
+                    document.getElementById('pos-prod-precio-bs').value = ((p.precioUSD || 0) * (this.tasaBCV || 36.85)).toFixed(2);
+                    
+                    const margen = (p.precioUSD > 0 && costo > 0) ? Math.round(((p.precioUSD - costo) / p.precioUSD) * 100) : 40;
+                    document.getElementById('pos-prod-margen').value = margen;
+                    
+                    const usdtRef = document.getElementById('pos-prod-ref-usdt-badge');
+                    if (usdtRef) usdtRef.textContent = `Bs. ${((p.precioUSD || 0) * (this.tasaParalelo || 39.50)).toFixed(2)}`;
+
+                    const selSeniat = document.getElementById('pos-prod-seniat');
+                    if (selSeniat) {
+                        selSeniat.value = p.exentoIVA ? 'EXENTO' : (p.condicionFiscal === 'REDUCIDO_8' ? 'REDUCIDO_8' : 'IVA_16');
+                    }
+
+                    const selUnidad = document.getElementById('pos-prod-unidad');
+                    if (selUnidad) selUnidad.value = p.unidad || 'UND';
+
+                    const selTipoStock = document.getElementById('pos-prod-tipo-stock');
+                    if (selTipoStock) selTipoStock.value = p.tipoExistencia || 'stock';
+
+                    document.getElementById('pos-prod-stock').value = p.stock !== undefined ? p.stock : 100;
+                    document.getElementById('pos-prod-stock-min').value = p.stockMinimo !== undefined ? p.stockMinimo : 10;
+                    
+                    const selDestino = document.getElementById('pos-prod-destino');
+                    if (selDestino) selDestino.value = p.destino || 'pos';
+
+                    const chkActivo = document.getElementById('pos-prod-activo');
+                    if (chkActivo) chkActivo.checked = p.activo !== false;
+
+                    this._tempProdEmoji = p.icono || '🥖';
+                    this._tempProdImage = p.imagen || null;
+                    this._actualizarPreviewImagenPOS();
+                }
+            } else {
+                // Modo Crear Nuevo Producto
+                this._editandoProductoIdPOS = null;
+                const titleEl = document.getElementById('pos-add-modal-title');
+                if (titleEl) titleEl.innerHTML = `<i class="fa-solid fa-cart-flatbed"></i> Gestión Rápida: Producto / Rubro`;
+                const btnLbl = document.getElementById('pos-prod-btn-submit-lbl');
+                if (btnLbl) btnLbl.textContent = '💾 Guardar Producto';
+
+                document.getElementById('pos-prod-id').value = '';
+                const proximoNum = this.productos.length + 1;
+                document.getElementById('pos-prod-sku').value = `PRD-${String(proximoNum).padStart(3, '0')}`;
+                document.getElementById('pos-prod-nombre').value = '';
+                
+                if (selCat) {
+                    if (this.categoriaActiva && this.categoriaActiva !== 'todas') {
+                        selCat.value = this.categoriaActiva;
+                    } else if (cats[0]) {
+                        selCat.value = cats[0].id;
+                    }
+                }
+
+                document.getElementById('pos-prod-costo').value = '0.50';
+                document.getElementById('pos-prod-margen').value = '40';
+                document.getElementById('pos-prod-precio-usd').value = '0.85';
+                document.getElementById('pos-prod-precio-bs').value = (0.85 * (this.tasaBCV || 36.85)).toFixed(2);
+                
+                const usdtRef = document.getElementById('pos-prod-ref-usdt-badge');
+                if (usdtRef) usdtRef.textContent = `Bs. ${(0.85 * (this.tasaParalelo || 39.50)).toFixed(2)}`;
+
+                document.getElementById('pos-prod-stock').value = '100';
+                document.getElementById('pos-prod-stock-min').value = '10';
+                document.getElementById('pos-prod-activo').checked = true;
+
+                this._tempProdEmoji = '🥖';
+                this._tempProdImage = null;
+                this._actualizarPreviewImagenPOS();
+
+                // Inicializar formulario de nuevo rubro con valores por defecto
+                const rubroCount = cats.length + 1;
+                document.getElementById('pos-rubro-id').value = `cat_${Date.now().toString(36)}`;
+                document.getElementById('pos-rubro-nombre').value = '';
+                document.getElementById('pos-rubro-desc').value = '';
+                document.getElementById('pos-rubro-color').value = '#f59e0b';
+                document.getElementById('pos-rubro-icono').value = 'fa-bread-slice';
+                document.getElementById('pos-rubro-orden').value = rubroCount * 10;
+                document.getElementById('pos-rubro-estado').value = 'activo';
+            }
+
+            this.cambiarTabModalPOSAgregar(tab);
+            modal.classList.add('active');
+            if (window.ViasaAudio) window.ViasaAudio.playClick();
+        },
+
+        cerrarModalPOSAgregarProductoRubro() {
+            const modal = document.getElementById('modal-pos-agregar-producto-rubro');
+            if (modal) modal.classList.remove('active');
+            this._editandoProductoIdPOS = null;
+        },
+
+        cambiarTabModalPOSAgregar(tab) {
+            const tabProd = document.getElementById('tab-panel-pos-add-producto');
+            const tabRubro = document.getElementById('tab-panel-pos-add-rubro');
+            const btnProd = document.getElementById('tab-btn-pos-add-producto');
+            const btnRubro = document.getElementById('tab-btn-pos-add-rubro');
+
+            if (tab === 'rubro') {
+                if (tabProd) tabProd.style.display = 'none';
+                if (tabRubro) tabRubro.style.display = 'block';
+                if (btnProd) {
+                    btnProd.style.border = '1.5px solid #334155';
+                    btnProd.style.background = '#1e293b';
+                    btnProd.style.color = '#94a3b8';
+                }
+                if (btnRubro) {
+                    btnRubro.style.border = '1.5px solid #06b6d4';
+                    btnRubro.style.background = 'rgba(6, 182, 212, 0.15)';
+                    btnRubro.style.color = '#38bdf8';
+                }
+            } else {
+                if (tabProd) tabProd.style.display = 'block';
+                if (tabRubro) tabRubro.style.display = 'none';
+                if (btnProd) {
+                    btnProd.style.border = '1.5px solid #f59e0b';
+                    btnProd.style.background = 'rgba(245, 158, 11, 0.15)';
+                    btnProd.style.color = '#fbbf24';
+                }
+                if (btnRubro) {
+                    btnRubro.style.border = '1.5px solid #334155';
+                    btnRubro.style.background = '#1e293b';
+                    btnRubro.style.color = '#94a3b8';
+                }
+            }
+            if (window.ViasaAudio) window.ViasaAudio.playClick();
+        },
+
+        seleccionarEmojiProductoPOS(emoji) {
+            this._tempProdEmoji = emoji;
+            this._tempProdImage = null;
+            const inputUrl = document.getElementById('pos-prod-image-url');
+            if (inputUrl) inputUrl.value = '';
+            this._actualizarPreviewImagenPOS();
+            if (window.ViasaAudio) window.ViasaAudio.playClick();
+        },
+
+        handleProductImageUploadPOS(input) {
+            if (!input || !input.files || !input.files[0]) return;
+            const file = input.files[0];
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                this._tempProdImage = e.target.result;
+                const inputUrl = document.getElementById('pos-prod-image-url');
+                if (inputUrl) inputUrl.value = '';
+                this._actualizarPreviewImagenPOS();
+            };
+            reader.readAsDataURL(file);
+        },
+
+        handleProductImageUrlInputPOS(url) {
+            const clean = (url || '').trim();
+            if (clean) {
+                this._tempProdImage = clean;
+            } else {
+                this._tempProdImage = null;
+            }
+            this._actualizarPreviewImagenPOS();
+        },
+
+        _actualizarPreviewImagenPOS() {
+            const box = document.getElementById('pos-prod-preview-box');
+            if (!box) return;
+            if (this._tempProdImage) {
+                box.innerHTML = `<img src="${this._tempProdImage}" alt="Preview" style="width: 100%; height: 100%; object-fit: cover;">`;
+            } else {
+                box.innerHTML = `<span style="font-size: 2rem; line-height: 1;">${this._tempProdEmoji || '🥖'}</span>`;
+            }
+        },
+
+        recalcularPreciosDesdeUSDPOS() {
+            const usd = parseFloat(document.getElementById('pos-prod-precio-usd').value) || 0;
+            const bs = (usd * (this.tasaBCV || 36.85)).toFixed(2);
+            document.getElementById('pos-prod-precio-bs').value = bs;
+            
+            const badge = document.getElementById('pos-prod-ref-usdt-badge');
+            if (badge) badge.textContent = `Bs. ${(usd * (this.tasaParalelo || 39.50)).toFixed(2)}`;
+
+            const costo = parseFloat(document.getElementById('pos-prod-costo').value) || 0;
+            if (costo > 0 && usd > 0) {
+                const margen = Math.round(((usd - costo) / usd) * 100);
+                document.getElementById('pos-prod-margen').value = margen;
+            }
+        },
+
+        recalcularPreciosDesdeBsPOS() {
+            const bs = parseFloat(document.getElementById('pos-prod-precio-bs').value) || 0;
+            const tasa = this.tasaBCV || 36.85;
+            const usd = (bs / tasa).toFixed(2);
+            document.getElementById('pos-prod-precio-usd').value = usd;
+
+            const badge = document.getElementById('pos-prod-ref-usdt-badge');
+            if (badge) badge.textContent = `Bs. ${(parseFloat(usd) * (this.tasaParalelo || 39.50)).toFixed(2)}`;
+
+            const costo = parseFloat(document.getElementById('pos-prod-costo').value) || 0;
+            const usdNum = parseFloat(usd);
+            if (costo > 0 && usdNum > 0) {
+                const margen = Math.round(((usdNum - costo) / usdNum) * 100);
+                document.getElementById('pos-prod-margen').value = margen;
+            }
+        },
+
+        recalcularPreciosDesdeMargenPOS() {
+            const costo = parseFloat(document.getElementById('pos-prod-costo').value) || 0;
+            const margen = parseFloat(document.getElementById('pos-prod-margen').value) || 0;
+            if (costo > 0) {
+                const divisor = (100 - margen) > 5 ? (100 - margen) / 100 : 0.5;
+                const usd = (costo / divisor).toFixed(2);
+                document.getElementById('pos-prod-precio-usd').value = usd;
+                document.getElementById('pos-prod-precio-bs').value = (parseFloat(usd) * (this.tasaBCV || 36.85)).toFixed(2);
+                const badge = document.getElementById('pos-prod-ref-usdt-badge');
+                if (badge) badge.textContent = `Bs. ${(parseFloat(usd) * (this.tasaParalelo || 39.50)).toFixed(2)}`;
+            }
+        },
+
+        setRubroColorPresetPOS(color) {
+            const input = document.getElementById('pos-rubro-color');
+            if (input) input.value = color;
+            if (window.ViasaAudio) window.ViasaAudio.playClick();
+        },
+
+        async guardarNuevoProductoPOS(e) {
+            if (e && e.preventDefault) e.preventDefault();
+
+            const editId = (document.getElementById('pos-prod-id').value || '').trim();
+            const sku = (document.getElementById('pos-prod-sku').value || '').trim();
+            const nombre = (document.getElementById('pos-prod-nombre').value || '').trim();
+            const categoria = document.getElementById('pos-prod-categoria').value;
+            const costoUSD = parseFloat(document.getElementById('pos-prod-costo').value) || 0;
+            const precioUSD = parseFloat(document.getElementById('pos-prod-precio-usd').value) || 0;
+            const seniat = document.getElementById('pos-prod-seniat').value;
+            const unidad = document.getElementById('pos-prod-unidad').value;
+            const tipoExistencia = document.getElementById('pos-prod-tipo-stock').value;
+            const stock = parseInt(document.getElementById('pos-prod-stock').value, 10) || 0;
+            const stockMinimo = parseInt(document.getElementById('pos-prod-stock-min').value, 10) || 10;
+            const destino = document.getElementById('pos-prod-destino').value;
+            const activo = document.getElementById('pos-prod-activo').checked;
+
+            if (!nombre) {
+                this.mostrarNotificacionToast('⚠️ Debe ingresar el nombre del producto.', 'warning');
+                return;
+            }
+            if (precioUSD <= 0) {
+                this.mostrarNotificacionToast('⚠️ El precio de venta debe ser mayor a 0.', 'warning');
+                return;
+            }
+
+            const id = editId || ('PRD-' + (sku.replace(/^PRD-/i, '') || Date.now().toString(36).toUpperCase()));
+            const exentoIVA = seniat === 'EXENTO';
+
+            const prodObj = {
+                id: id,
+                sku: sku || id,
+                codigoBarras: sku || id,
+                barcode: sku || id,
+                nombre: nombre,
+                categoria: categoria,
+                costoUSD: costoUSD,
+                precioUSD: precioUSD,
+                precioBs: parseFloat((precioUSD * (this.tasaBCV || 36.85)).toFixed(2)),
+                condicionFiscal: seniat,
+                exentoIVA: exentoIVA,
+                unidad: unidad,
+                tipoExistencia: tipoExistencia,
+                stock: stock,
+                stockMinimo: stockMinimo,
+                destino: destino,
+                activo: activo,
+                icono: this._tempProdEmoji || '🥖',
+                imagen: this._tempProdImage || null,
+                actualizadoEn: new Date().toISOString()
+            };
+
+            const existingIdx = this.productos.findIndex(p => p.id === id);
+            if (existingIdx !== -1) {
+                this.productos[existingIdx] = { ...this.productos[existingIdx], ...prodObj };
+            } else {
+                this.productos.unshift(prodObj);
+            }
+
+            // 1. Guardar en Storage permanente
+            await window.ViasaStorage.guardarRegistro('productos', prodObj);
+
+            // 2. Sincronizar con Productos Nueva Viasa Engine si existe
+            if (window.ViasaProductosExclusivosEngine && typeof window.ViasaProductosExclusivosEngine.sincronizarConPOS === 'function') {
+                window.ViasaProductosExclusivosEngine.sincronizarConPOS(prodObj);
+            }
+
+            // 3. Si el destino incluye Cafetín Viasa o Todos, sincronizar con platosCafetin
+            if (destino === 'cafetin' || destino === 'todos') {
+                if (Array.isArray(this.platosCafetin)) {
+                    const idxP = this.platosCafetin.findIndex(x => x.id === id);
+                    const platoObj = {
+                        id: id,
+                        nombre: nombre,
+                        categoria: categoria,
+                        precioUSD: precioUSD,
+                        costoUSD: costoUSD,
+                        icono: this._tempProdEmoji || 'fa-utensils',
+                        activo: activo
+                    };
+                    if (idxP !== -1) this.platosCafetin[idxP] = platoObj;
+                    else this.platosCafetin.push(platoObj);
+                    await window.ViasaStorage.guardarRegistro('platos_cafetin', platoObj);
+                }
+            }
+
+            this.cerrarModalPOSAgregarProductoRubro();
+            this.renderPOSProducts();
+            if (window.ViasaAudio) window.ViasaAudio.playCashChime();
+            this.mostrarNotificacionToast(`✅ Producto "${nombre}" guardado exitosamente en el Punto de Venta`, 'success');
+        },
+
+        async guardarNuevoRubroPOS(e) {
+            if (e && e.preventDefault) e.preventDefault();
+
+            const id = (document.getElementById('pos-rubro-id').value || '').trim();
+            const nombre = (document.getElementById('pos-rubro-nombre').value || '').trim();
+            const desc = (document.getElementById('pos-rubro-desc').value || '').trim();
+            const color = document.getElementById('pos-rubro-color').value || '#f59e0b';
+            const icono = document.getElementById('pos-rubro-icono').value || 'fa-bread-slice';
+            const orden = parseInt(document.getElementById('pos-rubro-orden').value, 10) || 10;
+            const estado = document.getElementById('pos-rubro-estado').value;
+
+            if (!id || !nombre) {
+                this.mostrarNotificacionToast('⚠️ Código y Nombre de Rubro son obligatorios.', 'warning');
+                return;
+            }
+
+            const rubroObj = {
+                id: id,
+                nombre: nombre,
+                descripcion: desc,
+                color: color,
+                icono: icono,
+                orden: orden,
+                estado: estado,
+                activo: estado === 'activo',
+                actualizadoEn: new Date().toISOString()
+            };
+
+            const existingIdx = this.categorias.findIndex(c => c.id === id);
+            if (existingIdx !== -1) {
+                this.categorias[existingIdx] = { ...this.categorias[existingIdx], ...rubroObj };
+            } else {
+                this.categorias.push(rubroObj);
+            }
+
+            // Sincronizar en Storage
+            await window.ViasaStorage.guardarRegistro('categorias', rubroObj);
+            if (window.ViasaDatabase) window.ViasaDatabase.categorias = this.categorias;
+
+            // Actualizar select de categorías en modal de producto y preseleccionarlo
+            const selCat = document.getElementById('pos-prod-categoria');
+            if (selCat) {
+                selCat.innerHTML = this.categorias.filter(c => c.activo !== false && c.estado !== 'oculto' && c.estado !== 'inactivo').map(c => `
+                    <option value="${c.id}">${c.nombre}</option>
+                `).join('');
+                selCat.value = id;
+            }
+
+            this.renderPOSCategories();
+            this.cambiarTabModalPOSAgregar('producto');
+            if (window.ViasaAudio) window.ViasaAudio.playCashChime();
+            this.mostrarNotificacionToast(`✅ Rubro "${nombre}" registrado con éxito. Ahora puedes asociarle productos.`, 'success');
+        },
+
+        abrirModalPOSEditarProducto(productoId) {
+            this.abrirModalPOSAgregarProductoRubro('producto', productoId);
+        },
+
+        async eliminarProductoPOS(productoId) {
+            const p = this.productos.find(x => x.id === productoId);
+            if (!p) return;
+
+            const confirmar = confirm(`¿Está seguro de eliminar el producto "${p.nombre}" (${p.id}) del catálogo del Punto de Venta?`);
+            if (!confirmar) return;
+
+            this.productos = this.productos.filter(x => x.id !== productoId);
+            await window.ViasaStorage.eliminarRegistro('productos', productoId);
+
+            // Eliminar del carrito si estaba agregado
+            if (Array.isArray(this.cart)) {
+                this.cart = this.cart.filter(item => item.id !== productoId);
+                this.renderCart();
+            }
+
+            // Sincronizar con Productos Nueva Viasa Engine
+            if (window.ViasaProductosExclusivosEngine && typeof window.ViasaProductosExclusivosEngine.sincronizarConPOS === 'function') {
+                window.ViasaProductosExclusivosEngine.sincronizarConPOS(p, true);
+            }
+
+            this.renderPOSProducts();
+            if (window.ViasaAudio) window.ViasaAudio.playClick();
+            this.mostrarNotificacionToast(`🗑️ Producto "${p.nombre}" eliminado del Punto de Venta.`, 'info');
+        },
+
+        abrirModalPOSEditarRubro(rubroId = null) {
+            const modal = document.getElementById('modal-pos-editar-rubro');
+            if (!modal) return;
+
+            const cats = (this.categorias && this.categorias.length > 0) ? this.categorias : (window.ViasaDatabase?.categorias || []);
+            const selRubro = document.getElementById('pos-edit-rubro-select');
+            if (selRubro) {
+                selRubro.innerHTML = cats.map(c => `
+                    <option value="${c.id}">${c.nombre} (${c.id})</option>
+                `).join('');
+            }
+
+            const targetId = rubroId || (this.categoriaActiva !== 'todas' ? this.categoriaActiva : cats[0]?.id);
+            this.cargarDatosRubroSeleccionadoPOS(targetId);
+
+            modal.classList.add('active');
+            if (window.ViasaAudio) window.ViasaAudio.playClick();
+        },
+
+        cerrarModalPOSEditarRubro() {
+            const modal = document.getElementById('modal-pos-editar-rubro');
+            if (modal) modal.classList.remove('active');
+        },
+
+        cargarDatosRubroSeleccionadoPOS(rubroId) {
+            const cats = (this.categorias && this.categorias.length > 0) ? this.categorias : (window.ViasaDatabase?.categorias || []);
+            const rubro = cats.find(c => c.id === rubroId) || cats[0];
+            if (!rubro) return;
+
+            const selRubro = document.getElementById('pos-edit-rubro-select');
+            if (selRubro) selRubro.value = rubro.id;
+
+            document.getElementById('pos-edit-rubro-nombre').value = rubro.nombre || '';
+            document.getElementById('pos-edit-rubro-icono').value = rubro.icono || 'fa-bread-slice';
+            document.getElementById('pos-edit-rubro-color').value = rubro.color || '#f59e0b';
+            document.getElementById('pos-edit-rubro-orden').value = rubro.orden || 10;
+            document.getElementById('pos-edit-rubro-estado').value = rubro.activo === false || rubro.estado === 'inactivo' ? 'inactivo' : 'activo';
+
+            // Cargar productos asociados a este rubro
+            const prods = this.productos.filter(p => p.categoria === rubro.id);
+            const badge = document.getElementById('pos-edit-rubro-count-badge');
+            if (badge) badge.textContent = prods.length;
+
+            const tbody = document.getElementById('pos-edit-rubro-products-tbody');
+            if (!tbody) return;
+
+            if (prods.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6" style="padding: 24px; text-align: center; color: #94a3b8;">
+                            <i class="fa-solid fa-boxes-stacked" style="font-size: 1.5rem; display: block; margin-bottom: 6px; color: #64748b;"></i>
+                            No hay productos asociados a este rubro actualmente.
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = prods.map(p => {
+                const precioBs = ((p.precioUSD || 0) * (this.tasaBCV || 36.85)).toFixed(2);
+                const optionsRubros = cats.map(c => `
+                    <option value="${c.id}" ${c.id === p.categoria ? 'selected' : ''}>${c.nombre}</option>
+                `).join('');
+
+                return `
+                    <tr style="border-bottom: 1px solid #1e293b; background: rgba(15, 23, 42, 0.4);">
+                        <td style="padding: 8px 10px; font-family: monospace; font-weight: 700; color: #94a3b8;">
+                            ${p.sku || p.id}
+                        </td>
+                        <td style="padding: 8px 10px;">
+                            <input type="text" value="${p.nombre}" onchange="ViasaApp.actualizarNombreFilaRubroPOS('${p.id}', this.value)" style="width: 100%; background: #0f172a; border: 1px solid #334155; border-radius: 6px; padding: 4px 8px; color: #fff; font-size: 0.78rem;">
+                        </td>
+                        <td style="padding: 8px 10px;">
+                            <div style="display: flex; align-items: center; gap: 4px;">
+                                <span style="color: #f59e0b; font-weight: 700;">$</span>
+                                <input type="number" step="0.01" value="${(p.precioUSD || 0).toFixed(2)}" oninput="ViasaApp.actualizarPrecioFilaRubroPOS('${p.id}', this.value)" style="width: 75px; background: #0f172a; border: 1px solid #f59e0b; border-radius: 6px; padding: 4px 6px; color: #fbbf24; font-weight: 800; font-size: 0.78rem;">
+                            </div>
+                        </td>
+                        <td style="padding: 8px 10px; color: #38bdf8; font-weight: 800;" id="pos-row-bs-${p.id}">
+                            Bs. ${precioBs}
+                        </td>
+                        <td style="padding: 8px 10px;">
+                            <select onchange="ViasaApp.cambiarRubroProductoFilaPOS('${p.id}', this.value)" style="width: 100%; background: #0f172a; border: 1px solid #334155; border-radius: 6px; padding: 4px 6px; color: #cbd5e1; font-size: 0.75rem;">
+                                ${optionsRubros}
+                            </select>
+                        </td>
+                        <td style="padding: 8px 10px; text-align: center;">
+                            <div style="display: flex; align-items: center; justify-content: center; gap: 4px;">
+                                <button type="button" onclick="ViasaApp.guardarFilaProductoRubroPOS('${p.id}')" title="Guardar cambios de este producto" style="background: rgba(16, 185, 129, 0.2); border: 1px solid #10b981; color: #34d399; width: 26px; height: 26px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.72rem;">
+                                    <i class="fa-solid fa-floppy-disk"></i>
+                                </button>
+                                <button type="button" onclick="ViasaApp.abrirModalPOSEditarProducto('${p.id}')" title="Abrir ficha completa del producto" style="background: rgba(14, 165, 233, 0.2); border: 1px solid #0284c7; color: #38bdf8; width: 26px; height: 26px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.72rem;">
+                                    <i class="fa-solid fa-pen"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        },
+
+        actualizarNombreFilaRubroPOS(prodId, nuevoNombre) {
+            const p = this.productos.find(x => x.id === prodId);
+            if (p && nuevoNombre && nuevoNombre.trim()) {
+                p.nombre = nuevoNombre.trim();
+            }
+        },
+
+        actualizarPrecioFilaRubroPOS(prodId, nuevoUSD) {
+            const p = this.productos.find(x => x.id === prodId);
+            if (p) {
+                const usd = parseFloat(nuevoUSD) || 0;
+                p.precioUSD = usd;
+                p.precioBs = parseFloat((usd * (this.tasaBCV || 36.85)).toFixed(2));
+                const tdBs = document.getElementById(`pos-row-bs-${prodId}`);
+                if (tdBs) tdBs.textContent = `Bs. ${p.precioBs.toFixed(2)}`;
+            }
+        },
+
+        cambiarRubroProductoFilaPOS(prodId, nuevoRubroId) {
+            const p = this.productos.find(x => x.id === prodId);
+            if (p) {
+                p.categoria = nuevoRubroId;
+            }
+        },
+
+        async guardarFilaProductoRubroPOS(prodId) {
+            const p = this.productos.find(x => x.id === prodId);
+            if (!p) return;
+            await window.ViasaStorage.guardarRegistro('productos', p);
+            if (window.ViasaProductosExclusivosEngine && typeof window.ViasaProductosExclusivosEngine.sincronizarConPOS === 'function') {
+                window.ViasaProductosExclusivosEngine.sincronizarConPOS(p);
+            }
+            if (window.ViasaAudio) window.ViasaAudio.playCashChime();
+            this.mostrarNotificacionToast(`✅ Producto "${p.nombre}" actualizado correctamente.`, 'success');
+        },
+
+        async guardarCambiosRubroPOS() {
+            const selRubro = document.getElementById('pos-edit-rubro-select');
+            if (!selRubro) return;
+            const rubroId = selRubro.value;
+            const rubro = this.categorias.find(c => c.id === rubroId);
+            if (!rubro) return;
+
+            const nuevoNombre = (document.getElementById('pos-edit-rubro-nombre').value || '').trim();
+            const nuevoIcono = document.getElementById('pos-edit-rubro-icono').value;
+            const nuevoColor = document.getElementById('pos-edit-rubro-color').value;
+            const nuevoOrden = parseInt(document.getElementById('pos-edit-rubro-orden').value, 10) || 10;
+            const nuevoEstado = document.getElementById('pos-edit-rubro-estado').value;
+
+            if (!nuevoNombre) {
+                this.mostrarNotificacionToast('⚠️ El nombre del rubro no puede estar vacío.', 'warning');
+                return;
+            }
+
+            rubro.nombre = nuevoNombre;
+            rubro.icono = nuevoIcono;
+            rubro.color = nuevoColor;
+            rubro.orden = nuevoOrden;
+            rubro.estado = nuevoEstado;
+            rubro.activo = nuevoEstado === 'activo';
+            rubro.actualizadoEn = new Date().toISOString();
+
+            // Guardar rubro en Storage
+            await window.ViasaStorage.guardarRegistro('categorias', rubro);
+            if (window.ViasaDatabase) window.ViasaDatabase.categorias = this.categorias;
+
+            // Guardar todos los productos asociados a este rubro que hayan sido editados
+            const prods = this.productos.filter(p => p.categoria === rubro.id);
+            for (const p of prods) {
+                await window.ViasaStorage.guardarRegistro('productos', p);
+                if (window.ViasaProductosExclusivosEngine && typeof window.ViasaProductosExclusivosEngine.sincronizarConPOS === 'function') {
+                    window.ViasaProductosExclusivosEngine.sincronizarConPOS(p);
+                }
+            }
+
+            this.cerrarModalPOSEditarRubro();
+            this.renderPOSCategories();
+            this.renderPOSProducts();
+            if (window.ViasaAudio) window.ViasaAudio.playCashChime();
+            this.mostrarNotificacionToast('✅ Rubro y productos actualizados correctamente en el Punto de Venta', 'success');
+        },
+
+        abrirModalPOSEliminarRubro(rubroId = null) {
+            const modal = document.getElementById('modal-pos-eliminar-rubro');
+            if (!modal) return;
+
+            const cats = (this.categorias && this.categorias.length > 0) ? this.categorias : (window.ViasaDatabase?.categorias || []);
+            const selRubro = document.getElementById('pos-del-rubro-select');
+            if (selRubro) {
+                selRubro.innerHTML = cats.map(c => `
+                    <option value="${c.id}">${c.nombre} (${c.id})</option>
+                `).join('');
+            }
+
+            const targetId = rubroId || (this.categoriaActiva !== 'todas' ? this.categoriaActiva : cats[0]?.id);
+            this.actualizarInfoEliminarRubro(targetId);
+
+            modal.classList.add('active');
+            if (window.ViasaAudio) window.ViasaAudio.playClick();
+        },
+
+        cerrarModalPOSEliminarRubro() {
+            const modal = document.getElementById('modal-pos-eliminar-rubro');
+            if (modal) modal.classList.remove('active');
+        },
+
+        actualizarInfoEliminarRubro(rubroId) {
+            const cats = (this.categorias && this.categorias.length > 0) ? this.categorias : (window.ViasaDatabase?.categorias || []);
+            const rubro = cats.find(c => c.id === rubroId) || cats[0];
+            if (!rubro) return;
+
+            const selRubro = document.getElementById('pos-del-rubro-select');
+            if (selRubro) selRubro.value = rubro.id;
+
+            const prods = this.productos.filter(p => p.categoria === rubro.id);
+            const msgEl = document.getElementById('pos-del-rubro-msg');
+            if (msgEl) {
+                msgEl.innerHTML = `Este rubro contiene <strong style="color: #fff; font-size: 1.05rem;">${prods.length}</strong> productos asociados actualmente.`;
+            }
+
+            // Poblar selector de rubro destino (excluyendo el que se va a eliminar)
+            const selDest = document.getElementById('pos-del-rubro-destino');
+            if (selDest) {
+                const otrosRubros = cats.filter(c => c.id !== rubro.id);
+                let opts = otrosRubros.map(c => `<option value="${c.id}">${c.nombre}</option>`).join('');
+                opts += `<option value="cat_general">🏷️ General / Sin Rubro</option>`;
+                selDest.innerHTML = opts;
+            }
+        },
+
+        toggleDestinoEliminarRubro() {
+            const optReasignar = document.getElementById('pos-del-opt-reasignar').checked;
+            const wrapper = document.getElementById('pos-del-rubro-destino-wrapper');
+            if (wrapper) {
+                wrapper.style.display = optReasignar ? 'block' : 'none';
+            }
+        },
+
+        async confirmarEliminarRubroPOS() {
+            const selRubro = document.getElementById('pos-del-rubro-select');
+            if (!selRubro) return;
+            const rubroId = selRubro.value;
+            const rubro = this.categorias.find(c => c.id === rubroId);
+            if (!rubro) return;
+
+            const opcion = document.querySelector('input[name="pos_del_rubro_opt"]:checked')?.value || 'reasignar';
+            const prods = this.productos.filter(p => p.categoria === rubroId);
+
+            if (opcion === 'completa') {
+                const conf = confirm(`⚠️ ADVERTENCIA CRÍTICA:\n\n¿Está seguro de eliminar definitivamente el rubro "${rubro.nombre}" Y SUS ${prods.length} PRODUCTOS ASOCIADOS?\n\nEsta acción no se puede deshacer.`);
+                if (!conf) return;
+
+                // Eliminar en cascada los productos
+                for (const p of prods) {
+                    await window.ViasaStorage.eliminarRegistro('productos', p.id);
+                    if (window.ViasaProductosExclusivosEngine && typeof window.ViasaProductosExclusivosEngine.sincronizarConPOS === 'function') {
+                        window.ViasaProductosExclusivosEngine.sincronizarConPOS(p, true);
+                    }
+                }
+                this.productos = this.productos.filter(p => p.categoria !== rubroId);
+
+                // Eliminar del carrito los eliminados
+                if (Array.isArray(this.cart)) {
+                    const idsEliminados = new Set(prods.map(p => p.id));
+                    this.cart = this.cart.filter(item => !idsEliminados.has(item.id));
+                    this.renderCart();
+                }
+            } else {
+                // Opción Segura: Reasignar productos
+                const destinoId = document.getElementById('pos-del-rubro-destino')?.value || 'cat_general';
+                for (const p of prods) {
+                    p.categoria = destinoId;
+                    await window.ViasaStorage.guardarRegistro('productos', p);
+                    if (window.ViasaProductosExclusivosEngine && typeof window.ViasaProductosExclusivosEngine.sincronizarConPOS === 'function') {
+                        window.ViasaProductosExclusivosEngine.sincronizarConPOS(p);
+                    }
+                }
+            }
+
+            // Eliminar el rubro
+            this.categorias = this.categorias.filter(c => c.id !== rubroId);
+            await window.ViasaStorage.eliminarRegistro('categorias', rubroId);
+            if (window.ViasaDatabase) window.ViasaDatabase.categorias = this.categorias;
+
+            if (this.categoriaActiva === rubroId) {
+                this.categoriaActiva = 'todas';
+            }
+
+            this.cerrarModalPOSEliminarRubro();
+            this.renderPOSCategories();
+            this.renderPOSProducts();
+            if (window.ViasaAudio) window.ViasaAudio.playClick();
+            this.mostrarNotificacionToast(`🗑️ Rubro "${rubro.nombre}" eliminado. Catálogo reorganizado correctamente.`, 'success');
         },
 
         agregarAlCarrito(productoId, qty = 1) {
