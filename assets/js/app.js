@@ -2701,6 +2701,27 @@
                     stockClass = 'stock-medio';
                 }
 
+                // Presentación / Peso discreto y unidad corta de Stock
+                let presentacionTexto = (p.presentacion || p.presentacion_peso || p.peso || '').trim();
+                let unidadRaw = (p.unidad || 'UND').trim();
+                let unidadCorta = unidadRaw;
+
+                // Si la unidad contiene descripción larga o números (ej. "Empaque Familiar 650 gr", "Paquete 500g", etc.)
+                if (unidadRaw.length > 5 || /\d/.test(unidadRaw)) {
+                    if (!presentacionTexto) {
+                        presentacionTexto = unidadRaw;
+                    }
+                    if (/paq/i.test(unidadRaw)) unidadCorta = 'PAQ';
+                    else if (/bolsa/i.test(unidadRaw)) unidadCorta = 'BOLSA';
+                    else if (/bandeja/i.test(unidadRaw)) unidadCorta = 'BAND';
+                    else if (/kg|kilo/i.test(unidadRaw)) unidadCorta = 'KG';
+                    else if (/gr|gram/i.test(unidadRaw)) unidadCorta = 'GR';
+                    else if (/lit|lts/i.test(unidadRaw)) unidadCorta = 'LTS';
+                    else unidadCorta = 'UND';
+                } else if (unidadCorta.length > 6) {
+                    unidadCorta = unidadCorta.slice(0, 4).toUpperCase();
+                }
+
                 // Precios bimonetarios claros y contrastados
                 let priceDisplay = '';
                 if (this.modoMonedaPOS === 'usd') {
@@ -2743,6 +2764,7 @@
                             </div>
                             <div class="pos-card-info-box">
                                 <h4 class="pos-card-product-title" title="${p.nombre}">${p.nombre}</h4>
+                                ${presentacionTexto ? `<div class="pos-card-product-sub" title="${presentacionTexto}">${presentacionTexto}</div>` : ''}
                                 <div class="pos-card-pricing-row">
                                     ${priceDisplay}
                                 </div>
@@ -2751,16 +2773,14 @@
 
                         <!-- 3. Pie de Ficha: Stock + Código de Barras y QR -->
                         <div class="pos-card-footer-row">
-                            <div class="pos-card-stock-indicator ${stockClass}">
-                                <i class="fa-solid fa-box-archive"></i>
-                                <span>Stock: <strong>${stockVal} ${p.unidad || 'UND'}</strong></span>
+                            <div class="pos-card-stock-indicator ${stockClass}" title="Stock disponible: ${stockVal} ${unidadCorta}">
+                                <span>📦 Stock: <strong>${stockVal} ${unidadCorta}</strong></span>
                             </div>
-                            <div class="pos-card-barcode-pill" onclick="event.stopPropagation(); ViasaApp.abrirModalEtiquetaProducto('${p.id}')" title="Ver código de barras 1D, QR 2D e imprimir etiqueta térmica">
+                            <div class="pos-card-barcode-pill" onclick="event.stopPropagation(); ViasaApp.abrirModalEtiquetaProducto('${p.id}')" title="Ver código de barras 1D y QR">
                                 <i class="fa-solid fa-barcode"></i>
                                 <span class="barcode-digits">${barcodeDigits}</span>
                                 <span class="barcode-sep">&bull;</span>
-                                <i class="fa-solid fa-qrcode" style="color: #38bdf8;"></i>
-                                <span style="color: #7dd3fc; font-weight: 800; font-size: 0.65rem;">QR</span>
+                                <span class="barcode-qr-tag">QR</span>
                             </div>
                         </div>
                     </div>
