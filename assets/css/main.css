@@ -9683,6 +9683,58 @@ input, select, textarea {
    ESTUDIO DE CÓDIGOS DE BARRA, QR E IMPRESIÓN DE STICKERS (PRODUCTOS NUEVA VIASA)
    ============================================================================ */
 
+.barcode-preview-container {
+    width: 100%;
+    height: 110px;
+    background-color: #FFFFFF !important;
+    border-radius: 8px;
+    padding: 6px 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    box-sizing: border-box;
+}
+
+.barcode-preview-container img,
+.barcode-preview-container svg {
+    width: 100%;
+    height: 100%;
+    max-height: 98px;
+    object-fit: contain;
+    object-position: center;
+    display: block;
+    margin: 0 auto;
+}
+
+.qr-preview-container {
+    width: 100%;
+    height: 110px;
+    background-color: #FFFFFF !important;
+    border-radius: 8px;
+    padding: 6px 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    box-sizing: border-box;
+}
+
+.qr-preview-container img,
+.qr-preview-container svg {
+    height: 100%;
+    width: auto;
+    max-height: 98px;
+    aspect-ratio: 1 / 1;
+    object-fit: contain;
+    object-position: center;
+    margin: 0 auto;
+    display: block;
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+    image-rendering: pixelated;
+}
+
 .pnv-card-codes-box {
     display: flex;
     align-items: center;

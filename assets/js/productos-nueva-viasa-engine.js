@@ -435,20 +435,20 @@
         bits += '01010';
         for (let i = 7; i <= 12; i++) bits += EAN_R[parseInt(full[i], 10)];
         bits += '101';
-        const w = width || 190;
-        const h = height || 64;
-        const mod = w / (bits.length + 14);
+        const numW = (typeof width === 'number') ? width : 240;
+        const numH = (typeof height === 'number') ? height : 64;
+        const mod = numW / (bits.length + 14);
         let rects = '';
         for (let i = 0; i < bits.length; i++) {
             if (bits[i] === '1') {
                 const guard = i < 3 || (i >= 45 && i < 50) || i >= 92;
-                rects += `<rect x="${((i + 7) * mod).toFixed(2)}" y="0" width="${mod.toFixed(2)}" height="${guard ? h - 4 : h - 14}" fill="#0f172a"/>`;
+                rects += `<rect x="${((i + 7) * mod).toFixed(2)}" y="0" width="${mod.toFixed(2)}" height="${guard ? numH - 4 : numH - 14}" fill="#0f172a"/>`;
             }
         }
         const formatted = `${full.slice(0,1)} ${full.slice(1,7)} ${full.slice(7,13)}`;
-        return `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h + 4}" viewBox="0 0 ${w} ${h + 4}" shape-rendering="crispEdges">
-            <rect width="${w}" height="${h + 4}" fill="#fff"/>${rects}
-            <text x="${w / 2}" y="${h + 2}" text-anchor="middle" font-family="'JetBrains Mono', 'Courier New', monospace" font-size="11" font-weight="800" fill="#0f172a">${formatted}</text>
+        return `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${numW} ${numH + 4}" style="width:100%;height:100%;max-height:${numH + 4}px;object-fit:contain;display:block;margin:0 auto;" shape-rendering="crispEdges">
+            <rect width="${numW}" height="${numH + 4}" fill="#fff"/>${rects}
+            <text x="${numW / 2}" y="${numH + 2}" text-anchor="middle" font-family="'JetBrains Mono', 'Courier New', monospace" font-size="11" font-weight="800" fill="#0f172a">${formatted}</text>
         </svg>`;
     }
 
@@ -483,18 +483,18 @@
         if (!raw) return `<div style="font-family:monospace;font-size:11px;color:#0f172a;">SIN CÓDIGO</div>`;
         const { bits } = code128Bits(raw);
         if (!bits) return `<div style="font-family:monospace;font-size:11px;color:#0f172a;">${esc(raw)}</div>`;
-        const w = width || 190;
-        const h = height || 64;
-        const mod = w / (bits.length + 16);
+        const numW = (typeof width === 'number') ? width : 240;
+        const numH = (typeof height === 'number') ? height : 64;
+        const mod = numW / (bits.length + 16);
         let rects = '';
         for (let i = 0; i < bits.length; i++) {
             if (bits[i] === '1') {
-                rects += `<rect x="${((i + 8) * mod).toFixed(2)}" y="2" width="${mod.toFixed(2)}" height="${h - 18}" fill="#0f172a"/>`;
+                rects += `<rect x="${((i + 8) * mod).toFixed(2)}" y="2" width="${mod.toFixed(2)}" height="${numH - 18}" fill="#0f172a"/>`;
             }
         }
-        return `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h + 2}" viewBox="0 0 ${w} ${h + 2}" shape-rendering="crispEdges">
-            <rect width="${w}" height="${h + 2}" fill="#fff"/>${rects}
-            <text x="${w / 2}" y="${h}" text-anchor="middle" font-family="'JetBrains Mono', 'Courier New', monospace" font-size="11" font-weight="800" fill="#0f172a">${esc(raw)}</text>
+        return `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${numW} ${numH + 2}" style="width:100%;height:100%;max-height:${numH + 2}px;object-fit:contain;display:block;margin:0 auto;" shape-rendering="crispEdges">
+            <rect width="${numW}" height="${numH + 2}" fill="#fff"/>${rects}
+            <text x="${numW / 2}" y="${numH}" text-anchor="middle" font-family="'JetBrains Mono', 'Courier New', monospace" font-size="11" font-weight="800" fill="#0f172a">${esc(raw)}</text>
         </svg>`;
     }
 
@@ -729,7 +729,7 @@
                 }
             }
         }
-        return `<svg xmlns="http://www.w3.org/2000/svg" width="${pixelSize}" height="${pixelSize}" viewBox="0 0 ${total} ${total}" shape-rendering="crispEdges">
+        return `<svg xmlns="http://www.w3.org/2000/svg" width="${pixelSize}" height="${pixelSize}" viewBox="0 0 ${total} ${total}" shape-rendering="crispEdges" style="max-width:100%;max-height:100%;aspect-ratio:1/1;object-fit:contain;display:block;margin:0 auto;">
             <rect width="${total}" height="${total}" fill="#ffffff"/>
             <path d="${pathD}" fill="#0f172a"/>
         </svg>`;
@@ -737,20 +737,28 @@
 
     function renderBarcodeGraphic(p, code, formato = 'EAN13', width = 190, height = 64) {
         if (p && p.customBarcodeImage) {
-            const numStr = String(code || p.barcode || '').trim();
-            const fontSize = Math.min(10, Math.max(7, Math.round(height * 0.17)));
-            return `<div style="width:${width}px;height:${height}px;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;background:#ffffff;border-radius:3px;box-sizing:border-box;padding:2px 4px;">
-                <img src="${esc(p.customBarcodeImage)}" alt="Código de barras" style="max-width:100%;max-height:${Math.max(16, height - 16)}px;object-fit:contain;display:block;margin:auto;">
-                ${numStr ? `<div style="font-size:${fontSize}px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#0f172a;letter-spacing:1px;line-height:1;margin-top:2px;text-align:center;">${esc(numStr)}</div>` : ''}
+            const wStyle = typeof width === 'number' ? `${width}px` : (width || '100%');
+            const hStyle = typeof height === 'number' ? `${height}px` : (height || '100%');
+            return `<div class="barcode-preview-container" style="width:${wStyle};height:${hStyle};background-color:#FFFFFF;border-radius:6px;padding:4px 8px;display:flex;align-items:center;justify-content:center;overflow:hidden;box-sizing:border-box;">
+                <img src="${esc(p.customBarcodeImage)}" alt="Código de barras" style="width:100%;height:100%;max-height:100%;object-fit:contain;object-position:center;display:block;margin:0 auto;">
             </div>`;
         }
-        return renderBarcodeSvg(code || (p ? p.barcode : ''), formato, width, height);
+        let cleanCode = String(code || (p ? p.barcode : '') || '').trim();
+        // Separación total: NUNCA pasar ni imprimir el SKU como código de barras
+        if (p && p.sku && (cleanCode === p.sku || cleanCode.toUpperCase() === p.sku.toUpperCase())) {
+            cleanCode = (p.barcode && p.barcode !== p.sku) ? p.barcode : '';
+        }
+        if (/^[a-zA-Z]{2,4}-[a-zA-Z0-9]+-[0-9]+/i.test(cleanCode)) {
+            cleanCode = (p && p.barcode && !/^[a-zA-Z]{2,4}-/i.test(p.barcode)) ? p.barcode : '';
+        }
+        return renderBarcodeSvg(cleanCode, formato, width, height);
     }
 
     function renderQRGraphic(p, payloadQR, pixelSize = 120, margin = 2) {
         if (p && p.customQrImage) {
-            return `<div style="width:${pixelSize}px;height:${pixelSize}px;display:flex;align-items:center;justify-content:center;overflow:hidden;background:#ffffff;border-radius:4px;box-sizing:border-box;padding:2px;">
-                <img src="${esc(p.customQrImage)}" alt="Código QR" style="max-width:100%;max-height:100%;object-fit:contain;display:block;margin:auto;">
+            const sizeStyle = typeof pixelSize === 'number' ? `${pixelSize}px` : (pixelSize || '100%');
+            return `<div class="qr-preview-container" style="width:${sizeStyle};height:${sizeStyle};background-color:#FFFFFF;border-radius:6px;padding:2px;display:flex;align-items:center;justify-content:center;overflow:hidden;box-sizing:border-box;">
+                <img src="${esc(p.customQrImage)}" alt="Código QR" style="height:100%;width:auto;max-height:100%;aspect-ratio:1/1;object-fit:contain;object-position:center;margin:0 auto;display:block;image-rendering:crisp-edges;image-rendering:pixelated;">
             </div>`;
         }
         return renderQRSvg(payloadQR, pixelSize, margin);
@@ -856,6 +864,9 @@
             }, p);
 
             // Identificación y trazabilidad: Códigos de Barra y QR
+            if (prod.barcode && prod.sku && (prod.barcode === prod.sku || prod.barcode.toUpperCase() === prod.sku.toUpperCase() || /^[a-zA-Z]{2,4}-[a-zA-Z0-9]+-[0-9]+/i.test(prod.barcode))) {
+                prod.barcode = '';
+            }
             if (!prod.barcode && !prod.codigoBarras) {
                 prod.barcode = this.generarEAN13Auto(prod.id ? prod.id.replace(/\D/g, '') : null);
             } else if (!prod.barcode && prod.codigoBarras) {
@@ -1309,11 +1320,11 @@
                     
                     <!-- Tarjeta / Vista rápida de códigos de barras y QR -->
                     <div class="pnv-card-codes-box" onclick="event.stopPropagation();ViasaProductosExclusivosEngine.abrirEstudioStickers('${id}')" title="Clic para abrir Estudio de Códigos e Impresión de Stickers">
-                        <div style="flex:1;overflow:hidden;margin-right:8px;background:#fff;padding:2px 4px;border-radius:4px;display:flex;align-items:center;justify-content:center;">
-                            ${renderBarcodeGraphic(p, p.barcode || p.sku, p.tipoCodigo || 'EAN13', 140, 32)}
+                        <div style="flex:1;overflow:hidden;margin-right:8px;background:#ffffff;padding:2px 6px;border-radius:6px;display:flex;align-items:center;justify-content:center;height:38px;box-sizing:border-box;">
+                            ${renderBarcodeGraphic(p, p.barcode || '', p.tipoCodigo || 'EAN13', '100%', 32)}
                         </div>
-                        <div style="flex-shrink:0;background:#fff;padding:2px;border-radius:4px;display:flex;align-items:center;justify-content:center;">
-                            ${renderQRGraphic(p, p.qrCode || this.generarPayloadQR(p), 34, 1)}
+                        <div style="flex-shrink:0;background:#ffffff;padding:2px;border-radius:6px;display:flex;align-items:center;justify-content:center;height:38px;width:38px;box-sizing:border-box;">
+                            ${renderQRGraphic(p, p.qrCode || this.generarPayloadQR(p), 32, 1)}
                         </div>
                     </div>
                     <div class="pnv-metrics-box">
@@ -1358,8 +1369,16 @@
 
         refrescarTodo() {
             const view = document.getElementById('view-productos-nueva-viasa');
-            if (view && view.classList.contains('active')) this.render();
-            if (this.detalleId && document.getElementById('pnv-detalle-overlay')) this.renderDetalle();
+            if (view) {
+                if (document.getElementById('pnv-grid-wrap')) {
+                    this.renderGrid();
+                } else {
+                    this.render();
+                }
+            }
+            if (this.detalleId && document.getElementById('pnv-detalle-overlay')) {
+                this.renderDetalle();
+            }
         },
 
         // --------------------------------------------------------------------
@@ -1448,7 +1467,7 @@
                 stockInicialMostrador: 0, stockInicialReserva: 0, stockMinimo: 10, costoUnitarioUsd: 0, pvpUnitarioUsd: 0,
                 precioAliadoUsd: 0, margenObjetivoPct: 35, vidaUtilDias: 7, fotoUrl: '', activo: true
             };
-            if (!v.barcode) {
+            if (!v.barcode || (v.sku && (v.barcode === v.sku || v.barcode.toUpperCase() === v.sku.toUpperCase() || /^[a-zA-Z]{2,4}-[a-zA-Z0-9]+-[0-9]+/i.test(v.barcode)))) {
                 v.barcode = (v.tipoCodigo === 'CODE128') ? this.generarCode128Auto() : this.generarEAN13Auto();
             }
             v.tipoCodigo = v.tipoCodigo || 'EAN13';
@@ -1683,23 +1702,18 @@
             const hasCustomQr = !!this._customQrImageForm;
 
             const barcodePreviewHtml = hasCustomBarcode
-                ? `<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2px 4px;box-sizing:border-box;">
-                     <img src="${esc(this._customBarcodeImageForm)}" alt="Código de barras personalizado" style="max-height:44px;max-width:180px;object-fit:contain;display:block;">
-                     <div style="font-size:10px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#0F172A;margin-top:2px;">${esc(code)}</div>
-                   </div>`
-                : renderBarcodeSvg(code, tipo, 190, 42);
+                ? `<img src="${esc(this._customBarcodeImageForm)}" alt="Código de barras personalizado" style="width:100%;height:100%;max-height:98px;object-fit:contain;object-position:center;display:block;margin:0 auto;">`
+                : renderBarcodeSvg(code, tipo, '100%', 84);
 
             const qrPreviewHtml = hasCustomQr
-                ? `<div style="display:flex;align-items:center;justify-content:center;padding:2px;box-sizing:border-box;">
-                     <img src="${esc(this._customQrImageForm)}" alt="QR personalizado" style="width:48px;height:48px;object-fit:contain;display:block;">
-                   </div>`
-                : renderQRSvg(payloadQR, 48, 1);
+                ? `<img src="${esc(this._customQrImageForm)}" alt="QR personalizado" style="height:100%;width:auto;max-height:98px;aspect-ratio:1/1;object-fit:contain;object-position:center;margin:0 auto;display:block;image-rendering:crisp-edges;image-rendering:pixelated;">`
+                : renderQRSvg(payloadQR, 96, 1);
 
             liveBox.innerHTML = `
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:flex-start;width:100%;">
                     <!-- Columna Código de Barras -->
                     <div>
-                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
                             <span style="font-size:0.68rem;font-weight:800;color:#94A3B8;text-transform:uppercase;letter-spacing:0.04em;">
                                 <i class="fa-solid fa-barcode" style="color:#FBBF24;"></i> Código de Barras
                             </span>
@@ -1707,7 +1721,7 @@
                                 ? '<span class="pnv-badge" style="background:#065F46;color:#A7F3D0;font-size:0.62rem;border:1px solid #10B981;">Imagen Propia</span>'
                                 : `<span style="font-size:0.65rem;color:#94A3B8;font-weight:700;">${tipo} (Sistema)</span>`}
                         </div>
-                        <div style="background:#fff;padding:6px;border-radius:6px;display:flex;align-items:center;justify-content:center;min-height:56px;box-shadow:0 2px 6px rgba(0,0,0,0.35);">
+                        <div class="barcode-preview-container" style="height:110px;width:100%;background-color:#FFFFFF;border-radius:8px;padding:6px 12px;display:flex;align-items:center;justify-content:center;overflow:hidden;box-sizing:border-box;box-shadow:0 2px 8px rgba(0,0,0,0.35);">
                             ${barcodePreviewHtml}
                         </div>
                         <div style="display:flex;gap:4px;margin-top:6px;flex-wrap:wrap;">
@@ -1725,7 +1739,7 @@
 
                     <!-- Columna Código QR -->
                     <div>
-                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
                             <span style="font-size:0.68rem;font-weight:800;color:#94A3B8;text-transform:uppercase;letter-spacing:0.04em;">
                                 <i class="fa-solid fa-qrcode" style="color:#FBBF24;"></i> Código QR
                             </span>
@@ -1733,7 +1747,7 @@
                                 ? '<span class="pnv-badge" style="background:#065F46;color:#A7F3D0;font-size:0.62rem;border:1px solid #10B981;">QR Propio</span>'
                                 : '<span style="font-size:0.65rem;color:#94A3B8;font-weight:700;">Trazable (Sistema)</span>'}
                         </div>
-                        <div style="background:#fff;padding:4px;border-radius:6px;display:flex;align-items:center;justify-content:center;min-height:56px;box-shadow:0 2px 6px rgba(0,0,0,0.35);">
+                        <div class="qr-preview-container" style="height:110px;width:100%;background-color:#FFFFFF;border-radius:8px;padding:6px 12px;display:flex;align-items:center;justify-content:center;overflow:hidden;box-sizing:border-box;box-shadow:0 2px 8px rgba(0,0,0,0.35);">
                             ${qrPreviewHtml}
                         </div>
                         <div style="display:flex;gap:4px;margin-top:6px;flex-wrap:wrap;">
@@ -1754,8 +1768,14 @@
         guardarFormProducto(id) {
             const f = document.getElementById('pnv-form-producto');
             if (!f) return;
-            const tipoCodigo = (f.tipoCodigo ? f.tipoCodigo.value : 'EAN13');
+            let tipoCodigo = (f.tipoCodigo ? f.tipoCodigo.value : 'EAN13');
             let barcodeVal = (f.barcode ? f.barcode.value : '').trim();
+            const skuVal = (f.sku ? f.sku.value : '').trim().toUpperCase();
+
+            // Separación estricta: si el campo barcode contiene el SKU, limpiarlo
+            if (barcodeVal && skuVal && (barcodeVal.toUpperCase() === skuVal || /^[a-zA-Z]{2,4}-[a-zA-Z0-9]+-[0-9]+/i.test(barcodeVal))) {
+                barcodeVal = '';
+            }
 
             if (tipoCodigo === 'EAN13') {
                 const cleanDigits = barcodeVal.replace(/\D/g, '');
@@ -2444,7 +2464,7 @@
             const venc = lote ? lote.vencimiento : addDays(elab, p.vidaUtilDias);
             const qrData = this.generarPayloadQR(p, lote, 'texto');
             const tipo = p.tipoCodigo || 'EAN13';
-            const barcode = p.barcode || (tipo === 'EAN13' ? this.generarEAN13Auto() : this.generarCode128Auto());
+            const barcode = (p.barcode && p.barcode !== p.sku && !/^[a-zA-Z]{2,4}-/i.test(p.barcode)) ? p.barcode : (tipo === 'EAN13' ? this.generarEAN13Auto() : this.generarCode128Auto());
             return `<div class="pnv-sticker">
                 <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">
                     <div>
@@ -2528,7 +2548,7 @@
             this.guardar();
             this.sincronizarConPOS(p);
             this.toast(`💾 Código de barras asignado actualizado: ${clean}`);
-            this.renderStudioPreview();
+            this.refrescarTodo();
         },
 
         async subirBarcodeStudio(input) {
@@ -2539,7 +2559,7 @@
                 this.guardar();
                 this.sincronizarConPOS(p);
                 this.toast(`🖼️ Imagen propia de código de barras guardada para ${p.nombre}.`);
-                this.renderDetalle();
+                this.refrescarTodo();
             } catch (e) {
                 this.toast('⚠️ ' + e.message, 'error');
             }
@@ -2552,7 +2572,7 @@
             this.guardar();
             this.sincronizarConPOS(p);
             this.toast('🔄 Generador automático de código de barras restaurado.');
-            this.renderDetalle();
+            this.refrescarTodo();
         },
 
         async subirQRStudio(input) {
@@ -2563,7 +2583,7 @@
                 this.guardar();
                 this.sincronizarConPOS(p);
                 this.toast(`🖼️ Imagen propia de código QR guardada para ${p.nombre}.`);
-                this.renderDetalle();
+                this.refrescarTodo();
             } catch (e) {
                 this.toast('⚠️ ' + e.message, 'error');
             }
@@ -2576,7 +2596,7 @@
             this.guardar();
             this.sincronizarConPOS(p);
             this.toast('🔄 Generador automático de código QR restaurado.');
-            this.renderDetalle();
+            this.refrescarTodo();
         },
 
         setStudioCopias(n) {
@@ -2600,7 +2620,7 @@
             const formato = this.studioFormato || this._studioFormato || 'comercial';
             const lote = this.obtenerLoteStudio(p);
             const tipoCodigo = this.studioTipoCodigo || this._studioTipoCodigo || p.tipoCodigo || 'EAN13';
-            const barcode = p.barcode || (tipoCodigo === 'EAN13' ? this.generarEAN13Auto() : this.generarCode128Auto());
+            const barcode = (p.barcode && p.barcode !== p.sku && !/^[a-zA-Z]{2,4}-/i.test(p.barcode)) ? p.barcode : (tipoCodigo === 'EAN13' ? this.generarEAN13Auto() : this.generarCode128Auto());
             const loteId = lote ? lote.id : 'LOT-' + new Date().getFullYear() + '-001';
             const fechaElab = lote ? String(lote.fechaHora).slice(0, 10) : nowLocalInput().slice(0, 10);
             const fechaVenc = lote ? lote.vencimiento : addDays(fechaElab, p.vidaUtilDias);
@@ -2892,7 +2912,7 @@
             const copias = Math.max(1, parseInt(this.studioCopias || this._studioCopias, 10) || 1);
             const lote = this.obtenerLoteStudio(p);
             const tipoCodigo = this.studioTipoCodigo || this._studioTipoCodigo || p.tipoCodigo || 'EAN13';
-            const barcode = p.barcode || (tipoCodigo === 'EAN13' ? this.generarEAN13Auto() : this.generarCode128Auto());
+            const barcode = (p.barcode && p.barcode !== p.sku && !/^[a-zA-Z]{2,4}-/i.test(p.barcode)) ? p.barcode : (tipoCodigo === 'EAN13' ? this.generarEAN13Auto() : this.generarCode128Auto());
             const loteId = lote ? lote.id : 'LOT-' + new Date().getFullYear() + '-001';
             const fechaElab = lote ? String(lote.fechaHora).slice(0, 10) : nowLocalInput().slice(0, 10);
             const fechaVenc = lote ? lote.vencimiento : addDays(fechaElab, p.vidaUtilDias);
