@@ -194,9 +194,12 @@
          */
         async optimizarImagen(input, { esCodigo = false, maxDim = 1200, calidad = 0.85 } = {}) {
             let dataUrl = '';
+            if (input && input.files && input.files[0]) {
+                input = input.files[0];
+            }
             if (typeof input === 'string') {
                 dataUrl = input;
-            } else if (input instanceof Blob || input instanceof File) {
+            } else if (input && (input instanceof Blob || input instanceof File || typeof input.slice === 'function')) {
                 dataUrl = await this.fileToDataUrl(input);
             } else {
                 throw new Error('Entrada de imagen no válida para optimizar.');
@@ -310,8 +313,26 @@
             await this.initPromise;
             if (!input) return null;
 
-            // 1. Optimizar imagen
-            const opt = await this.optimizarImagen(input, { esCodigo });
+            // 1. Optimizar imagen con fallback a datos directos si canvas falla
+            let opt;
+            try {
+                opt = await this.optimizarImagen(input, { esCodigo });
+            } catch (errOpt) {
+                console.warn('[ViasaMediaStorage] Optimización canvas falló, usando entrada directa:', errOpt);
+                try {
+                    const rawDataUrl = typeof input === 'string' ? input : await this.fileToDataUrl(input && input.files ? input.files[0] : input);
+                    opt = {
+                        blob: this.dataUrlToBlob(rawDataUrl),
+                        dataUrl: rawDataUrl,
+                        mimeType: (input && input.type) || 'image/jpeg',
+                        extension: 'jpg',
+                        ancho: 800,
+                        alto: 600
+                    };
+                } catch (errDirect) {
+                    throw new Error('No se pudo procesar el archivo de imagen.');
+                }
+            }
 
             // 2. Determinar nombre de archivo estandarizado
             const nombreArchivo = nombrePersonalizado || this.generarNombreArchivo({
@@ -920,13 +941,27 @@
         }
 
         dataUrlToBlob(dataUrl) {
-            const parts = dataUrl.split(',');
-            const mime = parts[0].match(/:(.*?);/)[1];
-            const bstr = atob(parts[1]);
-            let n = bstr.length;
-            const u8arr = new Uint8Array(n);
-            while (n--) u8arr[n] = bstr.charCodeAt(n);
-            return new Blob([u8arr], { type: mime });
+            if (!dataUrl || typeof dataUrl !== 'string') return new Blob([], { type: 'image/jpeg' });
+            try {
+                const parts = dataUrl.split(',');
+                if (parts.length < 2) return new Blob([dataUrl], { type: 'text/plain' });
+                const mimeMatch = parts[0].match(/:(.*?)(;|$)/);
+                const mime = (mimeMatch && mimeMatch[1]) ? mimeMatch[1] : 'image/jpeg';
+                const isBase64 = parts[0].includes(';base64');
+                if (isBase64) {
+                    const bstr = atob(parts[1]);
+                    let n = bstr.length;
+                    const u8arr = new Uint8Array(n);
+                    while (n--) u8arr[n] = bstr.charCodeAt(n);
+                    return new Blob([u8arr], { type: mime });
+                } else {
+                    const text = decodeURIComponent(parts[1] || '');
+                    return new Blob([text], { type: mime });
+                }
+            } catch (err) {
+                console.warn('[ViasaMediaStorage] dataUrlToBlob fallback:', err);
+                return new Blob([dataUrl], { type: 'image/jpeg' });
+            }
         }
 
         toast(msg, tipo = 'info') {
