@@ -859,14 +859,14 @@
                     // Para el guardado síncrono inmediato, asegurar que ninguna cadena Base64 exceda 20KB
                     productosParaStorage = this.productos.map(p => {
                         const copy = Object.assign({}, p);
-                        if (copy.fotoUrl && copy.fotoUrl.startsWith('data:image/') && copy.fotoUrl.length > 20000) {
+                        if (copy.fotoUrl && (copy.fotoUrl.startsWith('blob:') || (copy.fotoUrl.startsWith('data:image/') && copy.fotoUrl.length > 20000))) {
                             copy.fotoUrl = `viasa-media://imagenes_productos/${window.ViasaMediaStorage.generarNombreArchivo({
                                 categoria: 'imagenes_productos',
                                 sku: copy.sku,
                                 nombre: copy.nombre
                             })}`;
                         }
-                        if (copy.customBarcodeImage && copy.customBarcodeImage.startsWith('data:image/') && copy.customBarcodeImage.length > 20000) {
+                        if (copy.customBarcodeImage && (copy.customBarcodeImage.startsWith('blob:') || (copy.customBarcodeImage.startsWith('data:image/') && copy.customBarcodeImage.length > 20000))) {
                             copy.customBarcodeImage = `viasa-media://codigos_barras_y_qr/${window.ViasaMediaStorage.generarNombreArchivo({
                                 categoria: 'codigos_barras_y_qr',
                                 sku: copy.sku,
@@ -875,7 +875,7 @@
                                 esBarcode: true
                             })}`;
                         }
-                        if (copy.customQrImage && copy.customQrImage.startsWith('data:image/') && copy.customQrImage.length > 20000) {
+                        if (copy.customQrImage && (copy.customQrImage.startsWith('blob:') || (copy.customQrImage.startsWith('data:image/') && copy.customQrImage.length > 20000))) {
                             copy.customQrImage = `viasa-media://codigos_barras_y_qr/${window.ViasaMediaStorage.generarNombreArchivo({
                                 categoria: 'codigos_barras_y_qr',
                                 sku: copy.sku,
@@ -1528,6 +1528,105 @@
             input.click();
         },
 
+        cambiarBarcodeDirecto(id) {
+            const p = this.getProducto(id);
+            if (!p) return;
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/png,image/jpeg,image/jpg,image/webp,image/svg+xml,image/*,.png,.jpg,.jpeg,.webp,.svg';
+            input.style.position = 'fixed';
+            input.style.top = '-1000px';
+            input.style.left = '-1000px';
+            input.style.opacity = '0';
+            document.body.appendChild(input);
+
+            input.onchange = async () => {
+                try {
+                    const file = input.files && input.files[0];
+                    if (!file) return;
+                    const anterior = p.customBarcodeImage;
+                    if (window.ViasaMediaStorage) {
+                        try {
+                            const guardado = await window.ViasaMediaStorage.guardarMedia({
+                                input: file,
+                                categoria: 'codigos_barras_y_qr',
+                                sku: p.sku,
+                                nombre: p.nombre,
+                                codigo: p.barcode,
+                                esCodigo: true,
+                                esQR: false
+                            });
+                            p.customBarcodeImage = guardado.uri;
+                        } catch (errStorage) {
+                            console.warn('[Productos Nueva Viasa] Fallback a leerImagenCodigo en cambiarBarcodeDirecto:', errStorage);
+                            p.customBarcodeImage = await this.leerImagenCodigo(file);
+                        }
+                    } else {
+                        p.customBarcodeImage = await this.leerImagenCodigo(file);
+                    }
+                    if (!this.guardar()) { p.customBarcodeImage = anterior; return; }
+                    this.sincronizarConPOS(p);
+                    this.toast(`✅ Imagen de código de barras asignada para: ${p.nombre}`);
+                    this.refrescarTodo();
+                    if (this.detalleId === id) this.renderDetalle();
+                } catch (e) {
+                    this.toast('⚠️ ' + e.message, 'error');
+                } finally {
+                    input.remove();
+                }
+            };
+            input.click();
+        },
+
+        cambiarQRDirecto(id) {
+            const p = this.getProducto(id);
+            if (!p) return;
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/png,image/jpeg,image/jpg,image/webp,image/svg+xml,image/*,.png,.jpg,.jpeg,.webp,.svg';
+            input.style.position = 'fixed';
+            input.style.top = '-1000px';
+            input.style.left = '-1000px';
+            input.style.opacity = '0';
+            document.body.appendChild(input);
+
+            input.onchange = async () => {
+                try {
+                    const file = input.files && input.files[0];
+                    if (!file) return;
+                    const anterior = p.customQrImage;
+                    if (window.ViasaMediaStorage) {
+                        try {
+                            const guardado = await window.ViasaMediaStorage.guardarMedia({
+                                input: file,
+                                categoria: 'codigos_barras_y_qr',
+                                sku: p.sku,
+                                nombre: p.nombre,
+                                esCodigo: true,
+                                esQR: true
+                            });
+                            p.customQrImage = guardado.uri;
+                        } catch (errStorage) {
+                            console.warn('[Productos Nueva Viasa] Fallback a leerImagenCodigo en cambiarQRDirecto:', errStorage);
+                            p.customQrImage = await this.leerImagenCodigo(file);
+                        }
+                    } else {
+                        p.customQrImage = await this.leerImagenCodigo(file);
+                    }
+                    if (!this.guardar()) { p.customQrImage = anterior; return; }
+                    this.sincronizarConPOS(p);
+                    this.toast(`✅ Imagen de código QR asignada para: ${p.nombre}`);
+                    this.refrescarTodo();
+                    if (this.detalleId === id) this.renderDetalle();
+                } catch (e) {
+                    this.toast('⚠️ ' + e.message, 'error');
+                } finally {
+                    input.remove();
+                }
+            };
+            input.click();
+        },
+
         // --------------------------------------------------------------------
         // MODALES GENÉRICOS
         // --------------------------------------------------------------------
@@ -1573,7 +1672,9 @@
             }
             v.tipoCodigo = v.tipoCodigo || 'EAN13';
             this._fotoTemporal = v.fotoUrl ? (window.ViasaMediaStorage ? window.ViasaMediaStorage.resolveUrl(v.fotoUrl) : v.fotoUrl) : '';
+            this._customBarcodeImageUri = v.customBarcodeImage || '';
             this._customBarcodeImageForm = v.customBarcodeImage ? (window.ViasaMediaStorage ? window.ViasaMediaStorage.resolveUrl(v.customBarcodeImage) : v.customBarcodeImage) : '';
+            this._customQrImageUri = v.customQrImage || '';
             this._customQrImageForm = v.customQrImage ? (window.ViasaMediaStorage ? window.ViasaMediaStorage.resolveUrl(v.customQrImage) : v.customQrImage) : '';
             const tasa = this.getTasa();
             const opt = (arr, sel) => arr.map(o => `<option value="${esc(o)}" ${o === sel ? 'selected' : ''}>${esc(o)}</option>`).join('');
@@ -1581,13 +1682,17 @@
             const html = `
                 ${this.modalHeader(p ? '✏️ Modificar Producto Nueva Viasa' : '➕ Nuevo Producto Nueva Viasa', p ? `${esc(p.sku)} • ${esc(p.nombre)}` : 'Registro en el Catálogo Maestro Exclusivo', 'pnv-form-overlay')}
                 <form id="pnv-form-producto" class="pnv-modal-body" onsubmit="event.preventDefault();ViasaProductosExclusivosEngine.guardarFormProducto('${p ? esc(p.id) : ''}')" oninput="ViasaProductosExclusivosEngine.recalcForm()">
+                    <!-- Inputs ocultos persistentes para archivos de medios -->
+                    <input type="file" id="pnv-form-foto-input" accept="image/png,image/jpeg,image/jpg,image/webp,image/svg+xml,image/*" style="display:none;" onchange="ViasaProductosExclusivosEngine.previewFotoForm(this)">
+                    <input type="file" id="pnv-form-barcode-input" accept="image/png,image/jpeg,image/jpg,image/webp,image/svg+xml,image/*,.png,.jpg,.jpeg,.webp,.svg" style="display:none;" onchange="ViasaProductosExclusivosEngine.subirBarcodeForm(this)">
+                    <input type="file" id="pnv-form-qr-input" accept="image/png,image/jpeg,image/jpg,image/webp,image/svg+xml,image/*,.png,.jpg,.jpeg,.webp,.svg" style="display:none;" onchange="ViasaProductosExclusivosEngine.subirQRForm(this)">
+
                     <div style="display:grid;grid-template-columns:240px 1fr;gap:20px;" class="pnv-form-split">
                         <div>
                             <div class="pnv-label">Fotografía del producto</div>
                             <div id="pnv-form-foto" onclick="ViasaProductosExclusivosEngine.seleccionarFotoForm()" style="height:180px;border-radius:12px;border:1.5px dashed rgba(251,191,36,0.55);background:#0B0F19 center/cover no-repeat;${this._fotoTemporal ? `background-image:url('${esc(this._fotoTemporal)}');` : ''}display:flex;flex-direction:column;align-items:center;justify-content:center;color:#94A3B8;font-size:0.8rem;cursor:pointer;transition:all 0.2s;" title="Haga clic para subir o cambiar fotografía">
                                 ${this._fotoTemporal ? '' : '<i class="fa-solid fa-camera" style="font-size:2.2rem;color:#FBBF24;margin-bottom:8px;"></i><span style="font-weight:700;">Haga clic para subir fotografía</span><span style="font-size:0.7rem;color:#64748B;margin-top:2px;">PNG, JPG, WEBP, SVG</span>'}
                             </div>
-                            <input type="file" id="pnv-form-foto-input" accept="image/png,image/jpeg,image/jpg,image/webp,image/svg+xml,image/*" style="display:none;" onchange="ViasaProductosExclusivosEngine.previewFotoForm(this)">
                             <button type="button" class="pnv-btn pnv-btn-gold pnv-btn-sm" style="margin-top:8px;width:100%;justify-content:center;cursor:pointer;" onclick="ViasaProductosExclusivosEngine.seleccionarFotoForm()">
                                 <i class="fa-solid fa-upload"></i> Subir Imagen desde la Computadora
                             </button>
@@ -1771,7 +1876,7 @@
         leerImagenCodigo(file) {
             return new Promise((resolve, reject) => {
                 if (!file) { reject(new Error('No se seleccionó ningún archivo.')); return; }
-                const isImg = /^image\//.test(file.type) || file.name.match(/\.(png|jpe?g|svg|webp)$/i);
+                const isImg = !file.type || /^image\//.test(file.type) || /\.(png|jpe?g|svg|webp|bmp|gif|jfif)$/i.test(file.name || '');
                 if (!isImg) { reject(new Error('El archivo seleccionado debe ser una imagen (.png, .jpg, .jpeg, .svg, .webp).')); return; }
                 const reader = new FileReader();
                 reader.onerror = () => reject(new Error('Error al leer el archivo de imagen.'));
@@ -1801,51 +1906,90 @@
         },
 
         seleccionarBarcodeForm() {
-            const input = document.getElementById('pnv-form-barcode-input');
-            if (input) {
-                input.value = '';
-                input.click();
+            let input = document.getElementById('pnv-form-barcode-input');
+            if (!input) {
+                input = document.createElement('input');
+                input.type = 'file';
+                input.id = 'pnv-form-barcode-input';
+                input.accept = 'image/png,image/jpeg,image/jpg,image/webp,image/svg+xml,image/*,.png,.jpg,.jpeg,.webp,.svg';
+                input.style.position = 'fixed';
+                input.style.top = '-1000px';
+                input.style.left = '-1000px';
+                input.style.opacity = '0';
+                input.onchange = () => this.subirBarcodeForm(input);
+                document.body.appendChild(input);
             }
+            input.value = '';
+            input.click();
         },
 
         seleccionarQRForm() {
-            const input = document.getElementById('pnv-form-qr-input');
-            if (input) {
-                input.value = '';
-                input.click();
+            let input = document.getElementById('pnv-form-qr-input');
+            if (!input) {
+                input = document.createElement('input');
+                input.type = 'file';
+                input.id = 'pnv-form-qr-input';
+                input.accept = 'image/png,image/jpeg,image/jpg,image/webp,image/svg+xml,image/*,.png,.jpg,.jpeg,.webp,.svg';
+                input.style.position = 'fixed';
+                input.style.top = '-1000px';
+                input.style.left = '-1000px';
+                input.style.opacity = '0';
+                input.onchange = () => this.subirQRForm(input);
+                document.body.appendChild(input);
             }
+            input.value = '';
+            input.click();
         },
 
         async subirBarcodeForm(input) {
             try {
-                if (!input.files || !input.files[0]) return;
-                const file = input.files[0];
+                const file = input && input.files && input.files[0];
+                if (!file) return;
                 const f = document.getElementById('pnv-form-producto');
                 const sku = (f && f.sku ? f.sku.value.trim() : '') || 'PNV';
                 const nom = (f && f.nombre ? f.nombre.value.trim() : '') || 'Producto';
                 const cod = (f && f.barcode ? f.barcode.value.trim() : '') || '1D';
+
+                // Vista previa inmediata reactiva
+                let previewUrl = '';
+                try {
+                    previewUrl = URL.createObjectURL(file);
+                    this._customBarcodeImageForm = previewUrl;
+                    this.recalcFormCodes();
+                } catch (eObj) {}
+
                 if (window.ViasaMediaStorage) {
-                    const guardado = await window.ViasaMediaStorage.guardarMedia({
-                        input: file,
-                        categoria: 'codigos_barras_y_qr',
-                        sku: sku,
-                        nombre: nom,
-                        codigo: cod,
-                        esCodigo: true,
-                        esQR: false
-                    });
-                    this._customBarcodeImageForm = guardado.resolvedUrl || guardado.uri;
+                    try {
+                        const guardado = await window.ViasaMediaStorage.guardarMedia({
+                            input: file,
+                            categoria: 'codigos_barras_y_qr',
+                            sku: sku,
+                            nombre: nom,
+                            codigo: cod,
+                            esCodigo: true,
+                            esQR: false
+                        });
+                        this._customBarcodeImageUri = guardado.uri;
+                        this._customBarcodeImageForm = guardado.resolvedUrl || previewUrl || guardado.uri;
+                    } catch (errStorage) {
+                        console.warn('[PNV] Guardado en storage falló, usando lectura directa:', errStorage);
+                        this._customBarcodeImageForm = await this.leerImagenCodigo(file);
+                        this._customBarcodeImageUri = this._customBarcodeImageForm;
+                    }
                 } else {
                     this._customBarcodeImageForm = await this.leerImagenCodigo(file);
+                    this._customBarcodeImageUri = this._customBarcodeImageForm;
                 }
                 this.recalcFormCodes();
-                this.toast('🖼️ Imagen de código de barras guardada en /codigos_barras_y_qr.');
+                this.toast('🖼️ Imagen de código de barras asignada y guardada correctamente.');
             } catch (e) {
+                console.error('[PNV] Error al subir código de barras:', e);
                 this.toast('⚠️ ' + e.message, 'error');
             }
         },
 
         restaurarBarcodeForm() {
+            this._customBarcodeImageUri = '';
             this._customBarcodeImageForm = '';
             this.recalcFormCodes();
             this.toast('🔄 Generador automático de código de barras restaurado.');
@@ -1853,32 +1997,50 @@
 
         async subirQRForm(input) {
             try {
-                if (!input.files || !input.files[0]) return;
-                const file = input.files[0];
+                const file = input && input.files && input.files[0];
+                if (!file) return;
                 const f = document.getElementById('pnv-form-producto');
                 const sku = (f && f.sku ? f.sku.value.trim() : '') || 'PNV';
                 const nom = (f && f.nombre ? f.nombre.value.trim() : '') || 'Producto';
+
+                let previewUrl = '';
+                try {
+                    previewUrl = URL.createObjectURL(file);
+                    this._customQrImageForm = previewUrl;
+                    this.recalcFormCodes();
+                } catch (eObj) {}
+
                 if (window.ViasaMediaStorage) {
-                    const guardado = await window.ViasaMediaStorage.guardarMedia({
-                        input: file,
-                        categoria: 'codigos_barras_y_qr',
-                        sku: sku,
-                        nombre: nom,
-                        esCodigo: true,
-                        esQR: true
-                    });
-                    this._customQrImageForm = guardado.resolvedUrl || guardado.uri;
+                    try {
+                        const guardado = await window.ViasaMediaStorage.guardarMedia({
+                            input: file,
+                            categoria: 'codigos_barras_y_qr',
+                            sku: sku,
+                            nombre: nom,
+                            esCodigo: true,
+                            esQR: true
+                        });
+                        this._customQrImageUri = guardado.uri;
+                        this._customQrImageForm = guardado.resolvedUrl || previewUrl || guardado.uri;
+                    } catch (errStorage) {
+                        console.warn('[PNV] Guardado en storage falló, usando lectura directa:', errStorage);
+                        this._customQrImageForm = await this.leerImagenCodigo(file);
+                        this._customQrImageUri = this._customQrImageForm;
+                    }
                 } else {
                     this._customQrImageForm = await this.leerImagenCodigo(file);
+                    this._customQrImageUri = this._customQrImageForm;
                 }
                 this.recalcFormCodes();
-                this.toast('🖼️ Imagen de código QR guardada en /codigos_barras_y_qr.');
+                this.toast('🖼️ Imagen de código QR asignada y guardada correctamente.');
             } catch (e) {
+                console.error('[PNV] Error al subir código QR:', e);
                 this.toast('⚠️ ' + e.message, 'error');
             }
         },
 
         restaurarQRForm() {
+            this._customQrImageUri = '';
             this._customQrImageForm = '';
             this.recalcFormCodes();
             this.toast('🔄 Generador automático de código QR restaurado.');
@@ -1924,23 +2086,25 @@
                     <div>
                         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
                             <span style="font-size:0.68rem;font-weight:800;color:#94A3B8;text-transform:uppercase;letter-spacing:0.04em;">
-                                <i class="fa-solid fa-barcode" style="color:#FBBF24;"></i> Código de Barras
+                                <i class="fa-solid fa-barcode" style="color:#FBBF24;"></i> Código de Barras Asignado
                             </span>
                             ${hasCustomBarcode
                                 ? '<span class="pnv-badge" style="background:#065F46;color:#A7F3D0;font-size:0.62rem;border:1px solid #10B981;">Imagen Propia</span>'
                                 : `<span style="font-size:0.65rem;color:#94A3B8;font-weight:700;">${tipo} (Sistema)</span>`}
                         </div>
-                        <div class="barcode-preview-container" style="height:110px;width:100%;background-color:#FFFFFF;border-radius:8px;padding:6px 12px;display:flex;align-items:center;justify-content:center;overflow:hidden;box-sizing:border-box;box-shadow:0 2px 8px rgba(0,0,0,0.35);">
+                        <div class="barcode-preview-container" 
+                             onclick="ViasaProductosExclusivosEngine.seleccionarBarcodeForm()" 
+                             style="height:110px;width:100%;background-color:#FFFFFF;border-radius:8px;padding:6px 12px;display:flex;align-items:center;justify-content:center;overflow:hidden;box-sizing:border-box;box-shadow:0 2px 8px rgba(0,0,0,0.35);cursor:pointer;border:2px dashed ${hasCustomBarcode ? '#10B981' : '#CBD5E1'};transition:all 0.2s;" 
+                             title="Haga clic aquí para subir o cambiar la imagen del código de barras desde su computadora">
                             ${barcodePreviewHtml}
                         </div>
                         <div style="display:flex;gap:4px;margin-top:6px;flex-wrap:wrap;">
-                            <input type="file" id="pnv-form-barcode-input" accept="image/png,image/jpeg,image/svg+xml,image/webp" style="display:none;" onchange="ViasaProductosExclusivosEngine.subirBarcodeForm(this)">
-                            <button type="button" class="pnv-btn pnv-btn-ghost pnv-btn-xs" style="flex:1;justify-content:center;cursor:pointer;font-size:0.68rem;" title="Subir imagen propia (.png, .jpg, .svg, .webp) para el código de barras" onclick="ViasaProductosExclusivosEngine.seleccionarBarcodeForm()">
-                                🖼️ Cambiar Imagen de Código de Barras
+                            <button type="button" class="pnv-btn pnv-btn-gold pnv-btn-xs" style="flex:1;justify-content:center;cursor:pointer;font-size:0.68rem;" title="Subir imagen propia (.png, .jpg, .svg, .webp) para el código de barras" onclick="ViasaProductosExclusivosEngine.seleccionarBarcodeForm()">
+                                <i class="fa-solid fa-upload"></i> ${hasCustomBarcode ? 'Cambiar Imagen Código Barras' : 'Subir Imagen Código Barras'}
                             </button>
                             ${hasCustomBarcode ? `
                                 <button type="button" class="pnv-btn pnv-btn-ghost pnv-btn-xs" style="color:#F87171;border-color:rgba(248,113,113,0.35);font-size:0.65rem;" title="Volver al código de barras dibujado por el sistema" onclick="ViasaProductosExclusivosEngine.restaurarBarcodeForm()">
-                                    🔄 Restaurar Generador Automático
+                                    🔄 Restaurar Auto
                                 </button>
                             ` : ''}
                         </div>
@@ -1956,17 +2120,19 @@
                                 ? '<span class="pnv-badge" style="background:#065F46;color:#A7F3D0;font-size:0.62rem;border:1px solid #10B981;">QR Propio</span>'
                                 : '<span style="font-size:0.65rem;color:#94A3B8;font-weight:700;">Trazable (Sistema)</span>'}
                         </div>
-                        <div class="qr-preview-container" style="height:110px;width:100%;background-color:#FFFFFF;border-radius:8px;padding:6px 12px;display:flex;align-items:center;justify-content:center;overflow:hidden;box-sizing:border-box;box-shadow:0 2px 8px rgba(0,0,0,0.35);">
+                        <div class="qr-preview-container" 
+                             onclick="ViasaProductosExclusivosEngine.seleccionarQRForm()" 
+                             style="height:110px;width:100%;background-color:#FFFFFF;border-radius:8px;padding:6px 12px;display:flex;align-items:center;justify-content:center;overflow:hidden;box-sizing:border-box;box-shadow:0 2px 8px rgba(0,0,0,0.35);cursor:pointer;border:2px dashed ${hasCustomQr ? '#10B981' : '#CBD5E1'};transition:all 0.2s;" 
+                             title="Haga clic aquí para subir o cambiar la imagen del código QR desde su computadora">
                             ${qrPreviewHtml}
                         </div>
                         <div style="display:flex;gap:4px;margin-top:6px;flex-wrap:wrap;">
-                            <input type="file" id="pnv-form-qr-input" accept="image/png,image/jpeg,image/svg+xml,image/webp" style="display:none;" onchange="ViasaProductosExclusivosEngine.subirQRForm(this)">
-                            <button type="button" class="pnv-btn pnv-btn-ghost pnv-btn-xs" style="flex:1;justify-content:center;cursor:pointer;font-size:0.68rem;" title="Subir imagen propia (.png, .jpg, .svg, .webp) para el código QR" onclick="ViasaProductosExclusivosEngine.seleccionarQRForm()">
-                                🖼️ Cambiar Imagen de Código QR
+                            <button type="button" class="pnv-btn pnv-btn-gold pnv-btn-xs" style="flex:1;justify-content:center;cursor:pointer;font-size:0.68rem;" title="Subir imagen propia (.png, .jpg, .svg, .webp) para el código QR" onclick="ViasaProductosExclusivosEngine.seleccionarQRForm()">
+                                <i class="fa-solid fa-upload"></i> ${hasCustomQr ? 'Cambiar Imagen QR' : 'Subir Imagen QR'}
                             </button>
                             ${hasCustomQr ? `
                                 <button type="button" class="pnv-btn pnv-btn-ghost pnv-btn-xs" style="color:#F87171;border-color:rgba(248,113,113,0.35);font-size:0.65rem;" title="Volver al código QR dibujado por el sistema" onclick="ViasaProductosExclusivosEngine.restaurarQRForm()">
-                                    🔄 Restaurar Generador Automático
+                                    🔄 Restaurar Auto
                                 </button>
                             ` : ''}
                         </div>
@@ -1999,14 +2165,21 @@
                 if (!barcodeVal) barcodeVal = this.generarCode128Auto();
             }
 
+            const finalBarcodeImg = (this._customBarcodeImageUri !== undefined && this._customBarcodeImageUri !== '')
+                ? this._customBarcodeImageUri
+                : (this._customBarcodeImageForm || null);
+            const finalQrImg = (this._customQrImageUri !== undefined && this._customQrImageUri !== '')
+                ? this._customQrImageUri
+                : (this._customQrImageForm || null);
+
             const datos = {
                 nombre: f.nombre.value.trim(),
                 sku: f.sku.value.trim().toUpperCase(),
                 barcode: barcodeVal,
                 tipoCodigo: tipoCodigo,
                 codigoBarras: barcodeVal,
-                customBarcodeImage: this._customBarcodeImageForm || null,
-                customQrImage: this._customQrImageForm || null,
+                customBarcodeImage: finalBarcodeImg,
+                customQrImage: finalQrImg,
                 presentacion: f.presentacion.value.trim(),
                 categoria: f.categoria.value,
                 condicionFiscal: f.condicionFiscal.value,
@@ -2038,8 +2211,8 @@
                 const skuAnterior = p.sku;
                 Object.assign(p, datos, {
                     fotoUrl: this._fotoTemporal || p.fotoUrl,
-                    customBarcodeImage: this._customBarcodeImageForm !== undefined ? (this._customBarcodeImageForm || null) : p.customBarcodeImage,
-                    customQrImage: this._customQrImageForm !== undefined ? (this._customQrImageForm || null) : p.customQrImage
+                    customBarcodeImage: (this._customBarcodeImageUri !== undefined && this._customBarcodeImageUri !== '') ? this._customBarcodeImageUri : (this._customBarcodeImageForm ? this._customBarcodeImageForm : null),
+                    customQrImage: (this._customQrImageUri !== undefined && this._customQrImageUri !== '') ? this._customQrImageUri : (this._customQrImageForm ? this._customQrImageForm : null)
                 });
                 const st = this.calcStock(p);
                 if (st.mostrador < 0 || st.reserva < 0) {
@@ -2182,6 +2355,7 @@
                     </div>
                     <div style="display:flex;gap:8px;align-items:flex-start;flex-wrap:wrap;">
                         <button type="button" class="pnv-btn pnv-btn-gold pnv-btn-sm" onclick="ViasaProductosExclusivosEngine.cambiarFoto('${esc(p.id)}')"><i class="fa-solid fa-camera"></i> Subir / Cambiar Foto</button>
+                        <button type="button" class="pnv-btn pnv-btn-ghost pnv-btn-sm" style="color:#FBBF24;border-color:rgba(251,191,36,0.35);" onclick="ViasaProductosExclusivosEngine.cambiarBarcodeDirecto('${esc(p.id)}')"><i class="fa-solid fa-barcode"></i> Asignar Imagen Código Barras</button>
                         <button type="button" class="pnv-btn pnv-btn-ghost pnv-btn-sm" onclick="ViasaProductosExclusivosEngine.abrirFormProducto('${esc(p.id)}')">✏️ Modificar</button>
                         <button type="button" class="pnv-btn pnv-btn-ghost pnv-btn-sm" onclick="ViasaProductosExclusivosEngine.cerrarModal('pnv-detalle-overlay')"><i class="fa-solid fa-xmark"></i> Cerrar</button>
                     </div>
@@ -2623,6 +2797,7 @@
                         ${alerta ? `<div class="pnv-alert">⚠️ Alerta de rentabilidad: el margen de ganancia está por debajo del objetivo de ${fmtNum(p.margenObjetivoPct)}%. Revise el costo de insumos o ajuste el PVP.</div>` : '<div class="pnv-hint" style="color:#4ade80;">✔ El margen de ganancia cumple con el objetivo establecido.</div>'}
                         <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;">
                             <button type="button" class="pnv-btn pnv-btn-gold pnv-btn-sm" onclick="ViasaProductosExclusivosEngine.cambiarFoto('${esc(p.id)}')"><i class="fa-solid fa-camera"></i> Subir / Cambiar Foto</button>
+                            <button type="button" class="pnv-btn pnv-btn-ghost pnv-btn-sm" style="color:#FBBF24;border-color:rgba(251,191,36,0.35);" onclick="ViasaProductosExclusivosEngine.cambiarBarcodeDirecto('${esc(p.id)}')"><i class="fa-solid fa-barcode"></i> Asignar Imagen Código Barras</button>
                             ${p.insumosReceta.length ? `<button type="button" class="pnv-btn pnv-btn-ghost pnv-btn-sm" onclick="ViasaProductosExclusivosEngine.aplicarCostoReceta()"><i class="fa-solid fa-arrows-rotate"></i> Aplicar costo de receta a la ficha</button>` : ''}
                             <button type="button" class="pnv-btn pnv-btn-ghost pnv-btn-sm" onclick="ViasaProductosExclusivosEngine.imprimirFicha()"><i class="fa-solid fa-print"></i> Imprimir Ficha Técnica PDF</button>
                         </div>
@@ -2769,19 +2944,39 @@
         },
 
         seleccionarBarcodeStudio() {
-            const input = document.getElementById('pnv-studio-barcode-input');
-            if (input) {
-                input.value = '';
-                input.click();
+            let input = document.getElementById('pnv-studio-barcode-file-input');
+            if (!input) {
+                input = document.createElement('input');
+                input.type = 'file';
+                input.id = 'pnv-studio-barcode-file-input';
+                input.accept = 'image/png,image/jpeg,image/jpg,image/webp,image/svg+xml,image/*,.png,.jpg,.jpeg,.webp,.svg';
+                input.style.position = 'fixed';
+                input.style.top = '-1000px';
+                input.style.left = '-1000px';
+                input.style.opacity = '0';
+                input.onchange = () => this.subirBarcodeStudio(input);
+                document.body.appendChild(input);
             }
+            input.value = '';
+            input.click();
         },
 
         seleccionarQRStudio() {
-            const input = document.getElementById('pnv-studio-qr-input');
-            if (input) {
-                input.value = '';
-                input.click();
+            let input = document.getElementById('pnv-studio-qr-file-input');
+            if (!input) {
+                input = document.createElement('input');
+                input.type = 'file';
+                input.id = 'pnv-studio-qr-file-input';
+                input.accept = 'image/png,image/jpeg,image/jpg,image/webp,image/svg+xml,image/*,.png,.jpg,.jpeg,.webp,.svg';
+                input.style.position = 'fixed';
+                input.style.top = '-1000px';
+                input.style.left = '-1000px';
+                input.style.opacity = '0';
+                input.onchange = () => this.subirQRStudio(input);
+                document.body.appendChild(input);
             }
+            input.value = '';
+            input.click();
         },
 
         async subirBarcodeStudio(input) {
@@ -2790,23 +2985,29 @@
             try {
                 const file = input.files[0];
                 if (window.ViasaMediaStorage) {
-                    const guardado = await window.ViasaMediaStorage.guardarMedia({
-                        input: file,
-                        categoria: 'codigos_barras_y_qr',
-                        sku: p.sku,
-                        nombre: p.nombre,
-                        codigo: p.barcode,
-                        esCodigo: true,
-                        esQR: false
-                    });
-                    p.customBarcodeImage = guardado.resolvedUrl || guardado.uri;
+                    try {
+                        const guardado = await window.ViasaMediaStorage.guardarMedia({
+                            input: file,
+                            categoria: 'codigos_barras_y_qr',
+                            sku: p.sku,
+                            nombre: p.nombre,
+                            codigo: p.barcode,
+                            esCodigo: true,
+                            esQR: false
+                        });
+                        p.customBarcodeImage = guardado.uri;
+                    } catch (errStorage) {
+                        console.warn('[PNV Studio] Fallback a leerImagenCodigo en subirBarcodeStudio:', errStorage);
+                        p.customBarcodeImage = await this.leerImagenCodigo(file);
+                    }
                 } else {
                     p.customBarcodeImage = await this.leerImagenCodigo(file);
                 }
                 this.guardar();
                 this.sincronizarConPOS(p);
-                this.toast(`🖼️ Código de barras guardado en /codigos_barras_y_qr: ${p.nombre}`);
+                this.toast(`🖼️ Código de barras asignado y guardado: ${p.nombre}`);
                 this.refrescarTodo();
+                this.renderStudioPreview();
             } catch (e) {
                 this.toast('⚠️ ' + e.message, 'error');
             }
@@ -2820,6 +3021,7 @@
             this.sincronizarConPOS(p);
             this.toast('🔄 Generador automático de código de barras restaurado.');
             this.refrescarTodo();
+            this.renderStudioPreview();
         },
 
         async subirQRStudio(input) {
@@ -2828,22 +3030,28 @@
             try {
                 const file = input.files[0];
                 if (window.ViasaMediaStorage) {
-                    const guardado = await window.ViasaMediaStorage.guardarMedia({
-                        input: file,
-                        categoria: 'codigos_barras_y_qr',
-                        sku: p.sku,
-                        nombre: p.nombre,
-                        esCodigo: true,
-                        esQR: true
-                    });
-                    p.customQrImage = guardado.resolvedUrl || guardado.uri;
+                    try {
+                        const guardado = await window.ViasaMediaStorage.guardarMedia({
+                            input: file,
+                            categoria: 'codigos_barras_y_qr',
+                            sku: p.sku,
+                            nombre: p.nombre,
+                            esCodigo: true,
+                            esQR: true
+                        });
+                        p.customQrImage = guardado.uri;
+                    } catch (errStorage) {
+                        console.warn('[PNV Studio] Fallback a leerImagenCodigo en subirQRStudio:', errStorage);
+                        p.customQrImage = await this.leerImagenCodigo(file);
+                    }
                 } else {
                     p.customQrImage = await this.leerImagenCodigo(file);
                 }
                 this.guardar();
                 this.sincronizarConPOS(p);
-                this.toast(`🖼️ Código QR guardado en /codigos_barras_y_qr: ${p.nombre}`);
+                this.toast(`🖼️ Código QR asignado y guardado: ${p.nombre}`);
                 this.refrescarTodo();
+                this.renderStudioPreview();
             } catch (e) {
                 this.toast('⚠️ ' + e.message, 'error');
             }
@@ -2857,6 +3065,7 @@
             this.sincronizarConPOS(p);
             this.toast('🔄 Generador automático de código QR restaurado.');
             this.refrescarTodo();
+            this.renderStudioPreview();
         },
 
         setStudioCopias(n) {
@@ -3072,24 +3281,24 @@
                                 <!-- Botonera Imágenes Propias del Producto -->
                                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:10px;">
                                     <div>
-                                        <input type="file" id="pnv-studio-barcode-input" accept="image/png,image/jpeg,image/svg+xml,image/webp" style="display:none;" onchange="ViasaProductosExclusivosEngine.subirBarcodeStudio(this)">
-                                        <button type="button" class="pnv-btn pnv-btn-ghost pnv-btn-xs" style="width:100%;justify-content:center;cursor:pointer;font-size:0.68rem;padding:6px 4px;" title="Subir imagen propia (.png, .jpg, .svg, .webp) para el código de barras" onclick="ViasaProductosExclusivosEngine.seleccionarBarcodeStudio()">
-                                            🖼️ Cambiar Imagen de Código de Barras
+                                        <input type="file" id="pnv-studio-barcode-file-input" accept="image/png,image/jpeg,image/jpg,image/webp,image/svg+xml,image/*,.png,.jpg,.jpeg,.webp,.svg" style="display:none;" onchange="ViasaProductosExclusivosEngine.subirBarcodeStudio(this)">
+                                        <button type="button" class="pnv-btn pnv-btn-gold pnv-btn-xs" style="width:100%;justify-content:center;cursor:pointer;font-size:0.68rem;padding:6px 4px;" title="Subir imagen propia (.png, .jpg, .svg, .webp) para el código de barras" onclick="ViasaProductosExclusivosEngine.seleccionarBarcodeStudio()">
+                                            <i class="fa-solid fa-upload"></i> ${p.customBarcodeImage ? 'Cambiar Imagen Código' : 'Subir Imagen Código'}
                                         </button>
                                         ${p.customBarcodeImage ? `
                                             <button type="button" class="pnv-btn pnv-btn-ghost pnv-btn-xs" style="width:100%;margin-top:4px;color:#F87171;border-color:rgba(248,113,113,0.3);font-size:0.65rem;justify-content:center;" onclick="ViasaProductosExclusivosEngine.restaurarBarcodeStudio()">
-                                                🔄 Restaurar Generador Automático
+                                                🔄 Restaurar Auto
                                             </button>
                                         ` : ''}
                                     </div>
                                     <div>
-                                        <input type="file" id="pnv-studio-qr-input" accept="image/png,image/jpeg,image/svg+xml,image/webp" style="display:none;" onchange="ViasaProductosExclusivosEngine.subirQRStudio(this)">
-                                        <button type="button" class="pnv-btn pnv-btn-ghost pnv-btn-xs" style="width:100%;justify-content:center;cursor:pointer;font-size:0.68rem;padding:6px 4px;" title="Subir imagen propia (.png, .jpg, .svg, .webp) para el código QR" onclick="ViasaProductosExclusivosEngine.seleccionarQRStudio()">
-                                            🖼️ Cambiar Imagen de Código QR
+                                        <input type="file" id="pnv-studio-qr-file-input" accept="image/png,image/jpeg,image/jpg,image/webp,image/svg+xml,image/*,.png,.jpg,.jpeg,.webp,.svg" style="display:none;" onchange="ViasaProductosExclusivosEngine.subirQRStudio(this)">
+                                        <button type="button" class="pnv-btn pnv-btn-gold pnv-btn-xs" style="width:100%;justify-content:center;cursor:pointer;font-size:0.68rem;padding:6px 4px;" title="Subir imagen propia (.png, .jpg, .svg, .webp) para el código QR" onclick="ViasaProductosExclusivosEngine.seleccionarQRStudio()">
+                                            <i class="fa-solid fa-upload"></i> ${p.customQrImage ? 'Cambiar Imagen QR' : 'Subir Imagen QR'}
                                         </button>
                                         ${p.customQrImage ? `
                                             <button type="button" class="pnv-btn pnv-btn-ghost pnv-btn-xs" style="width:100%;margin-top:4px;color:#F87171;border-color:rgba(248,113,113,0.3);font-size:0.65rem;justify-content:center;" onclick="ViasaProductosExclusivosEngine.restaurarQRStudio()">
-                                                🔄 Restaurar Generador Automático
+                                                🔄 Restaurar Auto
                                             </button>
                                         ` : ''}
                                     </div>
