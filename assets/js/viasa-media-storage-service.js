@@ -111,20 +111,48 @@
             try {
                 const registros = await this.obtenerTodosLosMedios();
                 registros.forEach(item => {
-                    if (item && item.uri && item.blob) {
-                        try {
-                            const blobUrl = URL.createObjectURL(item.blob);
-                            this._urlCache.set(item.uri, blobUrl);
-                        } catch (e) {
-                            if (item.dataUrl) this._urlCache.set(item.uri, item.dataUrl);
+                    if (item && item.uri) {
+                        let finalUrl = '';
+                        if (item.blob) {
+                            try {
+                                finalUrl = URL.createObjectURL(item.blob);
+                            } catch (e) {
+                                finalUrl = item.dataUrl || '';
+                            }
+                        } else if (item.dataUrl) {
+                            finalUrl = item.dataUrl;
                         }
-                    } else if (item && item.uri && item.dataUrl) {
-                        this._urlCache.set(item.uri, item.dataUrl);
+                        if (finalUrl) {
+                            this.cacheUrl(item.uri, finalUrl);
+                            if (item.localPath) this._urlCache.set(item.localPath, finalUrl);
+                            if (item.nombreArchivo) this._urlCache.set(item.nombreArchivo, finalUrl);
+                        }
                     }
                 });
                 console.log(`[ViasaMediaStorage] ${this._urlCache.size} medios precargados en caché en memoria.`);
             } catch (err) {
                 console.warn('[ViasaMediaStorage] Error precargando caché de medios:', err);
+            }
+        }
+
+        /**
+         * Registra un recurso en caché bajo su URI y variantes de extensión para resolución tolerante
+         */
+        cacheUrl(uri, resolvedUrl) {
+            if (!uri || !resolvedUrl) return;
+            this._urlCache.set(uri, resolvedUrl);
+            const str = String(uri);
+            const stem = str.replace(/\.[a-zA-Z0-9]+$/, '');
+            this._urlCache.set(stem, resolvedUrl);
+            ['.webp', '.png', '.jpg', '.jpeg', '.svg'].forEach(ext => {
+                this._urlCache.set(`${stem}${ext}`, resolvedUrl);
+            });
+            const baseStem = str.split('/').pop().replace(/\.[a-zA-Z0-9]+$/, '');
+            if (baseStem) {
+                this._urlCache.set(baseStem, resolvedUrl);
+                ['.webp', '.png', '.jpg', '.jpeg', '.svg'].forEach(ext => {
+                    this._urlCache.set(`${baseStem}${ext}`, resolvedUrl);
+                });
             }
         }
 
@@ -351,15 +379,17 @@
             const uri = `viasa-media://${categoria}/${nombreArchivo}`;
             const localPath = `VIASA_System_Data/${categoria}/${nombreArchivo}`;
 
-            // 4. Crear Blob URL en memoria
+            // 4. Crear Blob URL en memoria y registrar en caché multi-clave
             let blobUrl = '';
             try {
                 blobUrl = URL.createObjectURL(opt.blob);
-                this._urlCache.set(uri, blobUrl);
+                this.cacheUrl(uri, blobUrl);
             } catch (e) {
                 blobUrl = opt.dataUrl;
-                this._urlCache.set(uri, opt.dataUrl);
+                this.cacheUrl(uri, opt.dataUrl);
             }
+            if (localPath) this._urlCache.set(localPath, blobUrl);
+            if (nombreArchivo) this._urlCache.set(nombreArchivo, blobUrl);
 
             const record = {
                 uri,
@@ -449,33 +479,81 @@
             if (!uriOrUrl) return '';
             const str = String(uriOrUrl).trim();
             if (!str.startsWith('viasa-media://')) {
-                return str; // Ya es data:, http://, https:// o ruta relativa
+                return str; // Ya es data:, http://, https://, blob: o ruta relativa
             }
-            // 1. Buscar en memoria caché
-            const cached = this._urlCache.get(str);
+            // 1. Buscar en memoria caché por coincidencia directa
+            let cached = this._urlCache.get(str);
             if (cached) return cached;
 
-            // 2. Fallback de ruta física
+            // 1b. Buscar por stem sin extensión (.webp vs .png vs .jpg)
+            const stem = str.replace(/\.[a-zA-Z0-9]+$/, '');
+            cached = this._urlCache.get(stem);
+            if (cached) {
+                this._urlCache.set(str, cached);
+                return cached;
+            }
+
+            // 1c. Búsqueda flexible en caché por coincidencia de nombre de archivo
             const clean = str.replace('viasa-media://', '');
+            const baseStem = clean.split('/').pop().replace(/\.[a-zA-Z0-9]+$/, '');
+            if (baseStem) {
+                cached = this._urlCache.get(baseStem);
+                if (cached) {
+                    this._urlCache.set(str, cached);
+                    return cached;
+                }
+                for (const [k, v] of this._urlCache.entries()) {
+                    if (k.includes(baseStem)) {
+                        this.cacheUrl(str, v);
+                        return v;
+                    }
+                }
+            }
+
+            // 2. Fallback de ruta física local
             const fallbackPath = `VIASA_System_Data/${clean}`;
 
-            // Disparar carga asíncrona para actualizar caché
+            // Disparar carga asíncrona para actualizar caché desde IndexedDB
             this._hidratarUri(str).catch(() => {});
             return fallbackPath;
         }
 
         async _hidratarUri(uri) {
-            const item = await this.obtenerMedia(uri);
-            if (item && item.blob) {
-                const url = URL.createObjectURL(item.blob);
-                this._urlCache.set(uri, url);
-                // Si hay elementos con data-viasa-media-src, actualizarlos en el DOM
-                if (typeof document !== 'undefined') {
-                    document.querySelectorAll(`img[data-viasa-media-src="${uri}"]`).forEach(img => {
-                        img.src = url;
-                    });
+            let item = await this.obtenerMedia(uri);
+            if (!item) {
+                // Búsqueda tolerante en IndexedDB por coincidencia de stem si difiere la extensión
+                const clean = uri.replace('viasa-media://', '');
+                const stem = clean.replace(/\.[a-zA-Z0-9]+$/, '');
+                const baseStem = stem.split('/').pop();
+                const todos = await this.obtenerTodosLosMedios();
+                item = todos.find(r => 
+                    r.uri === uri || 
+                    (r.uri && r.uri.replace(/\.[a-zA-Z0-9]+$/, '').endsWith(stem)) || 
+                    (r.nombreArchivo && r.nombreArchivo.replace(/\.[a-zA-Z0-9]+$/, '') === baseStem)
+                );
+            }
+            if (item && (item.blob || item.dataUrl)) {
+                let url = '';
+                if (item.blob) {
+                    try {
+                        url = URL.createObjectURL(item.blob);
+                    } catch (e) {
+                        url = item.dataUrl || '';
+                    }
+                } else {
+                    url = item.dataUrl || '';
                 }
-                return url;
+                if (url) {
+                    this.cacheUrl(uri, url);
+                    if (item.uri && item.uri !== uri) this.cacheUrl(item.uri, url);
+                    // Si hay elementos con data-viasa-media-src, actualizarlos en el DOM
+                    if (typeof document !== 'undefined') {
+                        document.querySelectorAll(`img[data-viasa-media-src="${uri}"]`).forEach(img => {
+                            img.src = url;
+                        });
+                    }
+                    return url;
+                }
             }
             return null;
         }
@@ -486,7 +564,7 @@
 
         /**
          * Prepara el catálogo de productos para LocalStorage:
-         * Extrae cadenas Base64 grandes, las guarda en IndexedDB y deja solo 'viasa-media://...'
+         * Extrae cadenas Base64 o Blob URLs grandes, las guarda en IndexedDB y deja solo 'viasa-media://...'
          * Garantiza que el JSON guardado en LocalStorage mida apenas ~20KB.
          */
         async prepararProductosParaLocalStorage(productos) {
@@ -497,7 +575,7 @@
                 const clon = Object.assign({}, prod);
 
                 // 1. Fotografía de producto
-                if (clon.fotoUrl && clon.fotoUrl.startsWith('data:image/')) {
+                if (clon.fotoUrl && (clon.fotoUrl.startsWith('data:image/') || clon.fotoUrl.startsWith('blob:'))) {
                     try {
                         const guardado = await this.guardarMedia({
                             input: clon.fotoUrl,
@@ -506,13 +584,14 @@
                             nombre: clon.nombre
                         });
                         clon.fotoUrl = guardado.uri;
+                        if (guardado.resolvedUrl) this.cacheUrl(guardado.uri, guardado.resolvedUrl);
                     } catch (e) {
                         console.warn('[ViasaMediaStorage] No se pudo migrar foto de producto:', clon.sku, e);
                     }
                 }
 
                 // 2. Código de barras personalizado
-                if (clon.customBarcodeImage && clon.customBarcodeImage.startsWith('data:image/')) {
+                if (clon.customBarcodeImage && (clon.customBarcodeImage.startsWith('data:image/') || clon.customBarcodeImage.startsWith('blob:'))) {
                     try {
                         const guardado = await this.guardarMedia({
                             input: clon.customBarcodeImage,
@@ -524,13 +603,14 @@
                             esQR: false
                         });
                         clon.customBarcodeImage = guardado.uri;
+                        if (guardado.resolvedUrl) this.cacheUrl(guardado.uri, guardado.resolvedUrl);
                     } catch (e) {
                         console.warn('[ViasaMediaStorage] No se pudo migrar barcode de producto:', clon.sku, e);
                     }
                 }
 
                 // 3. Código QR personalizado
-                if (clon.customQrImage && clon.customQrImage.startsWith('data:image/')) {
+                if (clon.customQrImage && (clon.customQrImage.startsWith('data:image/') || clon.customQrImage.startsWith('blob:'))) {
                     try {
                         const guardado = await this.guardarMedia({
                             input: clon.customQrImage,
@@ -541,6 +621,7 @@
                             esQR: true
                         });
                         clon.customQrImage = guardado.uri;
+                        if (guardado.resolvedUrl) this.cacheUrl(guardado.uri, guardado.resolvedUrl);
                     } catch (e) {
                         console.warn('[ViasaMediaStorage] No se pudo migrar QR de producto:', clon.sku, e);
                     }
