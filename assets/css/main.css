@@ -922,33 +922,26 @@ body {
 }
 
 /* ============================================================== */
-/* GRILLA Y FICHAS DE PRODUCTO TÁCTIL POS (TOUCH-FIRST 3 COLUMNAS) */
+/* GRILLA Y FICHAS DE PRODUCTO TÁCTIL POS (RECTANGULAR 2 COLUMNAS) */
 /* ============================================================== */
 .pos-products-grid {
     flex: 1;
     overflow-y: auto;
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    row-gap: 24px;       /* Separación vertical amplia y destacada entre fila y fila */
-    column-gap: 18px;    /* Separación horizontal limpia entre columnas */
-    padding: 12px 8px 28px 8px;
+    grid-template-columns: repeat(2, minmax(0, 1fr)); /* Exactamente 2 fichas anchas por fila */
+    row-gap: 18px;      /* Separación vertical limpia y destacada entre fila y fila */
+    column-gap: 18px;   /* Separación horizontal entre las 2 columnas */
+    padding: 10px 10px 24px 10px;
     align-items: stretch;
     box-sizing: border-box;
 }
 
-@media (max-width: 1180px) {
-    .pos-products-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        row-gap: 20px;
-        column-gap: 14px;
-    }
-}
-
-@media (max-width: 680px) {
+@media (max-width: 768px) {
     .pos-products-grid {
         grid-template-columns: 1fr;
-        row-gap: 16px;
+        row-gap: 14px;
         column-gap: 0;
+        padding: 8px 6px 20px 6px;
     }
 }
 
@@ -956,14 +949,13 @@ body {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    height: 100%;
-    min-height: 155px;
-    padding: 14px;
+    height: auto;
+    min-height: 145px;
+    padding: 12px 14px;
     border-radius: 12px;
-    background-color: #1E293B;
-    border: 1px solid #334155;
+    background-color: #1e293b;
+    border: 1.5px solid #334155;
     box-sizing: border-box;
-    overflow: hidden;
     position: relative;
     cursor: pointer;
     touch-action: manipulation;
@@ -980,7 +972,7 @@ body {
 }
 
 .pos-product-card:active {
-    transform: scale(0.96);
+    transform: scale(0.97);
     border-color: #10b981;
     background-color: rgba(16, 185, 129, 0.12);
     transition: all 0.08s ease;
@@ -1163,7 +1155,6 @@ body {
     flex: 1;
     min-width: 0;
     gap: 3px;
-    overflow: hidden;
 }
 
 .pos-card-product-title {
@@ -1173,11 +1164,8 @@ body {
     color: #f8fafc;
     line-height: 1.25;
     white-space: normal;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
     word-break: break-word;
+    /* Nombre 100% completo, sin truncamiento ni elipsis forzada */
 }
 
 .pos-card-product-sub {
@@ -1218,11 +1206,10 @@ body {
     justify-content: space-between;
     gap: 8px;
     width: 100%;
-    margin-top: 12px;
-    padding-top: 10px;
+    margin-top: 10px;
+    padding-top: 8px;
     border-top: 1px solid rgba(255, 255, 255, 0.08);
     box-sizing: border-box;
-    overflow: hidden;
 }
 
 .pos-card-stock-indicator {
@@ -1263,7 +1250,7 @@ body {
 .pos-card-barcode-pill {
     display: inline-flex;
     align-items: center;
-    gap: 5px;
+    gap: 6px;
     background: #0f172a;
     color: #cbd5e1;
     padding: 3px 8px;
@@ -1271,14 +1258,11 @@ body {
     font-size: 11px;
     font-family: 'Consolas', 'Courier New', monospace;
     white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 58%;
-    border: 1px solid rgba(148, 163, 184, 0.2);
+    border: 1px solid rgba(148, 163, 184, 0.25);
     cursor: pointer;
     transition: all 0.2s ease;
     box-sizing: border-box;
-    flex-shrink: 1;
+    flex-shrink: 0;
     line-height: 1.2;
 }
 
