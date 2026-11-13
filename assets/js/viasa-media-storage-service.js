@@ -219,8 +219,9 @@
 
         /**
          * Optimiza y redimensiona imágenes en Canvas en segundo plano
+         * Por defecto WebP al 75% y max 500px para fotos de productos; PNG nítido para códigos
          */
-        async optimizarImagen(input, { esCodigo = false, maxDim = 1200, calidad = 0.85 } = {}) {
+        async optimizarImagen(input, { esCodigo = false, maxDim = 500, calidad = 0.75 } = {}) {
             let dataUrl = '';
             if (input && input.files && input.files[0]) {
                 input = input.files[0];
@@ -417,6 +418,7 @@
             return {
                 uri,
                 resolvedUrl: blobUrl,
+                dataUrl: opt.dataUrl,
                 nombreArchivo,
                 categoria,
                 localPath,
@@ -1058,5 +1060,333 @@
 
     // Instancia singleton global
     window.ViasaMediaStorage = new ViasaMediaStorageService();
+
+    // =========================================================================
+    // RESOLVEDOR E HIDRATADOR REACTIVO UNIVERSAL DE MEDIOS (ViasaImageResolver)
+    // =========================================================================
+    const ViasaImageResolver = {
+        _cache: new Map(),
+
+        // 1. Optimizador de Foto: WebP calidad 0.75, max 500px (fallback JPEG 0.85)
+        procesarFoto(fileOrUrl, maxDim = 500, quality = 0.75) {
+            return new Promise((resolve) => {
+                if (!fileOrUrl) return resolve('');
+                if (typeof fileOrUrl === 'string' && fileOrUrl.startsWith('data:image/') && fileOrUrl.length < 40000) {
+                    return resolve(fileOrUrl);
+                }
+                const img = new Image();
+                img.crossOrigin = 'anonymous';
+                let tempUrl = '';
+                const cleanup = () => {
+                    if (tempUrl) { try { URL.revokeObjectURL(tempUrl); } catch (e) {} }
+                };
+                img.onload = () => {
+                    try {
+                        const canvas = document.createElement('canvas');
+                        const w = img.naturalWidth || img.width || 1;
+                        const h = img.naturalHeight || img.height || 1;
+                        const scale = Math.min(1, maxDim / Math.max(w, h, 1));
+                        canvas.width = Math.max(1, Math.round(w * scale));
+                        canvas.height = Math.max(1, Math.round(h * scale));
+                        const ctx = canvas.getContext('2d');
+                        ctx.imageSmoothingEnabled = true;
+                        ctx.imageSmoothingQuality = 'high';
+                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                        let dataUrl = '';
+                        try {
+                            dataUrl = canvas.toDataURL('image/webp', quality);
+                            if (!dataUrl.startsWith('data:image/webp')) {
+                                dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+                            }
+                        } catch (eCanvas) {
+                            dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+                        }
+                        cleanup();
+                        resolve(dataUrl);
+                    } catch (e) {
+                        cleanup();
+                        resolve(typeof fileOrUrl === 'string' ? fileOrUrl : '');
+                    }
+                };
+                img.onerror = () => {
+                    cleanup();
+                    resolve(typeof fileOrUrl === 'string' ? fileOrUrl : '');
+                };
+                if (typeof fileOrUrl === 'string') {
+                    img.src = fileOrUrl;
+                } else {
+                    try {
+                        tempUrl = URL.createObjectURL(fileOrUrl);
+                        img.src = tempUrl;
+                    } catch (e) {
+                        resolve('');
+                    }
+                }
+            });
+        },
+
+        // 2. Optimizador de Código de Barras: PNG nítido, max 600x120
+        procesarBarcode(fileOrUrl, maxW = 600, maxH = 120) {
+            return new Promise((resolve) => {
+                if (!fileOrUrl) return resolve('');
+                const img = new Image();
+                img.crossOrigin = 'anonymous';
+                let tempUrl = '';
+                const cleanup = () => {
+                    if (tempUrl) { try { URL.revokeObjectURL(tempUrl); } catch (e) {} }
+                };
+                img.onload = () => {
+                    try {
+                        const canvas = document.createElement('canvas');
+                        const w = img.naturalWidth || img.width || 1;
+                        const h = img.naturalHeight || img.height || 1;
+                        const scale = Math.min(1, maxW / w, maxH / h);
+                        canvas.width = Math.max(1, Math.round(w * scale));
+                        canvas.height = Math.max(1, Math.round(h * scale));
+                        const ctx = canvas.getContext('2d');
+                        ctx.fillStyle = '#FFFFFF';
+                        ctx.fillRect(0, 0, canvas.width, canvas.height);
+                        ctx.imageSmoothingEnabled = false;
+                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                        const dataUrl = canvas.toDataURL('image/png');
+                        cleanup();
+                        resolve(dataUrl);
+                    } catch (e) {
+                        cleanup();
+                        resolve(typeof fileOrUrl === 'string' ? fileOrUrl : '');
+                    }
+                };
+                img.onerror = () => {
+                    cleanup();
+                    resolve(typeof fileOrUrl === 'string' ? fileOrUrl : '');
+                };
+                if (typeof fileOrUrl === 'string') {
+                    img.src = fileOrUrl;
+                } else {
+                    try {
+                        tempUrl = URL.createObjectURL(fileOrUrl);
+                        img.src = tempUrl;
+                    } catch (e) {
+                        resolve('');
+                    }
+                }
+            });
+        },
+
+        // 3. Optimizador de Código QR: PNG nítido, max 256x256
+        procesarQR(fileOrUrl, maxDim = 256) {
+            return new Promise((resolve) => {
+                if (!fileOrUrl) return resolve('');
+                const img = new Image();
+                img.crossOrigin = 'anonymous';
+                let tempUrl = '';
+                const cleanup = () => {
+                    if (tempUrl) { try { URL.revokeObjectURL(tempUrl); } catch (e) {} }
+                };
+                img.onload = () => {
+                    try {
+                        const canvas = document.createElement('canvas');
+                        const w = img.naturalWidth || img.width || 1;
+                        const h = img.naturalHeight || img.height || 1;
+                        const scale = Math.min(1, maxDim / Math.max(w, h, 1));
+                        canvas.width = Math.max(1, Math.round(w * scale));
+                        canvas.height = Math.max(1, Math.round(h * scale));
+                        const ctx = canvas.getContext('2d');
+                        ctx.fillStyle = '#FFFFFF';
+                        ctx.fillRect(0, 0, canvas.width, canvas.height);
+                        ctx.imageSmoothingEnabled = false;
+                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                        const dataUrl = canvas.toDataURL('image/png');
+                        cleanup();
+                        resolve(dataUrl);
+                    } catch (e) {
+                        cleanup();
+                        resolve(typeof fileOrUrl === 'string' ? fileOrUrl : '');
+                    }
+                };
+                img.onerror = () => {
+                    cleanup();
+                    resolve(typeof fileOrUrl === 'string' ? fileOrUrl : '');
+                };
+                if (typeof fileOrUrl === 'string') {
+                    img.src = fileOrUrl;
+                } else {
+                    try {
+                        tempUrl = URL.createObjectURL(fileOrUrl);
+                        img.src = tempUrl;
+                    } catch (e) {
+                        resolve('');
+                    }
+                }
+            });
+        },
+
+        register(key, val) {
+            if (!key || !val) return;
+            const strKey = String(key).trim();
+            this._cache.set(strKey, val);
+            const stem = strKey.replace(/\.[a-zA-Z0-9]+$/, '');
+            this._cache.set(stem, val);
+            const clean = strKey.replace('viasa-media://', '');
+            this._cache.set(clean, val);
+            const baseName = clean.split('/').pop().replace(/\.[a-zA-Z0-9]+$/, '');
+            if (baseName) this._cache.set(baseName, val);
+            if (window.ViasaMediaStorage && typeof window.ViasaMediaStorage.cacheUrl === 'function') {
+                window.ViasaMediaStorage.cacheUrl(strKey, val);
+            }
+        },
+
+        resolve(uriOrKey, fallback = '') {
+            if (!uriOrKey) return fallback;
+            const str = String(uriOrKey).trim();
+            if (str.startsWith('data:image/') || str.startsWith('blob:') || str.startsWith('http://') || str.startsWith('https://')) {
+                return str;
+            }
+            if (this._cache.has(str)) return this._cache.get(str);
+            const stem = str.replace(/\.[a-zA-Z0-9]+$/, '');
+            if (this._cache.has(stem)) return this._cache.get(stem);
+            const clean = str.replace('viasa-media://', '');
+            if (this._cache.has(clean)) return this._cache.get(clean);
+            const base = clean.split('/').pop().replace(/\.[a-zA-Z0-9]+$/, '');
+            if (base && this._cache.has(base)) return this._cache.get(base);
+            if (window.ViasaMediaStorage && typeof window.ViasaMediaStorage.resolveUrl === 'function') {
+                const res = window.ViasaMediaStorage.resolveUrl(str);
+                if (res && (res.startsWith('data:') || res.startsWith('blob:') || res.startsWith('http'))) {
+                    this._cache.set(str, res);
+                    return res;
+                }
+            }
+            return fallback;
+        },
+
+        async hydrateProductsMedia(productos) {
+            if (!Array.isArray(productos) || productos.length === 0) return productos;
+            let allMedia = [];
+            if (window.ViasaMediaStorage && typeof window.ViasaMediaStorage.obtenerTodosLosMedios === 'function') {
+                try {
+                    allMedia = await window.ViasaMediaStorage.obtenerTodosLosMedios();
+                } catch (e) {}
+            }
+            const mediaMap = new Map();
+            allMedia.forEach(m => {
+                if (!m) return;
+                let resolved = '';
+                if (m.dataUrl) resolved = m.dataUrl;
+                else if (m.blob) {
+                    try { resolved = URL.createObjectURL(m.blob); } catch (e) {}
+                }
+                if (!resolved) return;
+                if (m.uri) mediaMap.set(m.uri, resolved);
+                if (m.nombreArchivo) {
+                    mediaMap.set(m.nombreArchivo, resolved);
+                    const stem = m.nombreArchivo.replace(/\.[a-zA-Z0-9]+$/, '');
+                    mediaMap.set(stem, resolved);
+                }
+                if (m.sku) mediaMap.set(String(m.sku).toUpperCase(), resolved);
+                ViasaImageResolver.register(m.uri || m.nombreArchivo, resolved);
+            });
+
+            for (const p of productos) {
+                if (!p) continue;
+
+                // 1. Fotografía del producto
+                const fotoRaw = p.fotoUrl || p.imagen || p.foto || p.imageUrl || p.imagen_producto || p.foto_url;
+                let fotoRes = '';
+                if (fotoRaw) {
+                    if (fotoRaw.startsWith('data:image/') || fotoRaw.startsWith('blob:') || fotoRaw.startsWith('http')) {
+                        fotoRes = fotoRaw;
+                    } else if (mediaMap.has(fotoRaw)) {
+                        fotoRes = mediaMap.get(fotoRaw);
+                    } else {
+                        fotoRes = ViasaImageResolver.resolve(fotoRaw, '');
+                    }
+                }
+                if (!fotoRes && p.sku && mediaMap.has(String(p.sku).toUpperCase())) {
+                    fotoRes = mediaMap.get(String(p.sku).toUpperCase());
+                }
+                if (fotoRes) {
+                    p.fotoUrl = fotoRes;
+                    p.imagen = fotoRes;
+                    p.foto = fotoRes;
+                    p.imageUrl = fotoRes;
+                    p.imagen_producto = fotoRes;
+                    p.foto_url = fotoRes;
+                    ViasaImageResolver.register(p.sku, fotoRes);
+                    if (p.id) ViasaImageResolver.register(p.id, fotoRes);
+                }
+
+                // 2. Imagen de Código de Barras
+                const bcRaw = p.customBarcodeImage || p.barcodeImage || p.imagen_codigo_barras || p.customBarcodeImg || p.codigo_barras_img || p.barcode_img;
+                let bcRes = null;
+                if (bcRaw && p.usar_imagen_barras_propia !== false) {
+                    if (bcRaw.startsWith('data:image/') || bcRaw.startsWith('blob:') || bcRaw.startsWith('http')) {
+                        bcRes = bcRaw;
+                    } else if (mediaMap.has(bcRaw)) {
+                        bcRes = mediaMap.get(bcRaw);
+                    } else {
+                        bcRes = ViasaImageResolver.resolve(bcRaw, null);
+                    }
+                }
+                if (!bcRes && p.sku) {
+                    const bcKey = `barcode-${String(p.sku).toLowerCase()}`;
+                    for (const [k, v] of mediaMap.entries()) {
+                        if (k.toLowerCase().includes(bcKey)) {
+                            bcRes = v;
+                            break;
+                        }
+                    }
+                }
+                if (bcRes) {
+                    p.customBarcodeImage = bcRes;
+                    p.barcodeImage = bcRes;
+                    p.imagen_codigo_barras = bcRes;
+                    p.customBarcodeImg = bcRes;
+                    p.codigo_barras_img = bcRes;
+                    p.barcode_img = bcRes;
+                    p.usar_imagen_barras_propia = true;
+                    ViasaImageResolver.register(`barcode-${p.sku}`, bcRes);
+                } else if (p.usar_imagen_barras_propia === false) {
+                    p.customBarcodeImage = null;
+                    p.barcodeImage = null;
+                    p.imagen_codigo_barras = null;
+                    p.customBarcodeImg = null;
+                    p.codigo_barras_img = null;
+                    p.barcode_img = null;
+                    p.usar_imagen_barras_propia = false;
+                }
+
+                // 3. Imagen de Código QR
+                const qrRaw = p.customQrImage || p.qrImage || p.imagen_qr || p.customQrImg || p.qr_img;
+                let qrRes = null;
+                if (qrRaw && p.usar_imagen_qr_propia !== false) {
+                    if (qrRaw.startsWith('data:image/') || qrRaw.startsWith('blob:') || qrRaw.startsWith('http')) {
+                        qrRes = qrRaw;
+                    } else if (mediaMap.has(qrRaw)) {
+                        qrRes = mediaMap.get(qrRaw);
+                    } else {
+                        qrRes = ViasaImageResolver.resolve(qrRaw, null);
+                    }
+                }
+                if (qrRes) {
+                    p.customQrImage = qrRes;
+                    p.qrImage = qrRes;
+                    p.imagen_qr = qrRes;
+                    p.customQrImg = qrRes;
+                    p.qr_img = qrRes;
+                    p.usar_imagen_qr_propia = true;
+                } else if (p.usar_imagen_qr_propia === false) {
+                    p.customQrImage = null;
+                    p.qrImage = null;
+                    p.imagen_qr = null;
+                    p.customQrImg = null;
+                    p.qr_img = null;
+                    p.usar_imagen_qr_propia = false;
+                }
+            }
+            return productos;
+        }
+    };
+
+    window.ViasaImageResolver = ViasaImageResolver;
 
 })(window);

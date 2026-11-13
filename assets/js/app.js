@@ -2672,8 +2672,10 @@
                 }
 
                 let iconDisplay = '';
-                if (p.imagen) {
-                    iconDisplay = `<img src="${p.imagen}" alt="${p.nombre}" style="width: 32px; height: 32px; border-radius: 6px; object-fit: cover; flex-shrink: 0; border: 1px solid rgba(255,255,255,0.1);">`;
+                const rawImg = p.imagen || p.fotoUrl || p.foto || p.imageUrl || p.imagen_producto || p.foto_url;
+                const resolvedImg = window.ViasaImageResolver ? window.ViasaImageResolver.resolve(rawImg) : (window.ViasaMediaStorage ? window.ViasaMediaStorage.resolveUrl(rawImg) : rawImg);
+                if (resolvedImg && !resolvedImg.startsWith('viasa-media://')) {
+                    iconDisplay = `<img src="${resolvedImg}" alt="${p.nombre}" style="width: 32px; height: 32px; border-radius: 6px; object-fit: cover; flex-shrink: 0; border: 1px solid rgba(255,255,255,0.1);">`;
                 } else if (p.icono) {
                     iconDisplay = `<span style="font-size: 1.35rem; line-height: 1; flex-shrink: 0;">${p.icono}</span>`;
                 }
@@ -3993,10 +3995,35 @@
                 codigo = '759800000001';
             }
 
-            // 1. Código de Barras 1D en Canvas
+            // 1. Código de Barras 1D en Canvas (soporta imagen personalizada o generación algorítmica)
             const barcodeCanvas = document.getElementById('sticker-barcode-canvas');
             if (barcodeCanvas) {
-                if (window.ViasaCodeEngine && window.ViasaCodeEngine.barcode) {
+                const customBc = p.customBarcodeImage || p.barcodeImage || p.imagen_codigo_barras || p.customBarcodeImg || p.codigo_barras_img || p.barcode_img;
+                const customBcSrc = customBc && window.ViasaImageResolver ? window.ViasaImageResolver.resolve(customBc) : (customBc || '');
+
+                if (customBcSrc && customBcSrc.length > 5 && !customBcSrc.startsWith('viasa-media://')) {
+                    const ctx = barcodeCanvas.getContext('2d');
+                    const img = new Image();
+                    img.crossOrigin = 'anonymous';
+                    img.onload = () => {
+                        barcodeCanvas.width = img.naturalWidth || 300;
+                        barcodeCanvas.height = img.naturalHeight || 60;
+                        ctx.imageSmoothingEnabled = false;
+                        ctx.fillStyle = '#FFFFFF';
+                        ctx.fillRect(0, 0, barcodeCanvas.width, barcodeCanvas.height);
+                        ctx.drawImage(img, 0, 0, barcodeCanvas.width, barcodeCanvas.height);
+                    };
+                    img.onerror = () => {
+                        if (window.ViasaCodeEngine && window.ViasaCodeEngine.barcode) {
+                            window.ViasaCodeEngine.barcode.renderBarcodeCanvas(barcodeCanvas, codigo, {
+                                height: 60,
+                                scale: 2,
+                                displayValue: true
+                            });
+                        }
+                    };
+                    img.src = customBcSrc;
+                } else if (window.ViasaCodeEngine && window.ViasaCodeEngine.barcode) {
                     try {
                         window.ViasaCodeEngine.barcode.renderBarcodeCanvas(barcodeCanvas, codigo, {
                             height: 60,
@@ -4009,10 +4036,32 @@
                 }
             }
 
-            // 2. Código QR 2D en Canvas
+            // 2. Código QR 2D en Canvas (soporta imagen personalizada o generación algorítmica)
             const qrCanvas = document.getElementById('sticker-qr-canvas');
             if (qrCanvas) {
-                if (window.ViasaCodeEngine && window.ViasaCodeEngine.qr) {
+                const customQr = p.customQrImage || p.qrImage || p.imagen_qr || p.customQrImg || p.qr_img;
+                const customQrSrc = customQr && window.ViasaImageResolver ? window.ViasaImageResolver.resolve(customQr) : (customQr || '');
+
+                if (customQrSrc && customQrSrc.length > 5 && !customQrSrc.startsWith('viasa-media://')) {
+                    const ctx = qrCanvas.getContext('2d');
+                    const img = new Image();
+                    img.crossOrigin = 'anonymous';
+                    img.onload = () => {
+                        qrCanvas.width = img.naturalWidth || 160;
+                        qrCanvas.height = img.naturalHeight || 160;
+                        ctx.imageSmoothingEnabled = false;
+                        ctx.fillStyle = '#FFFFFF';
+                        ctx.fillRect(0, 0, qrCanvas.width, qrCanvas.height);
+                        ctx.drawImage(img, 0, 0, qrCanvas.width, qrCanvas.height);
+                    };
+                    img.onerror = () => {
+                        if (window.ViasaCodeEngine && window.ViasaCodeEngine.qr) {
+                            const payload = `NV|${codigo}|${p.nombre}|USD:${(p.precioUSD || 0).toFixed(2)}|BS:${((p.precioUSD || 0) * (this.tasaBCV || 36.85)).toFixed(2)}|${p.exentoIVA ? 'E' : 'G'}`;
+                            window.ViasaCodeEngine.qr.renderQRCanvas(qrCanvas, payload, { size: 160 });
+                        }
+                    };
+                    img.src = customQrSrc;
+                } else if (window.ViasaCodeEngine && window.ViasaCodeEngine.qr) {
                     try {
                         const payload = `NV|${codigo}|${p.nombre}|USD:${(p.precioUSD || 0).toFixed(2)}|BS:${((p.precioUSD || 0) * (this.tasaBCV || 36.85)).toFixed(2)}|${p.exentoIVA ? 'E' : 'G'}`;
                         window.ViasaCodeEngine.qr.renderQRCanvas(qrCanvas, payload, {
