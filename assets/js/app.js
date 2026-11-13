@@ -1528,7 +1528,16 @@
             });
 
             if (viewName === 'dashboard') this.renderDashboard();
-            if (viewName === 'pos') { this.renderPOSCategories(); this.renderPOSProducts(); this.renderCart(); }
+            if (viewName === 'pos') { 
+                this.renderPOSCategories(); 
+                this.renderPOSProducts(); 
+                this.renderCart(); 
+                if (window.ViasaImageResolver && typeof window.ViasaImageResolver.hydrateProductsMedia === 'function') {
+                    window.ViasaImageResolver.hydrateProductsMedia(this.productos).then(() => {
+                        this.renderPOSProducts();
+                    });
+                }
+            }
             if (viewName === 'inventario') this.renderInventario();
             if (viewName === 'produccion') this.renderProduccion();
             if (viewName === 'activos') this.renderActivos();
@@ -2659,65 +2668,213 @@
                     `<span class="pos-tax-tag exento" title="Exento de IVA SENIAT">(E) Exento</span>` : 
                     `<span class="pos-tax-tag iva" title="Gravado con 16% IVA SENIAT">(G) +16%</span>`;
 
+                const skuDisplay = p.sku || p.codigoSKU || (p.id ? `PNV-${p.id.toUpperCase().slice(0, 8)}` : 'PNV-PROD');
+                const barcodeDigits = p.codigoBarras || p.barcode || p.sku || 'SIN CÓDIGO';
+
+                const rawImg = p.imagen || p.fotoUrl || p.foto || p.imageUrl || p.imagen_producto || p.foto_url;
+                let resolvedImg = window.ViasaImageResolver ? window.ViasaImageResolver.resolve(rawImg) : (window.ViasaMediaStorage ? window.ViasaMediaStorage.resolveUrl(rawImg) : rawImg);
+                if ((!resolvedImg || resolvedImg.startsWith('viasa-media://')) && p.sku && window.ViasaImageResolver) {
+                    resolvedImg = window.ViasaImageResolver.resolve(p.sku);
+                }
+
+                let mediaDisplay = '';
+                if (resolvedImg && !resolvedImg.startsWith('viasa-media://')) {
+                    mediaDisplay = `<img src="${resolvedImg}" alt="${p.nombre}" class="pos-card-thumb-img" onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\\'pos-card-thumb-fallback\\'>${p.icono || '🍞'}</div>';">`;
+                } else if (p.icono) {
+                    mediaDisplay = `<div class="pos-card-thumb-fallback">${p.icono}</div>`;
+                } else {
+                    mediaDisplay = `<div class="pos-card-thumb-fallback">🍞</div>`;
+                }
+
+                // Cantidad en mostrador / carrito
+                const cartItem = this.cart.find(c => c.id === p.id);
+                const cartQty = cartItem ? cartItem.cantidad : 0;
+                const cartBadgeHtml = cartQty > 0 ? 
+                    `<div class="pos-card-cart-qty-badge badge-pop-anim" id="pos-card-qty-${p.id}">x${cartQty}</div>` : '';
+
+                // Semáforo de stock: verde si > 10, ámbar si <= 10 y > 0, rojo si 0
+                const stockVal = Number(p.stock) || 0;
+                let stockClass = 'stock-optimo';
+                if (stockVal <= 0) {
+                    stockClass = 'stock-agotado';
+                } else if (stockVal <= 10) {
+                    stockClass = 'stock-medio';
+                }
+
+                // Precios bimonetarios claros y contrastados
                 let priceDisplay = '';
                 if (this.modoMonedaPOS === 'usd') {
-                    priceDisplay = `<div class="pos-price-usd">$${p.precioUSD.toFixed(2)}</div>`;
+                    priceDisplay = `<span class="pos-card-price-usd">$${p.precioUSD.toFixed(2)}</span>`;
                 } else if (this.modoMonedaPOS === 'ves') {
-                    priceDisplay = `<div class="pos-price-usd" style="color: #38bdf8;">Bs. ${precioBs}</div>`;
+                    priceDisplay = `<span class="pos-card-price-bs" style="font-size: 16px; font-weight: 800;">Bs. ${precioBs}</span>`;
                 } else {
                     priceDisplay = `
-                        <div class="pos-price-usd">$${p.precioUSD.toFixed(2)}</div>
-                        <div class="pos-price-bs">Bs. ${precioBs}</div>
+                        <span class="pos-card-price-usd">$${p.precioUSD.toFixed(2)}</span>
+                        <span class="pos-card-price-bs">Bs. ${precioBs}</span>
                     `;
                 }
 
-                let iconDisplay = '';
-                const rawImg = p.imagen || p.fotoUrl || p.foto || p.imageUrl || p.imagen_producto || p.foto_url;
-                const resolvedImg = window.ViasaImageResolver ? window.ViasaImageResolver.resolve(rawImg) : (window.ViasaMediaStorage ? window.ViasaMediaStorage.resolveUrl(rawImg) : rawImg);
-                if (resolvedImg && !resolvedImg.startsWith('viasa-media://')) {
-                    iconDisplay = `<img src="${resolvedImg}" alt="${p.nombre}" style="width: 32px; height: 32px; border-radius: 6px; object-fit: cover; flex-shrink: 0; border: 1px solid rgba(255,255,255,0.1);">`;
-                } else if (p.icono) {
-                    iconDisplay = `<span style="font-size: 1.35rem; line-height: 1; flex-shrink: 0;">${p.icono}</span>`;
-                }
-
-                const codigoVisible = p.codigoBarras || p.barcode || p.sku || 'SIN CÓDIGO';
-
                 return `
                     <div class="pos-product-card" id="pos-card-${p.id}" onclick="ViasaApp.agregarAlCarrito('${p.id}')">
-                        ${taxBadge}
-                        <div class="pos-card-quick-actions" onclick="event.stopPropagation()">
-                            <button type="button" class="btn-card-mini-action barcode" onclick="event.stopPropagation(); ViasaApp.abrirModalEtiquetaProducto('${p.id}')" title="Ver código de barras, QR e imprimir etiqueta">
-                                <i class="fa-solid fa-barcode"></i>
-                            </button>
-                            <button type="button" class="btn-card-mini-action edit" onclick="event.stopPropagation(); ViasaApp.abrirModalPOSEditarProducto('${p.id}')" title="Modificar ${p.nombre}">
-                                <i class="fa-solid fa-pen"></i>
-                            </button>
-                            <button type="button" class="btn-card-mini-action delete" onclick="event.stopPropagation(); ViasaApp.eliminarProductoPOS('${p.id}')" title="Eliminar ${p.nombre}">
-                                <i class="fa-solid fa-trash-can"></i>
-                            </button>
-                        </div>
-                        <div style="margin-top: 18px;">
-                            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
-                                ${iconDisplay}
-                                <div class="pos-product-name" style="margin-bottom: 0;">${p.nombre}</div>
+                        <!-- 1. Cinta Superior Técnica -->
+                        <div class="pos-card-top-bar">
+                            <div class="pos-card-fiscal-sku-group">
+                                ${taxBadge}
+                                <span class="pos-card-sku-badge" title="Código SKU">${skuDisplay}</span>
                             </div>
-                            <div class="pos-product-stock">Stock: <strong>${p.stock} ${p.unidad || 'UND'}</strong></div>
-                            
-                            <!-- Badge / Píldora Elegante de Código de Barras y QR -->
-                            <div class="pos-product-barcode-pill" onclick="event.stopPropagation(); ViasaApp.abrirModalEtiquetaProducto('${p.id}')" title="Ver código de barras 1D, QR 2D e imprimir etiqueta térmica">
+                            <div class="pos-card-admin-actions" onclick="event.stopPropagation()">
+                                <button type="button" class="btn-card-touch-action barcode" onclick="event.stopPropagation(); ViasaApp.abrirModalEtiquetaProducto('${p.id}')" title="Ver código de barras, QR e imprimir etiqueta">
+                                    <i class="fa-solid fa-barcode"></i> QR
+                                </button>
+                                <button type="button" class="btn-card-touch-action edit" onclick="event.stopPropagation(); ViasaApp.abrirModalPOSEditarProducto('${p.id}')" title="Modificar ${p.nombre}">
+                                    <i class="fa-solid fa-pen"></i>
+                                </button>
+                                <button type="button" class="btn-card-touch-action delete" onclick="event.stopPropagation(); ViasaApp.eliminarProductoPOS('${p.id}')" title="Eliminar ${p.nombre}">
+                                    <i class="fa-solid fa-trash-can"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- 2. Cuerpo Central: Imagen (68x68) + Nombre Completo + Precios Bimonetarios -->
+                        <div class="pos-card-main-body">
+                            <div class="pos-card-media-box">
+                                ${mediaDisplay}
+                                ${cartBadgeHtml}
+                            </div>
+                            <div class="pos-card-info-box">
+                                <h4 class="pos-card-product-title" title="${p.nombre}">${p.nombre}</h4>
+                                <div class="pos-card-pricing-row">
+                                    ${priceDisplay}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 3. Pie de Ficha: Stock + Código de Barras y QR -->
+                        <div class="pos-card-footer-row">
+                            <div class="pos-card-stock-indicator ${stockClass}">
+                                <i class="fa-solid fa-box-archive"></i>
+                                <span>Stock: <strong>${stockVal} ${p.unidad || 'UND'}</strong></span>
+                            </div>
+                            <div class="pos-card-barcode-pill" onclick="event.stopPropagation(); ViasaApp.abrirModalEtiquetaProducto('${p.id}')" title="Ver código de barras 1D, QR 2D e imprimir etiqueta térmica">
                                 <i class="fa-solid fa-barcode"></i>
-                                <span class="barcode-digits">${codigoVisible}</span>
-                                <span class="barcode-sep">|</span>
+                                <span class="barcode-digits">${barcodeDigits}</span>
+                                <span class="barcode-sep">&bull;</span>
                                 <i class="fa-solid fa-qrcode" style="color: #38bdf8;"></i>
                                 <span style="color: #7dd3fc; font-weight: 800; font-size: 0.65rem;">QR</span>
                             </div>
                         </div>
-                        <div class="pos-product-price-box">
-                            ${priceDisplay}
-                        </div>
                     </div>
                 `;
             }).join('');
+        },
+
+        // ====================================================================
+        // FEEDBACK AUDITIVO TÁCTIL (WEB AUDIO API CERO LATENCIA) Y BADGES REACTIVOS
+        // ====================================================================
+
+        reproducirTouchPop() {
+            try {
+                const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                if (!AudioCtx) return;
+                if (!this._touchAudioCtx) {
+                    this._touchAudioCtx = new AudioCtx();
+                }
+                const ctx = this._touchAudioCtx;
+                if (ctx.state === 'suspended') {
+                    ctx.resume();
+                }
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(750, ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(450, ctx.currentTime + 0.05);
+                gain.gain.setValueAtTime(0.12, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.05);
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.start(ctx.currentTime);
+                osc.stop(ctx.currentTime + 0.06);
+            } catch (e) {
+                // Silencioso si el navegador bloquea audio antes de interacción
+            }
+        },
+
+        actualizarBadgeTarjetaPOS(productoId, cantidad) {
+            const card = document.getElementById(`pos-card-${productoId}`);
+            if (!card) return;
+            const mediaBox = card.querySelector('.pos-card-media-box');
+            if (!mediaBox) return;
+
+            let badge = mediaBox.querySelector('.pos-card-cart-qty-badge');
+            if (cantidad > 0) {
+                if (!badge) {
+                    badge = document.createElement('div');
+                    badge.id = `pos-card-qty-${productoId}`;
+                    badge.className = 'pos-card-cart-qty-badge';
+                    mediaBox.appendChild(badge);
+                }
+                badge.textContent = `x${cantidad}`;
+                badge.classList.remove('badge-pop-anim');
+                void badge.offsetWidth; // Recalcular reflow para reiniciar animación pop
+                badge.classList.add('badge-pop-anim');
+            } else if (badge) {
+                badge.remove();
+            }
+        },
+
+        mostrarHUDProductoEscaneado(prod, totalUnits) {
+            let hud = document.getElementById('pos-scan-hud-banner');
+            if (!hud) {
+                hud = document.createElement('div');
+                hud.id = 'pos-scan-hud-banner';
+                hud.className = 'pos-scan-hud-banner';
+                document.body.appendChild(hud);
+            }
+
+            const rawImg = prod.imagen || prod.fotoUrl || prod.foto || prod.imageUrl || prod.imagen_producto || prod.foto_url;
+            let resolvedImg = window.ViasaImageResolver ? window.ViasaImageResolver.resolve(rawImg) : (window.ViasaMediaStorage ? window.ViasaMediaStorage.resolveUrl(rawImg) : rawImg);
+            if ((!resolvedImg || resolvedImg.startsWith('viasa-media://')) && prod.sku && window.ViasaImageResolver) {
+                resolvedImg = window.ViasaImageResolver.resolve(prod.sku);
+            }
+
+            const thumbHtml = (resolvedImg && !resolvedImg.startsWith('viasa-media://')) ?
+                `<img src="${resolvedImg}" alt="${prod.nombre}" class="pos-hud-thumb" onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\\'pos-hud-thumb-fallback\\'>${prod.icono || '🍞'}</div>';">` :
+                `<div class="pos-hud-thumb-fallback">${prod.icono || '🍞'}</div>`;
+
+            const precioBs = ((prod.precioUSD || 0) * (this.tasaBCV || 36.85)).toFixed(2);
+            const skuOrCode = prod.sku || prod.codigoSKU || prod.codigoBarras || prod.barcode || `PNV-${prod.id}`;
+
+            hud.innerHTML = `
+                <div class="pos-hud-card">
+                    <div class="pos-hud-left">
+                        ${thumbHtml}
+                    </div>
+                    <div class="pos-hud-center">
+                        <div class="pos-hud-badge-row">
+                            <span class="pos-hud-tag-scan"><i class="fa-solid fa-barcode"></i> LÁSER OK</span>
+                            <span class="pos-hud-sku">SKU: ${skuOrCode}</span>
+                        </div>
+                        <div class="pos-hud-title" title="${prod.nombre}">${prod.nombre}</div>
+                        <div class="pos-hud-prices">
+                            <span class="pos-hud-usd">$${(prod.precioUSD || 0).toFixed(2)}</span>
+                            <span class="pos-hud-bs">Bs. ${precioBs}</span>
+                        </div>
+                    </div>
+                    <div class="pos-hud-right">
+                        <div class="pos-hud-qty-added">+1 Agregado</div>
+                        <div class="pos-hud-qty-total">Total: <strong>${totalUnits}</strong> uds</div>
+                    </div>
+                </div>
+            `;
+
+            hud.classList.add('active');
+
+            if (this._scanHudTimeout) {
+                clearTimeout(this._scanHudTimeout);
+            }
+            this._scanHudTimeout = setTimeout(() => {
+                hud.classList.remove('active');
+            }, 2500);
         },
 
         // ====================================================================
@@ -3520,12 +3677,16 @@
         },
 
         agregarAlCarrito(productoId, qty = 1) {
+            this.reproducirTouchPop();
+
             const prod = this.productos.find(p => p.id === productoId);
             if (!prod) return;
 
             const existing = this.cart.find(item => item.id === productoId);
+            let totalCantidad = qty;
             if (existing) {
                 existing.cantidad += qty;
+                totalCantidad = existing.cantidad;
             } else {
                 this.cart.push({
                     id: prod.id,
@@ -3538,6 +3699,8 @@
                 });
             }
 
+            this.actualizarBadgeTarjetaPOS(productoId, totalCantidad);
+
             if (window.ViasaAudio) window.ViasaAudio.playScanBeep();
             this.renderCart();
         },
@@ -3547,9 +3710,12 @@
             if (!item) return;
 
             item.cantidad += delta;
+            const nuevaCantidad = item.cantidad;
             if (item.cantidad <= 0) {
                 this.cart = this.cart.filter(i => i.id !== productoId);
             }
+
+            this.actualizarBadgeTarjetaPOS(productoId, Math.max(0, nuevaCantidad));
 
             if (window.ViasaAudio) window.ViasaAudio.playClick();
             this.renderCart();
@@ -3557,6 +3723,7 @@
 
         eliminarItemCarrito(productoId) {
             this.cart = this.cart.filter(i => i.id !== productoId);
+            this.actualizarBadgeTarjetaPOS(productoId, 0);
             if (window.ViasaAudio) window.ViasaAudio.playClick();
             this.renderCart();
         },
@@ -3566,6 +3733,7 @@
             if (confirm('¿Vaciar mostrador / factura actual?')) {
                 this.cart = [];
                 this.renderCart();
+                this.renderPOSProducts();
                 if (window.ViasaAudio) window.ViasaAudio.playClick();
             }
         },
@@ -3669,10 +3837,10 @@
                             </div>
                         </div>
                         <div class="pos-qty-controls">
-                            <button type="button" class="btn-qty-pos" onclick="ViasaApp.modificarCantidadCarrito('${item.id}', -1)">-</button>
-                            <span style="font-weight: 800; font-size: 0.95rem; min-width: 24px; text-align: center; color: #fff;">${item.cantidad}</span>
-                            <button type="button" class="btn-qty-pos" onclick="ViasaApp.modificarCantidadCarrito('${item.id}', 1)">+</button>
-                            <button type="button" onclick="ViasaApp.eliminarItemCarrito('${item.id}')" style="background:none; border:none; color:var(--danger); cursor:pointer; margin-left:4px;" title="Quitar ítem">
+                            <button type="button" class="btn-qty-pos" onclick="ViasaApp.modificarCantidadCarrito('${item.id}', -1)" title="Reducir cantidad">-</button>
+                            <span style="font-weight: 800; font-size: 0.95rem; min-width: 28px; text-align: center; color: #fff;">${item.cantidad}</span>
+                            <button type="button" class="btn-qty-pos" onclick="ViasaApp.modificarCantidadCarrito('${item.id}', 1)" title="Aumentar cantidad">+</button>
+                            <button type="button" class="btn-del-cart-pos" onclick="ViasaApp.eliminarItemCarrito('${item.id}')" title="Quitar ítem">
                                 <i class="fa-solid fa-xmark"></i>
                             </button>
                         </div>
@@ -3885,6 +4053,10 @@
                 this.agregarAlCarrito(found.id);
                 this.resaltarTarjetaProductoEscaneado(found.id);
 
+                const cartItem = this.cart.find(item => item.id === found.id);
+                const totalUnits = cartItem ? cartItem.cantidad : 1;
+                this.mostrarHUDProductoEscaneado(found, totalUnits);
+
                 const sInput = document.getElementById('pos-search');
                 if (sInput) {
                     sInput.value = '';
@@ -3905,13 +4077,25 @@
         },
 
         resaltarTarjetaProductoEscaneado(prodId) {
-            const card = document.getElementById(`pos-card-${prodId}`);
+            let card = document.getElementById(`pos-card-${prodId}`);
+            // Si la tarjeta está oculta por filtro de categoría o búsqueda, cambiar automáticamente a 'todas'
+            if (!card) {
+                this.categoriaActiva = 'todas';
+                this.filtroBusqueda = '';
+                const sInput = document.getElementById('pos-search');
+                if (sInput) sInput.value = '';
+                this.renderPOSCategories();
+                this.renderPOSProducts();
+                card = document.getElementById(`pos-card-${prodId}`);
+            }
             if (card) {
+                card.classList.remove('scan-highlight');
+                void card.offsetWidth; // Recalcular reflow para reiniciar la animación CSS
                 card.classList.add('scan-highlight');
-                card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                card.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 setTimeout(() => {
                     card.classList.remove('scan-highlight');
-                }, 1200);
+                }, 1500);
             }
         },
 
