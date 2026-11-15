@@ -155,8 +155,8 @@
         <aside class="app-sidebar">
             <div>
                 <div class="brand-header">
-                    <div class="brand-logo-badge" style="background: none; border: none; box-shadow: none; padding: 0;">
-                        <img src="assets/img/viasa_isotipo.png" alt="Logo VIASA" id="sidebar-brand-logo-img" style="width: 72px; height: 72px; object-fit: contain; filter: drop-shadow(0 3px 10px rgba(200, 138, 43, 0.38)); transition: transform 0.3s ease;">
+                    <div class="brand-logo-badge" id="sidebar-brand-logo-container">
+                        <img src="assets/img/viasa_isotipo.png" alt="Logo VIASA" id="sidebar-brand-logo-img" class="brand-logo-circular">
                     </div>
                     <div class="brand-text-block">
                         <div class="brand-title">VIASA System</div>
@@ -483,9 +483,8 @@
                             </div>
 
                             <!-- Botón Principal de Acción Rápida -->
-                            <button type="button" class="btn-pos-welcome-action" onclick="ViasaApp.switchView('pos')" title="Ir directamente al Punto de Venta">
-                                <i class="fa-solid fa-cash-register"></i>
-                                <span>🏪 Ir al Mostrador (POS)</span>
+                            <button type="button" class="btn-pos-welcome-action" onclick="ViasaApp.switchView('pos')" title="Ir directamente al Mostrador (Punto de Venta)">
+                                <span>🏪 MOSTRADOR</span>
                             </button>
                         </div>
                     </div>
