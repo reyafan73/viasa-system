@@ -1044,24 +1044,24 @@
 
     <!-- MODAL 3: REGISTRO / EDICIÓN DE MATERIA PRIMA E INSUMOS -->
     <div class="viasa-modal" id="modal-materia-prima">
-        <div class="viasa-modal-card" style="max-width: 650px;">
+        <div class="viasa-modal-container viasa-modal-card" style="max-width: 650px; width: 95%;">
             <div class="viasa-modal-header">
-                <h3 style="color: var(--accent-wheat); font-size: 1.1rem; display: flex; align-items: center; gap: 8px;">
-                    <i class="fa-solid fa-boxes-stacked"></i> <span id="modal-mp-title">Registrar Materia Prima / Insumo</span>
+                <h3 style="color: #2C1A12; font-size: 1.1rem; font-weight: 800; display: flex; align-items: center; gap: 8px; margin: 0;">
+                    <i class="fa-solid fa-boxes-stacked" style="color: #C88A2B;"></i> <span id="modal-mp-title">Registrar Materia Prima / Insumo</span>
                 </h3>
-                <button type="button" onclick="ViasaApp.cerrarModalMP()" style="background:none; border:none; color:#fff; font-size:1.3rem; cursor:pointer;">&times;</button>
+                <button type="button" onclick="ViasaApp.cerrarModalMP()" class="viasa-modal-close" aria-label="Cerrar">&times;</button>
             </div>
-            <div class="viasa-modal-body">
-                <form id="form-materia-prima" onsubmit="ViasaApp.guardarMateriaPrima(event)">
+            <form id="form-materia-prima" onsubmit="ViasaApp.guardarMateriaPrima(event)" class="viasa-modal-form-wrapper">
+                <div class="viasa-modal-body">
                     <input type="hidden" id="mp-id">
                     
                     <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 12px; margin-bottom: 12px;">
                         <div>
-                            <label style="font-size: 0.78rem; color: var(--text-secondary); font-weight: 700; display: block; margin-bottom: 4px;">Nombre del Insumo / Materia Prima:</label>
+                            <label style="font-size: 0.78rem; color: #2C1A12; font-weight: 700; display: block; margin-bottom: 4px;">Nombre del Insumo / Materia Prima:</label>
                             <input type="text" id="mp-nombre" class="pos-search-input" required placeholder="Ej: Harina de Trigo Panadera Fuerte (000)" style="width: 100%;">
                         </div>
                         <div>
-                            <label style="font-size: 0.78rem; color: var(--text-secondary); font-weight: 700; display: block; margin-bottom: 4px;">Categoría:</label>
+                            <label style="font-size: 0.78rem; color: #2C1A12; font-weight: 700; display: block; margin-bottom: 4px;">Categoría:</label>
                             <select id="mp-categoria" class="pos-search-input" style="width: 100%;" required>
                                 <option value="harinas">🌾 Harinas y Trigo</option>
                                 <option value="grasas">🧈 Grasas y Mantequillas</option>
@@ -1079,7 +1079,7 @@
 
                     <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 12px;">
                         <div>
-                            <label style="font-size: 0.78rem; color: var(--text-secondary); font-weight: 700; display: block; margin-bottom: 4px;">Unidad de Medida:</label>
+                            <label style="font-size: 0.78rem; color: #2C1A12; font-weight: 700; display: block; margin-bottom: 4px;">Unidad de Medida:</label>
                             <select id="mp-unidad" class="pos-search-input" style="width: 100%;" required>
                                 <option value="SACO 45KG">SACO 45KG</option>
                                 <option value="SACO 50KG">SACO 50KG</option>
@@ -1092,125 +1092,125 @@
                             </select>
                         </div>
                         <div>
-                            <label style="font-size: 0.78rem; color: var(--text-secondary); font-weight: 700; display: block; margin-bottom: 4px;">Stock Actual:</label>
+                            <label style="font-size: 0.78rem; color: #2C1A12; font-weight: 700; display: block; margin-bottom: 4px;">Stock Actual:</label>
                             <input type="number" step="0.01" id="mp-stock-actual" class="pos-search-input" required placeholder="0.00" style="width: 100%;">
                         </div>
                         <div>
-                            <label style="font-size: 0.78rem; color: var(--text-secondary); font-weight: 700; display: block; margin-bottom: 4px;">Stock Mínimo (Alerta):</label>
+                            <label style="font-size: 0.78rem; color: #2C1A12; font-weight: 700; display: block; margin-bottom: 4px;">Stock Mínimo (Alerta):</label>
                             <input type="number" step="0.01" id="mp-stock-minimo" class="pos-search-input" required placeholder="5.00" style="width: 100%;">
                         </div>
                     </div>
 
                     <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 12px;">
                         <div>
-                            <label style="font-size: 0.78rem; color: var(--text-secondary); font-weight: 700; display: block; margin-bottom: 4px;">Costo Unitario ($ USD):</label>
-                            <input type="number" step="0.01" id="mp-costo-usd" class="pos-search-input" required placeholder="0.00" style="width: 100%; color: var(--accent-wheat); font-weight: bold;">
+                            <label style="font-size: 0.78rem; color: #2C1A12; font-weight: 700; display: block; margin-bottom: 4px;">Costo Unitario ($ USD):</label>
+                            <input type="number" step="0.01" id="mp-costo-usd" class="pos-search-input" required placeholder="0.00" style="width: 100%; color: #8C5A32; font-weight: bold;">
                         </div>
                         <div>
-                            <label style="font-size: 0.78rem; color: var(--text-secondary); font-weight: 700; display: block; margin-bottom: 4px;">N° de Lote:</label>
+                            <label style="font-size: 0.78rem; color: #2C1A12; font-weight: 700; display: block; margin-bottom: 4px;">N° de Lote:</label>
                             <input type="text" id="mp-lote" class="pos-search-input" placeholder="Ej: LOT-2026-09" style="width: 100%;">
                         </div>
                         <div>
-                            <label style="font-size: 0.78rem; color: var(--text-secondary); font-weight: 700; display: block; margin-bottom: 4px;">Fecha de Caducidad:</label>
+                            <label style="font-size: 0.78rem; color: #2C1A12; font-weight: 700; display: block; margin-bottom: 4px;">Fecha de Caducidad:</label>
                             <input type="date" id="mp-caducidad" class="pos-search-input" style="width: 100%;">
                         </div>
                     </div>
 
                     <div style="margin-bottom: 16px;">
-                        <label style="font-size: 0.78rem; color: var(--text-secondary); font-weight: 700; display: block; margin-bottom: 4px;">Proveedor Principal:</label>
+                        <label style="font-size: 0.78rem; color: #2C1A12; font-weight: 700; display: block; margin-bottom: 4px;">Proveedor Principal:</label>
                         <input type="text" id="mp-proveedor" class="pos-search-input" placeholder="Ej: Molinos Nacionales C.A." style="width: 100%;">
                     </div>
+                </div>
 
-                    <div style="display: flex; justify-content: flex-end; gap: 10px;">
-                        <button type="button" class="btn-secondary" onclick="ViasaApp.cerrarModalMP()">Cancelar</button>
-                        <button type="submit" class="btn-gold"><i class="fa-solid fa-floppy-disk"></i> Guardar Insumo</button>
-                    </div>
-                </form>
-            </div>
+                <div class="viasa-modal-footer">
+                    <button type="button" class="btn-secondary" onclick="ViasaApp.cerrarModalMP()">Cancelar</button>
+                    <button type="submit" class="btn-gold"><i class="fa-solid fa-floppy-disk"></i> Guardar Insumo</button>
+                </div>
+            </form>
         </div>
     </div>
 
     <!-- MODAL 4: RECEPCIÓN / ENTRADA DE ALMACÉN (COMPRA DE MATERIA PRIMA) -->
     <div class="viasa-modal" id="modal-recepcion-almacen">
-        <div class="viasa-modal-card" style="max-width: 580px;">
+        <div class="viasa-modal-container viasa-modal-card" style="max-width: 580px; width: 95%;">
             <div class="viasa-modal-header">
-                <h3 style="color: #10b981; font-size: 1.1rem; display: flex; align-items: center; gap: 8px;">
-                    <i class="fa-solid fa-truck-ramp-box"></i> Entrada / Recepción de Almacén
+                <h3 style="color: #2C1A12; font-size: 1.1rem; font-weight: 800; display: flex; align-items: center; gap: 8px; margin: 0;">
+                    <i class="fa-solid fa-truck-ramp-box" style="color: #059669;"></i> Entrada / Recepción de Almacén
                 </h3>
-                <button type="button" onclick="ViasaApp.cerrarModalRecepcion()" style="background:none; border:none; color:#fff; font-size:1.3rem; cursor:pointer;">&times;</button>
+                <button type="button" onclick="ViasaApp.cerrarModalRecepcion()" class="viasa-modal-close" aria-label="Cerrar">&times;</button>
             </div>
-            <div class="viasa-modal-body">
-                <form id="form-recepcion-almacen" onsubmit="ViasaApp.procesarRecepcionAlmacen(event)">
+            <form id="form-recepcion-almacen" onsubmit="ViasaApp.procesarRecepcionAlmacen(event)" class="viasa-modal-form-wrapper">
+                <div class="viasa-modal-body">
                     <div style="margin-bottom: 12px;">
-                        <label style="font-size: 0.78rem; color: var(--text-secondary); font-weight: 700; display: block; margin-bottom: 4px;">Seleccionar Materia Prima:</label>
+                        <label style="font-size: 0.78rem; color: #2C1A12; font-weight: 700; display: block; margin-bottom: 4px;">Seleccionar Materia Prima:</label>
                         <select id="recp-materia-prima-id" class="pos-search-input" style="width: 100%;" required onchange="ViasaApp.actualizarDatosInsumoEnRecepcion()">
                             <!-- Inyectado dinámicamente -->
                         </select>
                     </div>
 
-                    <div style="background: var(--bg-main); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; margin-bottom: 14px; font-size: 0.82rem; display: flex; justify-content: space-between;">
-                        <span>Stock Actual: <strong id="recp-stock-previo" style="color: #38bdf8;">0.00</strong></span>
-                        <span>Costo Actual: <strong id="recp-costo-previo" style="color: var(--accent-wheat);">$0.00</strong></span>
+                    <div style="background: #F5EFE6; border: 1px solid #DFD3C0; border-radius: 8px; padding: 10px; margin-bottom: 14px; font-size: 0.82rem; display: flex; justify-content: space-between;">
+                        <span style="color: #4A3B32;">Stock Actual: <strong id="recp-stock-previo" style="color: #0284c7;">0.00</strong></span>
+                        <span style="color: #4A3B32;">Costo Actual: <strong id="recp-costo-previo" style="color: #8C5A32;">$0.00</strong></span>
                     </div>
 
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
                         <div>
-                            <label style="font-size: 0.78rem; color: var(--text-secondary); font-weight: 700; display: block; margin-bottom: 4px;">Cantidad que Ingresa:</label>
-                            <input type="number" step="0.01" id="recp-cantidad" class="pos-search-input" required placeholder="Ej: 10" style="width: 100%; font-size: 1.1rem; font-weight: 900; color: #10b981;">
+                            <label style="font-size: 0.78rem; color: #2C1A12; font-weight: 700; display: block; margin-bottom: 4px;">Cantidad que Ingresa:</label>
+                            <input type="number" step="0.01" id="recp-cantidad" class="pos-search-input" required placeholder="Ej: 10" style="width: 100%; font-size: 1.1rem; font-weight: 900; color: #059669;">
                         </div>
                         <div>
-                            <label style="font-size: 0.78rem; color: var(--text-secondary); font-weight: 700; display: block; margin-bottom: 4px;">Costo Unitario de Compra ($ USD):</label>
-                            <input type="number" step="0.01" id="recp-costo-unitario" class="pos-search-input" required placeholder="0.00" style="width: 100%; font-size: 1.1rem; font-weight: 900; color: var(--accent-wheat);">
+                            <label style="font-size: 0.78rem; color: #2C1A12; font-weight: 700; display: block; margin-bottom: 4px;">Costo Unitario de Compra ($ USD):</label>
+                            <input type="number" step="0.01" id="recp-costo-unitario" class="pos-search-input" required placeholder="0.00" style="width: 100%; font-size: 1.1rem; font-weight: 900; color: #8C5A32;">
                         </div>
                     </div>
 
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
                         <div>
-                            <label style="font-size: 0.78rem; color: var(--text-secondary); font-weight: 700; display: block; margin-bottom: 4px;">N° Lote Nuevo:</label>
+                            <label style="font-size: 0.78rem; color: #2C1A12; font-weight: 700; display: block; margin-bottom: 4px;">N° Lote Nuevo:</label>
                             <input type="text" id="recp-lote" class="pos-search-input" placeholder="Ej: LOT-2026-X" style="width: 100%;">
                         </div>
                         <div>
-                            <label style="font-size: 0.78rem; color: var(--text-secondary); font-weight: 700; display: block; margin-bottom: 4px;">Nueva Fecha Caducidad:</label>
+                            <label style="font-size: 0.78rem; color: #2C1A12; font-weight: 700; display: block; margin-bottom: 4px;">Nueva Fecha Caducidad:</label>
                             <input type="date" id="recp-caducidad" class="pos-search-input" style="width: 100%;">
                         </div>
                     </div>
 
                     <div style="margin-bottom: 16px;">
-                        <label style="font-size: 0.78rem; color: var(--text-secondary); font-weight: 700; display: block; margin-bottom: 4px;">N° Factura / Guía de Recepción:</label>
+                        <label style="font-size: 0.78rem; color: #2C1A12; font-weight: 700; display: block; margin-bottom: 4px;">N° Factura / Guía de Recepción:</label>
                         <input type="text" id="recp-factura" class="pos-search-input" placeholder="Ej: FC-94821" style="width: 100%;">
                     </div>
+                </div>
 
-                    <div style="display: flex; justify-content: flex-end; gap: 10px;">
-                        <button type="button" class="btn-secondary" onclick="ViasaApp.cerrarModalRecepcion()">Cancelar</button>
-                        <button type="submit" class="btn-gold" style="background: linear-gradient(135deg, #059669 0%, #047857 100%); border-color: #34d399;">
-                            <i class="fa-solid fa-arrow-down-to-bracket"></i> Procesar Entrada
-                        </button>
-                    </div>
-                </form>
-            </div>
+                <div class="viasa-modal-footer">
+                    <button type="button" class="btn-secondary" onclick="ViasaApp.cerrarModalRecepcion()">Cancelar</button>
+                    <button type="submit" class="btn-gold" style="background: linear-gradient(135deg, #059669 0%, #047857 100%); border-color: #34d399;">
+                        <i class="fa-solid fa-arrow-down-to-bracket"></i> Procesar Entrada
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 
     <!-- MODAL 5: CREADOR / EDITOR DE RECETAS MAGISTRALES ("MASTER BAKER") -->
     <div class="viasa-modal" id="modal-receta-editor">
-        <div class="viasa-modal-card" style="max-width: 820px;">
+        <div class="viasa-modal-container viasa-modal-card" style="max-width: 820px; width: 95%;">
             <div class="viasa-modal-header">
-                <h3 style="color: var(--accent-wheat); font-size: 1.15rem; display: flex; align-items: center; gap: 8px;">
-                    <i class="fa-solid fa-scroll"></i> <span id="modal-receta-title">Fórmula Panadera y Escandallo Magistral</span>
+                <h3 style="color: #2C1A12; font-size: 1.15rem; font-weight: 800; display: flex; align-items: center; gap: 8px; margin: 0;">
+                    <i class="fa-solid fa-scroll" style="color: #C88A2B;"></i> <span id="modal-receta-title">Fórmula Panadera y Escandallo Magistral</span>
                 </h3>
-                <button type="button" onclick="ViasaApp.cerrarModalReceta()" style="background:none; border:none; color:#fff; font-size:1.3rem; cursor:pointer;">&times;</button>
+                <button type="button" onclick="ViasaApp.cerrarModalReceta()" class="viasa-modal-close" aria-label="Cerrar">&times;</button>
             </div>
-            <div class="viasa-modal-body">
-                <form id="form-receta-editor" onsubmit="ViasaApp.guardarRecetaMaestra(event)">
+            <form id="form-receta-editor" onsubmit="ViasaApp.guardarRecetaMaestra(event)" class="viasa-modal-form-wrapper">
+                <div class="viasa-modal-body">
                     <input type="hidden" id="receta-id">
 
                     <div style="display: grid; grid-template-columns: 2fr 1.5fr; gap: 12px; margin-bottom: 12px;">
                         <div>
-                            <label style="font-size: 0.78rem; color: var(--text-secondary); font-weight: 700; display: block; margin-bottom: 4px;">Nombre de la Receta / Fórmula:</label>
+                            <label style="font-size: 0.78rem; color: #2C1A12; font-weight: 700; display: block; margin-bottom: 4px;">Nombre de la Receta / Fórmula:</label>
                             <input type="text" id="receta-nombre" class="pos-search-input" required placeholder="Ej: Fórmula Pan Canilla Tradicional Viasa" style="width: 100%;">
                         </div>
                         <div>
-                            <label style="font-size: 0.78rem; color: var(--text-secondary); font-weight: 700; display: block; margin-bottom: 4px;">Producto Terminado Asociado (POS):</label>
+                            <label style="font-size: 0.78rem; color: #2C1A12; font-weight: 700; display: block; margin-bottom: 4px;">Producto Terminado Asociado (POS):</label>
                             <select id="receta-producto-id" class="pos-search-input" style="width: 100%;" required>
                                 <!-- Inyectado dinámicamente -->
                             </select>
@@ -1219,28 +1219,28 @@
 
                     <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 10px; margin-bottom: 14px;">
                         <div>
-                            <label style="font-size: 0.74rem; color: var(--text-secondary); font-weight: 700; display: block; margin-bottom: 2px;">Rendimiento (Uds):</label>
+                            <label style="font-size: 0.74rem; color: #2C1A12; font-weight: 700; display: block; margin-bottom: 2px;">Rendimiento (Uds):</label>
                             <input type="number" id="receta-rendimiento" class="pos-search-input" required placeholder="260" oninput="ViasaApp.recalcularEscandalloModal()" style="width: 100%;">
                         </div>
                         <div>
-                            <label style="font-size: 0.74rem; color: var(--text-secondary); font-weight: 700; display: block; margin-bottom: 2px;">Amasado (min):</label>
+                            <label style="font-size: 0.74rem; color: #2C1A12; font-weight: 700; display: block; margin-bottom: 2px;">Amasado (min):</label>
                             <input type="number" id="receta-tiempo-amasado" class="pos-search-input" placeholder="18" style="width: 100%;">
                         </div>
                         <div>
-                            <label style="font-size: 0.74rem; color: var(--text-secondary); font-weight: 700; display: block; margin-bottom: 2px;">Horneado (min):</label>
+                            <label style="font-size: 0.74rem; color: #2C1A12; font-weight: 700; display: block; margin-bottom: 2px;">Horneado (min):</label>
                             <input type="number" id="receta-tiempo-horneado" class="pos-search-input" placeholder="22" style="width: 100%;">
                         </div>
                         <div>
-                            <label style="font-size: 0.74rem; color: var(--text-secondary); font-weight: 700; display: block; margin-bottom: 2px;">Temp Horno (°C):</label>
+                            <label style="font-size: 0.74rem; color: #2C1A12; font-weight: 700; display: block; margin-bottom: 2px;">Temp Horno (°C):</label>
                             <input type="number" id="receta-temp-horno" class="pos-search-input" placeholder="220" style="width: 100%;">
                         </div>
                     </div>
 
                     <!-- Constructor de Ingredientes y Porcentaje Panadero -->
-                    <div style="background: var(--bg-main); border: 1.5px solid var(--border-color); border-radius: 10px; padding: 12px; margin-bottom: 14px;">
+                    <div style="background: #F5EFE6; border: 1.5px solid #DFD3C0; border-radius: 10px; padding: 12px; margin-bottom: 14px;">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                            <span style="font-weight: 800; font-size: 0.85rem; color: var(--accent-wheat);">
-                                <i class="fa-solid fa-scale-balanced"></i> Ingredientes de la Fórmula (Baker's Math)
+                            <span style="font-weight: 800; font-size: 0.85rem; color: #2C1A12;">
+                                <i class="fa-solid fa-scale-balanced" style="color: #C88A2B;"></i> Ingredientes de la Fórmula (Baker's Math)
                             </span>
                             <button type="button" class="btn-secondary" onclick="ViasaApp.agregarFilaIngredienteReceta()" style="padding: 4px 10px; font-size: 0.75rem;">
                                 <i class="fa-solid fa-plus"></i> Añadir Ingrediente
@@ -1250,7 +1250,7 @@
                         <div style="max-height: 200px; overflow-y: auto;">
                             <table style="width: 100%; border-collapse: collapse; font-size: 0.8rem;">
                                 <thead>
-                                    <tr style="border-bottom: 1px solid var(--border-color); color: var(--text-secondary); text-align: left;">
+                                    <tr style="border-bottom: 1px solid #DFD3C0; color: #4A3B32; text-align: left;">
                                         <th style="padding: 6px;">MATERIA PRIMA</th>
                                         <th>CANTIDAD (KG/L)</th>
                                         <th>% PANADERO</th>
@@ -1269,28 +1269,28 @@
                     <div class="escandallo-live-card" id="receta-escandallo-resumen">
                         <!-- Inyectado dinámicamente -->
                     </div>
+                </div>
 
-                    <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 14px;">
-                        <button type="button" class="btn-secondary" onclick="ViasaApp.cerrarModalReceta()">Cancelar</button>
-                        <button type="submit" class="btn-gold"><i class="fa-solid fa-floppy-disk"></i> Guardar Fórmula Magistral</button>
-                    </div>
-                </form>
-            </div>
+                <div class="viasa-modal-footer">
+                    <button type="button" class="btn-secondary" onclick="ViasaApp.cerrarModalReceta()">Cancelar</button>
+                    <button type="submit" class="btn-gold"><i class="fa-solid fa-floppy-disk"></i> Guardar Fórmula Magistral</button>
+                </div>
+            </form>
         </div>
     </div>
 
     <!-- MODAL 6: ORDEN DE PRODUCCIÓN / HORNEADO DIARIO -->
     <div class="viasa-modal" id="modal-orden-horneado">
-        <div class="viasa-modal-card" style="max-width: 680px;">
-            <div class="viasa-modal-header" style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);">
-                <h3 style="color: var(--accent-wheat); font-size: 1.15rem; display: flex; align-items: center; gap: 8px;">
-                    <i class="fa-solid fa-fire-burner"></i> Iniciar Lote de Horneado / Producción
+        <div class="viasa-modal-container viasa-modal-card" style="max-width: 680px; width: 95%;">
+            <div class="viasa-modal-header">
+                <h3 style="color: #2C1A12; font-size: 1.15rem; font-weight: 800; display: flex; align-items: center; gap: 8px; margin: 0;">
+                    <i class="fa-solid fa-fire-burner" style="color: #C88A2B;"></i> Iniciar Lote de Horneado / Producción
                 </h3>
-                <button type="button" onclick="ViasaApp.cerrarModalHorneado()" style="background:none; border:none; color:#fff; font-size:1.3rem; cursor:pointer;">&times;</button>
+                <button type="button" onclick="ViasaApp.cerrarModalHorneado()" class="viasa-modal-close" aria-label="Cerrar">&times;</button>
             </div>
             <div class="viasa-modal-body">
                 <div style="margin-bottom: 12px;">
-                    <label style="font-size: 0.78rem; color: var(--text-secondary); font-weight: 700; display: block; margin-bottom: 4px;">Seleccionar Receta Panadera:</label>
+                    <label style="font-size: 0.78rem; color: #2C1A12; font-weight: 700; display: block; margin-bottom: 4px;">Seleccionar Receta Panadera:</label>
                     <select id="horn-receta-id" class="pos-search-input" style="width: 100%;" onchange="ViasaApp.actualizarDetallesHorneado()">
                         <!-- Inyectado dinámicamente -->
                     </select>
@@ -1298,27 +1298,27 @@
 
                 <div style="display: grid; grid-template-columns: 1fr 1fr 1.2fr; gap: 10px; margin-bottom: 14px;">
                     <div>
-                        <label style="font-size: 0.78rem; color: var(--text-secondary); font-weight: 700; display: block; margin-bottom: 4px;">Multiplicador / Tandas:</label>
-                        <input type="number" step="0.1" id="horn-multiplicador" class="pos-search-input" value="1" min="0.1" oninput="ViasaApp.actualizarDetallesHorneado()" style="width: 100%; font-size: 1.1rem; font-weight: 900; color: var(--accent-wheat);">
+                        <label style="font-size: 0.78rem; color: #2C1A12; font-weight: 700; display: block; margin-bottom: 4px;">Multiplicador / Tandas:</label>
+                        <input type="number" step="0.1" id="horn-multiplicador" class="pos-search-input" value="1" min="0.1" oninput="ViasaApp.actualizarDetallesHorneado()" style="width: 100%; font-size: 1.1rem; font-weight: 900; color: #8C5A32;">
                     </div>
                     <div>
-                        <label style="font-size: 0.78rem; color: var(--text-secondary); font-weight: 700; display: block; margin-bottom: 4px;">Panes a Producir:</label>
-                        <div style="background: var(--bg-main); border: 1.5px solid var(--border-color); border-radius: 8px; padding: 9px 12px; font-weight: 900; font-size: 1.1rem; color: #38bdf8;" id="horn-unidades-totales">0 Uds</div>
+                        <label style="font-size: 0.78rem; color: #2C1A12; font-weight: 700; display: block; margin-bottom: 4px;">Panes a Producir:</label>
+                        <div style="background: #F5EFE6; border: 1.5px solid #DFD3C0; border-radius: 8px; padding: 9px 12px; font-weight: 900; font-size: 1.1rem; color: #0284c7;" id="horn-unidades-totales">0 Uds</div>
                     </div>
                     <div>
-                        <label style="font-size: 0.78rem; color: var(--text-secondary); font-weight: 700; display: block; margin-bottom: 4px;">Maestro Panadero Responsable:</label>
+                        <label style="font-size: 0.78rem; color: #2C1A12; font-weight: 700; display: block; margin-bottom: 4px;">Maestro Panadero Responsable:</label>
                         <input type="text" id="horn-panadero-nombre" class="pos-search-input" value="Carlos Rodríguez" style="width: 100%;">
                     </div>
                 </div>
 
                 <!-- Verificación de Disponibilidad de Materia Prima -->
-                <div style="font-weight: 800; font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 6px;">
-                    <i class="fa-solid fa-clipboard-check"></i> Verificación de Insumos Requeridos vs Disponibles en Almacén:
+                <div style="font-weight: 800; font-size: 0.82rem; color: #2C1A12; margin-bottom: 6px;">
+                    <i class="fa-solid fa-clipboard-check" style="color: #C88A2B;"></i> Verificación de Insumos Requeridos vs Disponibles en Almacén:
                 </div>
-                <div style="background: var(--bg-card); border: 1.5px solid var(--border-color); border-radius: 8px; max-height: 180px; overflow-y: auto; padding: 6px 10px; margin-bottom: 14px;">
+                <div style="background: #FFFFFF; border: 1.5px solid #DFD3C0; border-radius: 8px; max-height: 180px; overflow-y: auto; padding: 6px 10px; margin-bottom: 14px;">
                     <table style="width: 100%; border-collapse: collapse; font-size: 0.78rem;">
                         <thead>
-                            <tr style="border-bottom: 1px solid var(--border-color); color: var(--text-secondary); text-align: left;">
+                            <tr style="border-bottom: 1px solid #DFD3C0; color: #4A3B32; text-align: left;">
                                 <th style="padding: 4px;">INSUMO</th>
                                 <th>REQUERIDO</th>
                                 <th>EN ALMACÉN</th>
@@ -1335,13 +1335,13 @@
                 <div id="horn-status-banner" style="margin-bottom: 14px;">
                     <!-- Inyectado dinámicamente (Verde si todo disponible, Rojo si falta algo) -->
                 </div>
+            </div>
 
-                <div style="display: flex; justify-content: flex-end; gap: 10px;">
-                    <button type="button" class="btn-secondary" onclick="ViasaApp.cerrarModalHorneado()">Cancelar</button>
-                    <button type="button" class="btn-gold" id="btn-confirmar-horneado" onclick="ViasaApp.ejecutarHorneadoProduccion()" style="background: linear-gradient(135deg, #d97706 0%, #b45309 100%);">
-                        <i class="fa-solid fa-fire"></i> Confirmar Horneado y Cargar al POS
-                    </button>
-                </div>
+            <div class="viasa-modal-footer">
+                <button type="button" class="btn-secondary" onclick="ViasaApp.cerrarModalHorneado()">Cancelar</button>
+                <button type="button" class="btn-gold" id="btn-confirmar-horneado" onclick="ViasaApp.ejecutarHorneadoProduccion()" style="background: linear-gradient(135deg, #d97706 0%, #b45309 100%);">
+                    <i class="fa-solid fa-fire"></i> Confirmar Horneado y Cargar al POS
+                </button>
             </div>
         </div>
     </div>
@@ -1419,21 +1419,21 @@
 
     <!-- MODAL 8: REGISTRO / EDICIÓN DE PROVEEDOR GOURMET -->
     <div class="viasa-modal" id="modal-proveedor">
-        <div class="viasa-modal-card" style="max-width: 760px; width: 95%; background: #FFFFFF; border: 1.5px solid #DDD2C0; border-radius: 14px; box-shadow: 0 15px 45px rgba(44, 26, 18, 0.2); overflow: hidden;">
-            <div class="viasa-modal-header" style="background: #FAF7F2; border-bottom: 1.5px solid #DDD2C0; padding: 14px 20px; display: flex; justify-content: space-between; align-items: center;">
+        <div class="viasa-modal-container viasa-modal-card" style="max-width: 780px; width: 95%;">
+            <div class="viasa-modal-header">
                 <h3 style="color: #2C1A12; font-size: 1.15rem; font-weight: 800; display: flex; align-items: center; gap: 8px; margin: 0;">
                     <i class="fa-solid fa-truck-field" style="color: #C88A2B;"></i> <span id="modal-prv-title">Registrar Proveedor</span>
                 </h3>
-                <button type="button" onclick="ViasaApp.cerrarModalProveedor()" class="viasa-modal-close" style="background: #EFE6D8; border: 1px solid #D6C7B2; color: #2C1A12; width: 32px; height: 32px; border-radius: 8px; font-size: 1.15rem; font-weight: 800; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s ease;">&times;</button>
+                <button type="button" onclick="ViasaApp.cerrarModalProveedor()" class="viasa-modal-close">&times;</button>
             </div>
-            <div class="viasa-modal-body" style="padding: 18px 22px; background: #FFFFFF; max-height: 80vh; overflow-y: auto;">
-                <form id="form-proveedor" onsubmit="ViasaApp.guardarProveedor(event)">
+            <form id="form-proveedor" onsubmit="ViasaApp.guardarProveedor(event)" class="viasa-modal-form-wrapper">
+                <div class="viasa-modal-body">
                     <input type="hidden" id="prv-id">
                     <input type="hidden" id="prv-logo-base64">
 
                     <!-- SECCIÓN: LOGOTIPO DE LA EMPRESA PROVEEDORA -->
-                    <div style="background: #F5EFE6; border: 1px solid #DFD3C0; border-radius: 10px; padding: 14px 16px; margin-bottom: 14px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap;">
-                        <div style="position: relative; width: 84px; height: 84px; min-width: 84px; border-radius: 10px; background: #FFFFFF; border: 2px solid #D6C7B2; display: flex; align-items: center; justify-content: center; overflow: hidden; box-shadow: 0 2px 8px rgba(44, 26, 18, 0.08);">
+                    <div style="background: #F5EFE6; border: 1px solid #DFD3C0; border-radius: 10px; padding: 14px 16px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap;">
+                        <div style="position: relative; width: 84px; height: 84px; min-width: 84px; border-radius: 10px; background: #FFFFFF; border: 2px solid #D6C7B2; display: flex; align-items: center; justify-content: center; overflow: hidden; box-shadow: 0 2px 8px rgba(44, 26, 18, 0.08); flex-shrink: 0;">
                             <img id="prv-logo-preview" src="" alt="Logo Proveedor" style="display: none; width: 100%; height: 100%; object-fit: contain; background: #ffffff; padding: 4px;">
                             <div id="prv-logo-placeholder" style="display: flex; flex-direction: column; align-items: center; justify-content: center; color: #8C5A32; font-size: 0.68rem; text-align: center; padding: 4px; font-weight: 700;">
                                 <i class="fa-solid fa-cloud-arrow-up" style="font-size: 1.5rem; color: #C88A2B; margin-bottom: 4px;"></i>
@@ -1460,21 +1460,21 @@
                         </div>
                     </div>
 
-                    <div style="display: grid; grid-template-columns: 1.2fr 2fr; gap: 12px; margin-bottom: 12px;">
+                    <div style="display: grid; grid-template-columns: 1.2fr 2fr; gap: 12px;">
                         <div>
                             <label style="font-size: 0.78rem; color: #2C1A12; font-weight: 700; display: block; margin-bottom: 4px;">RIF de la Empresa: *</label>
-                            <input type="text" id="prv-rif" class="pos-search-input" required placeholder="Ej: J-00030291-0" style="width: 100%; background: #FFFFFF; border: 1px solid #C8B89E; color: #2C1A12; font-weight: 600; border-radius: 6px; padding: 8px 10px; font-size: 0.85rem; box-sizing: border-box;">
+                            <input type="text" id="prv-rif" class="pos-search-input" required placeholder="Ej: J-00030291-0" style="width: 100%;">
                         </div>
                         <div>
                             <label style="font-size: 0.78rem; color: #2C1A12; font-weight: 700; display: block; margin-bottom: 4px;">Razón Social / Nombre Comercial: *</label>
-                            <input type="text" id="prv-nombre" class="pos-search-input" required placeholder="Ej: Molinos Nacionales C.A. (MONACA)" style="width: 100%; background: #FFFFFF; border: 1px solid #C8B89E; color: #2C1A12; font-weight: 600; border-radius: 6px; padding: 8px 10px; font-size: 0.85rem; box-sizing: border-box;">
+                            <input type="text" id="prv-nombre" class="pos-search-input" required placeholder="Ej: Molinos Nacionales C.A. (MONACA)" style="width: 100%;">
                         </div>
                     </div>
 
-                    <div style="display: grid; grid-template-columns: 1fr 1.8fr; gap: 12px; margin-bottom: 12px;">
+                    <div style="display: grid; grid-template-columns: 1fr 1.8fr; gap: 12px;">
                         <div>
                             <label style="font-size: 0.78rem; color: #2C1A12; font-weight: 700; display: block; margin-bottom: 4px;">Categoría Principal: *</label>
-                            <select id="prv-categoria" class="pos-search-input" style="width: 100%; background: #FFFFFF; border: 1px solid #C8B89E; color: #2C1A12; font-weight: 600; border-radius: 6px; padding: 8px 10px; font-size: 0.85rem; box-sizing: border-box;" required>
+                            <select id="prv-categoria" class="pos-search-input" style="width: 100%;" required>
                                 <option value="Harinas y Trigo">🌾 Harinas y Trigo</option>
                                 <option value="Grasas y Mantequillas">🧈 Grasas y Mantequillas</option>
                                 <option value="Levaduras y Cultivos">🍞 Levaduras y Cultivos</option>
@@ -1489,64 +1489,64 @@
                         </div>
                         <div>
                             <label style="font-size: 0.78rem; color: #2C1A12; font-weight: 700; display: block; margin-bottom: 4px;">Dirección Fiscal / Galpón:</label>
-                            <input type="text" id="prv-direccion" class="pos-search-input" placeholder="Ej: Zona Industrial Matanzas, Galpón 12, Puerto Ordaz" style="width: 100%; background: #FFFFFF; border: 1px solid #C8B89E; color: #2C1A12; font-weight: 600; border-radius: 6px; padding: 8px 10px; font-size: 0.85rem; box-sizing: border-box;">
+                            <input type="text" id="prv-direccion" class="pos-search-input" placeholder="Ej: Zona Industrial Matanzas, Galpón 12, Puerto Ordaz" style="width: 100%;">
                         </div>
                     </div>
 
                     <!-- SECCIÓN: TELÉFONOS DE LA COMPAÑÍA PROVEEDORA (3 NÚMEROS) -->
-                    <div style="background: #FAF7F2; border: 1px solid #E2D6C3; border-left: 4px solid #8C5A32; border-radius: 8px; padding: 12px 14px; margin-bottom: 12px;">
+                    <div style="background: #FAF7F2; border: 1px solid #E2D6C3; border-left: 4px solid #8C5A32; border-radius: 8px; padding: 12px 14px;">
                         <div style="font-size: 13px; color: #7C4D2B; font-weight: 800; display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
                             <i class="fa-solid fa-building" style="color: #8C5A32;"></i> Números Telefónicos de la Compañía Proveedora (Hasta 3 Números)
                         </div>
                         <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
                             <div>
                                 <label style="font-size: 12px; color: #2C1A12; font-weight: 700; display: block; margin-bottom: 4px;">Teléfono Empresa 1 (Principal): *</label>
-                                <input type="text" id="prv-telefono" class="pos-search-input" required placeholder="Ej: 0286-9231122" style="width: 100%; background: #FFFFFF; border: 1px solid #C8B89E; color: #2C1A12; font-weight: 700; border-radius: 6px; padding: 7px 10px; font-size: 0.83rem; box-sizing: border-box;">
+                                <input type="text" id="prv-telefono" class="pos-search-input" required placeholder="Ej: 0286-9231122" style="width: 100%;">
                             </div>
                             <div>
                                 <label style="font-size: 12px; color: #2C1A12; font-weight: 700; display: block; margin-bottom: 4px;">Teléfono Empresa 2 (Oficina):</label>
-                                <input type="text" id="prv-telefono-empresa-2" class="pos-search-input" placeholder="Ej: 0286-9231123" style="width: 100%; background: #FFFFFF; border: 1px solid #C8B89E; color: #2C1A12; font-weight: 700; border-radius: 6px; padding: 7px 10px; font-size: 0.83rem; box-sizing: border-box;">
+                                <input type="text" id="prv-telefono-empresa-2" class="pos-search-input" placeholder="Ej: 0286-9231123" style="width: 100%;">
                             </div>
                             <div>
                                 <label style="font-size: 12px; color: #2C1A12; font-weight: 700; display: block; margin-bottom: 4px;">Teléfono Empresa 3 (Planta):</label>
-                                <input type="text" id="prv-telefono-empresa-3" class="pos-search-input" placeholder="Ej: 0414-8899220" style="width: 100%; background: #FFFFFF; border: 1px solid #C8B89E; color: #2C1A12; font-weight: 700; border-radius: 6px; padding: 7px 10px; font-size: 0.83rem; box-sizing: border-box;">
+                                <input type="text" id="prv-telefono-empresa-3" class="pos-search-input" placeholder="Ej: 0414-8899220" style="width: 100%;">
                             </div>
                         </div>
                     </div>
 
                     <!-- SECCIÓN: VENDEDOR O REPRESENTANTE DE LA COMPAÑÍA (2 NÚMEROS) -->
-                    <div style="background: #F3EDE2; border: 1px solid #DFD3C0; border-left: 4px solid #C88A2B; border-radius: 8px; padding: 12px 14px; margin-bottom: 12px;">
+                    <div style="background: #F3EDE2; border: 1px solid #DFD3C0; border-left: 4px solid #C88A2B; border-radius: 8px; padding: 12px 14px;">
                         <div style="font-size: 13px; color: #2C1A12; font-weight: 800; display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
                             <i class="fa-solid fa-user-tie" style="color: #C88A2B;"></i> Vendedor / Representante de la Compañía (Hasta 2 Números)
                         </div>
                         <div style="display: grid; grid-template-columns: 1.2fr 1fr 1fr; gap: 10px;">
                             <div>
                                 <label style="font-size: 12px; color: #2C1A12; font-weight: 700; display: block; margin-bottom: 4px;">Nombre del Representante:</label>
-                                <input type="text" id="prv-contacto" class="pos-search-input" placeholder="Ej: Ing. Roberto Morales" style="width: 100%; background: #FFFFFF; border: 1px solid #C8B89E; color: #2C1A12; font-weight: 700; border-radius: 6px; padding: 7px 10px; font-size: 0.83rem; box-sizing: border-box;">
+                                <input type="text" id="prv-contacto" class="pos-search-input" placeholder="Ej: Ing. Roberto Morales" style="width: 100%;">
                             </div>
                             <div>
                                 <label style="font-size: 12px; color: #2C1A12; font-weight: 700; display: block; margin-bottom: 4px;">Teléfono Vendedor 1 (Móvil):</label>
-                                <input type="text" id="prv-telefono-rep-1" class="pos-search-input" placeholder="Ej: 0414-8899221" style="width: 100%; background: #FFFFFF; border: 1px solid #C8B89E; color: #2C1A12; font-weight: 700; border-radius: 6px; padding: 7px 10px; font-size: 0.83rem; box-sizing: border-box;">
+                                <input type="text" id="prv-telefono-rep-1" class="pos-search-input" placeholder="Ej: 0414-8899221" style="width: 100%;">
                             </div>
                             <div>
                                 <label style="font-size: 12px; color: #2C1A12; font-weight: 700; display: block; margin-bottom: 4px;">Teléfono Vendedor 2 (Personal):</label>
-                                <input type="text" id="prv-telefono-rep-2" class="pos-search-input" placeholder="Ej: 0412-3456789" style="width: 100%; background: #FFFFFF; border: 1px solid #C8B89E; color: #2C1A12; font-weight: 700; border-radius: 6px; padding: 7px 10px; font-size: 0.83rem; box-sizing: border-box;">
+                                <input type="text" id="prv-telefono-rep-2" class="pos-search-input" placeholder="Ej: 0412-3456789" style="width: 100%;">
                             </div>
                         </div>
                     </div>
 
-                    <div style="display: grid; grid-template-columns: 1fr 1.5fr 1fr; gap: 12px; margin-bottom: 12px;">
+                    <div style="display: grid; grid-template-columns: 1fr 1.5fr 1fr; gap: 12px;">
                         <div>
                             <label style="font-size: 0.78rem; color: #2C1A12; font-weight: 700; display: block; margin-bottom: 4px;">Días de Crédito:</label>
-                            <input type="number" id="prv-dias-credito" class="pos-search-input" placeholder="15" value="15" style="width: 100%; background: #FFFFFF; border: 1px solid #C8B89E; color: #2C1A12; font-weight: 600; border-radius: 6px; padding: 7px 10px; font-size: 0.85rem; box-sizing: border-box;">
+                            <input type="number" id="prv-dias-credito" class="pos-search-input" placeholder="15" value="15" style="width: 100%;">
                         </div>
                         <div>
                             <label style="font-size: 0.78rem; color: #2C1A12; font-weight: 700; display: block; margin-bottom: 4px;">Datos Pago Móvil / Banco:</label>
-                            <input type="text" id="prv-pagomovil" class="pos-search-input" placeholder="0414-8899221 | J-00030291-0 | Banesco" style="width: 100%; background: #FFFFFF; border: 1px solid #C8B89E; color: #2C1A12; font-weight: 600; border-radius: 6px; padding: 7px 10px; font-size: 0.85rem; box-sizing: border-box;">
+                            <input type="text" id="prv-pagomovil" class="pos-search-input" placeholder="0414-8899221 | J-00030291-0 | Banesco" style="width: 100%;">
                         </div>
                         <div>
                             <label style="font-size: 0.78rem; color: #2C1A12; font-weight: 700; display: block; margin-bottom: 4px;">Calificación (Estrellas):</label>
-                            <select id="prv-calificacion" class="pos-search-input" style="width: 100%; background: #FFFFFF; border: 1px solid #C8B89E; color: #7C4D2B; font-weight: 800; border-radius: 6px; padding: 7px 10px; font-size: 0.85rem; box-sizing: border-box;">
+                            <select id="prv-calificacion" class="pos-search-input" style="width: 100%; color: #7C4D2B; font-weight: 800;">
                                 <option value="5.0">⭐⭐⭐⭐⭐ 5.0 (Excelente)</option>
                                 <option value="4.8">⭐⭐⭐⭐ 4.8 (Muy Bueno)</option>
                                 <option value="4.5">⭐⭐⭐⭐ 4.5 (Bueno)</option>
@@ -1556,32 +1556,32 @@
                         </div>
                     </div>
 
-                    <div style="margin-bottom: 16px;">
+                    <div>
                         <label style="font-size: 0.78rem; color: #2C1A12; font-weight: 700; display: block; margin-bottom: 4px;">Notas y Condiciones Comerciales:</label>
-                        <textarea id="prv-notas" class="pos-search-input" rows="2" placeholder="Ej: Despacho semanal los martes. Ofrece 5% de descuento por pronto pago..." style="width: 100%; background: #FFFFFF; border: 1px solid #C8B89E; color: #2C1A12; font-weight: 600; border-radius: 6px; padding: 8px 10px; font-size: 0.85rem; resize: none; box-sizing: border-box;"></textarea>
+                        <textarea id="prv-notas" class="pos-search-input" rows="2" placeholder="Ej: Despacho semanal los martes. Ofrece 5% de descuento por pronto pago..." style="width: 100%; resize: none;"></textarea>
                     </div>
+                </div>
 
-                    <div style="display: flex; justify-content: flex-end; gap: 10px; padding-top: 8px; border-top: 1px solid #E8DFD1;">
-                        <button type="button" class="btn-secondary" onclick="ViasaApp.cerrarModalProveedor()" style="background: #F3EDE2; border: 1px solid #C8B89E; color: #2C1A12; font-weight: 700; border-radius: 6px; padding: 8px 18px; cursor: pointer; font-size: 0.85rem; transition: all 0.2s ease;">Cancelar</button>
-                        <button type="submit" class="btn-gold" style="background: #C88A2B; border: 1px solid #B47820; color: #FFFFFF; font-weight: 800; border-radius: 6px; padding: 8px 20px; cursor: pointer; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 2px 6px rgba(200, 138, 43, 0.3); transition: all 0.2s ease;"><i class="fa-solid fa-floppy-disk"></i> Guardar Proveedor</button>
-                    </div>
-                </form>
-            </div>
+                <div class="viasa-modal-footer">
+                    <button type="button" class="btn-secondary" onclick="ViasaApp.cerrarModalProveedor()">Cancelar</button>
+                    <button type="submit" class="btn-gold"><i class="fa-solid fa-floppy-disk"></i> Guardar Proveedor</button>
+                </div>
+            </form>
         </div>
     </div>
 
     <!-- MODAL 9: GENERADOR DE ÓRDENES DE COMPRA Y REABASTECIMIENTO INTELIGENTE -->
     <div class="viasa-modal" id="modal-orden-compra">
-        <div class="viasa-modal-card" style="max-width: 820px; background: #FFFFFF; border: 1.5px solid #DDD2C0; border-radius: 14px; box-shadow: 0 15px 45px rgba(44, 26, 18, 0.2); overflow: hidden;">
-            <div class="viasa-modal-header" style="background: #FAF7F2; border-bottom: 1.5px solid #DDD2C0; padding: 14px 20px; display: flex; justify-content: space-between; align-items: center;">
+        <div class="viasa-modal-container viasa-modal-card" style="max-width: 840px; width: 95%;">
+            <div class="viasa-modal-header">
                 <h3 style="color: #2C1A12; font-size: 1.15rem; font-weight: 800; display: flex; align-items: center; gap: 8px; margin: 0;">
                     <i class="fa-solid fa-cart-flatbed" style="color: #C88A2B;"></i> Generar Orden de Compra a Proveedor
                 </h3>
-                <button type="button" onclick="ViasaApp.cerrarModalOrdenCompra()" class="viasa-modal-close" style="background: #EFE6D8; border: 1px solid #D6C7B2; color: #2C1A12; width: 32px; height: 32px; border-radius: 8px; font-size: 1.15rem; font-weight: 800; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s ease;">&times;</button>
+                <button type="button" onclick="ViasaApp.cerrarModalOrdenCompra()" class="viasa-modal-close">&times;</button>
             </div>
-            <div class="viasa-modal-body" style="padding: 18px 22px; background: #FFFFFF; max-height: 80vh; overflow-y: auto;">
-                <form id="form-orden-compra" onsubmit="ViasaApp.guardarOrdenCompra(event)">
-                    <div style="display: grid; grid-template-columns: 2fr 1.2fr 1fr; gap: 12px; margin-bottom: 12px;">
+            <form id="form-orden-compra" onsubmit="ViasaApp.guardarOrdenCompra(event)" class="viasa-modal-form-wrapper">
+                <div class="viasa-modal-body">
+                    <div style="display: grid; grid-template-columns: 2fr 1.2fr 1fr; gap: 12px;">
                         <div>
                             <label style="font-size: 0.78rem; color: #2C1A12; font-weight: 700; display: block; margin-bottom: 4px;">Seleccionar Proveedor: *</label>
                             <select id="oc-proveedor-id" class="pos-search-input" style="width: 100%; background: #FFFFFF; border: 1px solid #C8B89E; color: #2C1A12; font-weight: 600; border-radius: 6px; padding: 8px 10px; font-size: 0.85rem;" required onchange="ViasaApp.actualizarProveedorEnOC()">
@@ -1605,7 +1605,7 @@
                     </div>
 
                     <!-- Barra de Sugerencia Automática de Stock Mínimo -->
-                    <div style="background: #FAF7F2; border: 1.5px solid #C88A2B; border-radius: 10px; padding: 10px 14px; margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center;">
+                    <div style="background: #FAF7F2; border: 1.5px solid #C88A2B; border-radius: 10px; padding: 10px 14px; display: flex; justify-content: space-between; align-items: center;">
                         <div style="font-size: 0.8rem; color: #2C1A12;">
                             <i class="fa-solid fa-wand-magic-sparkles" style="color: #C88A2B;"></i> <strong>Asistente de Reabastecimiento:</strong> Detecta insumos bajos y calcula cantidades sugeridas.
                         </div>
@@ -1615,7 +1615,7 @@
                     </div>
 
                     <!-- Tabla de Ítems a Comprar -->
-                    <div style="background: #FAF7F2; border: 1.5px solid #DDD2C0; border-radius: 10px; padding: 12px; margin-bottom: 14px;">
+                    <div style="background: #FAF7F2; border: 1.5px solid #DDD2C0; border-radius: 10px; padding: 12px;">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 8px;">
                             <div style="display: flex; align-items: center; gap: 8px;">
                                 <span style="font-weight: 800; font-size: 0.88rem; color: #2C1A12;">
@@ -1744,7 +1744,7 @@
                     </div>
 
                     <!-- Totales de la Orden de Compra -->
-                    <div style="background: #FAF7F2; border: 1.5px solid #DDD2C0; border-radius: 10px; padding: 12px 18px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+                    <div style="background: #FAF7F2; border: 1.5px solid #DDD2C0; border-radius: 10px; padding: 12px 18px; display: flex; justify-content: space-between; align-items: center;">
                         <div>
                             <span style="font-size: 0.75rem; color: #4A3B32; font-weight: 800;">TOTAL ESTIMADO EN DIVISAS:</span>
                             <div style="font-size: 1.4rem; font-weight: 900; color: #7C4D2B;" id="oc-gran-total-usd">$0.00</div>
@@ -1755,34 +1755,34 @@
                             <small style="font-size: 0.68rem; color: #6A5B52;">Tasa BCV: Bs. <span id="oc-tasa-bcv-val">36.85</span></small>
                         </div>
                     </div>
+                </div>
 
-                    <div style="display: flex; justify-content: flex-end; gap: 10px; padding-top: 8px; border-top: 1px solid #E8DFD1;">
-                        <button type="button" class="btn-secondary" onclick="ViasaApp.cerrarModalOrdenCompra()" style="background: #F3EDE2; border: 1px solid #C8B89E; color: #2C1A12; font-weight: 700; border-radius: 6px; padding: 8px 18px; cursor: pointer; font-size: 0.85rem;">Cancelar</button>
-                        <button type="button" class="btn-secondary" onclick="ViasaApp.guardarBorradorOrdenCompra()" style="background: #F5EFE6; color: #7C4D2B; border: 1.5px solid #C88A2B; font-weight: 800; padding: 8px 16px; border-radius: 6px; font-size: 0.85rem; display: flex; align-items: center; gap: 6px; cursor: pointer;" title="Guardar cambios de catálogo y registrar Orden de Compra como Borrador / Pendiente">
-                            <i class="fa-solid fa-floppy-disk"></i> 💾 Guardar
-                        </button>
-                        <button type="submit" class="btn-gold" style="background: #C88A2B; border: 1px solid #B47820; color: #FFFFFF; font-weight: 800; border-radius: 6px; padding: 8px 20px; cursor: pointer; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 2px 6px rgba(200, 138, 43, 0.3);"><i class="fa-solid fa-paper-plane"></i> Emitir Orden de Compra</button>
-                    </div>
-                </form>
-            </div>
+                <div class="viasa-modal-footer">
+                    <button type="button" class="btn-secondary" onclick="ViasaApp.cerrarModalOrdenCompra()">Cancelar</button>
+                    <button type="button" class="btn-secondary" onclick="ViasaApp.guardarBorradorOrdenCompra()" style="background: #F5EFE6; color: #7C4D2B; border: 1.5px solid #C88A2B; font-weight: 800; padding: 8px 16px; border-radius: 6px; font-size: 0.85rem; display: flex; align-items: center; gap: 6px; cursor: pointer;" title="Guardar cambios de catálogo y registrar Orden de Compra como Borrador / Pendiente">
+                        <i class="fa-solid fa-floppy-disk"></i> 💾 Guardar
+                    </button>
+                    <button type="submit" class="btn-gold"><i class="fa-solid fa-paper-plane"></i> Emitir Orden de Compra</button>
+                </div>
+            </form>
         </div>
     </div>
 
     <!-- MODAL 10: REGISTRO DE PAGO MULTIDIVISA DE CUENTAS POR PAGAR (CxP) -->
     <div class="viasa-modal" id="modal-pago-cxp">
-        <div class="viasa-modal-card" style="max-width: 580px; background: #FFFFFF; border: 1.5px solid #DDD2C0; border-radius: 14px; box-shadow: 0 15px 45px rgba(44, 26, 18, 0.2); overflow: hidden;">
-            <div class="viasa-modal-header" style="background: #FAF7F2; border-bottom: 1.5px solid #DDD2C0; padding: 14px 20px; display: flex; justify-content: space-between; align-items: center;">
+        <div class="viasa-modal-container viasa-modal-card" style="max-width: 600px; width: 95%;">
+            <div class="viasa-modal-header">
                 <h3 style="color: #2C1A12; font-size: 1.1rem; font-weight: 800; display: flex; align-items: center; gap: 8px; margin: 0;">
                     <i class="fa-solid fa-money-bill-transfer" style="color: #C88A2B;"></i> Registrar Pago a Proveedor (CxP)
                 </h3>
-                <button type="button" onclick="ViasaApp.cerrarModalPagoCxP()" class="viasa-modal-close" style="background: #EFE6D8; border: 1px solid #D6C7B2; color: #2C1A12; width: 32px; height: 32px; border-radius: 8px; font-size: 1.15rem; font-weight: 800; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s ease;">&times;</button>
+                <button type="button" onclick="ViasaApp.cerrarModalPagoCxP()" class="viasa-modal-close">&times;</button>
             </div>
-            <div class="viasa-modal-body" style="padding: 18px 22px; background: #FFFFFF; max-height: 80vh; overflow-y: auto;">
-                <form id="form-pago-cxp" onsubmit="ViasaApp.procesarAbonoCxP(event)">
+            <form id="form-pago-cxp" onsubmit="ViasaApp.procesarAbonoCxP(event)" class="viasa-modal-form-wrapper">
+                <div class="viasa-modal-body">
                     <input type="hidden" id="pago-cxp-id">
 
                     <!-- Resumen de la Factura por Pagar -->
-                    <div style="background: #FAF7F2; border: 1.5px solid #DDD2C0; border-radius: 10px; padding: 12px; margin-bottom: 14px;">
+                    <div style="background: #FAF7F2; border: 1.5px solid #DDD2C0; border-radius: 10px; padding: 12px;">
                         <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
                             <span style="font-size: 0.8rem; color: #4A3B32; font-weight: 700;">Factura Proveedor:</span>
                             <strong style="color: #7C4D2B; font-weight: 800;" id="pago-cxp-factura-num">FC-0000</strong>
@@ -1797,7 +1797,7 @@
                         </div>
                     </div>
 
-                    <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 12px; margin-bottom: 12px;">
+                    <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 12px;">
                         <div>
                             <label style="font-size: 0.78rem; color: #2C1A12; font-weight: 700; display: block; margin-bottom: 4px;">Método de Pago: *</label>
                             <select id="pago-cxp-metodo" class="pos-search-input" style="width: 100%; background: #FFFFFF; border: 1px solid #C8B89E; color: #2C1A12; font-weight: 600; border-radius: 6px; padding: 8px 10px; font-size: 0.85rem;" required onchange="ViasaApp.cambiarMetodoPagoCxP()">
@@ -1814,12 +1814,12 @@
                         </div>
                     </div>
 
-                    <div style="background: #F5EFE6; border: 1px solid #DFD3C0; border-radius: 8px; padding: 8px 12px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;">
+                    <div style="background: #F5EFE6; border: 1px solid #DFD3C0; border-radius: 8px; padding: 8px 12px; display: flex; justify-content: space-between; align-items: center;">
                         <span style="font-size: 0.75rem; color: #4A3B32; font-weight: 700;">Equivalente en Bolívares (Tasa BCV):</span>
                         <strong style="font-size: 1.05rem; color: #7C4D2B; font-weight: 900;" id="pago-cxp-equivalente-bs">Bs. 0.00</strong>
                     </div>
 
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
                         <div>
                             <label style="font-size: 0.78rem; color: #2C1A12; font-weight: 700; display: block; margin-bottom: 4px;">N° de Referencia / Aprobación: *</label>
                             <input type="text" id="pago-cxp-referencia" class="pos-search-input" required placeholder="Ej: 984201" style="width: 100%; background: #FFFFFF; border: 1px solid #C8B89E; color: #2C1A12; font-weight: 600; border-radius: 6px; padding: 8px 10px; font-size: 0.85rem; box-sizing: border-box;">
@@ -1829,15 +1829,15 @@
                             <input type="text" id="pago-cxp-banco" class="pos-search-input" placeholder="Banesco / BDV / Zelle" style="width: 100%; background: #FFFFFF; border: 1px solid #C8B89E; color: #2C1A12; font-weight: 600; border-radius: 6px; padding: 8px 10px; font-size: 0.85rem; box-sizing: border-box;">
                         </div>
                     </div>
+                </div>
 
-                    <div style="display: flex; justify-content: flex-end; gap: 10px; padding-top: 8px; border-top: 1px solid #E8DFD1;">
-                        <button type="button" class="btn-secondary" onclick="ViasaApp.cerrarModalPagoCxP()" style="background: #F3EDE2; border: 1px solid #C8B89E; color: #2C1A12; font-weight: 700; border-radius: 6px; padding: 8px 18px; cursor: pointer; font-size: 0.85rem;">Cancelar</button>
-                        <button type="submit" class="btn-gold" style="background: #C88A2B; border: 1px solid #B47820; color: #FFFFFF; font-weight: 800; border-radius: 6px; padding: 8px 20px; cursor: pointer; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 2px 6px rgba(200, 138, 43, 0.3);">
-                            <i class="fa-solid fa-check"></i> Confirmar Pago y Generar Comprobante
-                        </button>
-                    </div>
-                </form>
-            </div>
+                <div class="viasa-modal-footer">
+                    <button type="button" class="btn-secondary" onclick="ViasaApp.cerrarModalPagoCxP()">Cancelar</button>
+                    <button type="submit" class="btn-gold">
+                        <i class="fa-solid fa-check"></i> Confirmar Pago y Generar Comprobante
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 
@@ -1868,31 +1868,31 @@
 
     <!-- MODAL 12: REGISTRO / EDICIÓN DE CLIENTE CRM -->
     <div class="viasa-modal" id="modal-cliente">
-        <div class="viasa-modal-card" style="max-width: 680px;">
+        <div class="viasa-modal-container viasa-modal-card" style="max-width: 680px; width: 95%;">
             <div class="viasa-modal-header">
-                <h3 style="color: var(--accent-wheat); font-size: 1.1rem; display: flex; align-items: center; gap: 8px;">
-                    <i class="fa-solid fa-user-plus"></i> <span id="modal-cli-title">Registrar Cliente CRM</span>
+                <h3 style="color: #2C1A12; font-size: 1.1rem; font-weight: 800; display: flex; align-items: center; gap: 8px; margin: 0;">
+                    <i class="fa-solid fa-user-plus" style="color: #C88A2B;"></i> <span id="modal-cli-title">Registrar Cliente CRM</span>
                 </h3>
-                <button type="button" onclick="ViasaApp.cerrarModalCliente()" style="background:none; border:none; color:#fff; font-size:1.3rem; cursor:pointer;">&times;</button>
+                <button type="button" onclick="ViasaApp.cerrarModalCliente()" class="viasa-modal-close" aria-label="Cerrar">&times;</button>
             </div>
-            <div class="viasa-modal-body">
-                <form id="form-cliente" onsubmit="ViasaApp.guardarCliente(event)">
+            <form id="form-cliente" onsubmit="ViasaApp.guardarCliente(event)" class="viasa-modal-form-wrapper">
+                <div class="viasa-modal-body">
                     <input type="hidden" id="cli-id">
 
                     <div style="display: grid; grid-template-columns: 2fr 1.2fr; gap: 12px; margin-bottom: 12px;">
                         <div>
-                            <label style="font-size: 0.78rem; color: var(--text-secondary); font-weight: 700; display: block; margin-bottom: 4px;">Nombre Completo / Razón Social:</label>
+                            <label style="font-size: 0.78rem; color: #2C1A12; font-weight: 700; display: block; margin-bottom: 4px;">Nombre Completo / Razón Social:</label>
                             <input type="text" id="cli-nombre" class="pos-search-input" required placeholder="Ej: Dr. Carlos Mendoza" style="width: 100%;">
                         </div>
                         <div>
-                            <label style="font-size: 0.78rem; color: var(--text-secondary); font-weight: 700; display: block; margin-bottom: 4px;">Cédula / RIF:</label>
+                            <label style="font-size: 0.78rem; color: #2C1A12; font-weight: 700; display: block; margin-bottom: 4px;">Cédula / RIF:</label>
                             <input type="text" id="cli-documento" class="pos-search-input" required placeholder="V-12345678 / J-12345678-0" style="width: 100%;">
                         </div>
                     </div>
 
                     <div style="display: grid; grid-template-columns: 1.2fr 1.2fr 1.4fr; gap: 12px; margin-bottom: 12px;">
                         <div>
-                            <label style="font-size: 0.78rem; color: var(--text-secondary); font-weight: 700; display: block; margin-bottom: 4px;">Categoría / Segmento:</label>
+                            <label style="font-size: 0.78rem; color: #2C1A12; font-weight: 700; display: block; margin-bottom: 4px;">Categoría / Segmento:</label>
                             <select id="cli-tipo" class="pos-search-input" style="width: 100%;" required>
                                 <option value="Consumidor Frecuente">🥖 Consumidor Frecuente</option>
                                 <option value="Cliente Corporativo">🏢 Cliente Corporativo</option>
@@ -1901,42 +1901,42 @@
                             </select>
                         </div>
                         <div>
-                            <label style="font-size: 0.78rem; color: var(--text-secondary); font-weight: 700; display: block; margin-bottom: 4px;">Teléfono / WhatsApp:</label>
+                            <label style="font-size: 0.78rem; color: #2C1A12; font-weight: 700; display: block; margin-bottom: 4px;">Teléfono / WhatsApp:</label>
                             <input type="text" id="cli-telefono" class="pos-search-input" required placeholder="0414-8921102" style="width: 100%;">
                         </div>
                         <div>
-                            <label style="font-size: 0.78rem; color: var(--text-secondary); font-weight: 700; display: block; margin-bottom: 4px;">Correo Electrónico:</label>
+                            <label style="font-size: 0.78rem; color: #2C1A12; font-weight: 700; display: block; margin-bottom: 4px;">Correo Electrónico:</label>
                             <input type="email" id="cli-email" class="pos-search-input" placeholder="cliente@correo.com" style="width: 100%;">
                         </div>
                     </div>
 
                     <div style="margin-bottom: 12px;">
-                        <label style="font-size: 0.78rem; color: var(--text-secondary); font-weight: 700; display: block; margin-bottom: 4px;">Dirección / Ubicación de Entrega:</label>
+                        <label style="font-size: 0.78rem; color: #2C1A12; font-weight: 700; display: block; margin-bottom: 4px;">Dirección / Ubicación de Entrega:</label>
                         <input type="text" id="cli-direccion" class="pos-search-input" placeholder="Ej: Urb. Los Olivos, Mz 14, Casa 8, Puerto Ordaz" style="width: 100%;">
                     </div>
 
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
                         <div>
-                            <label style="font-size: 0.78rem; color: var(--text-secondary); font-weight: 700; display: block; margin-bottom: 4px;">Saldo Inicial Wallet ($ USD):</label>
-                            <input type="number" step="0.01" id="cli-wallet-saldo" class="pos-search-input" value="0.00" style="width: 100%; font-weight: bold; color: #10b981;">
+                            <label style="font-size: 0.78rem; color: #2C1A12; font-weight: 700; display: block; margin-bottom: 4px;">Saldo Inicial Wallet ($ USD):</label>
+                            <input type="number" step="0.01" id="cli-wallet-saldo" class="pos-search-input" value="0.00" style="width: 100%; font-weight: bold; color: #059669;">
                         </div>
                         <div>
-                            <label style="font-size: 0.78rem; color: var(--text-secondary); font-weight: 700; display: block; margin-bottom: 4px;">Puntos Iniciales Club Viasa:</label>
-                            <input type="number" id="cli-puntos" class="pos-search-input" value="0" style="width: 100%; font-weight: bold; color: #fbbf24;">
+                            <label style="font-size: 0.78rem; color: #2C1A12; font-weight: 700; display: block; margin-bottom: 4px;">Puntos Iniciales Club Viasa:</label>
+                            <input type="number" id="cli-puntos" class="pos-search-input" value="0" style="width: 100%; font-weight: bold; color: #C88A2B;">
                         </div>
                     </div>
 
                     <div style="margin-bottom: 16px;">
-                        <label style="font-size: 0.78rem; color: var(--text-secondary); font-weight: 700; display: block; margin-bottom: 4px;">Preferencias Gastronómicas y Notas Especiales:</label>
+                        <label style="font-size: 0.78rem; color: #2C1A12; font-weight: 700; display: block; margin-bottom: 4px;">Preferencias Gastronómicas y Notas Especiales:</label>
                         <textarea id="cli-preferencias" class="pos-search-input" rows="2" placeholder="Ej: Café con leche bien caliente sin azúcar, Pan campesino bien tostado, alérgico al maní..." style="width: 100%; font-size: 0.85rem; resize: none;"></textarea>
                     </div>
+                </div>
 
-                    <div style="display: flex; justify-content: flex-end; gap: 10px;">
-                        <button type="button" class="btn-secondary" onclick="ViasaApp.cerrarModalCliente()">Cancelar</button>
-                        <button type="submit" class="btn-gold"><i class="fa-solid fa-floppy-disk"></i> Guardar Cliente</button>
-                    </div>
-                </form>
-            </div>
+                <div class="viasa-modal-footer">
+                    <button type="button" class="btn-secondary" onclick="ViasaApp.cerrarModalCliente()">Cancelar</button>
+                    <button type="submit" class="btn-gold"><i class="fa-solid fa-floppy-disk"></i> Guardar Cliente</button>
+                </div>
+            </form>
         </div>
     </div>
 
@@ -4475,7 +4475,7 @@
 
     <!-- MODAL 38: CREADOR Y REGISTRO DE NUEVO PRODUCTO PROPIO VIASA (DOBLE CODIFICACIÓN EAN-13 + QR EXCLUSIVO) -->
     <div class="viasa-modal" id="modal-crear-producto-viasa">
-        <div class="viasa-modal-card" style="max-width: 860px; width: 96%; max-height: 94vh; background: #FFFFFF; border: 1.5px solid #DDD2C0; border-radius: 14px; box-shadow: 0 15px 45px rgba(44, 26, 18, 0.2); overflow: hidden;">
+        <div class="viasa-modal-container viasa-modal-card" style="max-width: 860px; width: 96%; max-height: 94vh;">
             <div class="viasa-modal-header" style="background: #FAF7F2; border-bottom: 1.5px solid #DDD2C0; padding: 14px 20px; display: flex; justify-content: space-between; align-items: center;">
                 <h3 style="color: #2C1A12; font-size: 1.15rem; font-weight: 800; display: flex; align-items: center; gap: 8px; margin: 0;">
                     <i class="fa-solid fa-wand-magic-sparkles" style="color: #C88A2B;"></i> Registro de Creación Propia VIASA &bull; Codificación Automática (EAN-13 + QR)
@@ -4483,8 +4483,8 @@
                 <button type="button" onclick="ViasaApp.cerrarModalCrearProductoViasa()" class="viasa-modal-close" style="background: #EFE6D8; border: 1px solid #D6C7B2; color: #2C1A12; width: 32px; height: 32px; border-radius: 8px; font-size: 1.15rem; font-weight: 800; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s ease;">&times;</button>
             </div>
             
-            <div class="viasa-modal-body" style="padding: 18px 22px; background: #FFFFFF; overflow-y: auto;">
-                <form id="form-crear-producto-viasa" onsubmit="ViasaApp.guardarNuevoProductoViasa(event)">
+            <form id="form-crear-producto-viasa" onsubmit="ViasaApp.guardarNuevoProductoViasa(event)" class="viasa-modal-form-wrapper">
+                <div class="viasa-modal-body" style="padding: 18px 22px; background: #FFFFFF; overflow-y: auto;">
                     
                     <!-- Banner de Trazabilidad y Origen Exclusivo -->
                     <div style="background: #FAF7F2; border: 1.5px solid #C88A2B; border-radius: 10px; padding: 10px 14px; margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center;">
@@ -4635,26 +4635,26 @@
                             <i class="fa-solid fa-shield-halved" style="color: #C88A2B;"></i> <strong>Garantía de Unicidad:</strong> Correlativo verificado en memoria para asegurar cero duplicidad en el stock y mostrador.
                         </div>
                     </div>
+                </div>
 
-                    <!-- Botones de Acción -->
-                    <div style="display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; padding-top: 8px; border-top: 1px solid #E8DFD1;">
-                        <div style="display: flex; gap: 6px;">
-                            <button type="button" class="btn-secondary" onclick="ViasaApp.descargarBarcodeNuevoProductoPNG()" style="font-size: 0.78rem; padding: 7px 12px; background: #F3EDE2; color: #2C1A12; border: 1px solid #C8B89E; font-weight: 700; border-radius: 6px; cursor: pointer;" title="Descargar PNG del Código de Barra EAN-13 en Alta Resolución (FULL HD / 300 DPI)">
-                                <i class="fa-solid fa-download"></i> Barcode PNG
-                            </button>
-                            <button type="button" class="btn-secondary" onclick="ViasaApp.descargarQRNuevoProductoPNG()" style="font-size: 0.78rem; padding: 7px 12px; background: #F3EDE2; color: #2C1A12; border: 1px solid #C8B89E; font-weight: 700; border-radius: 6px; cursor: pointer;" title="Descargar PNG del Código QR de Trazabilidad en Alta Resolución (FULL HD 1600x1600)">
-                                <i class="fa-solid fa-qrcode"></i> QR PNG
-                            </button>
-                        </div>
-                        <div style="display: flex; gap: 8px;">
-                            <button type="button" class="btn-secondary" onclick="ViasaApp.cerrarModalCrearProductoViasa()" style="background: #F3EDE2; border: 1px solid #C8B89E; color: #2C1A12; font-weight: 700; border-radius: 6px; padding: 8px 18px; cursor: pointer; font-size: 0.85rem;">Cancelar</button>
-                            <button type="submit" class="btn-gold" style="background: #C88A2B; border: 1px solid #B47820; color: #FFFFFF; font-weight: 800; border-radius: 6px; padding: 8px 20px; cursor: pointer; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 2px 6px rgba(200, 138, 43, 0.3);">
-                                <i class="fa-solid fa-tags"></i> Crear Producto y Abrir Planilla de Etiquetas
-                            </button>
-                        </div>
+                <!-- Footer Fijo de Acciones Anti-Colisión -->
+                <div class="viasa-modal-footer" style="justify-content: space-between;">
+                    <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                        <button type="button" class="btn-secondary" onclick="ViasaApp.descargarBarcodeNuevoProductoPNG()" style="font-size: 0.78rem; padding: 7px 12px; background: #F3EDE2; color: #2C1A12; border: 1px solid #C8B89E; font-weight: 700; border-radius: 6px; cursor: pointer;" title="Descargar PNG del Código de Barra EAN-13 en Alta Resolución (FULL HD / 300 DPI)">
+                            <i class="fa-solid fa-download"></i> Barcode PNG
+                        </button>
+                        <button type="button" class="btn-secondary" onclick="ViasaApp.descargarQRNuevoProductoPNG()" style="font-size: 0.78rem; padding: 7px 12px; background: #F3EDE2; color: #2C1A12; border: 1px solid #C8B89E; font-weight: 700; border-radius: 6px; cursor: pointer;" title="Descargar PNG del Código QR de Trazabilidad en Alta Resolución (FULL HD 1600x1600)">
+                            <i class="fa-solid fa-qrcode"></i> QR PNG
+                        </button>
                     </div>
-                </form>
-            </div>
+                    <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                        <button type="button" class="btn-secondary" onclick="ViasaApp.cerrarModalCrearProductoViasa()" style="background: #F3EDE2; border: 1px solid #C8B89E; color: #2C1A12; font-weight: 700; border-radius: 6px; padding: 8px 18px; cursor: pointer; font-size: 0.85rem;">Cancelar</button>
+                        <button type="submit" class="btn-gold" style="background: #C88A2B; border: 1px solid #B47820; color: #FFFFFF; font-weight: 800; border-radius: 6px; padding: 8px 20px; cursor: pointer; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 2px 6px rgba(200, 138, 43, 0.3);">
+                            <i class="fa-solid fa-tags"></i> Crear Producto y Abrir Planilla de Etiquetas
+                        </button>
+                    </div>
+                </div>
+            </form>
         </div>
     </div>
 
