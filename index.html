@@ -169,6 +169,11 @@
                         <i class="fa-solid fa-gauge-high"></i>
                         <span>Panel Principal</span>
                     </div>
+                    <div class="nav-item" data-view="agenda-operaciones" id="nav-item-agenda-operaciones" style="border-left: 2px solid #f59e0b; background: rgba(245, 158, 11, 0.08);">
+                        <i class="fa-solid fa-calendar-days" style="color: #f59e0b;"></i>
+                        <span style="color: #fde68a; font-weight: 800;">Agenda y Operaciones</span>
+                        <span class="badge-agenda-live" id="badge-agenda-hoy-count" style="margin-left: auto; background: linear-gradient(135deg, #d97706, #b45309); color: #fff; font-size: 0.65rem; padding: 2px 7px; border-radius: 10px; font-weight: 800; border: 1px solid #f59e0b;" title="Compromisos Programados para Hoy">Hoy: 4</span>
+                    </div>
                     <div class="nav-item" data-view="pos">
                         <i class="fa-solid fa-cash-register"></i>
                         <span>Punto de Venta</span>
@@ -364,6 +369,11 @@
                     </button>
                 </div>
             </header>
+
+            <!-- VISTA: AGENDA Y OPERACIONES (AGENDA MAESTRA Y CRONOGRAMA CORPORATIVO) -->
+            <section class="view-container" id="view-agenda-operaciones">
+                <div id="agenda-operaciones-root"></div>
+            </section>
 
             <!-- VISTA: GESTIÓN DE GUARDIAS, CAMPO Y VANGUARDIA OPERATIVA -->
             <section class="view-container" id="view-guardias-hub">
@@ -7646,6 +7656,7 @@
     <script src="assets/js/contabilidad-crud-engine.js?v=2.9.5"></script>
     <script src="assets/js/productos-nueva-viasa-engine.js?v=3.0.0"></script>
     <script src="assets/js/carnets-personal-engine.js?v=3.1.0"></script>
+    <script src="assets/js/agenda-operaciones-engine.js?v=1.0.0"></script>
     <script src="assets/js/supabase-cloud.js"></script>
     <script src="assets/js/auth.js"></script>
     <script src="assets/js/app.js?v=3.1.0"></script>

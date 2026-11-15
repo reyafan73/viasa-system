@@ -355,6 +355,9 @@
 
             // 4. Inicializar UI y Eventos
             this.initNavigation();
+            if (window.ViasaAgendaEngine && typeof window.ViasaAgendaEngine.actualizarBadgeSidebar === 'function') {
+                window.ViasaAgendaEngine.actualizarBadgeSidebar();
+            }
             this.initClock();
             this.renderPOSCategories();
             this.renderPOSProducts();
@@ -1561,6 +1564,7 @@
             if (viewName === 'guardias-hub') { if (window.ViasaGuardiasEngine) window.ViasaGuardiasEngine.renderGuardiasHub(); }
             if (viewName === 'productos-nueva-viasa') { if (window.ViasaProductosExclusivosEngine) window.ViasaProductosExclusivosEngine.render(); }
             if (viewName === 'carnets-personal') { if (window.ViasaCarnetsEngine) window.ViasaCarnetsEngine.render(); }
+            if (viewName === 'agenda-operaciones') { if (window.ViasaAgendaEngine) window.ViasaAgendaEngine.render(); }
         },
 
         initClock() {

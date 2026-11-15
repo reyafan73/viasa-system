@@ -343,6 +343,12 @@
                 return ['carnets-personal', 'rrhh', 'guardias-hub', 'configuracion', 'reportes', 'usuarios']
                     .some(p => rolInfo.permisos.includes(p));
             }
+
+            // Agenda y Operaciones: accesible para roles directivos, ejecutivos y operativos
+            if (permiso === 'agenda-operaciones') {
+                return ['agenda-operaciones', 'dashboard', 'guardias-hub', 'produccion', 'proveedores', 'crm', 'pos', 'inventario']
+                    .some(p => rolInfo.permisos.includes(p));
+            }
             return rolInfo.permisos.includes(permiso);
         }
 

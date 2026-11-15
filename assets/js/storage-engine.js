@@ -12,7 +12,7 @@
 
     const VIASA_STORAGE_PREFIX = 'viasa_sys_';
     const DB_NAME = 'VIASA_SYSTEM_DB_v1';
-    const DB_VERSION = 10;
+    const DB_VERSION = 11;
 
     const STORES = [
         'categorias',
@@ -74,7 +74,9 @@
         'turnos_operativos',
         'anales_guardias_rrhh',
         'shift_marketplace',
-        'despachos_rutas'
+        'despachos_rutas',
+        'agenda_operaciones',
+        'agenda_bitacora_emails'
     ];
 
     class ViasaStorageEngine {
