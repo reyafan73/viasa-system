@@ -297,73 +297,51 @@
         <!-- ÁREA PRINCIPAL -->
         <main class="app-main">
             
-            <!-- HEADER SUPERIOR -->
+            <!-- HEADER SUPERIOR (FILA 1: BARRA DE UTILIDADES DEL SISTEMA) -->
             <header class="app-header">
-                <div class="header-rates-bar">
-                    <div class="rate-badge bcv" onclick="ViasaApp.sincronizarTasasEnTiempoReal(true)" title="Tasa Oficial Banco Central de Venezuela (Clic para Sincronizar en Tiempo Real)">
-                        <i class="fa-solid fa-building-columns"></i>
-                        <span>BCV: <strong id="rate-bcv-val">Bs. 36.85</strong></span>
-                    </div>
-                    <div class="rate-badge paralelo" onclick="ViasaApp.sincronizarTasasEnTiempoReal(true)" title="Tasa Referencial de Monitoreo / Binance P2P USDT (Clic para Sincronizar)">
-                        <i class="fa-solid fa-chart-line"></i>
-                        <span>USDT: <strong id="rate-paralelo-val">Bs. 39.50</strong></span>
-                    </div>
-                    <div class="rate-badge sync-status online" id="viasa-network-status-pill" onclick="ViasaApp.sincronizarTasasEnTiempoReal(true)" title="Sincronización en Tiempo Real (Clic para Actualizar Ahora)">
-                        <i class="fa-solid fa-cloud-arrow-up" id="viasa-network-status-icon"></i>
-                        <span id="viasa-network-status-text">Local / Offline Seguro</span>
-                    </div>
-                    <div class="rate-badge aclas-fiscal-status online" id="viasa-aclas-status-pill" onclick="ViasaApp.abrirModalDiagnosticoAclas()" title="Impresora Fiscal SENIAT Multi-Marca (Clic para Cambiar Marca o Diagnóstico)" style="border: 1.5px solid rgba(245, 158, 11, 0.6); box-shadow: 0 0 10px rgba(245, 158, 11, 0.25); font-weight: 700;">
-                        <i class="fa-solid fa-print" id="viasa-aclas-status-icon" style="color: #fbbf24;"></i>
-                        <span id="viasa-aclas-status-text">Impresora Fiscal: Lista</span>
-                    </div>
-                </div>
-
-                <div class="header-user-section">
-                    <div class="clock-display" id="live-clock">--:--:-- --</div>
-
-                    <!-- Botón Asistente de Voz Operativo (Viasa Voice) -->
-                    <button type="button" class="btn-voice-header-pill" id="btn-viasa-voice-header" onclick="ViasaApp.toggleViasaVoice()" title="Viasa Voice: Asistente Operativo Manos Libres">
-                        <i class="fa-solid fa-microphone"></i>
-                        <span>Viasa Voice</span>
+                <div class="header-utilities-bar">
+                    <!-- 1. Estado de Impresora Fiscal -->
+                    <button type="button" class="hdr-exec-pill fiscal-pill online" id="viasa-aclas-status-pill" onclick="ViasaApp.abrirModalDiagnosticoAclas()" title="Impresora Fiscal SENIAT Multi-Marca (Clic para Cambiar Marca o Diagnóstico)">
+                        <i class="fa-solid fa-print" id="viasa-aclas-status-icon"></i>
+                        <span id="viasa-aclas-status-text">Fiscal: Desconectada</span>
                     </button>
 
-                    <!-- Botones Exclusivos de Guardado General y Casillero de Respaldos (Master Senior, Gerente General y Gerente Administrativa) -->
-                    <div id="hdr-backup-actions-group" style="display: flex; align-items: center; gap: 6px;">
-                        <button type="button" class="btn-gold" id="btn-header-guardado-general" onclick="ViasaApp.ejecutarGuardadoGeneralYRespaldo()" title="Guardado General: Guarda todos los datos de VIASA System y archiva un respaldo en el Casillero General" style="padding: 6px 12px; font-size: 0.76rem; font-weight: 800; display: flex; align-items: center; gap: 6px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: #ffffff; border: 1.5px solid #34d399; box-shadow: 0 0 12px rgba(16, 185, 129, 0.35); cursor: pointer;">
+                    <!-- Grupo de Respaldos y Almacenamiento (Master Senior, Gerente General y Gerente Administrativa) -->
+                    <div id="hdr-backup-actions-group" class="hdr-backup-group">
+                        <!-- 2. Guardado General -->
+                        <button type="button" class="hdr-exec-pill btn-save-pill" id="btn-header-guardado-general" onclick="ViasaApp.ejecutarGuardadoGeneralYRespaldo()" title="Guardado General: Guarda todos los datos de VIASA System y archiva un respaldo en el Casillero General">
                             <i class="fa-solid fa-floppy-disk"></i>
-                            <span>Guardado General</span>
+                            <span>💾 Guardado General</span>
                         </button>
-                        <button type="button" class="btn-secondary" id="btn-header-casillero-respaldos" onclick="ViasaApp.switchView('casillero-respaldos')" title="Abrir el Casillero de Respaldos Generales de VIASA System" style="padding: 6px 12px; font-size: 0.76rem; font-weight: 800; display: flex; align-items: center; gap: 6px; border-color: #f59e0b; color: #fde68a; background: rgba(245, 158, 11, 0.12); cursor: pointer;">
-                            <i class="fa-solid fa-box-archive" style="color: #fbbf24;"></i>
-                            <span>Casillero de Respaldos</span>
+                        
+                        <!-- 3. Casillero de Respaldos -->
+                        <button type="button" class="hdr-exec-pill btn-casillero-pill" id="btn-header-casillero-respaldos" onclick="ViasaApp.switchView('casillero-respaldos')" title="Abrir el Casillero de Respaldos Generales de VIASA System">
+                            <i class="fa-solid fa-box-archive"></i>
+                            <span>🗄️ Casillero de Respaldos</span>
                         </button>
-                        <button type="button" class="btn-secondary" id="btn-header-sync-carpetas-laptop" onclick="window.ViasaMediaStorage && window.ViasaMediaStorage.sincronizarConCarpetaLocal()" title="Sincronizar y respaldar todas las imágenes y códigos en las carpetas de la laptop (/VIASA_System_Data/)" style="padding: 6px 12px; font-size: 0.76rem; font-weight: 800; display: flex; align-items: center; gap: 6px; border-color: #38bdf8; color: #bae6fd; background: rgba(56, 189, 248, 0.12); cursor: pointer;">
-                            <i class="fa-solid fa-folder-tree" style="color: #38bdf8;"></i>
-                            <span>Carpetas Laptop</span>
+                        
+                        <!-- 4. Carpetas Laptop -->
+                        <button type="button" class="hdr-exec-pill btn-carpetas-pill" id="btn-header-sync-carpetas-laptop" onclick="window.ViasaMediaStorage && window.ViasaMediaStorage.sincronizarConCarpetaLocal()" title="Sincronizar y respaldar todas las imágenes y códigos en las carpetas de la laptop (/VIASA_System_Data/)">
+                            <i class="fa-solid fa-folder-tree"></i>
+                            <span>📂 Carpetas Laptop</span>
                         </button>
                     </div>
-                    
-                    <div class="user-badge-box">
-                        <div class="user-avatar-circle">
-                            <i id="hdr-user-avatar" class="fa-solid fa-user-tie"></i>
-                        </div>
-                        <div class="user-info-text">
-                            <span class="user-name-title" id="hdr-user-name">Gerente General</span>
-                            <span class="user-role-tag" id="hdr-user-role">ADMINISTRADOR</span>
-                        </div>
+
+                    <!-- 5. Modos de Terminal: App Nativa Activa + Kiosco Clientes -->
+                    <div class="hdr-terminal-modes-group">
+                        <button type="button" class="hdr-exec-pill btn-pwa-pill" id="btn-header-install-pwa" onclick="ViasaApp.instalarAplicacionPWA()" title="Instalar VIASA SYSTEM como Aplicación Nativa en Escritorio / Móvil">
+                            <i class="fa-solid fa-laptop-medical" id="ico-header-install-pwa"></i>
+                            <span id="lbl-header-install-pwa">🖥️ App Nativa Activa</span>
+                        </button>
+
+                        <button type="button" class="hdr-exec-pill btn-kiosco-pill" onclick="ViasaApp.iniciarModoKiosco()" title="Activar Modo Kiosco de Autoservicio para Clientes en Salón">
+                            <i class="fa-solid fa-tablet-screen-button"></i>
+                            <span>📱 Kiosco Clientes</span>
+                        </button>
                     </div>
 
-                    <button type="button" class="btn-secondary" id="btn-header-install-pwa" onclick="ViasaApp.instalarAplicacionPWA()" title="Instalar VIASA SYSTEM como Aplicación Nativa en Escritorio / Móvil" style="border-color: #38bdf8; color: #7dd3fc; background: rgba(56, 189, 248, 0.1); padding: 6px 12px; font-size: 0.76rem; font-weight: 800; display: flex; align-items: center; gap: 6px; cursor: pointer;">
-                        <i class="fa-solid fa-laptop-medical" id="ico-header-install-pwa"></i>
-                        <span id="lbl-header-install-pwa">Instalar App</span>
-                    </button>
-
-                    <button type="button" class="btn-secondary" onclick="ViasaApp.iniciarModoKiosco()" title="Activar Modo Kiosco de Autoservicio para Clientes en Salón" style="border-color: #ec4899; color: #f472b6; padding: 6px 12px; font-size: 0.78rem; display: flex; align-items: center; gap: 6px;">
-                        <i class="fa-solid fa-tablet-screen-button"></i>
-                        <span>Kiosco Clientes</span>
-                    </button>
-
-                    <button class="btn-logout" onclick="ViasaApp.cerrarSesion()" title="Cerrar Sesión">
+                    <!-- Salir del Sistema -->
+                    <button type="button" class="hdr-exec-pill btn-logout-pill" onclick="ViasaApp.cerrarSesion()" title="Cerrar Sesión">
                         <i class="fa-solid fa-power-off"></i>
                         <span>Salir</span>
                     </button>
@@ -384,15 +362,100 @@
             <section class="view-container active" id="view-dashboard">
                 <div class="dashboard-container">
                     
-                    <!-- Banner de Bienvenida -->
-                    <div class="welcome-banner">
-                        <div>
-                            <div class="welcome-title" id="dash-welcome-title">¡Bienvenido a VIASA System!</div>
-                            <div class="welcome-subtitle" id="dash-welcome-sub">Sistema de Gestión y Desarrollo Administrativo y Operativo.</div>
+                    <!-- FILA 2: WIDGETS OPERATIVOS DE ALTA PRECISIÓN + BARRA COMPACTA DE BIENVENIDA CON AVATAR -->
+                    <div class="dash-exec-row-widgets-welcome">
+                        <!-- 4 WIDGETS EJECUTIVOS A LA IZQUIERDA -->
+                        <div class="dash-exec-left-widgets">
+                            <!-- Widget 1: Reloj Digital Operativo (8:00 / Hora en Vivo) -->
+                            <div class="dash-widget-card widget-clock" title="Reloj Operativo en Tiempo Real">
+                                <div class="dash-clock-top">
+                                    <span class="dash-clock-day" id="dash-widget-clock-day">DOM</span>
+                                    <span class="dash-clock-ampm" id="dash-widget-clock-ampm">A. M.</span>
+                                </div>
+                                <div class="dash-clock-digits" id="dash-widget-clock-digits">08:00:00</div>
+                                <div id="live-clock" style="display: none;">08:00:00 AM</div>
+                                <div class="dash-clock-bottom">
+                                    <i class="fa-solid fa-bell" style="color: #F59E0B; font-size: 10px;"></i>
+                                    <span class="dash-clock-shift-tag">TURNO ACTIVO</span>
+                                    <i class="fa-solid fa-business-time" style="color: #10B981; font-size: 10px;"></i>
+                                </div>
+                            </div>
+
+                            <!-- Widget 2: Botón Interactivo VIASA VOICE -->
+                            <div class="dash-widget-card widget-voice" id="widget-viasa-voice" onclick="ViasaApp.toggleViasaVoice()" title="Viasa Voice: Asistente Operativo Manos Libres (Clic para Activar/Desactivar)">
+                                <div class="voice-wave-anim-box">
+                                    <span class="vwave-bar b1"></span>
+                                    <span class="vwave-bar b2"></span>
+                                    <span class="vwave-bar b3"></span>
+                                    <span class="vwave-bar b4"></span>
+                                    <span class="vwave-bar b5"></span>
+                                    <i class="fa-solid fa-microphone-lines voice-icon-glow"></i>
+                                </div>
+                                <div class="voice-title-label">VIASA VOICE</div>
+                                <div class="voice-status-pill" id="widget-voice-status-pill">
+                                    <span class="voice-pulse-dot"></span>
+                                    <span id="widget-voice-status-text">LISTO</span>
+                                </div>
+                            </div>
+
+                            <!-- Widget 3: Mini-Monitor de Divisas (BCV Y USDT) -->
+                            <div class="dash-widget-card widget-rates" onclick="ViasaApp.sincronizarTasasEnTiempoReal(true)" title="Monitor de Divisas (Clic para Sincronizar en Tiempo Real)">
+                                <div class="rates-widget-header">
+                                    <span>MONITOR DE DIVISAS</span>
+                                    <i class="fa-solid fa-chart-line" style="color: #C88A2B; font-size: 11px;"></i>
+                                </div>
+                                <div class="rates-widget-row">
+                                    <span class="rate-currency-tag bcv">BCV:</span>
+                                    <strong class="rate-val-text" id="rate-bcv-val">Bs. 911.62</strong>
+                                    <span class="rate-trend-arrow up">▲</span>
+                                </div>
+                                <div class="rates-widget-row">
+                                    <span class="rate-currency-tag usdt">USDT:</span>
+                                    <strong class="rate-val-text" id="rate-paralelo-val">Bs. 1074.35</strong>
+                                    <span class="rate-trend-arrow up">▲</span>
+                                </div>
+                            </div>
+
+                            <!-- Widget 4: Indicador de Estado de Sincronización (SYNK OK) -->
+                            <div class="dash-widget-card widget-sync" id="viasa-network-status-pill" onclick="ViasaApp.sincronizarTasasEnTiempoReal(true)" title="Estado de Sincronización (Clic para Sincronizar Inmediatamente)">
+                                <div class="sync-top-label">SYNK</div>
+                                <div class="sync-main-status" id="dash-widget-sync-main">OK</div>
+                                <div class="sync-time-capsule">
+                                    <i class="fa-solid fa-cloud-arrow-up" id="viasa-network-status-icon"></i>
+                                    <span id="viasa-network-status-text">02:42 a. m.</span>
+                                </div>
+                            </div>
                         </div>
-                        <button class="btn-gold" onclick="ViasaApp.switchView('pos')" style="display: flex; align-items: center; gap: 8px;">
-                            <i class="fa-solid fa-cash-register"></i> Ir al Mostrador (POS)
-                        </button>
+
+                        <!-- BARRA COMPACTA DE BIENVENIDA CON FOTOGRAFÍA CIRCULAR DEL OPERADOR (A LA DERECHA) -->
+                        <div class="dash-welcome-executive-card">
+                            <div class="dash-welcome-user-profile">
+                                <!-- Círculo de Fotografía del Operador (54px x 54px) -->
+                                <div class="operator-avatar-circle" id="dash-operator-avatar-circle" onclick="document.getElementById('input-dash-user-avatar-upload').click()" title="Clic para subir o cambiar fotografía del operador">
+                                    <img id="dash-user-avatar-img" src="" alt="Fotografía del Operador" style="display: none; width: 100%; height: 100%; object-fit: cover;" />
+                                    <div id="dash-user-avatar-initials" class="operator-avatar-initials">DS</div>
+                                    <div class="camera-upload-icon-badge" title="Cambiar fotografía"><i class="fa-solid fa-camera"></i></div>
+                                    <input type="file" id="input-dash-user-avatar-upload" accept="image/*" style="display: none;" onchange="ViasaApp.handleUserAvatarUpload(event)" />
+                                </div>
+
+                                <!-- Textos de Bienvenida Compactos -->
+                                <div class="dash-welcome-details">
+                                    <div class="dash-welcome-greeting-title" id="dash-welcome-title">
+                                        ¡Bienvenido, <span id="dash-welcome-user-name">DESARROLLADOR</span>!
+                                        <span class="dash-role-badge-pill" id="dash-welcome-user-role-badge">(MASTER SENIOR)</span>
+                                    </div>
+                                    <div class="dash-welcome-corporate-sub" id="dash-welcome-sub">
+                                        Sistema de Gestión y Desarrollo Administrativo y Operativo.
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Botón Principal de Acción Rápida -->
+                            <button type="button" class="btn-pos-welcome-action" onclick="ViasaApp.switchView('pos')" title="Ir directamente al Punto de Venta">
+                                <i class="fa-solid fa-cash-register"></i>
+                                <span>🏪 Ir al Mostrador (POS)</span>
+                            </button>
+                        </div>
                     </div>
 
                     <!-- PANEL DE MONITOREO DE DIVISAS Y COTIZACIONES EN TIEMPO REAL (BCV Y USDT) -->

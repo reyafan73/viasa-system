@@ -845,6 +845,17 @@
                 hdrBackupGroup.style.display = window.ViasaAuth.canManageBackups() ? 'flex' : 'none';
             }
 
+            // Actualizar bienvenida en Fila 2
+            const welcomeName = document.getElementById('dash-welcome-user-name');
+            const welcomeRoleBadge = document.getElementById('dash-welcome-user-role-badge');
+            if (welcomeName) welcomeName.textContent = user.nombreCompleto || user.username;
+            if (welcomeRoleBadge) {
+                const rInfo = window.ViasaAuth.getRoleInfo(user.rol);
+                welcomeRoleBadge.textContent = rInfo ? `(${rInfo.badge.toUpperCase()})` : `(${user.rol.toUpperCase()})`;
+            }
+
+            this.cargarFotoUsuarioActivo();
+
             document.querySelectorAll('.nav-item').forEach(item => {
                 const view = item.getAttribute('data-view');
                 if (!view) return;
@@ -874,11 +885,17 @@
 
             const rInfo = window.ViasaAuth.getRoleInfo(user.rol);
             const welcomeTitle = document.getElementById('dash-welcome-title');
+            const welcomeName = document.getElementById('dash-welcome-user-name');
+            const welcomeRoleBadge = document.getElementById('dash-welcome-user-role-badge');
             const welcomeSub = document.getElementById('dash-welcome-sub');
 
-            if (welcomeTitle) {
+            if (welcomeName) welcomeName.textContent = user.nombreCompleto || user.username;
+            if (welcomeRoleBadge) {
+                welcomeRoleBadge.textContent = rInfo ? `(${rInfo.badge.toUpperCase()})` : `(${user.rol.toUpperCase()})`;
+            } else if (welcomeTitle) {
                 welcomeTitle.innerHTML = `¡Bienvenido, ${user.nombreCompleto}! <span style="font-size: 0.9rem; color: ${rInfo.color};">(${rInfo.badge})</span>`;
             }
+
             if (welcomeSub) {
                 const greetings = {
                     admin: "Control administrativo y operacional total de Panadería Nueva Viasa.",
@@ -887,6 +904,8 @@
                 };
                 welcomeSub.textContent = greetings[user.rol] || "Sistema de Gestión y Desarrollo Administrativo y Operativo.";
             }
+
+            this.cargarFotoUsuarioActivo();
 
             // Calcular ventas del día desde almacenamiento
             const ventas = await window.ViasaStorage.obtenerColeccion('ventas');
@@ -910,6 +929,123 @@
             this.actualizarWidgetsTasas();
 
             this.renderDashboardShortcuts(user.rol);
+        },
+
+        // ==============================================================
+        // GESTIÓN DE FOTOGRAFÍA / AVATAR DEL OPERADOR (PERSISTENCIA INDEXEDDB/LOCALSTORAGE)
+        // ==============================================================
+        async cargarFotoUsuarioActivo() {
+            const user = window.ViasaAuth ? window.ViasaAuth.getCurrentUser() : null;
+            const imgEl = document.getElementById('dash-user-avatar-img');
+            const initialsEl = document.getElementById('dash-user-avatar-initials');
+            if (!user) return;
+
+            const username = user.username || 'operador';
+            let fotoUrl = null;
+
+            try {
+                fotoUrl = localStorage.getItem(`viasa_user_avatar_${username}`);
+            } catch (e) {}
+
+            if (!fotoUrl && window.ViasaStorage) {
+                try {
+                    const avatars = await window.ViasaStorage.obtenerColeccion('user_avatars');
+                    const found = avatars && avatars.find(a => a.username === username);
+                    if (found) fotoUrl = found.dataUrl;
+                } catch (e) {}
+            }
+
+            if (fotoUrl) {
+                if (imgEl) {
+                    imgEl.src = fotoUrl;
+                    imgEl.style.display = 'block';
+                }
+                if (initialsEl) {
+                    initialsEl.style.display = 'none';
+                }
+            } else {
+                if (imgEl) {
+                    imgEl.style.display = 'none';
+                    imgEl.src = '';
+                }
+                if (initialsEl) {
+                    initialsEl.style.display = 'flex';
+                    const partes = (user.nombreCompleto || user.username || 'DS').trim().split(/\s+/);
+                    const ini = partes.length >= 2 
+                        ? (partes[0][0] + partes[1][0]).toUpperCase()
+                        : partes[0].slice(0, 2).toUpperCase();
+                    initialsEl.textContent = ini;
+                }
+            }
+        },
+
+        handleUserAvatarUpload(event) {
+            const file = event.target.files && event.target.files[0];
+            if (!file) return;
+
+            if (!file.type.startsWith('image/')) {
+                alert('Por favor selecciona un archivo de imagen válido (JPG, PNG, WEBP).');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const rawData = e.target.result;
+                const img = new Image();
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    const maxDim = 256;
+                    let w = img.width;
+                    let h = img.height;
+                    if (w > h) {
+                        if (w > maxDim) {
+                            h = Math.round((h * maxDim) / w);
+                            w = maxDim;
+                        }
+                    } else {
+                        if (h > maxDim) {
+                            w = Math.round((w * maxDim) / h);
+                            h = maxDim;
+                        }
+                    }
+                    canvas.width = w;
+                    canvas.height = h;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, w, h);
+                    const optimizedDataUrl = canvas.toDataURL('image/jpeg', 0.88);
+
+                    const user = window.ViasaAuth.getCurrentUser();
+                    const username = user ? user.username : 'operador';
+
+                    try {
+                        localStorage.setItem(`viasa_user_avatar_${username}`, optimizedDataUrl);
+                    } catch (err) {
+                        console.warn('[Avatar] Error al guardar en localStorage:', err);
+                    }
+
+                    if (window.ViasaStorage) {
+                        window.ViasaStorage.obtenerColeccion('user_avatars').then(avatars => {
+                            const arr = Array.isArray(avatars) ? avatars : [];
+                            const idx = arr.findIndex(a => a.username === username);
+                            const record = { username, dataUrl: optimizedDataUrl, updatedAt: new Date().toISOString() };
+                            if (idx >= 0) {
+                                arr[idx] = record;
+                            } else {
+                                arr.push(record);
+                            }
+                            window.ViasaStorage.guardarColeccion('user_avatars', arr);
+                        }).catch(() => {});
+                    }
+
+                    this.cargarFotoUsuarioActivo();
+                    if (window.ViasaAudio) window.ViasaAudio.playCashChime();
+                    if (typeof this.mostrarNotificacionToast === 'function') {
+                        this.mostrarNotificacionToast('Fotografía de perfil actualizada con éxito', 'success');
+                    }
+                };
+                img.src = rawData;
+            };
+            reader.readAsDataURL(file);
         },
 
         renderDashboardShortcuts(rol) {
@@ -1569,10 +1705,23 @@
 
         initClock() {
             const clockEl = document.getElementById('live-clock');
+            const dayEl = document.getElementById('dash-widget-clock-day');
+            const ampmEl = document.getElementById('dash-widget-clock-ampm');
+            const digitsEl = document.getElementById('dash-widget-clock-digits');
+            const dias = ['DOM', 'LUN', 'MAR', 'MIÉ', 'JUE', 'VIE', 'SÁB'];
+
             const update = () => {
-                if (clockEl) {
-                    const now = new Date();
-                    clockEl.textContent = now.toLocaleTimeString('es-VE', { hour12: true, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                const now = new Date();
+                const timeStr = now.toLocaleTimeString('es-VE', { hour12: true, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                if (clockEl) clockEl.textContent = timeStr;
+
+                if (digitsEl) {
+                    const timeParts = timeStr.split(' ');
+                    digitsEl.textContent = timeParts[0];
+                    if (ampmEl) ampmEl.textContent = (timeParts[1] || (now.getHours() >= 12 ? 'P. M.' : 'A. M.')).toUpperCase();
+                }
+                if (dayEl) {
+                    dayEl.textContent = dias[now.getDay()];
                 }
             };
             update();
@@ -1656,32 +1805,49 @@
             if (histBrecha) histBrecha.textContent = `${pctSign}${pct.toFixed(2)}%`;
             if (histTotal) histTotal.textContent = String(this.historialTasas?.length || 0);
 
-            // 4. Estado de Conectividad en Topbar
+            // 4. Estado de Conectividad y Sincronización en Topbar / Fila 2
             const estado = this.tasaSyncMeta?.estado || (navigator.onLine ? 'online' : 'offline');
+            const syncMainStatus = document.getElementById('dash-widget-sync-main');
+
+            if (syncMainStatus) {
+                if (estado === 'syncing') {
+                    syncMainStatus.textContent = 'SYNC';
+                    syncMainStatus.style.color = '#0284C7';
+                } else if (estado === 'online') {
+                    syncMainStatus.textContent = 'OK';
+                    syncMainStatus.style.color = '#1E3A8A';
+                } else if (estado === 'manual') {
+                    syncMainStatus.textContent = 'MAN';
+                    syncMainStatus.style.color = '#B45309';
+                } else {
+                    syncMainStatus.textContent = 'OFF';
+                    syncMainStatus.style.color = '#64748B';
+                }
+            }
 
             if (statusPill) {
                 statusPill.classList.remove('online', 'offline', 'syncing', 'warning');
                 if (estado === 'syncing') {
                     statusPill.classList.add('syncing');
                     if (statusIcon) statusIcon.className = 'fa-solid fa-arrows-rotate fa-spin';
-                    if (statusText) statusText.textContent = 'Sincronizando Tasas...';
+                    if (statusText) statusText.textContent = 'Sincronizando...';
                 } else if (estado === 'online') {
                     statusPill.classList.add('online');
-                    if (statusIcon) statusIcon.className = 'fa-solid fa-circle-check';
+                    if (statusIcon) statusIcon.className = 'fa-solid fa-cloud-arrow-up';
                     const hora = this.tasaSyncMeta?.ultimaSincronizacion 
                         ? new Date(this.tasaSyncMeta.ultimaSincronizacion).toLocaleTimeString('es-VE', { hour: '2-digit', minute: '2-digit', hour12: true })
-                        : 'En Línea';
-                    if (statusText) statusText.textContent = `Sync OK (${hora})`;
+                        : new Date().toLocaleTimeString('es-VE', { hour: '2-digit', minute: '2-digit', hour12: true });
+                    if (statusText) statusText.textContent = hora;
                     statusPill.title = `Tasas Sincronizadas:\nBCV: Bs. ${this.tasaBCV.toFixed(2)} (${this.tasaSyncMeta?.fuenteBCV || 'bcv.org.ve'})\nUSDT: Bs. ${this.tasaParalelo.toFixed(2)} (${this.tasaSyncMeta?.fuenteParalelo || 'usdt.com.ve / Binance P2P'})\nÚltima sinc: ${hora}`;
                 } else if (estado === 'manual') {
                     statusPill.classList.add('warning');
                     if (statusIcon) statusIcon.className = 'fa-solid fa-sliders';
-                    if (statusText) statusText.textContent = 'Tasa Manual Activa';
+                    if (statusText) statusText.textContent = 'Manual';
                     statusPill.title = `Tasa Administrativa Personalizada (BCV: Bs. ${this.tasaBCV.toFixed(2)} | USDT: Bs. ${this.tasaParalelo.toFixed(2)})`;
                 } else {
                     statusPill.classList.add('offline');
-                    if (statusIcon) statusIcon.className = 'fa-solid fa-cloud-slash';
-                    if (statusText) statusText.textContent = 'Modo Local / Caché';
+                    if (statusIcon) statusIcon.className = 'fa-solid fa-shield-halved';
+                    if (statusText) statusText.textContent = 'En Caché';
                     statusPill.title = `Modo Sin Conexión - Usando última tasa guardada (BCV: Bs. ${this.tasaBCV.toFixed(2)} | USDT: Bs. ${this.tasaParalelo.toFixed(2)})`;
                 }
             }
@@ -24496,12 +24662,18 @@
         toggleViasaVoice() {
             this.viasaVoiceActivo = !this.viasaVoiceActivo;
             const overlay = document.getElementById('viasa-voice-overlay');
+            const voiceWidget = document.getElementById('widget-viasa-voice');
+            const voiceStatus = document.getElementById('widget-voice-status-text');
 
             if (this.viasaVoiceActivo) {
                 if (overlay) overlay.classList.add('active');
+                if (voiceWidget) voiceWidget.classList.add('listening');
+                if (voiceStatus) voiceStatus.textContent = 'ESCUCHANDO...';
                 this.iniciarViasaVoice();
             } else {
                 if (overlay) overlay.classList.remove('active');
+                if (voiceWidget) voiceWidget.classList.remove('listening');
+                if (voiceStatus) voiceStatus.textContent = 'LISTO';
                 this.detenerViasaVoice();
             }
         },
@@ -24537,6 +24709,10 @@
         },
 
         detenerViasaVoice() {
+            const voiceWidget = document.getElementById('widget-viasa-voice');
+            const voiceStatus = document.getElementById('widget-voice-status-text');
+            if (voiceWidget) voiceWidget.classList.remove('listening');
+            if (voiceStatus) voiceStatus.textContent = 'LISTO';
             if (this.speechRecognitionInstance) {
                 try {
                     this.speechRecognitionInstance.stop();

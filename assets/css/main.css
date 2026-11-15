@@ -14966,4 +14966,652 @@ table tr:hover td,
     background: #C88A2B;
 }
 
+/* ==============================================================
+   FILA 1: CABECERA SUPERIOR DE UTILIDADES DEL SISTEMA (TOPBAR)
+   ============================================================== */
+.app-header {
+    height: 52px !important;
+    background: #FFFFFF !important;
+    border-bottom: 1px solid #E2D9C8 !important;
+    padding: 0 20px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 12px !important;
+    box-shadow: 0 1px 4px rgba(44, 26, 18, 0.04) !important;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    box-sizing: border-box !important;
+}
+
+.header-utilities-bar {
+    width: 100% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 12px !important;
+}
+
+.hdr-backup-group,
+.hdr-terminal-modes-group {
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+}
+
+/* Píldoras / Cápsulas Ejecutivas de la Fila 1 */
+.hdr-exec-pill {
+    height: 36px !important;
+    padding: 0 14px !important;
+    border-radius: 8px !important;
+    font-size: 12.5px !important;
+    font-weight: 600 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    background: #F3EDE2 !important;
+    border: 1px solid #E2D9C8 !important;
+    color: #2C1A12 !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+    white-space: nowrap !important;
+    text-decoration: none !important;
+    box-shadow: 0 1px 2px rgba(44, 26, 18, 0.03) !important;
+    box-sizing: border-box !important;
+}
+
+.hdr-exec-pill:hover {
+    background: #EAE2D5 !important;
+    border-color: #C88A2B !important;
+    color: #2C1A12 !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 2px 6px rgba(200, 138, 43, 0.15) !important;
+}
+
+.hdr-exec-pill:active {
+    transform: translateY(0) !important;
+}
+
+.hdr-exec-pill i {
+    font-size: 13px !important;
+}
+
+/* 1. Impresora Fiscal */
+.hdr-exec-pill.fiscal-pill {
+    background: #F3EDE2 !important;
+    border-color: #E2D9C8 !important;
+    color: #8C5A32 !important;
+}
+.hdr-exec-pill.fiscal-pill i {
+    color: #C88A2B !important;
+}
+.hdr-exec-pill.fiscal-pill.online {
+    background: #ECFDF5 !important;
+    border-color: #A7F3D0 !important;
+    color: #15803D !important;
+}
+.hdr-exec-pill.fiscal-pill.online i {
+    color: #15803D !important;
+}
+.hdr-exec-pill.fiscal-pill.printing {
+    background: #FEF3C7 !important;
+    border-color: #FCD34D !important;
+    color: #B45309 !important;
+}
+.hdr-exec-pill.fiscal-pill.offline {
+    background: #FEF2F2 !important;
+    border-color: #FECACA !important;
+    color: #B91C1C !important;
+}
+.hdr-exec-pill.fiscal-pill.offline i {
+    color: #B91C1C !important;
+}
+
+/* 2. Guardado General */
+.hdr-exec-pill.btn-save-pill {
+    background: #ECFDF5 !important;
+    border-color: #A7F3D0 !important;
+    color: #15803D !important;
+    font-weight: 700 !important;
+}
+.hdr-exec-pill.btn-save-pill:hover {
+    background: #D1FAE5 !important;
+    border-color: #10B981 !important;
+    color: #047857 !important;
+}
+.hdr-exec-pill.btn-save-pill i {
+    color: #15803D !important;
+}
+
+/* 3. Casillero de Respaldos */
+.hdr-exec-pill.btn-casillero-pill {
+    background: #F3EDE2 !important;
+    border-color: #E2D9C8 !important;
+    color: #C88A2B !important;
+}
+.hdr-exec-pill.btn-casillero-pill:hover {
+    background: #FAF7F2 !important;
+    border-color: #C88A2B !important;
+}
+.hdr-exec-pill.btn-casillero-pill i {
+    color: #C88A2B !important;
+}
+
+/* 4. Carpetas Laptop */
+.hdr-exec-pill.btn-carpetas-pill {
+    background: #F0F9FF !important;
+    border-color: #BAE6FD !important;
+    color: #0284C7 !important;
+}
+.hdr-exec-pill.btn-carpetas-pill:hover {
+    background: #E0F2FE !important;
+    border-color: #0284C7 !important;
+}
+.hdr-exec-pill.btn-carpetas-pill i {
+    color: #0284C7 !important;
+}
+
+/* 5. Modos de Terminal */
+.hdr-exec-pill.btn-pwa-pill {
+    background: #F3EDE2 !important;
+    border-color: #E2D9C8 !important;
+    color: #2C1A12 !important;
+}
+.hdr-exec-pill.btn-pwa-pill i {
+    color: #0284C7 !important;
+}
+.hdr-exec-pill.btn-kiosco-pill {
+    background: #F3EDE2 !important;
+    border-color: #E2D9C8 !important;
+    color: #8C5A32 !important;
+}
+.hdr-exec-pill.btn-kiosco-pill i {
+    color: #8C5A32 !important;
+}
+
+/* Salir / Logout */
+.hdr-exec-pill.btn-logout-pill {
+    background: #FEF2F2 !important;
+    border-color: #FECACA !important;
+    color: #B91C1C !important;
+}
+.hdr-exec-pill.btn-logout-pill:hover {
+    background: #FEE2E2 !important;
+    border-color: #EF4444 !important;
+    color: #991B1B !important;
+}
+.hdr-exec-pill.btn-logout-pill i {
+    color: #B91C1C !important;
+}
+
+/* ==============================================================
+   FILA 2: WIDGETS OPERATIVOS + BARRA COMPACTA DE BIENVENIDA
+   ============================================================== */
+.dash-exec-row-widgets-welcome {
+    display: flex !important;
+    align-items: stretch !important;
+    gap: 12px !important;
+    margin-bottom: 18px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+.dash-exec-left-widgets {
+    display: flex !important;
+    align-items: stretch !important;
+    gap: 10px !important;
+    flex-shrink: 0 !important;
+}
+
+.dash-widget-card {
+    height: 78px !important;
+    border-radius: 10px !important;
+    padding: 7px 12px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    box-sizing: border-box !important;
+    position: relative !important;
+    user-select: none;
+}
+
+/* Widget 1: Reloj Digital Operativo */
+.dash-widget-card.widget-clock {
+    width: 160px !important;
+    background: #1C1410 !important;
+    border: 1px solid rgba(200, 138, 43, 0.45) !important;
+    box-shadow: 0 2px 8px rgba(28, 20, 16, 0.25) !important;
+}
+
+.dash-clock-top {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    font-size: 10px !important;
+    font-weight: 800 !important;
+    color: #F59E0B !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.6px !important;
+}
+
+.dash-clock-day {
+    color: #F59E0B !important;
+}
+
+.dash-clock-ampm {
+    color: #E5A93C !important;
+}
+
+.dash-clock-digits {
+    font-family: 'Courier New', monospace, 'Inter', sans-serif !important;
+    font-size: 1.32rem !important;
+    font-weight: 900 !important;
+    color: #F59E0B !important;
+    letter-spacing: 1.2px !important;
+    line-height: 1 !important;
+    text-shadow: 0 0 10px rgba(245, 158, 11, 0.4) !important;
+    text-align: center !important;
+}
+
+.dash-clock-bottom {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    font-size: 9px !important;
+    font-weight: 800 !important;
+    color: #D6C7B2 !important;
+    letter-spacing: 0.4px !important;
+}
+
+.dash-clock-shift-tag {
+    font-size: 8.5px !important;
+    font-weight: 800 !important;
+    color: #E5A93C !important;
+    letter-spacing: 0.6px !important;
+}
+
+/* Widget 2: Viasa Voice */
+.dash-widget-card.widget-voice {
+    width: 130px !important;
+    background: linear-gradient(135deg, #0B253A 0%, #064E3B 100%) !important;
+    border: 1px solid rgba(16, 185, 129, 0.4) !important;
+    box-shadow: 0 2px 8px rgba(6, 78, 59, 0.25) !important;
+    cursor: pointer !important;
+    transition: all 0.25s ease !important;
+}
+
+.dash-widget-card.widget-voice:hover {
+    border-color: #34D399 !important;
+    box-shadow: 0 3px 12px rgba(16, 185, 129, 0.4) !important;
+    transform: translateY(-1px) !important;
+}
+
+.voice-wave-anim-box {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 3px !important;
+    height: 18px !important;
+}
+
+.vwave-bar {
+    width: 3px !important;
+    height: 10px !important;
+    background: #34D399 !important;
+    border-radius: 2px !important;
+    transition: height 0.2s ease !important;
+}
+
+.voice-icon-glow {
+    color: #34D399 !important;
+    font-size: 13px !important;
+    margin-left: 4px !important;
+}
+
+.widget-voice.listening {
+    border-color: #10B981 !important;
+    box-shadow: 0 0 16px rgba(16, 185, 129, 0.5) !important;
+    animation: voiceWidgetPulse 1.5s infinite alternate !important;
+}
+
+.widget-voice.listening .vwave-bar.b1 { animation: voiceBar1 0.4s infinite alternate; }
+.widget-voice.listening .vwave-bar.b2 { animation: voiceBar2 0.3s infinite alternate 0.1s; }
+.widget-voice.listening .vwave-bar.b3 { animation: voiceBar3 0.5s infinite alternate 0.2s; }
+.widget-voice.listening .vwave-bar.b4 { animation: voiceBar2 0.35s infinite alternate 0.15s; }
+.widget-voice.listening .vwave-bar.b5 { animation: voiceBar1 0.45s infinite alternate 0.05s; }
+
+@keyframes voiceBar1 { 0% { height: 4px; } 100% { height: 16px; } }
+@keyframes voiceBar2 { 0% { height: 6px; } 100% { height: 18px; } }
+@keyframes voiceBar3 { 0% { height: 8px; } 100% { height: 20px; } }
+@keyframes voiceWidgetPulse {
+    0% { box-shadow: 0 0 8px rgba(16, 185, 129, 0.3); }
+    100% { box-shadow: 0 0 20px rgba(52, 211, 153, 0.65); }
+}
+
+.voice-title-label {
+    font-size: 11px !important;
+    font-weight: 800 !important;
+    color: #FFFFFF !important;
+    text-align: center !important;
+    letter-spacing: 0.5px !important;
+}
+
+.voice-status-pill {
+    font-size: 9px !important;
+    font-weight: 700 !important;
+    color: #6EE7B7 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 4px !important;
+}
+
+.voice-pulse-dot {
+    width: 6px !important;
+    height: 6px !important;
+    border-radius: 50% !important;
+    background: #10B981 !important;
+}
+
+.widget-voice.listening .voice-pulse-dot {
+    background: #34D399 !important;
+    box-shadow: 0 0 8px #34D399 !important;
+}
+
+/* Widget 3: Mini-Monitor de Divisas */
+.dash-widget-card.widget-rates {
+    width: 175px !important;
+    background: #1C1410 !important;
+    border: 1px solid rgba(200, 138, 43, 0.45) !important;
+    box-shadow: 0 2px 8px rgba(28, 20, 16, 0.25) !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+}
+
+.dash-widget-card.widget-rates:hover {
+    border-color: #F59E0B !important;
+    transform: translateY(-1px) !important;
+}
+
+.rates-widget-header {
+    font-size: 9px !important;
+    font-weight: 800 !important;
+    color: #C88A2B !important;
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    letter-spacing: 0.5px !important;
+}
+
+.rates-widget-row {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    font-size: 11px !important;
+    line-height: 1.2 !important;
+}
+
+.rate-currency-tag.bcv {
+    color: #93C5FD !important;
+    font-weight: 800 !important;
+    font-size: 10.5px !important;
+}
+
+.rate-currency-tag.usdt {
+    color: #FCD34D !important;
+    font-weight: 800 !important;
+    font-size: 10.5px !important;
+}
+
+.rate-val-text {
+    color: #FFFFFF !important;
+    font-weight: 800 !important;
+    font-size: 11.5px !important;
+    font-family: monospace !important;
+}
+
+.rate-trend-arrow.up {
+    color: #10B981 !important;
+    font-size: 9px !important;
+}
+
+.rate-trend-arrow.down {
+    color: #EF4444 !important;
+    font-size: 9px !important;
+}
+
+/* Widget 4: Indicador de Sincronización */
+.dash-widget-card.widget-sync {
+    width: 125px !important;
+    background: #F1F5F9 !important;
+    border: 1px solid #CBD5E1 !important;
+    box-shadow: 0 2px 6px rgba(148, 163, 184, 0.15) !important;
+    cursor: pointer !important;
+    text-align: center !important;
+    transition: all 0.2s ease !important;
+}
+
+.dash-widget-card.widget-sync:hover {
+    background: #E2E8F0 !important;
+    border-color: #94A3B8 !important;
+    transform: translateY(-1px) !important;
+}
+
+.sync-top-label {
+    font-size: 9px !important;
+    font-weight: 800 !important;
+    color: #64748B !important;
+    letter-spacing: 0.8px !important;
+    text-transform: uppercase !important;
+}
+
+.sync-main-status {
+    font-size: 1.35rem !important;
+    font-weight: 900 !important;
+    color: #1E3A8A !important;
+    line-height: 1 !important;
+    letter-spacing: 0.5px !important;
+}
+
+.sync-time-capsule {
+    background: #DBEAFE !important;
+    border-radius: 10px !important;
+    padding: 1px 6px !important;
+    font-size: 9px !important;
+    font-weight: 700 !important;
+    color: #1E3A8A !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 4px !important;
+    margin: 0 auto !important;
+}
+
+.sync-time-capsule i {
+    font-size: 8px !important;
+}
+
+/* B. Barra Compacta de Bienvenida con Fotografía Circular del Operador */
+.dash-welcome-executive-card {
+    flex: 1 !important;
+    min-height: 78px !important;
+    background: #FFFFFF !important;
+    border: 1px solid #E2D9C8 !important;
+    border-radius: 12px !important;
+    padding: 10px 18px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 14px !important;
+    box-shadow: 0 2px 8px rgba(44, 26, 18, 0.04) !important;
+    box-sizing: border-box !important;
+}
+
+.dash-welcome-user-profile {
+    display: flex !important;
+    align-items: center !important;
+    gap: 14px !important;
+    min-width: 0 !important;
+}
+
+/* Marco circular de 54px x 54px */
+.operator-avatar-circle {
+    width: 54px !important;
+    height: 54px !important;
+    border-radius: 50% !important;
+    border: 2.5px solid #C88A2B !important;
+    box-shadow: 0 2px 8px rgba(200, 138, 43, 0.25) !important;
+    overflow: hidden !important;
+    cursor: pointer !important;
+    position: relative !important;
+    flex-shrink: 0 !important;
+    background: #2C1A12 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    transition: all 0.2s ease !important;
+}
+
+.operator-avatar-circle:hover {
+    transform: scale(1.04) !important;
+    box-shadow: 0 3px 12px rgba(200, 138, 43, 0.35) !important;
+}
+
+.operator-avatar-initials {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 100% !important;
+    height: 100% !important;
+    background: #2C1A12 !important;
+    color: #C88A2B !important;
+    font-weight: 800 !important;
+    font-size: 1.15rem !important;
+    letter-spacing: 1px !important;
+}
+
+.camera-upload-icon-badge {
+    position: absolute !important;
+    bottom: 0 !important;
+    right: 0 !important;
+    width: 18px !important;
+    height: 18px !important;
+    border-radius: 50% !important;
+    background: #C88A2B !important;
+    color: #FFFFFF !important;
+    font-size: 8.5px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border: 1.5px solid #FFFFFF !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3) !important;
+    transition: transform 0.2s ease !important;
+}
+
+.operator-avatar-circle:hover .camera-upload-icon-badge {
+    transform: scale(1.15) !important;
+    background: #B0761E !important;
+}
+
+.dash-welcome-details {
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    min-width: 0 !important;
+}
+
+.dash-welcome-greeting-title {
+    font-size: 1.05rem !important;
+    font-weight: 800 !important;
+    color: #2C1A12 !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    flex-wrap: wrap !important;
+    margin-bottom: 2px !important;
+}
+
+.dash-role-badge-pill {
+    font-size: 0.72rem !important;
+    font-weight: 800 !important;
+    padding: 2px 8px !important;
+    border-radius: 6px !important;
+    background: #F3EDE2 !important;
+    border: 1px solid #E2D9C8 !important;
+    color: #8C5A32 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+}
+
+.dash-welcome-corporate-sub {
+    font-size: 0.8rem !important;
+    color: #8A7E77 !important;
+    margin: 0 !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+}
+
+.btn-pos-welcome-action {
+    background: linear-gradient(135deg, #C88A2B 0%, #B0761E 100%) !important;
+    color: #FFFFFF !important;
+    font-size: 0.85rem !important;
+    font-weight: 800 !important;
+    border: none !important;
+    border-radius: 8px !important;
+    padding: 10px 18px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    cursor: pointer !important;
+    box-shadow: 0 2px 8px rgba(200, 138, 43, 0.3) !important;
+    transition: all 0.2s ease !important;
+    white-space: nowrap !important;
+    flex-shrink: 0 !important;
+}
+
+.btn-pos-welcome-action:hover {
+    background: linear-gradient(135deg, #B0761E 0%, #945F12 100%) !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 4px 12px rgba(200, 138, 43, 0.4) !important;
+}
+
+@media (max-width: 1250px) {
+    .dash-exec-row-widgets-welcome {
+        flex-direction: column !important;
+    }
+    .dash-exec-left-widgets {
+        width: 100% !important;
+        justify-content: space-between !important;
+    }
+    .dash-widget-card {
+        flex: 1 !important;
+    }
+}
+
+@media (max-width: 768px) {
+    .header-utilities-bar {
+        overflow-x: auto !important;
+        padding-bottom: 4px !important;
+    }
+    .dash-exec-left-widgets {
+        flex-wrap: wrap !important;
+    }
+    .dash-widget-card {
+        min-width: calc(50% - 6px) !important;
+    }
+    .dash-welcome-executive-card {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 12px !important;
+    }
+    .btn-pos-welcome-action {
+        width: 100% !important;
+        justify-content: center !important;
+    }
+}
+
+
 
