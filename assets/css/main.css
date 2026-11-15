@@ -6,32 +6,69 @@
  */
 
 :root {
-    --bg-main: #0b0f19;
-    --bg-card: #111827;
-    --bg-card-hover: #1f2937;
-    --bg-sidebar: #070a10;
-    --bg-input: #050811;
-    
-    --accent-gold: #d97706;
-    --accent-gold-light: #f59e0b;
-    --accent-wheat: #fbbf24;
-    --accent-wheat-light: #fef3c7;
-    
-    --text-primary: #f8fafc;
-    --text-secondary: #94a3b8;
-    --text-muted: #64748b;
-    
-    --success: #10b981;
-    --danger: #ef4444;
-    --warning: #f59e0b;
-    --info: #0284c7;
-    
-    --border-color: #1e293b;
-    --border-gold: rgba(217, 119, 6, 0.4);
-    
+    /* ==========================================================================
+       PALETA OFICIAL: "NUEVA VIASA PRESTIGE LIGHT" (WCAG AAA)
+       ========================================================================== */
+    /* Superficies y Fondos */
+    --bg-canvas: #FAF7F2;          /* Blanco Marfil Suave */
+    --bg-surface: #FFFFFF;         /* Blanco Nácar Puro */
+    --bg-secondary: #F3EDE2;       /* Beige Crema */
+    --bg-neutral-light: #F1F3F5;   /* Gris Claro Corporativo */
+    --bg-card-elevated: #FFFFFF;
+
+    /* Identidad de Marca y Estructura Ejecutiva */
+    --brand-espresso: #2C1A12;     /* Marrón Muy Oscuro / Espresso (Sidebar / Títulos Máximos) */
+    --brand-gold: #C88A2B;         /* Dorado Tostado Corporativo (Acciones Principales / Precios USD) */
+    --brand-gold-hover: #B0761E;   /* Dorado Profundo */
+    --brand-hazelnut: #8C5A32;     /* Marrón Avellana (Subtítulos, Categorías, Acentos) */
+
+    /* Tipografía y Bordes */
+    --text-primary: #2C1A12;       /* Marrón Espresso */
+    --text-secondary: #5C4D44;     /* Marrón Grisáceo Cálido */
+    --text-muted: #8A7E77;         /* Gris Piedra Cálido */
+    --border-subtle: #E2D9C8;      /* Beige Borde Arquitectónico */
+    --border-color: #E2D9C8;
+    --border-gold: rgba(200, 138, 43, 0.4);
+
+    /* Mapeo de Compatibilidad con Clases Base */
+    --bg-main: #FAF7F2;
+    --bg-card: #FFFFFF;
+    --bg-card-hover: #F8F5EE;
+    --bg-sidebar: #2C1A12;
+    --bg-input: #FFFFFF;
+
+    --accent-gold: #C88A2B;
+    --accent-gold-light: #D99B3D;
+    --accent-wheat: #C88A2B;
+    --accent-wheat-light: #FEF3C7;
+
+    /* Estados Semánticos Adaptados a Fondo Claro (Sobrios y Legibles) */
+    --success: #15803D;            /* Verde Salvia Profundo */
+    --success-bg: #DCFCE7;
+    --success-border: #BBF7D0;
+
+    --info: #0369A1;               /* Azul Pizarra Corporativo */
+    --info-bg: #E0F2FE;
+    --info-border: #BAE6FD;
+
+    --warning: #B45309;            /* Ámbar Tostado */
+    --warning-bg: #FEF3C7;
+    --warning-border: #FDE68A;
+
+    --danger: #B91C1C;             /* Carmesí Sobrio */
+    --danger-bg: #FEE2E2;
+    --danger-border: #FECACA;
+
+    /* Tipografías */
     --font-main: 'Segoe UI', system-ui, -apple-system, sans-serif;
     --font-heading: 'Outfit', 'Segoe UI', sans-serif;
     --font-ticket: 'Courier New', Courier, monospace;
+
+    /* Sombras Cálidas de Prestigio */
+    --shadow-subtle: 0 4px 16px -2px rgba(44, 26, 18, 0.06);
+    --shadow-card: 0 4px 14px -2px rgba(44, 26, 18, 0.07);
+    --shadow-dropdown: 0 10px 25px -4px rgba(44, 26, 18, 0.12);
+    --shadow-modal: 0 20px 50px -10px rgba(44, 26, 18, 0.25);
 }
 
 * {
@@ -450,8 +487,8 @@ body {
 /* SIDEBAR DE NAVEGACIÓN */
 .app-sidebar {
     width: 250px;
-    background-color: var(--bg-sidebar);
-    border-right: 1px solid var(--border-color);
+    background-color: var(--brand-espresso);
+    border-right: 1px solid rgba(226, 217, 200, 0.15);
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -465,7 +502,7 @@ body {
     align-items: center;
     gap: 12px;
     padding: 6px 6px 16px 6px;
-    border-bottom: 1px solid var(--border-color);
+    border-bottom: 1px solid rgba(226, 217, 200, 0.15);
 }
 
 .brand-logo-badge {
@@ -481,13 +518,13 @@ body {
     font-size: 1.15rem;
     font-weight: 800;
     letter-spacing: 0.5px;
-    color: var(--accent-wheat);
+    color: #E5A93C;
     line-height: 1.2;
 }
 
 .brand-subtitle {
     font-size: 0.65rem;
-    color: var(--text-muted);
+    color: #D6C7B2;
     font-weight: 600;
     text-transform: uppercase;
 }
@@ -507,11 +544,11 @@ body {
     width: 5px;
 }
 .nav-menu::-webkit-scrollbar-thumb {
-    background: #334155;
+    background: #4A2E1F;
     border-radius: 4px;
 }
 .nav-menu::-webkit-scrollbar-thumb:hover {
-    background: #d97706;
+    background: #C88A2B;
 }
 
 .nav-item {
@@ -520,7 +557,7 @@ body {
     gap: 12px;
     padding: 11px 14px;
     border-radius: 8px;
-    color: var(--text-secondary);
+    color: #D6C7B2;
     font-weight: 700;
     font-size: 0.88rem;
     cursor: pointer;
@@ -532,17 +569,25 @@ body {
     font-size: 1.05rem;
     width: 22px;
     text-align: center;
+    color: #E5A93C;
 }
 
 .nav-item:hover {
-    background-color: var(--bg-card);
-    color: var(--text-primary);
+    background-color: rgba(200, 138, 43, 0.15);
+    color: #FFFFFF;
 }
 
 .nav-item.active {
-    background: linear-gradient(135deg, rgba(217, 119, 6, 0.2) 0%, rgba(120, 53, 15, 0.1) 100%);
-    border-color: var(--accent-gold);
-    color: var(--accent-wheat);
+    background: #C88A2B !important;
+    border-color: #C88A2B !important;
+    color: #FFFFFF !important;
+    border-radius: 10px !important;
+    box-shadow: 0 4px 12px rgba(200, 138, 43, 0.35);
+}
+
+.nav-item.active i,
+.nav-item.active span {
+    color: #FFFFFF !important;
 }
 
 .nav-item.disabled {
@@ -558,19 +603,19 @@ body {
     flex-direction: column;
     height: 100vh;
     overflow: hidden;
-    background: radial-gradient(circle at top right, #131d31 0%, #0b0f19 70%);
+    background: var(--bg-canvas);
 }
 
 /* CABECERA SUPERIOR */
 .app-header {
     height: 64px;
-    background-color: rgba(17, 24, 39, 0.85);
-    backdrop-filter: blur(10px);
-    border-bottom: 1px solid var(--border-color);
+    background-color: var(--bg-surface);
+    border-bottom: 1px solid var(--border-subtle);
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 0 20px;
+    box-shadow: 0 2px 10px rgba(44, 26, 18, 0.04);
 }
 
 .header-rates-bar {
@@ -580,8 +625,9 @@ body {
 }
 
 .rate-badge {
-    background: var(--bg-input);
-    border: 1px solid var(--border-color);
+    background: #F3EDE2;
+    border: 1px solid #E2D9C8;
+    color: #2C1A12;
     padding: 6px 12px;
     border-radius: 8px;
     display: flex;
@@ -594,32 +640,78 @@ body {
 }
 
 .rate-badge:hover {
-    border-color: var(--accent-gold);
-    background: #111827;
+    border-color: #C88A2B;
+    background: #EBE4D8;
+}
+
+.rate-badge strong {
+    color: #2C1A12;
+    font-weight: 800;
 }
 
 .rate-badge.bcv {
-    border-color: rgba(2, 132, 199, 0.4);
-    color: #38bdf8;
+    border-color: #BAE6FD;
+    background: #F3EDE2;
+    color: #2C1A12;
+}
+
+.rate-badge.bcv i {
+    color: #0369A1;
 }
 
 .rate-badge.paralelo {
-    border-color: rgba(245, 158, 11, 0.4);
-    color: var(--accent-wheat);
+    border-color: #FDE68A;
+    background: #F3EDE2;
+    color: #2C1A12;
+}
+
+.rate-badge.paralelo i {
+    color: #B45309;
 }
 
 .header-user-section {
     display: flex;
     align-items: center;
-    gap: 14px;
+    gap: 12px;
+}
+
+.clock-display {
+    background: #F3EDE2;
+    border: 1px solid #E2D9C8;
+    color: #2C1A12;
+    font-weight: 800;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 0.82rem;
+}
+
+.btn-voice-header-pill {
+    background: #F3EDE2;
+    border: 1.5px solid #C88A2B;
+    color: #8C5A32;
+    font-weight: 800;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 0.78rem;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-voice-header-pill:hover {
+    background: #EBE4D8;
+    color: #2C1A12;
+    transform: translateY(-1px);
 }
 
 .user-badge-box {
     display: flex;
     align-items: center;
     gap: 10px;
-    background: var(--bg-card);
-    border: 1px solid var(--border-color);
+    background: #F3EDE2;
+    border: 1px solid #E2D9C8;
     padding: 5px 12px 5px 6px;
     border-radius: 30px;
 }
@@ -628,8 +720,8 @@ body {
     width: 32px;
     height: 32px;
     border-radius: 50%;
-    background: var(--accent-gold);
-    color: #fff;
+    background: #C88A2B;
+    color: #FFFFFF;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -645,20 +737,20 @@ body {
 .user-name-title {
     font-size: 0.8rem;
     font-weight: 800;
-    color: #fff;
+    color: #2C1A12;
 }
 
 .user-role-tag {
     font-size: 0.65rem;
     font-weight: 800;
     text-transform: uppercase;
-    color: var(--accent-wheat);
+    color: #8C5A32;
 }
 
 .btn-logout {
-    background: rgba(239, 68, 68, 0.15);
-    border: 1px solid #ef4444;
-    color: #f87171;
+    background: #FEE2E2;
+    border: 1px solid #FECACA;
+    color: #B91C1C;
     padding: 6px 12px;
     border-radius: 8px;
     font-size: 0.8rem;
@@ -685,27 +777,27 @@ body {
 }
 
 .welcome-banner {
-    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-    border: 1.5px solid var(--accent-gold);
+    background: #FFFFFF;
+    border: 1.5px solid #C88A2B;
     border-radius: 14px;
     padding: 22px 24px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 4px 16px -2px rgba(44, 26, 18, 0.06);
 }
 
 .welcome-title {
     font-family: var(--font-heading);
     font-size: 1.4rem;
     font-weight: 800;
-    color: var(--accent-wheat);
+    color: #2C1A12;
     margin-bottom: 4px;
 }
 
 .welcome-subtitle {
     font-size: 0.85rem;
-    color: var(--text-secondary);
+    color: #5C4D44;
 }
 
 .kpi-grid {
@@ -715,20 +807,21 @@ body {
 }
 
 .kpi-card {
-    background: var(--bg-card);
-    border: 1.5px solid var(--border-color);
+    background: #FFFFFF;
+    border: 1px solid #E2D9C8;
     border-radius: 12px;
     padding: 16px 18px;
     display: flex;
     align-items: center;
     gap: 16px;
     transition: all 0.2s ease;
+    box-shadow: 0 4px 14px -2px rgba(44, 26, 18, 0.06);
 }
 
 .kpi-card:hover {
-    border-color: var(--accent-wheat);
+    border-color: #C88A2B;
     transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(0,0,0,0.3);
+    box-shadow: 0 8px 20px -2px rgba(44, 26, 18, 0.1);
 }
 
 .kpi-icon-box {
@@ -741,22 +834,22 @@ body {
     font-size: 1.4rem;
 }
 
-.kpi-icon-box.gold { background: rgba(217, 119, 6, 0.2); color: var(--accent-wheat); border: 1px solid var(--accent-gold); }
-.kpi-icon-box.green { background: rgba(16, 185, 129, 0.2); color: var(--success); border: 1px solid var(--success); }
-.kpi-icon-box.blue { background: rgba(2, 132, 199, 0.2); color: #38bdf8; border: 1px solid #0284c7; }
-.kpi-icon-box.purple { background: rgba(168, 85, 247, 0.2); color: #c084fc; border: 1px solid #a855f7; }
+.kpi-icon-box.gold { background: #FEF3C7; color: #B45309; border: 1px solid #FDE68A; }
+.kpi-icon-box.green { background: #DCFCE7; color: #15803D; border: 1px solid #BBF7D0; }
+.kpi-icon-box.blue { background: #E0F2FE; color: #0369A1; border: 1px solid #BAE6FD; }
+.kpi-icon-box.purple { background: #F3E8FF; color: #7E22CE; border: 1px solid #DDD6FE; }
 
 .kpi-info-val {
     font-size: 1.4rem;
     font-weight: 900;
-    color: #fff;
+    color: #2C1A12;
     line-height: 1.1;
 }
 
 .kpi-info-lbl {
     font-size: 0.75rem;
     font-weight: 700;
-    color: var(--text-secondary);
+    color: #5C4D44;
     text-transform: uppercase;
     margin-top: 3px;
 }
@@ -13590,4 +13683,1287 @@ input, select, textarea {
 .agenda-table-responsive {
     overflow-x: auto;
 }
+
+/* ==============================================================================
+   MASTER ENGINE: NUEVA VIASA PRESTIGE LIGHT THEME (WCAG AAA)
+   Identidad Corporativa, Ligeramente Cálida, Luminosa y de Altísimo Prestigio
+   Panadería y Pastelería Nueva Viasa, C.A. • RIF: J-31163165-8
+   ============================================================================== */
+
+/* --- 1. SUPERFICIES GLOBALES, CANVAS Y LIENZO --- */
+html, body, #app, .app-container, .app-main, .view-container, .view-container.active {
+    background-color: var(--bg-canvas) !important;
+    background: var(--bg-canvas) !important;
+    color: var(--text-primary) !important;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    color: var(--brand-espresso);
+    letter-spacing: -0.2px;
+}
+
+p, span, label, div {
+    color: inherit;
+}
+
+/* --- 2. BARRA LATERAL IZQUIERDA (SIDEBAR ESPRESSO PRESTIGE) --- */
+.app-sidebar {
+    background-color: var(--brand-espresso) !important;
+    background: var(--brand-espresso) !important;
+    border-right: 1px solid rgba(226, 217, 200, 0.16) !important;
+    color: #D6C7B2 !important;
+    box-shadow: 4px 0 20px rgba(44, 26, 18, 0.15) !important;
+}
+
+.brand-header {
+    border-bottom: 1px solid rgba(226, 217, 200, 0.16) !important;
+}
+
+.brand-title {
+    color: #E5A93C !important;
+    font-weight: 800 !important;
+    letter-spacing: 0.5px !important;
+}
+
+.brand-subtitle {
+    color: #D6C7B2 !important;
+    font-size: 0.65rem !important;
+    font-weight: 600 !important;
+}
+
+.nav-menu {
+    scrollbar-color: #8C5A32 #4A2E1F;
+}
+
+.nav-menu::-webkit-scrollbar-track {
+    background: #3A2318 !important;
+}
+
+.nav-menu::-webkit-scrollbar-thumb {
+    background: #8C5A32 !important;
+    border-radius: 4px !important;
+}
+
+.nav-menu::-webkit-scrollbar-thumb:hover {
+    background: #C88A2B !important;
+}
+
+.nav-item {
+    color: #D6C7B2 !important;
+    background: transparent !important;
+    border: 1px solid transparent !important;
+    border-radius: 8px !important;
+    transition: all 0.2s ease !important;
+}
+
+.nav-item i {
+    color: #E5A93C !important;
+}
+
+.nav-item span {
+    color: #D6C7B2 !important;
+}
+
+.nav-item:hover {
+    background-color: rgba(200, 138, 43, 0.18) !important;
+    color: #FFFFFF !important;
+}
+
+.nav-item:hover i,
+.nav-item:hover span {
+    color: #FFFFFF !important;
+}
+
+.nav-item.active {
+    background: linear-gradient(135deg, #C88A2B 0%, #B0761E 100%) !important;
+    border-color: #C88A2B !important;
+    color: #FFFFFF !important;
+    border-radius: 10px !important;
+    box-shadow: 0 4px 14px rgba(200, 138, 43, 0.35) !important;
+}
+
+.nav-item.active i,
+.nav-item.active span {
+    color: #FFFFFF !important;
+    font-weight: 800 !important;
+}
+
+/* Badges dinámicos en el Sidebar */
+.badge-agenda-live {
+    background: #C88A2B !important;
+    color: #FFFFFF !important;
+    border: 1px solid #E5A93C !important;
+    font-weight: 800 !important;
+}
+
+.badge-guardias-live {
+    background: #8C5A32 !important;
+    color: #FFFFFF !important;
+    border: 1px solid #D6C7B2 !important;
+    font-weight: 800 !important;
+}
+
+.badge-cafetin-count {
+    background: #C88A2B !important;
+    color: #FFFFFF !important;
+    font-weight: 800 !important;
+}
+
+/* --- 3. BARRA SUPERIOR (HEADER / TOPBAR) --- */
+.app-header {
+    background-color: #FFFFFF !important;
+    background: #FFFFFF !important;
+    border-bottom: 1px solid #E2D9C8 !important;
+    box-shadow: 0 2px 10px rgba(44, 26, 18, 0.04) !important;
+}
+
+.header-rates-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.rate-badge {
+    background: #F3EDE2 !important;
+    border: 1px solid #E2D9C8 !important;
+    color: #2C1A12 !important;
+    border-radius: 8px !important;
+    box-shadow: 0 1px 4px rgba(44, 26, 18, 0.03) !important;
+}
+
+.rate-badge:hover {
+    background: #EBE4D8 !important;
+    border-color: #C88A2B !important;
+}
+
+.rate-badge strong {
+    color: #2C1A12 !important;
+    font-weight: 800 !important;
+}
+
+.rate-badge.bcv i {
+    color: #0369A1 !important;
+}
+
+.rate-badge.paralelo i {
+    color: #B45309 !important;
+}
+
+#viasa-network-status-pill {
+    background: #E0F2FE !important;
+    border: 1px solid #BAE6FD !important;
+    color: #0369A1 !important;
+}
+
+#viasa-network-status-pill i {
+    color: #0369A1 !important;
+}
+
+#viasa-aclas-status-pill {
+    background: #FEF3C7 !important;
+    border: 1px solid #FDE68A !important;
+    color: #B45309 !important;
+    box-shadow: none !important;
+}
+
+#viasa-aclas-status-pill i {
+    color: #C88A2B !important;
+}
+
+.clock-display {
+    background: #F3EDE2 !important;
+    border: 1px solid #E2D9C8 !important;
+    color: #2C1A12 !important;
+    font-weight: 800 !important;
+}
+
+.btn-voice-header-pill {
+    background: #F3EDE2 !important;
+    border: 1.5px solid #C88A2B !important;
+    color: #8C5A32 !important;
+}
+
+.btn-voice-header-pill:hover {
+    background: #EBE4D8 !important;
+    color: #2C1A12 !important;
+}
+
+#btn-header-guardado-general {
+    background: linear-gradient(135deg, #15803D 0%, #166534 100%) !important;
+    border: 1.5px solid #166534 !important;
+    color: #FFFFFF !important;
+    box-shadow: 0 2px 8px rgba(21, 128, 61, 0.3) !important;
+}
+
+#btn-header-guardado-general:hover {
+    filter: brightness(1.1) !important;
+}
+
+#btn-header-casillero-respaldos {
+    background: #F3EDE2 !important;
+    border: 1.5px solid #C88A2B !important;
+    color: #8C5A32 !important;
+}
+
+#btn-header-casillero-respaldos:hover {
+    background: #EBE4D8 !important;
+    color: #2C1A12 !important;
+}
+
+#btn-header-sync-carpetas-laptop {
+    background: #F0FDF4 !important;
+    border: 1.5px solid #86EFAC !important;
+    color: #166534 !important;
+}
+
+#btn-header-sync-carpetas-laptop:hover {
+    background: #DCFCE7 !important;
+}
+
+.user-badge-box {
+    background: #F3EDE2 !important;
+    border: 1px solid #E2D9C8 !important;
+}
+
+.user-name-title {
+    color: #2C1A12 !important;
+    font-weight: 800 !important;
+}
+
+.user-role-tag {
+    color: #8C5A32 !important;
+    font-weight: 800 !important;
+}
+
+.user-avatar-circle {
+    background: #C88A2B !important;
+    color: #FFFFFF !important;
+}
+
+#btn-header-install-pwa {
+    background: #EFF6FF !important;
+    border: 1.5px solid #93C5FD !important;
+    color: #1E40AF !important;
+}
+
+.btn-logout {
+    background: #FEE2E2 !important;
+    border: 1.5px solid #FECACA !important;
+    color: #B91C1C !important;
+}
+
+.btn-logout:hover {
+    background: #B91C1C !important;
+    color: #FFFFFF !important;
+}
+
+/* --- 4. PANEL PRINCIPAL (DASHBOARD PRESTIGE LIGHT) --- */
+.welcome-banner {
+    background: #FFFFFF !important;
+    border: 1.5px solid #C88A2B !important;
+    border-radius: 14px !important;
+    box-shadow: 0 4px 16px -2px rgba(44, 26, 18, 0.06) !important;
+}
+
+.welcome-title {
+    color: #2C1A12 !important;
+    font-weight: 800 !important;
+}
+
+.welcome-subtitle {
+    color: #5C4D44 !important;
+}
+
+.kpi-card {
+    background: #FFFFFF !important;
+    border: 1px solid #E2D9C8 !important;
+    border-radius: 12px !important;
+    box-shadow: 0 4px 14px -2px rgba(44, 26, 18, 0.06) !important;
+}
+
+.kpi-card:hover {
+    border-color: #C88A2B !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 8px 22px rgba(44, 26, 18, 0.1) !important;
+}
+
+.kpi-info-val {
+    color: #2C1A12 !important;
+    font-weight: 900 !important;
+}
+
+.kpi-info-lbl {
+    color: #5C4D44 !important;
+    font-weight: 700 !important;
+}
+
+.shortcut-card {
+    background: #FFFFFF !important;
+    border: 1px solid #E2D9C8 !important;
+    border-radius: 12px !important;
+    box-shadow: 0 4px 14px -2px rgba(44, 26, 18, 0.06) !important;
+}
+
+.shortcut-card:hover {
+    border-color: #C88A2B !important;
+    background: #FAF7F2 !important;
+}
+
+.shortcut-title {
+    color: #2C1A12 !important;
+}
+
+.shortcut-desc {
+    color: #5C4D44 !important;
+}
+
+.shortcut-icon {
+    background: #F3EDE2 !important;
+    color: #8C5A32 !important;
+    border: 1px solid #E2D9C8 !important;
+}
+
+/* --- 5. PUNTO DE VENTA (POS TÁCTIL PRESTIGE LIGHT) --- */
+.pos-search-input {
+    background: #FFFFFF !important;
+    border: 1.5px solid #E2D9C8 !important;
+    color: #2C1A12 !important;
+}
+
+.pos-search-input:focus {
+    border-color: #C88A2B !important;
+    box-shadow: 0 0 0 3px rgba(200, 138, 43, 0.18) !important;
+}
+
+.pos-currency-mode-selector {
+    background: #F3EDE2 !important;
+    border: 1.5px solid #E2D9C8 !important;
+}
+
+.curr-pill-btn {
+    color: #5C4D44 !important;
+}
+
+.curr-pill-btn.active {
+    background: #C88A2B !important;
+    color: #FFFFFF !important;
+}
+
+.pos-cat-pill {
+    background: #FFFFFF !important;
+    border: 1px solid #E2D9C8 !important;
+    color: #5C4D44 !important;
+}
+
+.pos-cat-pill:hover,
+.pos-cat-pill.active {
+    background: #C88A2B !important;
+    border-color: #C88A2B !important;
+    color: #FFFFFF !important;
+}
+
+.pos-commands-toolbar {
+    background: #FFFFFF !important;
+    border: 1px solid #E2D9C8 !important;
+}
+
+/* Fichas de Producto POS (2 por Fila x 4 Filas Rectangulares) */
+.pos-product-card {
+    background-color: #FFFFFF !important;
+    background: #FFFFFF !important;
+    border: 1.5px solid #E2D9C8 !important;
+    border-radius: 12px !important;
+    box-shadow: 0 4px 14px -2px rgba(44, 26, 18, 0.06) !important;
+}
+
+.pos-product-card:hover {
+    border-color: #C88A2B !important;
+    box-shadow: 0 8px 22px rgba(44, 26, 18, 0.12) !important;
+    transform: translateY(-2px) !important;
+}
+
+.pos-product-card:active {
+    background-color: #FAF7F2 !important;
+    border-color: #C88A2B !important;
+}
+
+.pos-card-top-bar {
+    border-bottom: 1px dashed #E2D9C8 !important;
+}
+
+.pos-card-product-title {
+    color: #2C1A12 !important;
+    font-weight: 800 !important;
+}
+
+.pos-card-product-sub {
+    color: #5C4D44 !important;
+}
+
+.pos-card-sku-badge {
+    background: #F3EDE2 !important;
+    border: 1px solid #E2D9C8 !important;
+    color: #8C5A32 !important;
+}
+
+.btn-card-touch-action {
+    background: #F3EDE2 !important;
+    border: 1px solid #E2D9C8 !important;
+    color: #5C4D44 !important;
+}
+
+.btn-card-touch-action:hover {
+    background: #C88A2B !important;
+    border-color: #C88A2B !important;
+    color: #FFFFFF !important;
+}
+
+.pos-tax-tag.exento {
+    background: #DCFCE7 !important;
+    color: #15803D !important;
+    border: 1px solid #BBF7D0 !important;
+}
+
+.pos-tax-tag.iva {
+    background: #FEF3C7 !important;
+    color: #B45309 !important;
+    border: 1px solid #FDE68A !important;
+}
+
+.pos-card-thumb-img,
+.pos-card-thumb-fallback {
+    background: #FAF7F2 !important;
+    border: 1.5px solid #E2D9C8 !important;
+    color: #8C5A32 !important;
+}
+
+.pos-card-price-usd {
+    color: #C88A2B !important;
+    font-weight: 900 !important;
+}
+
+.pos-card-price-bs {
+    color: #0369A1 !important;
+    font-weight: 700 !important;
+}
+
+.pos-card-stock-indicator {
+    background: #DCFCE7 !important;
+    color: #15803D !important;
+    border: 1px solid #BBF7D0 !important;
+}
+
+.pos-card-stock-indicator.stock-optimo {
+    background: #DCFCE7 !important;
+    color: #15803D !important;
+    border-color: #BBF7D0 !important;
+}
+
+.pos-card-stock-indicator.stock-medio {
+    background: #FEF3C7 !important;
+    color: #B45309 !important;
+    border-color: #FDE68A !important;
+}
+
+.pos-card-stock-indicator.stock-agotado {
+    background: #FEE2E2 !important;
+    color: #B91C1C !important;
+    border-color: #FECACA !important;
+}
+
+/* Columna de Carrito y Facturación POS */
+.pos-cart-panel {
+    background: #FFFFFF !important;
+    border: 1.5px solid #E2D9C8 !important;
+    box-shadow: 0 4px 16px -2px rgba(44, 26, 18, 0.06) !important;
+}
+
+.pos-cart-header {
+    background: #F3EDE2 !important;
+    border-bottom: 1px solid #E2D9C8 !important;
+    color: #2C1A12 !important;
+}
+
+.pos-cart-header h3 {
+    color: #2C1A12 !important;
+    font-weight: 800 !important;
+}
+
+.pos-cart-items-list {
+    background: #FAF7F2 !important;
+}
+
+.pos-cart-item-row {
+    background: #FFFFFF !important;
+    border: 1px solid #E2D9C8 !important;
+    box-shadow: 0 2px 6px rgba(44, 26, 18, 0.04) !important;
+}
+
+.pos-cart-item-title {
+    color: #2C1A12 !important;
+    font-weight: 800 !important;
+}
+
+.pos-cart-item-sub {
+    color: #5C4D44 !important;
+}
+
+.btn-qty-pos {
+    background: #F3EDE2 !important;
+    border: 1px solid #E2D9C8 !important;
+    color: #2C1A12 !important;
+}
+
+.btn-qty-pos:hover {
+    background: #C88A2B !important;
+    border-color: #C88A2B !important;
+    color: #FFFFFF !important;
+}
+
+.btn-del-cart-pos {
+    background: #FEE2E2 !important;
+    border: 1px solid #FECACA !important;
+    color: #B91C1C !important;
+}
+
+.pos-cart-totals {
+    background: #F3EDE2 !important;
+    border-top: 1px solid #E2D9C8 !important;
+}
+
+.pos-breakdown-box {
+    background: #FFFFFF !important;
+    border: 1px solid #E2D9C8 !important;
+}
+
+.pos-total-row {
+    color: #5C4D44 !important;
+}
+
+.pos-total-row.grand-total {
+    color: #C88A2B !important;
+    border-top: 1px dashed #E2D9C8 !important;
+    font-weight: 900 !important;
+}
+
+.pos-total-row.grand-total-bs {
+    color: #0369A1 !important;
+    font-weight: 800 !important;
+}
+
+.btn-checkout-pos {
+    background: linear-gradient(135deg, #C88A2B 0%, #B0761E 100%) !important;
+    border: 1.5px solid #C88A2B !important;
+    color: #FFFFFF !important;
+    box-shadow: 0 4px 14px rgba(200, 138, 43, 0.35) !important;
+}
+
+.btn-checkout-pos:hover {
+    background: linear-gradient(135deg, #D99B3D 0%, #C88A2B 100%) !important;
+    box-shadow: 0 6px 20px rgba(200, 138, 43, 0.5) !important;
+}
+
+/* --- 6. PRODUCTOS NUEVA VIASA & INVENTARIO Y HARINAS --- */
+.pnv-workspace {
+    background-color: var(--bg-canvas) !important;
+    color: var(--text-primary) !important;
+}
+
+.pnv-exec-header {
+    background: #FFFFFF !important;
+    border: 1.5px solid #C88A2B !important;
+    border-left: 5px solid #C88A2B !important;
+    box-shadow: 0 4px 16px -2px rgba(44, 26, 18, 0.06) !important;
+    color: #2C1A12 !important;
+}
+
+.pnv-brand-title {
+    color: #2C1A12 !important;
+}
+
+.pnv-brand-subtitle {
+    color: #5C4D44 !important;
+}
+
+.pnv-kpi-card {
+    background: #FFFFFF !important;
+    border: 1px solid #E2D9C8 !important;
+    box-shadow: 0 4px 14px -2px rgba(44, 26, 18, 0.06) !important;
+    color: #2C1A12 !important;
+}
+
+.pnv-kpi-card:hover {
+    border-color: #C88A2B !important;
+}
+
+.pnv-toolbar {
+    background: #FFFFFF !important;
+    border: 1px solid #E2D9C8 !important;
+    box-shadow: 0 4px 14px -2px rgba(44, 26, 18, 0.06) !important;
+}
+
+.pnv-card {
+    background: #FFFFFF !important;
+    border: 1.5px solid #E2D9C8 !important;
+    box-shadow: 0 4px 14px -2px rgba(44, 26, 18, 0.06) !important;
+    color: #2C1A12 !important;
+}
+
+.pnv-card:hover {
+    border-color: #C88A2B !important;
+    box-shadow: 0 8px 22px rgba(44, 26, 18, 0.12) !important;
+}
+
+.pnv-card-title {
+    color: #2C1A12 !important;
+    font-weight: 800 !important;
+}
+
+.pnv-card-sku {
+    color: #8C5A32 !important;
+    background: #F3EDE2 !important;
+    border: 1px solid #E2D9C8 !important;
+}
+
+.pnv-chip {
+    background: #F3EDE2 !important;
+    border: 1px solid #E2D9C8 !important;
+    color: #5C4D44 !important;
+}
+
+.barcode-preview-container,
+.qr-preview-container {
+    background-color: #FFFFFF !important;
+    background: #FFFFFF !important;
+    border: 1px solid #E2D9C8 !important;
+    box-shadow: 0 2px 6px rgba(44, 26, 18, 0.04) !important;
+}
+
+/* --- 7. PROVEEDORES Y COMPRAS --- */
+.suppliers-container,
+.supplier-card {
+    background: #FFFFFF !important;
+    border: 1px solid #E2D9C8 !important;
+    box-shadow: 0 4px 14px -2px rgba(44, 26, 18, 0.06) !important;
+    color: #2C1A12 !important;
+}
+
+.supplier-card:hover {
+    border-color: #C88A2B !important;
+    box-shadow: 0 8px 22px rgba(44, 26, 18, 0.12) !important;
+}
+
+.supplier-title,
+.supplier-name {
+    color: #2C1A12 !important;
+    font-weight: 800 !important;
+}
+
+.supplier-sub,
+.supplier-meta {
+    color: #5C4D44 !important;
+}
+
+.supplier-tag {
+    background: #F3EDE2 !important;
+    color: #8C5A32 !important;
+    border: 1px solid #E2D9C8 !important;
+}
+
+.supplier-rating i.fa-star {
+    color: #C88A2B !important;
+}
+
+.viasa-ficha-tecnica-card {
+    background: #FFFFFF !important;
+    border: 1px solid #E2D9C8 !important;
+    color: #2C1A12 !important;
+    box-shadow: 0 10px 30px rgba(44, 26, 18, 0.15) !important;
+}
+
+/* --- 8. GUARDIAS Y VANGUARDIA (MATRIZ Y REPORTES) --- */
+.guardias-hub-wrapper {
+    background: var(--bg-canvas) !important;
+    color: var(--text-primary) !important;
+}
+
+.guardias-hero-card {
+    background: #FFFFFF !important;
+    border: 1.5px solid #C88A2B !important;
+    box-shadow: 0 4px 16px -2px rgba(44, 26, 18, 0.06) !important;
+    color: #2C1A12 !important;
+}
+
+.guardias-hero-card::before {
+    background: linear-gradient(90deg, #C88A2B 0%, #8C5A32 50%, #15803D 100%) !important;
+}
+
+.guardias-hero-header {
+    border-bottom: 1px solid #E2D9C8 !important;
+}
+
+.guardias-hero-title {
+    color: #2C1A12 !important;
+    font-weight: 800 !important;
+}
+
+.guardias-hero-subtitle {
+    color: #5C4D44 !important;
+}
+
+.guardias-hero-icon-box {
+    background: #F3EDE2 !important;
+    border: 1px solid #C88A2B !important;
+    color: #C88A2B !important;
+}
+
+.guardias-matrix-toolbar {
+    background: #FFFFFF !important;
+    border: 1px solid #E2D9C8 !important;
+    box-shadow: 0 4px 14px -2px rgba(44, 26, 18, 0.06) !important;
+}
+
+/* Cabeceras de Turnos en la Matriz */
+.guardias-turno-header.madrugada {
+    background: #2C1A12 !important;
+    color: #FFFFFF !important;
+}
+
+.guardias-turno-header.matutino {
+    background: #C88A2B !important;
+    color: #FFFFFF !important;
+}
+
+.guardias-turno-header.vespertino {
+    background: #8C5A32 !important;
+    color: #FFFFFF !important;
+}
+
+.guardias-turno-header.nocturno {
+    background: #475569 !important;
+    color: #FFFFFF !important;
+}
+
+.guardias-matrix-cell {
+    background: #FFFFFF !important;
+    border: 1px solid #E2D9C8 !important;
+    color: #2C1A12 !important;
+}
+
+.guardias-emp-chip {
+    background: #F3EDE2 !important;
+    color: #2C1A12 !important;
+    border: 1px solid #E2D9C8 !important;
+}
+
+.table-lottt-analitica,
+.table-viasa-guardias {
+    background: #FFFFFF !important;
+}
+
+.table-lottt-analitica th,
+.table-viasa-guardias th {
+    background: #F3EDE2 !important;
+    color: #2C1A12 !important;
+    border-bottom: 1.5px solid #E2D9C8 !important;
+    font-weight: 800 !important;
+}
+
+.table-lottt-analitica td,
+.table-viasa-guardias td {
+    background: #FFFFFF !important;
+    color: #2C1A12 !important;
+    border-bottom: 1px solid #E2D9C8 !important;
+}
+
+.table-lottt-analitica tr:hover td,
+.table-viasa-guardias tr:hover td {
+    background: #FAF7F2 !important;
+}
+
+/* --- 9. AGENDA Y OPERACIONES (CALENDARIO PRESTIGE LIGHT) --- */
+#view-agenda-operaciones {
+    background: var(--bg-canvas) !important;
+    color: var(--text-primary) !important;
+}
+
+.agenda-header {
+    background: #FFFFFF !important;
+    border: 1px solid #E2D9C8 !important;
+    box-shadow: 0 4px 16px -2px rgba(44, 26, 18, 0.06) !important;
+}
+
+.agenda-brand-title {
+    color: #2C1A12 !important;
+    background: none !important;
+    -webkit-text-fill-color: #2C1A12 !important;
+}
+
+.agenda-brand-subtitle {
+    color: #5C4D44 !important;
+}
+
+.agenda-brand-icon {
+    background: #F3EDE2 !important;
+    border: 1px solid #C88A2B !important;
+    color: #C88A2B !important;
+    box-shadow: none !important;
+}
+
+.agenda-kpi-card {
+    background: #FFFFFF !important;
+    border: 1px solid #E2D9C8 !important;
+    box-shadow: 0 4px 14px -2px rgba(44, 26, 18, 0.06) !important;
+}
+
+.agenda-kpi-value {
+    color: #2C1A12 !important;
+    font-weight: 900 !important;
+}
+
+.agenda-kpi-sub {
+    color: #5C4D44 !important;
+}
+
+.agenda-controls-bar {
+    background: #FFFFFF !important;
+    border: 1px solid #E2D9C8 !important;
+    box-shadow: 0 4px 14px -2px rgba(44, 26, 18, 0.06) !important;
+}
+
+.agenda-view-selector {
+    background: #F3EDE2 !important;
+    border: 1px solid #E2D9C8 !important;
+}
+
+.agenda-view-btn {
+    color: #5C4D44 !important;
+}
+
+.agenda-view-btn:hover {
+    color: #2C1A12 !important;
+    background: #EBE4D8 !important;
+}
+
+.agenda-view-btn.active {
+    background: #C88A2B !important;
+    color: #FFFFFF !important;
+    border: 1px solid #C88A2B !important;
+    box-shadow: 0 2px 8px rgba(200, 138, 43, 0.3) !important;
+}
+
+.agenda-search-box input {
+    background: #FAF7F2 !important;
+    border: 1px solid #D5CBB8 !important;
+    color: #2C1A12 !important;
+}
+
+.agenda-search-box input:focus {
+    border-color: #C88A2B !important;
+}
+
+.agenda-filter-select {
+    background: #FAF7F2 !important;
+    border: 1px solid #D5CBB8 !important;
+    color: #2C1A12 !important;
+}
+
+.agenda-month-card {
+    background: #FFFFFF !important;
+    border: 1px solid #E2D9C8 !important;
+    box-shadow: 0 4px 16px -2px rgba(44, 26, 18, 0.06) !important;
+}
+
+.agenda-month-card-header {
+    background: #F3EDE2 !important;
+    border-bottom: 1px solid #E2D9C8 !important;
+}
+
+.agenda-month-card-title {
+    color: #2C1A12 !important;
+    font-weight: 800 !important;
+}
+
+.agenda-weekdays-row {
+    background: #F8F5EE !important;
+    border-bottom: 1px solid #E2D9C8 !important;
+}
+
+.agenda-weekday-col {
+    color: #5C4D44 !important;
+    border-right: 1px solid #E2D9C8 !important;
+    font-weight: 800 !important;
+}
+
+.agenda-day-cell {
+    background: #FFFFFF !important;
+    border-right: 1px solid #E5E7EB !important;
+    border-bottom: 1px solid #E5E7EB !important;
+    color: #2C1A12 !important;
+}
+
+.agenda-day-cell:hover {
+    background: #FAF7F2 !important;
+}
+
+.agenda-day-cell.outside-month {
+    background: #F8F5EE !important;
+    opacity: 0.45 !important;
+}
+
+.agenda-day-cell.is-today {
+    border: 2px solid #C88A2B !important;
+    background: #FFFDF8 !important;
+    box-shadow: inset 0 0 16px rgba(200, 138, 43, 0.12) !important;
+}
+
+.agenda-day-num {
+    color: #2C1A12 !important;
+    font-weight: 800 !important;
+}
+
+.agenda-day-cell.is-today .agenda-day-num {
+    color: #C88A2B !important;
+}
+
+.agenda-badge-today {
+    background: #C88A2B !important;
+    color: #FFFFFF !important;
+}
+
+.agenda-day-load-badge {
+    background: #F3EDE2 !important;
+    color: #8C5A32 !important;
+    border: 1px solid #E2D9C8 !important;
+}
+
+/* Cápsulas de Eventos en Calendario (Alto Contraste y Fondo Claro) */
+.agenda-capsule.produccion {
+    background: #FEF3C7 !important;
+    border: 1px solid #FDE68A !important;
+    border-left: 3px solid #C88A2B !important;
+    color: #78350F !important;
+}
+
+.agenda-capsule.entrega {
+    background: #DCFCE7 !important;
+    border: 1px solid #BBF7D0 !important;
+    border-left: 3px solid #15803D !important;
+    color: #14532D !important;
+}
+
+.agenda-capsule.recepcion {
+    background: #E0F2FE !important;
+    border: 1px solid #BAE6FD !important;
+    border-left: 3px solid #0369A1 !important;
+    color: #0C4A6E !important;
+}
+
+.agenda-capsule.reunion {
+    background: #F3E8FF !important;
+    border: 1px solid #DDD6FE !important;
+    border-left: 3px solid #7E22CE !important;
+    color: #581C87 !important;
+}
+
+.agenda-capsule.pago {
+    background: #FEE2E2 !important;
+    border: 1px solid #FECACA !important;
+    border-left: 3px solid #B91C1C !important;
+    color: #7F1D1D !important;
+}
+
+.agenda-capsule-title {
+    color: inherit !important;
+    font-weight: 700 !important;
+}
+
+.agenda-capsule-time {
+    color: inherit !important;
+    font-weight: 700 !important;
+}
+
+.agenda-capsule-status {
+    background: rgba(255, 255, 255, 0.75) !important;
+    color: inherit !important;
+    border: 1px solid rgba(0, 0, 0, 0.08) !important;
+}
+
+/* Timeline 24h & Kanban en Agenda */
+.agenda-timeline-container {
+    background: #FFFFFF !important;
+    border: 1px solid #E2D9C8 !important;
+}
+
+.agenda-timeline-header-bar {
+    background: #F3EDE2 !important;
+    border-bottom: 1px solid #E2D9C8 !important;
+}
+
+.agenda-timeline-hour-marker {
+    background: #F8F5EE !important;
+    border-right: 1px solid #E2D9C8 !important;
+    color: #5C4D44 !important;
+}
+
+.agenda-timeline-row {
+    border-bottom: 1px solid #E2D9C8 !important;
+}
+
+.agenda-kanban-col {
+    background: #FFFFFF !important;
+    border: 1px solid #E2D9C8 !important;
+}
+
+.agenda-kanban-col-header {
+    background: #F3EDE2 !important;
+    border-bottom: 1px solid #E2D9C8 !important;
+}
+
+.agenda-kanban-col-title {
+    color: #2C1A12 !important;
+    font-weight: 800 !important;
+}
+
+.agenda-kanban-card {
+    background: #FAF7F2 !important;
+    border: 1px solid #E2D9C8 !important;
+    box-shadow: 0 2px 8px rgba(44, 26, 18, 0.05) !important;
+}
+
+.agenda-kanban-card:hover {
+    border-color: #C88A2B !important;
+}
+
+.agenda-kanban-card-title {
+    color: #2C1A12 !important;
+    font-weight: 700 !important;
+}
+
+.agenda-kanban-card-meta {
+    color: #5C4D44 !important;
+}
+
+/* --- 10. CAFETÍN, ACTIVOS, CRM, CAJA, CONTABILIDAD, SENIAT, KDS --- */
+.cafetin-container,
+.activos-container,
+.crm-container,
+.caja-container,
+.contabilidad-container,
+.reportes-container {
+    background: var(--bg-canvas) !important;
+    color: var(--text-primary) !important;
+}
+
+.card,
+.panel,
+.box,
+.stat-box,
+.report-card,
+.account-card,
+.order-card {
+    background-color: #FFFFFF !important;
+    border: 1px solid #E2D9C8 !important;
+    box-shadow: 0 4px 14px -2px rgba(44, 26, 18, 0.06) !important;
+    color: #2C1A12 !important;
+}
+
+.card-header,
+.panel-header {
+    background: #F3EDE2 !important;
+    border-bottom: 1px solid #E2D9C8 !important;
+    color: #2C1A12 !important;
+}
+
+/* --- 11. MODALES GLOBALES PRESTIGE LIGHT --- */
+.viasa-modal,
+.agenda-modal-overlay,
+.modal-overlay {
+    background: rgba(44, 26, 18, 0.45) !important;
+    backdrop-filter: blur(8px) !important;
+}
+
+.viasa-modal-card,
+.agenda-modal-card,
+.modal-card {
+    background: #FFFFFF !important;
+    border: 1px solid #E2D9C8 !important;
+    box-shadow: 0 20px 50px -10px rgba(44, 26, 18, 0.25) !important;
+    color: #2C1A12 !important;
+    border-radius: 14px !important;
+}
+
+.viasa-modal-header,
+.agenda-modal-header,
+.modal-header {
+    background: #F3EDE2 !important;
+    border-bottom: 1px solid #E2D9C8 !important;
+    color: #2C1A12 !important;
+}
+
+.viasa-modal-header h3,
+.agenda-modal-title,
+.modal-title {
+    color: #2C1A12 !important;
+    font-weight: 800 !important;
+}
+
+.viasa-modal-header .btn-close,
+.agenda-modal-close,
+.btn-close-modal {
+    color: #8C5A32 !important;
+}
+
+.viasa-modal-body,
+.agenda-modal-body,
+.modal-body {
+    background: #FFFFFF !important;
+    color: #2C1A12 !important;
+}
+
+.viasa-modal-footer,
+.agenda-modal-footer,
+.modal-footer {
+    background: #F3EDE2 !important;
+    border-top: 1px solid #E2D9C8 !important;
+}
+
+/* --- 12. FORMULARIOS, INPUTS Y SELECTS --- */
+input:not([type="checkbox"]):not([type="radio"]),
+select,
+textarea,
+.form-control,
+.login-input,
+.pnv-input,
+.agenda-input,
+.agenda-textarea {
+    background-color: #FAF7F2 !important;
+    border: 1px solid #D5CBB8 !important;
+    color: #2C1A12 !important;
+    border-radius: 8px !important;
+    font-family: inherit !important;
+}
+
+input:focus,
+select:focus,
+textarea:focus,
+.form-control:focus,
+.agenda-input:focus,
+.agenda-textarea:focus {
+    border-color: #C88A2B !important;
+    background-color: #FFFFFF !important;
+    box-shadow: 0 0 0 3px rgba(200, 138, 43, 0.18) !important;
+    outline: none !important;
+}
+
+input::placeholder,
+textarea::placeholder {
+    color: #8A7E77 !important;
+}
+
+label,
+.agenda-label {
+    color: #5C4D44 !important;
+    font-weight: 700 !important;
+}
+
+/* --- 13. TABLAS GENERALES --- */
+table,
+.table-viasa,
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #FFFFFF !important;
+}
+
+table th,
+.table-viasa th,
+.data-table th {
+    background-color: #F3EDE2 !important;
+    color: #2C1A12 !important;
+    border-bottom: 1.5px solid #E2D9C8 !important;
+    font-weight: 800 !important;
+    padding: 10px 12px !important;
+}
+
+table td,
+.table-viasa td,
+.data-table td {
+    background-color: #FFFFFF !important;
+    color: #2C1A12 !important;
+    border-bottom: 1px solid #E2D9C8 !important;
+    padding: 10px 12px !important;
+}
+
+table tr:hover td,
+.table-viasa tr:hover td,
+.data-table tr:hover td {
+    background-color: #FAF7F2 !important;
+}
+
+/* --- 14. BOTONES CORPORATIVOS --- */
+.btn-primary,
+.btn-gold,
+.btn-action,
+.btn-cmd-guardia.gold {
+    background: linear-gradient(135deg, #C88A2B 0%, #B0761E 100%) !important;
+    border: 1px solid #C88A2B !important;
+    color: #FFFFFF !important;
+    box-shadow: 0 2px 8px rgba(200, 138, 43, 0.25) !important;
+}
+
+.btn-primary:hover,
+.btn-gold:hover,
+.btn-action:hover,
+.btn-cmd-guardia.gold:hover {
+    background: linear-gradient(135deg, #D99B3D 0%, #C88A2B 100%) !important;
+    box-shadow: 0 4px 14px rgba(200, 138, 43, 0.4) !important;
+    transform: translateY(-1px) !important;
+}
+
+.btn-secondary {
+    background: #F3EDE2 !important;
+    border: 1px solid #E2D9C8 !important;
+    color: #5C4D44 !important;
+}
+
+.btn-secondary:hover {
+    background: #EBE4D8 !important;
+    color: #2C1A12 !important;
+    border-color: #C88A2B !important;
+}
+
+.btn-success,
+.btn-cmd-guardia.emerald {
+    background: #15803D !important;
+    color: #FFFFFF !important;
+    border: 1px solid #166534 !important;
+}
+
+.btn-danger,
+.btn-cmd-guardia.red {
+    background: #B91C1C !important;
+    color: #FFFFFF !important;
+    border: 1px solid #991B1B !important;
+}
+
+/* --- 15. SCROLLBARS GLOBALES DE PRESTIGIO --- */
+*::-webkit-scrollbar {
+    width: 7px;
+    height: 7px;
+}
+
+*::-webkit-scrollbar-track {
+    background: #F3EDE2;
+}
+
+*::-webkit-scrollbar-thumb {
+    background: #D5CBB8;
+    border-radius: 4px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+    background: #C88A2B;
+}
+
 
