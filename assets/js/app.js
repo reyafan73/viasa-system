@@ -8083,28 +8083,28 @@
 
                 <!-- KPIs de Abastecimiento y Finanzas con Proveedores -->
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin-bottom: 16px;">
-                    <div style="background: var(--bg-card); border: 1.5px solid var(--border-color); border-radius: 10px; padding: 12px 14px;">
-                        <div style="font-size: 0.75rem; color: var(--text-secondary); font-weight: 700; text-transform: uppercase;">Directorio Proveedores</div>
-                        <div style="font-size: 1.4rem; font-weight: 900; color: var(--accent-wheat); margin-top: 4px;">
-                            ${totalProveedores} <span style="font-size: 0.8rem; color: var(--text-muted); font-weight: 400;">Empresas Activas</span>
+                    <div style="background: #FFFFFF; border: 1.5px solid #DDD2C0; border-radius: 10px; padding: 12px 14px; box-shadow: 0 2px 8px rgba(44, 26, 18, 0.05);">
+                        <div style="font-size: 0.75rem; color: #5C4D44; font-weight: 700; text-transform: uppercase; letter-spacing: 0.3px;">Directorio Proveedores</div>
+                        <div style="font-size: 1.4rem; font-weight: 900; color: #2C1A12; margin-top: 4px;">
+                            ${totalProveedores} <span style="font-size: 0.8rem; color: #8C5A32; font-weight: 600;">Empresas Activas</span>
                         </div>
                     </div>
-                    <div style="background: var(--bg-card); border: 1.5px solid var(--border-color); border-radius: 10px; padding: 12px 14px;">
-                        <div style="font-size: 0.75rem; color: var(--text-secondary); font-weight: 700; text-transform: uppercase;">Órdenes de Compra</div>
-                        <div style="font-size: 1.4rem; font-weight: 900; color: #38bdf8; margin-top: 4px;">
-                            ${totalOrdenes} <span style="font-size: 0.8rem; color: #60a5fa; font-weight: 600;">(${ordenesEmitidas} por Recibir)</span>
+                    <div style="background: #FFFFFF; border: 1.5px solid #DDD2C0; border-radius: 10px; padding: 12px 14px; box-shadow: 0 2px 8px rgba(44, 26, 18, 0.05);">
+                        <div style="font-size: 0.75rem; color: #5C4D44; font-weight: 700; text-transform: uppercase; letter-spacing: 0.3px;">Órdenes de Compra</div>
+                        <div style="font-size: 1.4rem; font-weight: 900; color: #B45309; margin-top: 4px;">
+                            ${totalOrdenes} <span style="font-size: 0.8rem; color: #5C4D44; font-weight: 600;">(${ordenesEmitidas} por Recibir)</span>
                         </div>
                     </div>
-                    <div style="background: #022c22; border: 1.5px solid #059669; border-radius: 10px; padding: 12px 14px;">
-                        <div style="font-size: 0.75rem; color: #6ee7b7; font-weight: 700; text-transform: uppercase;">Deuda Total CxP (USD)</div>
-                        <div style="font-size: 1.4rem; font-weight: 900; color: #fff; margin-top: 4px;">
+                    <div style="background: #2C1A12; border: 1.5px solid #4A2818; border-radius: 10px; padding: 12px 14px; box-shadow: 0 4px 12px rgba(44, 26, 18, 0.25);">
+                        <div style="font-size: 0.75rem; color: #E7DEC8; font-weight: 700; text-transform: uppercase; letter-spacing: 0.3px;">Deuda Total CxP (USD)</div>
+                        <div style="font-size: 1.4rem; font-weight: 900; color: #F59E0B; margin-top: 4px;">
                             $${totalCxPPendienteUSD.toFixed(2)}
                         </div>
-                        <div style="font-size: 0.72rem; color: #a7f3d0;">Bs. ${totalCxPPendienteBs.toFixed(2)}</div>
+                        <div style="font-size: 0.72rem; color: #E7DEC8; font-weight: 600;">Bs. ${totalCxPPendienteBs.toFixed(2)}</div>
                     </div>
-                    <div style="background: ${cxpVencidas > 0 ? '#450a0a' : '#1e293b'}; border: 1.5px solid ${cxpVencidas > 0 ? '#ef4444' : 'var(--border-color)'}; border-radius: 10px; padding: 12px 14px;">
-                        <div style="font-size: 0.75rem; color: ${cxpVencidas > 0 ? '#fca5a5' : 'var(--text-secondary)'}; font-weight: 700; text-transform: uppercase;">Semáforo de Vencimiento</div>
-                        <div style="font-size: 1.4rem; font-weight: 900; color: ${cxpVencidas > 0 ? '#f87171' : '#34d399'}; margin-top: 4px;">
+                    <div style="background: ${cxpVencidas > 0 ? '#451A1A' : '#FFFFFF'}; border: 1.5px solid ${cxpVencidas > 0 ? '#991B1B' : '#DDD2C0'}; border-radius: 10px; padding: 12px 14px; box-shadow: 0 2px 8px rgba(44, 26, 18, 0.05);">
+                        <div style="font-size: 0.75rem; color: ${cxpVencidas > 0 ? '#FEF3C7' : '#5C4D44'}; font-weight: 700; text-transform: uppercase; letter-spacing: 0.3px;">Semáforo de Vencimiento</div>
+                        <div style="font-size: 1.4rem; font-weight: 900; color: ${cxpVencidas > 0 ? '#F87171' : '#065F46'}; margin-top: 4px;">
                             ${cxpVencidas > 0 ? `⚠️ ${cxpVencidas} Vencidas` : '✅ Al Día'}
                         </div>
                     </div>
@@ -8189,113 +8189,113 @@
                                     <div class="prv-card" onclick="ViasaApp.abrirFichaTecnicaIntegralProveedor('${prv.id}')" style="cursor: pointer;" title="Haga clic para abrir la Ficha Técnica Integral de ${prv.nombreEmpresa}">
                                         <div>
                                             <div class="prv-card-header" style="display: flex; gap: 10px; align-items: center; margin-bottom: 10px;">
-                                                <div class="prv-logo-box" style="width: 48px; height: 48px; min-width: 48px; border-radius: 8px; background: rgba(15, 23, 42, 0.8); border: 1.5px solid #38bdf8; display: flex; align-items: center; justify-content: center; overflow: hidden; box-shadow: 0 2px 6px rgba(0,0,0,0.35);">
+                                                <div class="prv-logo-box" style="width: 48px; height: 48px; min-width: 48px; border-radius: 8px; background: #FAF7F2; border: 1.5px solid #DDD2C0; display: flex; align-items: center; justify-content: center; overflow: hidden; box-shadow: 0 1px 4px rgba(44, 26, 18, 0.08);">
                                                     ${prv.logo ? `
                                                         <img src="${prv.logo}" alt="Logo ${prv.nombreEmpresa}" style="width: 100%; height: 100%; object-fit: contain; background: #ffffff; padding: 2px;">
                                                     ` : `
-                                                        <i class="fa-solid fa-truck-field" style="font-size: 1.3rem; color: #38bdf8;"></i>
+                                                        <i class="fa-solid fa-truck-field" style="font-size: 1.3rem; color: #8C5A32;"></i>
                                                     `}
                                                 </div>
                                                 <div style="flex: 1; min-width: 0;">
-                                                    <div class="prv-title" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${prv.nombreEmpresa}">${prv.nombreEmpresa}</div>
-                                                    <div class="prv-rif">RIF: ${prv.rif}</div>
+                                                    <div class="prv-title" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #2C1A12; font-weight: 800; font-size: 15.5px;" title="${prv.nombreEmpresa}">${prv.nombreEmpresa}</div>
+                                                    <div class="prv-rif" style="color: #5C4D44; font-weight: 600; font-size: 0.75rem;">RIF: ${prv.rif}</div>
                                                 </div>
-                                                <div class="prv-stars" title="Calificación del Proveedor">
+                                                <div class="prv-stars" style="background: #FEF3C7; border: 1px solid #F59E0B; color: #92400E; font-weight: 800; padding: 2px 8px; border-radius: 6px; font-size: 0.78rem;" title="Calificación del Proveedor">
                                                     <i class="fa-solid fa-star"></i> ${prv.calificacion || '5.0'}
                                                 </div>
                                             </div>
 
-                                            <div style="margin-bottom: 8px;">
-                                                <span class="mp-badge-tag ok" style="font-size: 0.68rem;">
+                                            <div style="margin-bottom: 10px; display: flex; flex-wrap: wrap; gap: 6px;">
+                                                <span class="mp-badge-tag ok" style="background: #F3EDE2; border: 1px solid #D6C7B2; color: #6F4322; font-weight: 700; font-size: 0.7rem; padding: 3px 8px; border-radius: 6px;">
                                                     <i class="fa-solid fa-tag"></i> ${prv.categoria || 'Materia Prima'}
                                                 </span>
-                                                <span class="prv-badge-credit ${(prv.diasCredito || 0) > 0 ? 'has-credit' : 'no-credit'}">
+                                                <span class="prv-badge-credit ${(prv.diasCredito || 0) > 0 ? 'has-credit' : 'no-credit'}" style="${(prv.diasCredito || 0) > 0 ? 'background: #FEF3C7; border: 1px solid #FDE68A; color: #92400E;' : 'background: #ECFDF5; border: 1px solid #A7F3D0; color: #065F46;'} font-weight: 700; font-size: 0.7rem; padding: 3px 8px; border-radius: 6px;">
                                                     <i class="fa-solid fa-calendar-check"></i> ${(prv.diasCredito || 0) > 0 ? `${prv.diasCredito} Días Crédito` : 'Contado'}
                                                 </span>
                                             </div>
 
                                             <div class="prv-info-list" style="display: flex; flex-direction: column; gap: 8px;">
                                                 <!-- Teléfonos de la Empresa (Hasta 3 números) -->
-                                                <div style="background: rgba(15, 23, 42, 0.45); border-radius: 6px; padding: 7px 9px; border-left: 3px solid #38bdf8;">
-                                                    <div style="font-size: 0.72rem; color: #38bdf8; font-weight: 700; display: flex; align-items: center; gap: 5px; margin-bottom: 3px;">
+                                                <div style="background: #FAF7F2; border: 1px solid #E6DEC8; border-left: 3px solid #8C5A32; border-radius: 6px; padding: 8px 10px;">
+                                                    <div style="font-size: 11.5px; color: #8C5A32; font-weight: 700; display: flex; align-items: center; gap: 5px; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.3px;">
                                                         <i class="fa-solid fa-building"></i> Teléfonos Empresa:
                                                     </div>
-                                                    <div style="font-size: 0.76rem; color: #cbd5e1; display: flex; flex-wrap: wrap; gap: 5px;">
+                                                    <div style="font-size: 0.76rem; display: flex; flex-wrap: wrap; gap: 6px;">
                                                         ${telsEmp.length > 0 ? telsEmp.map((t, idx) => `
-                                                            <a href="tel:${t.replace(/\s+/g, '')}" onclick="event.stopPropagation()" style="color: #e2e8f0; text-decoration: none; background: rgba(255,255,255,0.07); padding: 2px 7px; border-radius: 4px; font-size: 0.73rem; display: inline-flex; align-items: center; gap: 4px;" title="Llamar a la Empresa (${idx + 1})">
-                                                                <i class="fa-solid fa-phone" style="font-size: 0.65rem; color: #38bdf8;"></i> ${t}
+                                                            <a href="tel:${t.replace(/\s+/g, '')}" onclick="event.stopPropagation()" style="color: #2C1A12; text-decoration: none; background: #FFFFFF; border: 1px solid #E2D6C3; padding: 2px 8px; border-radius: 4px; font-size: 13px; font-weight: 700; display: inline-flex; align-items: center; gap: 4px;" title="Llamar a la Empresa (${idx + 1})">
+                                                                <i class="fa-solid fa-phone" style="font-size: 0.65rem; color: #8C5A32;"></i> ${t}
                                                             </a>
-                                                        `).join('') : '<span style="color: #64748b; font-size: 0.72rem;">No registrados</span>'}
+                                                        `).join('') : '<span style="color: #8C7B70; font-size: 0.75rem;">No registrados</span>'}
                                                     </div>
                                                 </div>
 
                                                 <!-- Vendedor / Representante de la Empresa (2 números) -->
-                                                <div style="background: rgba(6, 78, 59, 0.3); border-radius: 6px; padding: 7px 9px; border-left: 3px solid #34d399;">
-                                                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 3px;">
-                                                        <div style="font-size: 0.72rem; color: #34d399; font-weight: 700; display: flex; align-items: center; gap: 5px;">
+                                                <div style="background: #F5EFE6; border: 1px solid #E2D6C3; border-radius: 6px; padding: 8px 10px;">
+                                                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                                                        <div style="font-size: 11px; color: #5C4D44; font-weight: 700; display: flex; align-items: center; gap: 5px; text-transform: uppercase; letter-spacing: 0.3px;">
                                                             <i class="fa-solid fa-user-tie"></i> Vendedor / Representante:
                                                         </div>
                                                         ${waNumRep ? `
-                                                            <a href="${waUrl}" onclick="event.stopPropagation()" target="_blank" style="color: #25d366; font-size: 0.8rem; text-decoration: none; display: inline-flex; align-items: center; gap: 3px;" title="Chatear por WhatsApp">
-                                                                <i class="fa-brands fa-whatsapp"></i> <strong>WhatsApp</strong>
+                                                            <a href="${waUrl}" onclick="event.stopPropagation()" target="_blank" style="background: #15803D; color: #FFFFFF; font-size: 0.72rem; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 4px; box-shadow: 0 1px 3px rgba(21, 128, 61, 0.25);" title="Chatear por WhatsApp">
+                                                                <i class="fa-brands fa-whatsapp"></i> WhatsApp
                                                             </a>
                                                         ` : ''}
                                                     </div>
-                                                    <div style="font-size: 0.8rem; font-weight: 700; color: #ffffff; margin-bottom: 3px;">
+                                                    <div style="font-size: 13.5px; font-weight: 800; color: #2C1A12; margin-bottom: 4px;">
                                                         ${prv.contacto || prv.vendedor || 'Sin representante asignado'}
                                                     </div>
-                                                    <div style="font-size: 0.74rem; color: #cbd5e1; display: flex; flex-wrap: wrap; gap: 5px;">
+                                                    <div style="font-size: 0.74rem; display: flex; flex-wrap: wrap; gap: 6px;">
                                                         ${telsRep.length > 0 ? telsRep.map((t, idx) => `
-                                                            <a href="tel:${t.replace(/\s+/g, '')}" onclick="event.stopPropagation()" style="color: #e2e8f0; text-decoration: none; background: rgba(255,255,255,0.07); padding: 2px 7px; border-radius: 4px; font-size: 0.73rem; display: inline-flex; align-items: center; gap: 4px;" title="Llamar al Vendedor (${idx + 1})">
-                                                                <i class="fa-solid fa-mobile-screen" style="font-size: 0.65rem; color: #34d399;"></i> ${t}
+                                                            <a href="tel:${t.replace(/\s+/g, '')}" onclick="event.stopPropagation()" style="color: #7C4D2B; text-decoration: none; background: #FFFFFF; border: 1px solid #E2D6C3; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: 600; display: inline-flex; align-items: center; gap: 4px;" title="Llamar al Vendedor (${idx + 1})">
+                                                                <i class="fa-solid fa-mobile-screen" style="font-size: 0.65rem; color: #8C5A32;"></i> ${t}
                                                             </a>
-                                                        `).join('') : '<span style="color: #64748b; font-size: 0.72rem;">Sin teléfonos del vendedor</span>'}
+                                                        `).join('') : '<span style="color: #8C7B70; font-size: 0.75rem;">Sin teléfonos del vendedor</span>'}
                                                     </div>
                                                 </div>
 
-                                                <div class="prv-info-item">
-                                                    <i class="fa-solid fa-location-dot"></i>
-                                                    <span style="font-size: 0.75rem;">${prv.direccion || 'Puerto Ordaz, Venezuela'}</span>
+                                                <div class="prv-info-item" style="color: #3E312B; font-size: 0.75rem; display: flex; align-items: center; gap: 6px;">
+                                                    <i class="fa-solid fa-location-dot" style="color: #8C5A32; width: 14px; text-align: center;"></i>
+                                                    <span>${prv.direccion || 'Puerto Ordaz, Venezuela'}</span>
                                                 </div>
-                                                <div class="prv-info-item">
-                                                    <i class="fa-solid fa-building-columns"></i>
-                                                    <span style="font-size: 0.73rem; color: #94a3b8;">${prv.bancoPago || prv.pagoMovil || 'Transferencia Bancaria'}</span>
+                                                <div class="prv-info-item" style="color: #3E312B; font-size: 0.73rem; display: flex; align-items: center; gap: 6px;">
+                                                    <i class="fa-solid fa-building-columns" style="color: #8C5A32; width: 14px; text-align: center;"></i>
+                                                    <span>${prv.bancoPago || prv.pagoMovil || 'Transferencia Bancaria'}</span>
                                                 </div>
                                             </div>
 
                                             ${prv.insumosSuministrados && prv.insumosSuministrados.length > 0 ? `
                                                 <div style="margin-top: 8px; font-size: 0.73rem;">
-                                                    <strong style="color: var(--text-secondary); display: block; margin-bottom: 2px;">Insumos principales:</strong>
+                                                    <strong style="color: #5C4D44; display: block; margin-bottom: 3px; font-size: 0.72rem; text-transform: uppercase;">Insumos principales:</strong>
                                                     <div style="display: flex; flex-wrap: wrap; gap: 4px;">
-                                                        ${prv.insumosSuministrados.map(ins => `<span class="prv-tag-currency">${ins}</span>`).join('')}
+                                                        ${prv.insumosSuministrados.map(ins => `<span class="prv-tag-currency" style="background: #F3EDE2; border: 1px solid #C8B89E; color: #2C1A12; font-family: monospace; font-weight: 700; font-size: 0.72rem; padding: 2px 7px; border-radius: 4px; margin-right: 4px;">${ins}</span>`).join('')}
                                                     </div>
                                                 </div>
                                             ` : ''}
 
                                             ${prv.notas ? `
-                                                <div style="margin-top: 8px; font-size: 0.72rem; color: var(--text-muted); font-style: italic; background: rgba(0,0,0,0.2); padding: 4px 8px; border-radius: 4px;">
+                                                <div style="margin-top: 8px; font-size: 12px; color: #3B2F2A; font-style: italic; background: #FAF7F2; border: 1px solid #E2D9C8; padding: 6px 10px; border-radius: 6px;">
                                                     "${prv.notas}"
                                                 </div>
                                             ` : ''}
                                         </div>
 
-                                        <div style="display: flex; gap: 6px; margin-top: 14px; border-top: 1px solid var(--border-color); padding-top: 10px; flex-wrap: wrap;">
-                                            <button type="button" class="btn-secondary" onclick="event.stopPropagation(); ViasaApp.abrirModalProveedor('${prv.id}')" style="flex: 1; font-size: 0.75rem; padding: 6px 8px;" title="Editar datos del Proveedor">
+                                        <div style="display: flex; gap: 6px; margin-top: 14px; border-top: 1px solid #E6DEC8; padding-top: 10px; flex-wrap: wrap;">
+                                            <button type="button" class="btn-secondary" onclick="event.stopPropagation(); ViasaApp.abrirModalProveedor('${prv.id}')" style="flex: 1; font-size: 0.75rem; padding: 6px 8px; background: #FAF7F2; border: 1px solid #DDD2C0; color: #4A3B32; font-weight: 700;" title="Editar datos del Proveedor">
                                                 <i class="fa-solid fa-pen-to-square"></i> Editar
                                             </button>
-                                            <button type="button" class="btn-secondary" onclick="event.stopPropagation(); ViasaApp.abrirFichaTecnicaIntegralProveedor('${prv.id}')" style="font-size: 0.75rem; padding: 6px 10px; color: #10b981; border-color: #059669; font-weight: 700; background: rgba(16, 185, 129, 0.1);" title="Ver Ficha Técnica Integral del Proveedor">
+                                            <button type="button" class="btn-secondary" onclick="event.stopPropagation(); ViasaApp.abrirFichaTecnicaIntegralProveedor('${prv.id}')" style="font-size: 0.75rem; padding: 6px 10px; color: #065F46; border-color: #A7F3D0; font-weight: 700; background: #ECFDF5;" title="Ver Ficha Técnica Integral del Proveedor">
                                                 <i class="fa-solid fa-clipboard-list"></i> 📋 Ficha
                                             </button>
                                             <button type="button" class="btn-gold" onclick="event.stopPropagation(); ViasaApp.abrirModalOrdenCompra('${prv.id}')" style="flex: 1.3; font-size: 0.75rem; padding: 6px 8px;" title="Generar Orden de Compra">
                                                 <i class="fa-solid fa-cart-plus"></i> Generar OC
                                             </button>
-                                            <button type="button" class="btn-secondary" onclick="event.stopPropagation(); ViasaApp.abrirRedactorCorreo({destinatarioEmail: '${prv.email || ''}', destinatarioNombre: '${prv.nombreEmpresa}', entidadId: '${prv.id}', entidadTipo: 'proveedor', plantilla: 'solicitud_cotizacion'})" style="font-size: 0.75rem; padding: 6px 8px; color: #38bdf8; border-color: #0284c7;" title="Redactar Correo al Proveedor">
+                                            <button type="button" class="btn-secondary" onclick="event.stopPropagation(); ViasaApp.abrirRedactorCorreo({destinatarioEmail: '${prv.email || ''}', destinatarioNombre: '${prv.nombreEmpresa}', entidadId: '${prv.id}', entidadTipo: 'proveedor', plantilla: 'solicitud_cotizacion'})" style="font-size: 0.75rem; padding: 6px 8px; color: #8C5A32; border-color: #DDD2C0; background: #FAF7F2;" title="Redactar Correo al Proveedor">
                                                 <i class="fa-solid fa-envelope"></i>
                                             </button>
-                                            <button type="button" class="btn-secondary" onclick="event.stopPropagation(); ViasaApp.abrirHistorialCorreosProveedor('${prv.id}')" style="font-size: 0.75rem; padding: 6px 8px; color: #fbbf24; border-color: #d97706;" title="Ver Historial de Correos y Facturas">
+                                            <button type="button" class="btn-secondary" onclick="event.stopPropagation(); ViasaApp.abrirHistorialCorreosProveedor('${prv.id}')" style="font-size: 0.75rem; padding: 6px 8px; color: #B45309; border-color: #DDD2C0; background: #FAF7F2;" title="Ver Historial de Correos y Facturas">
                                                 <i class="fa-solid fa-inbox"></i>
                                             </button>
-                                            <button type="button" class="btn-secondary" onclick="event.stopPropagation(); ViasaApp.eliminarProveedor('${prv.id}')" style="font-size: 0.75rem; padding: 6px 8px; color: #f87171;" title="Eliminar Proveedor">
+                                            <button type="button" class="btn-secondary" onclick="event.stopPropagation(); ViasaApp.eliminarProveedor('${prv.id}')" style="font-size: 0.75rem; padding: 6px 8px; color: #B91C1C; border-color: #FECACA; background: #FEF2F2;" title="Eliminar Proveedor">
                                                 <i class="fa-solid fa-trash"></i>
                                             </button>
                                         </div>
@@ -8327,7 +8327,7 @@
 
                     <div style="background: var(--bg-card); border: 1.5px solid var(--border-color); border-radius: 12px; padding: 14px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
                         <div>
-                            <h4 style="margin: 0; color: #fff; font-size: 0.95rem;">Órdenes de Compra a Molinos y Proveedores</h4>
+                            <h4 style="margin: 0; color: #2C1A12; font-size: 0.95rem; font-weight: 800;">Órdenes de Compra a Molinos y Proveedores</h4>
                             <p style="font-size: 0.75rem; color: var(--text-secondary); margin: 2px 0 0 0;">Gestión de suministros, recepción con balanza y conversión automática a Cuentas por Pagar (CxP)</p>
                         </div>
                         <button type="button" class="btn-gold" onclick="ViasaApp.abrirModalOrdenCompra()">
@@ -8363,15 +8363,15 @@
                                             : oc.estado === 'Anulada'
                                             ? `<span class="oc-pill anulada"><i class="fa-solid fa-circle-xmark"></i> Anulada</span>`
                                             : oc.estado === 'Guardada / Pendiente'
-                                            ? `<span class="oc-pill pendiente" style="background: rgba(16, 185, 129, 0.2); color: #6ee7b7; border: 1px solid #059669; font-weight: 700; padding: 3px 8px; border-radius: 4px; font-size: 0.72rem;"><i class="fa-solid fa-floppy-disk"></i> Guardada / Pendiente</span>`
+                                            ? `<span class="oc-pill pendiente"><i class="fa-solid fa-floppy-disk"></i> Guardada / Pendiente</span>`
                                             : `<span class="oc-pill emitida"><i class="fa-solid fa-clock"></i> Emitida / En Camino</span>`;
 
                                         return `
                                             <tr>
-                                                <td><strong style="color: var(--accent-wheat);">${oc.id}</strong></td>
+                                                <td><strong style="color: #8C5A32; font-family: monospace;">${oc.id}</strong></td>
                                                 <td><small style="color: var(--text-secondary);">${oc.fechaEmision ? new Date(oc.fechaEmision).toLocaleDateString('es-VE') : 'Hoy'}</small></td>
                                                 <td>
-                                                    <div style="font-weight: 700; color: #fff;">${oc.proveedorNombre || 'Proveedor'}</div>
+                                                    <div style="font-weight: 700; color: #2C1A12;">${oc.proveedorNombre || 'Proveedor'}</div>
                                                     <small style="font-size: 0.72rem; color: var(--text-muted);">Entrega: ${oc.fechaEntregaEstimada || 'Inmediata'}</small>
                                                 </td>
                                                 <td>
@@ -8379,35 +8379,35 @@
                                                         ${(oc.items || []).map(i => `<span class="prv-tag-currency">${i.cantidad} ${i.unidad} ${i.nombre}</span>`).join(' ')}
                                                     </div>
                                                 </td>
-                                                <td><span style="font-size: 0.75rem; color: var(--text-secondary); font-weight: 600;">${oc.condicionPago || 'Crédito'}</span></td>
+                                                <td><span style="font-size: 0.75rem; color: #5C4D44; font-weight: 600;">${oc.condicionPago || 'Crédito'}</span></td>
                                                 <td>
-                                                    <div style="font-weight: 900; color: var(--accent-wheat);">$${(oc.totalUSD || 0).toFixed(2)}</div>
-                                                    <small style="font-size: 0.72rem; color: #38bdf8;">Bs. ${((oc.totalUSD || 0) * (oc.tasaBCVAplicada || this.tasaBCV)).toFixed(2)}</small>
+                                                    <div style="font-weight: 900; color: #2C1A12;">$${(oc.totalUSD || 0).toFixed(2)}</div>
+                                                    <small style="font-size: 0.72rem; color: #8C5A32; font-weight: 600;">Bs. ${((oc.totalUSD || 0) * (oc.tasaBCVAplicada || this.tasaBCV)).toFixed(2)}</small>
                                                 </td>
                                                 <td>${statusPill}</td>
                                                 <td style="text-align: right;">
                                                     <div style="display: flex; justify-content: flex-end; gap: 6px; align-items: center;">
-                                                        <button type="button" class="btn-secondary" onclick="ViasaApp.enviarOrdenCompraPorCorreo('${oc.id}')" style="font-size: 0.72rem; padding: 5px 8px; color: #38bdf8; border-color: #0284c7;" title="Enviar Orden por Correo Electrónico">
+                                                        <button type="button" class="btn-secondary" onclick="ViasaApp.enviarOrdenCompraPorCorreo('${oc.id}')" style="font-size: 0.72rem; padding: 5px 8px; color: #8C5A32; border-color: #DDD2C0; background: #FAF7F2;" title="Enviar Orden por Correo Electrónico">
                                                             <i class="fa-solid fa-envelope"></i>
                                                         </button>
                                                         ${oc.estado === 'Guardada / Pendiente' ? `
                                                             <button type="button" class="btn-gold" onclick="ViasaApp.emitirOrdenGuardada('${oc.id}')" style="font-size: 0.72rem; padding: 5px 9px;" title="Emitir Orden de Compra Guardada">
                                                                 <i class="fa-solid fa-paper-plane"></i> Emitir
                                                             </button>
-                                                            <button type="button" class="btn-secondary" onclick="ViasaApp.anularOrdenCompra('${oc.id}')" style="font-size: 0.72rem; padding: 5px 8px; color: #f87171;" title="Descartar Orden">
+                                                            <button type="button" class="btn-secondary" onclick="ViasaApp.anularOrdenCompra('${oc.id}')" style="font-size: 0.72rem; padding: 5px 8px; color: #B91C1C; border-color: #FECACA; background: #FEF2F2;" title="Descartar Orden">
                                                                 <i class="fa-solid fa-trash"></i>
                                                             </button>
                                                         ` : oc.estado === 'Emitida' ? `
                                                             <button type="button" class="btn-gold" onclick="ViasaApp.recibirMercanciaOC('${oc.id}')" style="font-size: 0.72rem; padding: 5px 9px;" title="Ingresar mercancía a inventario y generar CxP">
                                                                 <i class="fa-solid fa-box-archive"></i> Recibir
                                                             </button>
-                                                            <button type="button" class="btn-secondary" onclick="ViasaApp.anularOrdenCompra('${oc.id}')" style="font-size: 0.72rem; padding: 5px 8px; color: #f87171;" title="Anular Orden">
+                                                            <button type="button" class="btn-secondary" onclick="ViasaApp.anularOrdenCompra('${oc.id}')" style="font-size: 0.72rem; padding: 5px 8px; color: #B91C1C; border-color: #FECACA; background: #FEF2F2;" title="Anular Orden">
                                                                 <i class="fa-solid fa-ban"></i>
                                                             </button>
                                                         ` : oc.estado === 'Recibida' ? `
-                                                            <small style="color: #34d399; font-weight: 700;"><i class="fa-solid fa-check-double"></i> Recibida</small>
+                                                            <small style="color: #065F46; font-weight: 700;"><i class="fa-solid fa-check-double"></i> Recibida</small>
                                                         ` : `
-                                                            <small style="color: #f87171;">Anulada</small>
+                                                            <small style="color: #991B1B;">Anulada</small>
                                                         `}
                                                     </div>
                                                 </td>
@@ -8450,26 +8450,26 @@
                 html += `
                     <!-- KPIs de Cuentas por Pagar -->
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin-bottom: 16px;">
-                        <div style="background: var(--bg-card); border: 1.5px solid var(--border-color); border-radius: 10px; padding: 12px 14px;">
-                            <div style="font-size: 0.75rem; color: var(--text-secondary); font-weight: 700; text-transform: uppercase;">Compromisos Totales (USD)</div>
-                            <div style="font-size: 1.4rem; font-weight: 900; color: var(--accent-wheat); margin-top: 4px;">
+                        <div style="background: #FFFFFF; border: 1.5px solid #DDD2C0; border-radius: 10px; padding: 12px 14px; box-shadow: 0 2px 8px rgba(44, 26, 18, 0.05);">
+                            <div style="font-size: 0.75rem; color: #5C4D44; font-weight: 700; text-transform: uppercase; letter-spacing: 0.3px;">Compromisos Totales (USD)</div>
+                            <div style="font-size: 1.4rem; font-weight: 900; color: #B45309; margin-top: 4px;">
                                 $${totalDeudaUSD.toFixed(2)}
                             </div>
-                            <div style="font-size: 0.72rem; color: var(--text-muted);">Saldo pendiente de pago a molinos</div>
+                            <div style="font-size: 0.72rem; color: #8C5A32; font-weight: 600;">Saldo pendiente de pago a molinos</div>
                         </div>
-                        <div style="background: var(--bg-card); border: 1.5px solid var(--border-color); border-radius: 10px; padding: 12px 14px;">
-                            <div style="font-size: 0.75rem; color: var(--text-secondary); font-weight: 700; text-transform: uppercase;">Equivalente Oficial (BCV)</div>
-                            <div style="font-size: 1.4rem; font-weight: 900; color: #38bdf8; margin-top: 4px;">
+                        <div style="background: #FFFFFF; border: 1.5px solid #DDD2C0; border-radius: 10px; padding: 12px 14px; box-shadow: 0 2px 8px rgba(44, 26, 18, 0.05);">
+                            <div style="font-size: 0.75rem; color: #5C4D44; font-weight: 700; text-transform: uppercase; letter-spacing: 0.3px;">Equivalente Oficial (BCV)</div>
+                            <div style="font-size: 1.4rem; font-weight: 900; color: #2C1A12; margin-top: 4px;">
                                 Bs. ${totalDeudaBs.toFixed(2)}
                             </div>
-                            <div style="font-size: 0.72rem; color: var(--text-muted);">Calculado a Tasa BCV: ${this.tasaBCV.toFixed(2)} Bs/$</div>
+                            <div style="font-size: 0.72rem; color: #5C4D44;">Calculado a Tasa BCV: ${this.tasaBCV.toFixed(2)} Bs/$</div>
                         </div>
-                        <div style="background: ${facturasVencidas > 0 ? '#450a0a' : 'var(--bg-card)'}; border: 1.5px solid ${facturasVencidas > 0 ? '#dc2626' : 'var(--border-color)'}; border-radius: 10px; padding: 12px 14px;">
-                            <div style="font-size: 0.75rem; color: ${facturasVencidas > 0 ? '#fca5a5' : 'var(--text-secondary)'}; font-weight: 700; text-transform: uppercase;">Facturas Vencidas</div>
-                            <div style="font-size: 1.4rem; font-weight: 900; color: ${facturasVencidas > 0 ? '#ef4444' : '#34d399'}; margin-top: 4px;">
+                        <div style="background: ${facturasVencidas > 0 ? '#451A1A' : '#FFFFFF'}; border: 1.5px solid ${facturasVencidas > 0 ? '#991B1B' : '#DDD2C0'}; border-radius: 10px; padding: 12px 14px; box-shadow: 0 2px 8px rgba(44, 26, 18, 0.05);">
+                            <div style="font-size: 0.75rem; color: ${facturasVencidas > 0 ? '#FEF3C7' : '#5C4D44'}; font-weight: 700; text-transform: uppercase; letter-spacing: 0.3px;">Facturas Vencidas</div>
+                            <div style="font-size: 1.4rem; font-weight: 900; color: ${facturasVencidas > 0 ? '#F87171' : '#065F46'}; margin-top: 4px;">
                                 ${facturasVencidas} <span style="font-size: 0.8rem; font-weight: 400;">Facturas</span>
                             </div>
-                            <div style="font-size: 0.72rem; color: ${facturasVencidas > 0 ? '#fca5a5' : 'var(--text-muted)'};">${facturasVencidas > 0 ? '⚠️ Requiere abono inmediato' : '✅ Cartera 100% al día'}</div>
+                            <div style="font-size: 0.72rem; color: ${facturasVencidas > 0 ? '#FCA5A5' : '#5C4D44'};">${facturasVencidas > 0 ? '⚠️ Requiere abono inmediato' : '✅ Cartera 100% al día'}</div>
                         </div>
                     </div>
 
@@ -8541,36 +8541,36 @@
                                         return `
                                             <tr>
                                                 <td>
-                                                    <strong style="color: #38bdf8;">${cxp.numeroFacturaProveedor || cxp.id}</strong>
-                                                    <div style="font-size: 0.7rem; color: var(--text-muted);">${cxp.id}</div>
+                                                    <strong style="color: #8C5A32; font-family: monospace;">${cxp.numeroFacturaProveedor || cxp.id}</strong>
+                                                    <div style="font-size: 0.7rem; color: #5C4D44;">${cxp.id}</div>
                                                 </td>
                                                 <td>
-                                                    <strong style="color: #fff;">${cxp.proveedorNombre || 'Proveedor'}</strong>
-                                                    <div style="font-size: 0.72rem; color: var(--text-secondary);">${cxp.concepto || 'Compra de materias primas'}</div>
+                                                    <strong style="color: #2C1A12;">${cxp.proveedorNombre || 'Proveedor'}</strong>
+                                                    <div style="font-size: 0.72rem; color: #5C4D44;">${cxp.concepto || 'Compra de materias primas'}</div>
                                                 </td>
                                                 <td>
-                                                    <div style="font-size: 0.78rem;">Emisión: <strong>${cxp.fechaEmision || 'N/A'}</strong></div>
-                                                    <div style="font-size: 0.78rem; color: ${esVencida ? '#f87171' : 'var(--text-secondary)'};">
+                                                    <div style="font-size: 0.78rem; color: #2C1A12;">Emisión: <strong>${cxp.fechaEmision || 'N/A'}</strong></div>
+                                                    <div style="font-size: 0.78rem; color: ${esVencida ? '#B91C1C' : '#5C4D44'}; font-weight: ${esVencida ? '700' : 'normal'};">
                                                         Vence: <strong>${cxp.fechaVencimiento || 'N/A'}</strong>
                                                     </div>
                                                 </td>
-                                                <td><strong style="color: var(--accent-wheat); font-size: 0.95rem;">$${totalUSD.toFixed(2)}</strong></td>
+                                                <td><strong style="color: #2C1A12; font-size: 0.95rem;">$${totalUSD.toFixed(2)}</strong></td>
                                                 <td>
-                                                    <span style="color: #34d399; font-weight: 700;">$${pagadoUSD.toFixed(2)}</span>
-                                                    <div class="cxp-progress-bar-bg">
-                                                        <div class="cxp-progress-bar-fill" style="width: ${pct}%;"></div>
+                                                    <span style="color: #065F46; font-weight: 700;">$${pagadoUSD.toFixed(2)}</span>
+                                                    <div class="cxp-progress-bar-bg" style="background: #E2D6C3; height: 6px; border-radius: 3px; overflow: hidden; margin-top: 3px;">
+                                                        <div class="cxp-progress-bar-fill" style="width: ${pct}%; background: #10B981; height: 100%;"></div>
                                                     </div>
                                                 </td>
                                                 <td>
-                                                    <div style="font-weight: 900; color: ${saldoUSD > 0 ? '#ef4444' : '#34d399'}; font-size: 1rem;">
+                                                    <div style="font-weight: 900; color: ${saldoUSD > 0 ? '#B91C1C' : '#065F46'}; font-size: 1rem;">
                                                         $${saldoUSD.toFixed(2)}
                                                     </div>
-                                                    <small style="font-size: 0.72rem; color: #38bdf8;">Bs. ${(saldoUSD * this.tasaBCV).toFixed(2)}</small>
+                                                    <small style="font-size: 0.72rem; color: #8C5A32; font-weight: 600;">Bs. ${(saldoUSD * this.tasaBCV).toFixed(2)}</small>
                                                 </td>
                                                 <td>${statusPill}</td>
                                                 <td style="text-align: right;">
                                                     <div style="display: flex; justify-content: flex-end; gap: 6px; align-items: center;">
-                                                        <button type="button" class="btn-secondary" onclick="ViasaApp.enviarComprobanteCxPPorCorreo('${cxp.id}')" style="font-size: 0.72rem; padding: 5px 8px; color: #38bdf8; border-color: #0284c7;" title="Enviar Estado / Comprobante por Correo">
+                                                        <button type="button" class="btn-secondary" onclick="ViasaApp.enviarComprobanteCxPPorCorreo('${cxp.id}')" style="font-size: 0.72rem; padding: 5px 8px; color: #8C5A32; border-color: #DDD2C0; background: #FAF7F2;" title="Enviar Estado / Comprobante por Correo">
                                                             <i class="fa-solid fa-envelope"></i>
                                                         </button>
                                                         ${saldoUSD > 0.01 ? `
@@ -8579,7 +8579,7 @@
                                                             </button>
                                                         ` : ''}
                                                         ${cxp.pagosRealizados && cxp.pagosRealizados.length > 0 ? `
-                                                            <button type="button" class="btn-secondary" onclick="ViasaApp.abrirModalComprobanteCxP('${cxp.pagosRealizados[cxp.pagosRealizados.length - 1].id}', '${cxp.id}')" style="font-size: 0.75rem; padding: 6px 8px;" title="Ver último comprobante de egreso">
+                                                            <button type="button" class="btn-secondary" onclick="ViasaApp.abrirModalComprobanteCxP('${cxp.pagosRealizados[cxp.pagosRealizados.length - 1].id}', '${cxp.id}')" style="font-size: 0.75rem; padding: 6px 8px; color: #5C4D44; border-color: #DDD2C0; background: #FAF7F2;" title="Ver último comprobante de egreso">
                                                                 <i class="fa-solid fa-receipt"></i>
                                                             </button>
                                                         ` : ''}
@@ -8609,17 +8609,17 @@
             const insumos = this.historicoCostosInsumos || [];
 
             return `
-                <div style="background: #111827; border: 1px solid #1f2937; border-radius: 12px; padding: 16px; margin-bottom: 16px;">
+                <div style="background: #FAF7F2; border: 1.5px solid #DDD2C0; border-radius: 12px; padding: 16px; margin-bottom: 16px;">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 8px;">
                         <div>
-                            <h3 style="font-size: 1.05rem; font-weight: 800; color: #fff; margin: 0; display: flex; align-items: center; gap: 8px;">
-                                <i class="fa-solid fa-chart-line" style="color: #f59e0b;"></i> Trazabilidad de Inflación de Insumos y Escandallos Dinámicos
+                            <h3 style="font-size: 1.05rem; font-weight: 800; color: #2C1A12; margin: 0; display: flex; align-items: center; gap: 8px;">
+                                <i class="fa-solid fa-chart-line" style="color: #C88A2B;"></i> Trazabilidad de Inflación de Insumos y Escandallos Dinámicos
                             </h3>
-                            <span style="font-size: 0.74rem; color: #94a3b8;">
+                            <span style="font-size: 0.74rem; color: #5C4D44;">
                                 Recalibración automática de costos de recetas y sugerencia de PVP para proteger margen bruto (55% - 65%)
                             </span>
                         </div>
-                        <div style="background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 6px 12px; font-size: 0.75rem; color: #38bdf8;">
+                        <div style="background: #FFFFFF; border: 1px solid #DDD2C0; border-radius: 8px; padding: 6px 12px; font-size: 0.75rem; color: #8C5A32; font-weight: 700;">
                             <i class="fa-solid fa-shield-halved"></i> Margen Objetivo: <strong>55% - 65%</strong>
                         </div>
                     </div>
@@ -8629,28 +8629,28 @@
                         ${insumos.map(ins => {
                             const subio = ins.variacionPct > 0;
                             const badgeVar = subio ?
-                                `<span style="background: #7f1d1d; color: #fca5a5; padding: 2px 8px; border-radius: 10px; font-size: 0.72rem; font-weight: 800;"><i class="fa-solid fa-arrow-trend-up"></i> +${ins.variacionPct}% Inflación</span>` :
-                                `<span style="background: #064e3b; color: #6ee7b7; padding: 2px 8px; border-radius: 10px; font-size: 0.72rem; font-weight: 800;"><i class="fa-solid fa-arrow-trend-down"></i> ${ins.variacionPct}%</span>`;
+                                `<span style="background: #FEF2F2; color: #991B1B; border: 1px solid #FECACA; padding: 2px 8px; border-radius: 10px; font-size: 0.72rem; font-weight: 800;"><i class="fa-solid fa-arrow-trend-up"></i> +${ins.variacionPct}% Inflación</span>` :
+                                `<span style="background: #ECFDF5; color: #065F46; border: 1px solid #A7F3D0; padding: 2px 8px; border-radius: 10px; font-size: 0.72rem; font-weight: 800;"><i class="fa-solid fa-arrow-trend-down"></i> ${ins.variacionPct}%</span>`;
 
                             return `
-                                <div style="background: #0f172a; border: 1.5px solid #1e293b; border-radius: 10px; padding: 14px;">
-                                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 8px; border-bottom: 1px solid #1e293b; padding-bottom: 8px;">
+                                <div style="background: #FFFFFF; border: 1.5px solid #DDD2C0; border-radius: 10px; padding: 14px; box-shadow: 0 2px 6px rgba(44, 26, 18, 0.05);">
+                                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 8px; border-bottom: 1px solid #E2D6C3; padding-bottom: 8px;">
                                         <div>
-                                            <span style="font-size: 0.7rem; color: #38bdf8; font-family: monospace; font-weight: 800;">${ins.insumoId} &bull; ${ins.proveedor}</span>
-                                            <h4 style="font-size: 1rem; font-weight: 900; color: #fff; margin: 2px 0;">${ins.nombre} (${ins.unidad})</h4>
+                                            <span style="font-size: 0.7rem; color: #8C5A32; font-family: monospace; font-weight: 800;">${ins.insumoId} &bull; ${ins.proveedor}</span>
+                                            <h4 style="font-size: 1rem; font-weight: 900; color: #2C1A12; margin: 2px 0;">${ins.nombre} (${ins.unidad})</h4>
                                         </div>
                                         <div style="display: flex; align-items: center; gap: 12px;">
                                             <div style="text-align: right;">
-                                                <div style="font-size: 0.7rem; color: #64748b;">Costo Ant: <strike>$${(ins.costoAnteriorUSD || 0).toFixed(2)}</strike> &rarr; <strong style="color: #fbbf24; font-size: 0.88rem;">$${(ins.costoActualUSD || 0).toFixed(2)}</strong></div>
-                                                <div style="font-size: 0.68rem; color: #94a3b8;">Ajuste: ${ins.fechaAjuste}</div>
+                                                <div style="font-size: 0.7rem; color: #5C4D44;">Costo Ant: <strike>$${(ins.costoAnteriorUSD || 0).toFixed(2)}</strike> &rarr; <strong style="color: #B45309; font-size: 0.88rem;">$${(ins.costoActualUSD || 0).toFixed(2)}</strong></div>
+                                                <div style="font-size: 0.68rem; color: #8C5A32;">Ajuste: ${ins.fechaAjuste}</div>
                                             </div>
                                             ${badgeVar}
                                         </div>
                                     </div>
 
                                     <!-- Recetas Impactadas -->
-                                    <div style="font-size: 0.75rem; color: #94a3b8; font-weight: 700; margin-bottom: 6px;">
-                                        <i class="fa-solid fa-utensils"></i> Recetas y Fórmulas Magistrales Impactadas:
+                                    <div style="font-size: 0.75rem; color: #5C4D44; font-weight: 700; margin-bottom: 6px;">
+                                        <i class="fa-solid fa-utensils" style="color: #8C5A32;"></i> Recetas y Fórmulas Magistrales Impactadas:
                                     </div>
 
                                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 10px;">
@@ -8659,26 +8659,26 @@
                                             const pvpActualBs = (rec.pvpActualUSD * this.tasaBCV).toFixed(2);
 
                                             return `
-                                                <div style="background: #111827; border: 1px solid #1f2937; border-radius: 8px; padding: 10px; display: flex; flex-direction: column; justify-content: space-between;">
+                                                <div style="background: #FAF7F2; border: 1px solid #E2D6C3; border-radius: 8px; padding: 10px; display: flex; flex-direction: column; justify-content: space-between;">
                                                     <div>
                                                         <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                                                            <strong style="color: #fff; font-size: 0.82rem;">${rec.nombre}</strong>
-                                                            <span style="background: #065f46; color: #6ee7b7; font-size: 0.65rem; padding: 1px 6px; border-radius: 4px; font-weight: 800;">
+                                                            <strong style="color: #2C1A12; font-size: 0.82rem;">${rec.nombre}</strong>
+                                                            <span style="background: #ECFDF5; border: 1px solid #A7F3D0; color: #065F46; font-size: 0.65rem; padding: 1px 6px; border-radius: 4px; font-weight: 800;">
                                                                 Margen ${rec.margenPct}%
                                                             </span>
                                                         </div>
-                                                        <div style="font-size: 0.72rem; color: #94a3b8; margin: 6px 0;">
-                                                            Costo Ración: <strike style="color: #64748b;">$${rec.costoRaciónAnteriorUSD.toFixed(2)}</strike> &rarr; <strong style="color: #f87171;">$${rec.costoRaciónNuevoUSD.toFixed(2)}</strong>
+                                                        <div style="font-size: 0.72rem; color: #5C4D44; margin: 6px 0;">
+                                                            Costo Ración: <strike style="color: #8C7B70;">$${rec.costoRaciónAnteriorUSD.toFixed(2)}</strike> &rarr; <strong style="color: #B91C1C;">$${rec.costoRaciónNuevoUSD.toFixed(2)}</strong>
                                                         </div>
-                                                        <div style="font-size: 0.74rem; color: #cbd5e1;">
+                                                        <div style="font-size: 0.74rem; color: #4A3B32;">
                                                             PVP Actual: <strong>$${rec.pvpActualUSD.toFixed(2)}</strong> (Bs. ${pvpActualBs})
                                                         </div>
-                                                        <div style="font-size: 0.78rem; color: #34d399; font-weight: 800; margin-top: 2px;">
+                                                        <div style="font-size: 0.78rem; color: #065F46; font-weight: 800; margin-top: 2px;">
                                                             PVP Sugerido: $${rec.pvpSugeridoUSD.toFixed(2)} (Bs. ${pvpSugeridoBs})
                                                         </div>
                                                     </div>
 
-                                                    <button type="button" class="btn-gold" onclick="ViasaApp.aplicarAjustePreciosSugerido('${ins.insumoId}', '${rec.productoId}', ${rec.pvpSugeridoUSD})" style="margin-top: 8px; font-size: 0.72rem; font-weight: 800; padding: 5px 8px; background: linear-gradient(135deg, #d97706 0%, #f59e0b 100%);">
+                                                    <button type="button" class="btn-gold" onclick="ViasaApp.aplicarAjustePreciosSugerido('${ins.insumoId}', '${rec.productoId}', ${rec.pvpSugeridoUSD})" style="margin-top: 8px; font-size: 0.72rem; font-weight: 800; padding: 5px 8px;">
                                                         <i class="fa-solid fa-arrows-rotate"></i> Aplicar PVP Sugerido
                                                     </button>
                                                 </div>
@@ -8691,24 +8691,24 @@
                     </div>
 
                     <!-- Simulador Interactivo de Inflación -->
-                    <div style="margin-top: 20px; background: #0b0f19; border: 1.5px solid #38bdf8; border-radius: 10px; padding: 14px;">
-                        <div style="font-size: 0.85rem; font-weight: 800; color: #38bdf8; margin-bottom: 10px; display: flex; align-items: center; gap: 8px;">
-                            <i class="fa-solid fa-calculator"></i> Simulador Rápido de Costos y Proyección de PVP
+                    <div style="margin-top: 20px; background: #FFFFFF; border: 1.5px solid #C88A2B; border-radius: 10px; padding: 14px; box-shadow: 0 2px 8px rgba(44, 26, 18, 0.05);">
+                        <div style="font-size: 0.85rem; font-weight: 800; color: #8C5A32; margin-bottom: 10px; display: flex; align-items: center; gap: 8px;">
+                            <i class="fa-solid fa-calculator" style="color: #C88A2B;"></i> Simulador Rápido de Costos y Proyección de PVP
                         </div>
                         <div style="display: grid; grid-template-columns: 1.5fr 1fr auto; gap: 10px; align-items: flex-end;">
                             <div>
-                                <label style="font-size: 0.72rem; color: #94a3b8; font-weight: 700; display: block; margin-bottom: 4px;">Seleccione Insumo / Materia Prima:</label>
-                                <select id="simulador-insumo-select" class="login-input" style="background: #1e293b; color: #fff; font-size: 0.8rem; padding: 6px;">
+                                <label style="font-size: 0.72rem; color: #5C4D44; font-weight: 700; display: block; margin-bottom: 4px;">Seleccione Insumo / Materia Prima:</label>
+                                <select id="simulador-insumo-select" class="login-input" style="background: #FAF7F2; color: #2C1A12; border: 1px solid #DDD2C0; font-size: 0.8rem; padding: 6px;">
                                     ${(this.materiaPrima || []).map(m => `
                                         <option value="${m.id}">${m.nombre} (Actual: $${(m.costoUnitarioUSD || 0).toFixed(2)} / ${m.unidad})</option>
                                     `).join('')}
                                 </select>
                             </div>
                             <div>
-                                <label style="font-size: 0.72rem; color: #94a3b8; font-weight: 700; display: block; margin-bottom: 4px;">Nuevo Costo Proyectado ($ USD):</label>
-                                <input type="number" step="0.01" id="simulador-costo-input" class="login-input" placeholder="Ej. 38.50" style="background: #1e293b; color: #fff; font-size: 0.8rem; padding: 6px;">
+                                <label style="font-size: 0.72rem; color: #5C4D44; font-weight: 700; display: block; margin-bottom: 4px;">Nuevo Costo Proyectado ($ USD):</label>
+                                <input type="number" step="0.01" id="simulador-costo-input" class="login-input" placeholder="Ej. 38.50" style="background: #FAF7F2; color: #2C1A12; border: 1px solid #DDD2C0; font-size: 0.8rem; padding: 6px;">
                             </div>
-                            <button type="button" class="btn-gold" onclick="ViasaApp.simularImpactoIncrementoInsumo()" style="font-size: 0.8rem; font-weight: 800; padding: 7px 16px; background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);">
+                            <button type="button" class="btn-gold" onclick="ViasaApp.simularImpactoIncrementoInsumo()" style="font-size: 0.8rem; font-weight: 800; padding: 7px 16px;">
                                 <i class="fa-solid fa-play"></i> Proyectar Recetas
                             </button>
                         </div>
@@ -9181,97 +9181,97 @@
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 18px;">
                         <!-- Columna 1: Corporativo & SENIAT -->
                         <div style="display: flex; flex-direction: column; gap: 16px;">
-                            <div class="ficha-section-card" style="background: #1e293b; border: 1.5px solid #334155; border-radius: 12px; padding: 18px;">
-                                <h4 style="margin: 0 0 14px 0; font-size: 0.95rem; color: #38bdf8; display: flex; align-items: center; gap: 8px;">
+                            <div class="ficha-section-card" style="background: #FAF7F2; border: 1.5px solid #DDD2C0; border-radius: 12px; padding: 18px;">
+                                <h4 style="margin: 0 0 14px 0; font-size: 0.95rem; color: #8C5A32; font-weight: 800; display: flex; align-items: center; gap: 8px;">
                                     <i class="fa-solid fa-building-circle-check"></i> Datos Corporativos y Ubicación Fiscal
                                 </h4>
                                 <div style="display: flex; flex-direction: column; gap: 10px; font-size: 0.82rem;">
                                     <div>
-                                        <span style="color: #94a3b8; display: block; font-size: 0.72rem; text-transform: uppercase;">Razón Social:</span>
-                                        <strong style="color: #f8fafc; font-size: 0.95rem;">${prv.nombreEmpresa}</strong>
+                                        <span style="color: #5C4D44; display: block; font-size: 0.72rem; text-transform: uppercase; font-weight: 700;">Razón Social:</span>
+                                        <strong style="color: #2C1A12; font-size: 0.95rem; font-weight: 800;">${prv.nombreEmpresa}</strong>
                                     </div>
                                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
                                         <div>
-                                            <span style="color: #94a3b8; display: block; font-size: 0.72rem; text-transform: uppercase;">RIF Fiscal:</span>
-                                            <span style="color: #38bdf8; font-family: monospace; font-weight: 700;">${prv.rif}</span>
+                                            <span style="color: #5C4D44; display: block; font-size: 0.72rem; text-transform: uppercase; font-weight: 700;">RIF Fiscal:</span>
+                                            <span style="color: #2C1A12; font-family: monospace; font-weight: 700;">${prv.rif}</span>
                                         </div>
                                         <div>
-                                            <span style="color: #94a3b8; display: block; font-size: 0.72rem; text-transform: uppercase;">Categoría:</span>
-                                            <span style="color: #fbbf24; font-weight: 700;">${prv.categoria || 'Materia Prima'}</span>
+                                            <span style="color: #5C4D44; display: block; font-size: 0.72rem; text-transform: uppercase; font-weight: 700;">Categoría:</span>
+                                            <span style="color: #8C5A32; font-weight: 700;">${prv.categoria || 'Materia Prima'}</span>
                                         </div>
                                     </div>
                                     <div>
-                                        <span style="color: #94a3b8; display: block; font-size: 0.72rem; text-transform: uppercase;">Dirección Fiscal & Galpón:</span>
-                                        <span style="color: #cbd5e1;"><i class="fa-solid fa-location-dot" style="color: #ef4444; margin-right: 4px;"></i> ${prv.direccion || 'Av. Las Américas, Puerto Ordaz, Estado Bolívar'}</span>
+                                        <span style="color: #5C4D44; display: block; font-size: 0.72rem; text-transform: uppercase; font-weight: 700;">Dirección Fiscal & Galpón:</span>
+                                        <span style="color: #3E312B;"><i class="fa-solid fa-location-dot" style="color: #8C5A32; margin-right: 4px;"></i> ${prv.direccion || 'Av. Las Américas, Puerto Ordaz, Estado Bolívar'}</span>
                                     </div>
                                     <div>
-                                        <span style="color: #94a3b8; display: block; font-size: 0.72rem; text-transform: uppercase;">Correo Electrónico Oficial:</span>
-                                        <a href="mailto:${prv.email || 'proveedores@viasa.com'}" style="color: #38bdf8; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
+                                        <span style="color: #5C4D44; display: block; font-size: 0.72rem; text-transform: uppercase; font-weight: 700;">Correo Electrónico Oficial:</span>
+                                        <a href="mailto:${prv.email || 'proveedores@viasa.com'}" style="color: #8C5A32; text-decoration: none; font-weight: 700; display: inline-flex; align-items: center; gap: 6px;">
                                             <i class="fa-solid fa-envelope"></i> ${prv.email || 'proveedores@viasa.com'}
                                         </a>
                                     </div>
                                 </div>
 
                                 <!-- Teléfonos de Planta/Empresa (Hasta 3 números) -->
-                                <div style="margin-top: 14px; background: rgba(15, 23, 42, 0.6); border-radius: 8px; padding: 12px; border-left: 3px solid #38bdf8;">
-                                    <div style="font-size: 0.75rem; color: #38bdf8; font-weight: 700; margin-bottom: 6px; display: flex; align-items: center; gap: 6px;">
+                                <div style="margin-top: 14px; background: #FFFFFF; border-radius: 8px; padding: 12px; border: 1px solid #E2D6C3; border-left: 3px solid #8C5A32;">
+                                    <div style="font-size: 0.75rem; color: #8C5A32; font-weight: 700; margin-bottom: 6px; display: flex; align-items: center; gap: 6px; text-transform: uppercase; letter-spacing: 0.3px;">
                                         <i class="fa-solid fa-phone"></i> Teléfonos de Empresa / Planta (Click-to-Call):
                                     </div>
                                     <div style="display: flex; flex-direction: column; gap: 6px;">
                                         ${telsEmp.length > 0 ? telsEmp.map((t, idx) => `
                                             <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem;">
-                                                <span style="color: #94a3b8;">Línea Directa ${idx + 1}:</span>
-                                                <a href="tel:${t.replace(/\s+/g, '')}" style="color: #38bdf8; text-decoration: none; font-weight: 700; font-family: monospace; background: rgba(56, 189, 248, 0.1); padding: 3px 8px; border-radius: 4px; display: inline-flex; align-items: center; gap: 4px;">
-                                                    <i class="fa-solid fa-phone-volume" style="font-size: 0.7rem;"></i> ${t}
+                                                <span style="color: #5C4D44; font-weight: 600;">Línea Directa ${idx + 1}:</span>
+                                                <a href="tel:${t.replace(/\s+/g, '')}" style="color: #2C1A12; text-decoration: none; font-weight: 700; font-family: monospace; background: #FAF7F2; border: 1px solid #DDD2C0; padding: 3px 8px; border-radius: 4px; display: inline-flex; align-items: center; gap: 4px;">
+                                                    <i class="fa-solid fa-phone-volume" style="font-size: 0.7rem; color: #8C5A32;"></i> ${t}
                                                 </a>
                                             </div>
-                                        `).join('') : '<span style="color: #64748b; font-size: 0.75rem;">Sin números registrados</span>'}
+                                        `).join('') : '<span style="color: #8C7B70; font-size: 0.75rem;">Sin números registrados</span>'}
                                     </div>
                                 </div>
 
                                 <!-- Información Fiscal SENIAT -->
-                                <div style="margin-top: 14px; background: rgba(15, 23, 42, 0.6); border-radius: 8px; padding: 12px; border-left: 3px solid #fbbf24;">
-                                    <div style="font-size: 0.75rem; color: #fbbf24; font-weight: 700; margin-bottom: 6px; display: flex; align-items: center; gap: 6px;">
+                                <div style="margin-top: 14px; background: #FFFFFF; border-radius: 8px; padding: 12px; border: 1px solid #E2D6C3; border-left: 3px solid #C88A2B;">
+                                    <div style="font-size: 0.75rem; color: #8C5A32; font-weight: 700; margin-bottom: 6px; display: flex; align-items: center; gap: 6px; text-transform: uppercase; letter-spacing: 0.3px;">
                                         <i class="fa-solid fa-scale-balanced"></i> Información Fiscal SENIAT:
                                     </div>
                                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 0.78rem;">
                                         <div>
-                                            <span style="color: #94a3b8; display: block; font-size: 0.7rem;">Condición SENIAT:</span>
-                                            <strong style="color: #e2e8f0;">Sujeto Pasivo Especial</strong>
+                                            <span style="color: #5C4D44; display: block; font-size: 0.7rem;">Condición SENIAT:</span>
+                                            <strong style="color: #2C1A12;">Sujeto Pasivo Especial</strong>
                                         </div>
                                         <div>
-                                            <span style="color: #94a3b8; display: block; font-size: 0.7rem;">Retención IVA:</span>
-                                            <strong style="color: #34d399;">75% del IVA facturado</strong>
+                                            <span style="color: #5C4D44; display: block; font-size: 0.7rem;">Retención IVA:</span>
+                                            <strong style="color: #065F46;">75% del IVA facturado</strong>
                                         </div>
                                         <div>
-                                            <span style="color: #94a3b8; display: block; font-size: 0.7rem;">Retención ISLR:</span>
-                                            <strong style="color: #38bdf8;">2.00% (Bienes Muebles)</strong>
+                                            <span style="color: #5C4D44; display: block; font-size: 0.7rem;">Retención ISLR:</span>
+                                            <strong style="color: #8C5A32;">2.00% (Bienes Muebles)</strong>
                                         </div>
                                         <div>
-                                            <span style="color: #94a3b8; display: block; font-size: 0.7rem;">Libros Fiscales:</span>
-                                            <strong style="color: #e2e8f0;">Compras SENIAT</strong>
+                                            <span style="color: #5C4D44; display: block; font-size: 0.7rem;">Libros Fiscales:</span>
+                                            <strong style="color: #2C1A12;">Compras SENIAT</strong>
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
                             <!-- Políticas Comerciales y Despacho -->
-                            <div class="ficha-section-card" style="background: #1e293b; border: 1.5px solid #334155; border-radius: 12px; padding: 18px;">
-                                <h4 style="margin: 0 0 12px 0; font-size: 0.92rem; color: #f59e0b; display: flex; align-items: center; gap: 8px;">
+                            <div class="ficha-section-card" style="background: #FAF7F2; border: 1.5px solid #DDD2C0; border-radius: 12px; padding: 18px;">
+                                <h4 style="margin: 0 0 12px 0; font-size: 0.92rem; color: #8C5A32; font-weight: 800; display: flex; align-items: center; gap: 8px;">
                                     <i class="fa-solid fa-handshake-angle"></i> Políticas Comerciales y Condiciones de Recepción
                                 </h4>
-                                <div style="display: flex; flex-direction: column; gap: 8px; font-size: 0.8rem; color: #cbd5e1;">
+                                <div style="display: flex; flex-direction: column; gap: 8px; font-size: 0.8rem; color: #3E312B;">
                                     <div>
-                                        <strong style="color: #e2e8f0;">Condición de Pago:</strong> ${(prv.diasCredito || 0) > 0 ? `${prv.diasCredito} Días Crédito continuos desde la recepción conforme de la factura.` : 'Operación Estricto Contado contra entrega.'}
+                                        <strong style="color: #2C1A12;">Condición de Pago:</strong> ${(prv.diasCredito || 0) > 0 ? `${prv.diasCredito} Días Crédito continuos desde la recepción conforme de la factura.` : 'Operación Estricto Contado contra entrega.'}
                                     </div>
                                     <div>
-                                        <strong style="color: #e2e8f0;">Horario de Recepción en Panadería:</strong> Lunes a Viernes de 7:00 AM a 12:00 PM (Acceso por Muelle de Almacén).
+                                        <strong style="color: #2C1A12;">Horario de Recepción en Panadería:</strong> Lunes a Viernes de 7:00 AM a 12:00 PM (Acceso por Muelle de Almacén).
                                     </div>
                                     <div>
-                                        <strong style="color: #e2e8f0;">Control de Calidad:</strong> Inspección de lote, fecha de caducidad y pesaje en báscula por el Maestro Panadero.
+                                        <strong style="color: #2C1A12;">Control de Calidad:</strong> Inspección de lote, fecha de caducidad y pesaje en báscula por el Maestro Panadero.
                                     </div>
                                     ${prv.notas ? `
-                                        <div style="background: rgba(0,0,0,0.25); padding: 8px 12px; border-radius: 6px; font-style: italic; color: #94a3b8; margin-top: 4px;">
+                                        <div style="background: #FFFFFF; border: 1px solid #E2D6C3; padding: 8px 12px; border-radius: 6px; font-style: italic; color: #3B2F2A; margin-top: 4px;">
                                             "${prv.notas}"
                                         </div>
                                     ` : ''}
@@ -9282,19 +9282,19 @@
                         <!-- Columna 2: Vendedor & Datos Bancarios -->
                         <div style="display: flex; flex-direction: column; gap: 16px;">
                             <!-- Ejecutivo de Ventas / Representante -->
-                            <div class="ficha-section-card" style="background: #1e293b; border: 1.5px solid #334155; border-radius: 12px; padding: 18px;">
-                                <h4 style="margin: 0 0 14px 0; font-size: 0.95rem; color: #34d399; display: flex; align-items: center; gap: 8px;">
+                            <div class="ficha-section-card" style="background: #FAF7F2; border: 1.5px solid #DDD2C0; border-radius: 12px; padding: 18px;">
+                                <h4 style="margin: 0 0 14px 0; font-size: 0.95rem; color: #8C5A32; font-weight: 800; display: flex; align-items: center; gap: 8px;">
                                     <i class="fa-solid fa-user-tie"></i> Ejecutivo de Ventas / Representante Asignado
                                 </h4>
                                 <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 12px;">
-                                    <div style="width: 52px; height: 52px; min-width: 52px; border-radius: 50%; background: linear-gradient(135deg, #059669, #10b981); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 1.4rem; box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3);">
+                                    <div style="width: 52px; height: 52px; min-width: 52px; border-radius: 50%; background: #8C5A32; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 1.4rem; box-shadow: 0 2px 8px rgba(140, 90, 50, 0.25);">
                                         <i class="fa-solid fa-user"></i>
                                     </div>
                                     <div>
-                                        <div style="font-size: 1.05rem; font-weight: 800; color: #f8fafc;">
+                                        <div style="font-size: 1.05rem; font-weight: 800; color: #2C1A12;">
                                             ${prv.contacto || prv.vendedor || 'Representante Asignado'}
                                         </div>
-                                        <div style="font-size: 0.75rem; color: #94a3b8;">
+                                        <div style="font-size: 0.75rem; color: #5C4D44; font-weight: 600;">
                                             Asesor Comercial &bull; Atención Directa de Pedidos
                                         </div>
                                     </div>
@@ -9303,51 +9303,51 @@
                                 <!-- Teléfonos del Representante (Hasta 2 números) -->
                                 <div style="display: flex; flex-direction: column; gap: 6px; font-size: 0.8rem; margin-bottom: 12px;">
                                     ${telsRep.length > 0 ? telsRep.map((t, idx) => `
-                                        <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(15, 23, 42, 0.5); padding: 6px 10px; border-radius: 6px;">
-                                            <span style="color: #94a3b8;">Teléfono Móvil ${idx + 1}:</span>
-                                            <a href="tel:${t.replace(/\s+/g, '')}" style="color: #34d399; text-decoration: none; font-weight: 700; font-family: monospace; display: inline-flex; align-items: center; gap: 4px;">
-                                                <i class="fa-solid fa-mobile-screen"></i> ${t}
+                                        <div style="display: flex; justify-content: space-between; align-items: center; background: #FFFFFF; border: 1px solid #E2D6C3; padding: 6px 10px; border-radius: 6px;">
+                                            <span style="color: #5C4D44; font-weight: 600;">Teléfono Móvil ${idx + 1}:</span>
+                                            <a href="tel:${t.replace(/\s+/g, '')}" style="color: #7C4D2B; text-decoration: none; font-weight: 700; font-family: monospace; display: inline-flex; align-items: center; gap: 4px;">
+                                                <i class="fa-solid fa-mobile-screen" style="color: #8C5A32;"></i> ${t}
                                             </a>
                                         </div>
-                                    `).join('') : '<span style="color: #64748b; font-size: 0.75rem;">Sin teléfonos de representante registrados</span>'}
+                                    `).join('') : '<span style="color: #8C7B70; font-size: 0.75rem;">Sin teléfonos de representante registrados</span>'}
                                 </div>
 
                                 ${waNumRep ? `
-                                    <a href="${waUrl}" target="_blank" style="display: flex; align-items: center; justify-content: center; gap: 8px; background: linear-gradient(135deg, #25d366, #128c7e); color: #fff; padding: 10px 16px; border-radius: 8px; text-decoration: none; font-weight: 700; font-size: 0.85rem; box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3); transition: transform 0.15s ease;" onmouseover="this.style.transform='scale(1.02)'" onmouseout="this.style.transform='scale(1)'">
+                                    <a href="${waUrl}" target="_blank" style="display: flex; align-items: center; justify-content: center; gap: 8px; background: #15803D; color: #fff; padding: 10px 16px; border-radius: 8px; text-decoration: none; font-weight: 700; font-size: 0.85rem; box-shadow: 0 2px 8px rgba(21, 128, 61, 0.25); transition: transform 0.15s ease;" onmouseover="this.style.transform='scale(1.02)'" onmouseout="this.style.transform='scale(1)'">
                                         <i class="fa-brands fa-whatsapp" style="font-size: 1.25rem;"></i> Abrir Chat Directo de WhatsApp
                                     </a>
                                 ` : ''}
                             </div>
 
                             <!-- Cuentas Bancarias y Métodos de Pago Afiliados -->
-                            <div class="ficha-section-card" style="background: #1e293b; border: 1.5px solid #334155; border-radius: 12px; padding: 18px;">
+                            <div class="ficha-section-card" style="background: #FAF7F2; border: 1.5px solid #DDD2C0; border-radius: 12px; padding: 18px;">
                                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                                    <h4 style="margin: 0; font-size: 0.95rem; color: #fbbf24; display: flex; align-items: center; gap: 8px;">
+                                    <h4 style="margin: 0; font-size: 0.95rem; color: #8C5A32; font-weight: 800; display: flex; align-items: center; gap: 8px;">
                                         <i class="fa-solid fa-building-columns"></i> Cuentas Bancarias y Métodos de Pago
                                     </h4>
-                                    <span style="font-size: 0.7rem; background: rgba(245, 158, 11, 0.15); color: #fbbf24; padding: 2px 8px; border-radius: 4px; font-weight: 700;">
+                                    <span style="font-size: 0.7rem; background: #ECFDF5; border: 1px solid #A7F3D0; color: #065F46; padding: 2px 8px; border-radius: 4px; font-weight: 700;">
                                         Verificado
                                     </span>
                                 </div>
 
                                 <div style="display: flex; flex-direction: column; gap: 10px; font-size: 0.82rem;">
-                                    <div style="background: rgba(15, 23, 42, 0.6); padding: 10px 12px; border-radius: 8px; border-left: 3px solid #38bdf8;">
-                                        <span style="color: #94a3b8; display: block; font-size: 0.7rem; text-transform: uppercase;">Banco Principal:</span>
-                                        <strong style="color: #f8fafc; font-size: 0.88rem;">${prv.bancoNombre || (prv.bancoPago && prv.bancoPago.includes('Banesco') ? 'Banesco Banco Universal (0134)' : (prv.bancoPago && prv.bancoPago.includes('Venezuela') ? 'Banco de Venezuela (0102)' : 'Banesco Banco Universal (0134)'))}</strong>
+                                    <div style="background: #FFFFFF; padding: 10px 12px; border-radius: 8px; border: 1px solid #E2D6C3; border-left: 3px solid #8C5A32;">
+                                        <span style="color: #5C4D44; display: block; font-size: 0.7rem; text-transform: uppercase; font-weight: 700;">Banco Principal:</span>
+                                        <strong style="color: #2C1A12; font-size: 0.88rem;">${prv.bancoNombre || (prv.bancoPago && prv.bancoPago.includes('Banesco') ? 'Banesco Banco Universal (0134)' : (prv.bancoPago && prv.bancoPago.includes('Venezuela') ? 'Banco de Venezuela (0102)' : 'Banesco Banco Universal (0134)'))}</strong>
                                         <div style="margin-top: 4px;">
-                                            <span style="color: #94a3b8; font-size: 0.72rem;">N° Cuenta Corriente: </span>
-                                            <span style="color: #38bdf8; font-family: monospace; font-weight: 700;">${prv.cuentaBancaria || (prv.bancoPago && prv.bancoPago.match(/\d{10,20}/) ? prv.bancoPago.match(/\d{10,20}/)[0] : '0134-0982-11-0001849201')}</span>
+                                            <span style="color: #5C4D44; font-size: 0.72rem;">N° Cuenta Corriente: </span>
+                                            <span style="color: #8C5A32; font-family: monospace; font-weight: 700;">${prv.cuentaBancaria || (prv.bancoPago && prv.bancoPago.match(/\d{10,20}/) ? prv.bancoPago.match(/\d{10,20}/)[0] : '0134-0982-11-0001849201')}</span>
                                         </div>
                                     </div>
 
-                                    <div style="background: rgba(15, 23, 42, 0.6); padding: 10px 12px; border-radius: 8px; border-left: 3px solid #34d399;">
-                                        <span style="color: #94a3b8; display: block; font-size: 0.7rem; text-transform: uppercase;">Pago Móvil C2P / P2P:</span>
-                                        <strong style="color: #34d399;">${prv.pagoMovil || `Banesco 0134 &bull; ${prv.telefonoRep1 || prv.telefonoEmpresa1 || prv.telefono || '0414-8901234'} &bull; RIF ${prv.rif}`}</strong>
+                                    <div style="background: #FFFFFF; padding: 10px 12px; border-radius: 8px; border: 1px solid #E2D6C3; border-left: 3px solid #065F46;">
+                                        <span style="color: #5C4D44; display: block; font-size: 0.7rem; text-transform: uppercase; font-weight: 700;">Pago Móvil C2P / P2P:</span>
+                                        <strong style="color: #065F46;">${prv.pagoMovil || `Banesco 0134 &bull; ${prv.telefonoRep1 || prv.telefonoEmpresa1 || prv.telefono || '0414-8901234'} &bull; RIF ${prv.rif}`}</strong>
                                     </div>
 
-                                    <div style="background: rgba(15, 23, 42, 0.6); padding: 10px 12px; border-radius: 8px; border-left: 3px solid #fbbf24;">
-                                        <span style="color: #94a3b8; display: block; font-size: 0.7rem; text-transform: uppercase;">Divisas en Efectivo & Zelle:</span>
-                                        <span style="color: #cbd5e1;">Acepta Dólares USD en efectivo en caja de planta &bull; Zelle corporativo disponible previa coordinación.</span>
+                                    <div style="background: #FFFFFF; padding: 10px 12px; border-radius: 8px; border: 1px solid #E2D6C3; border-left: 3px solid #B45309;">
+                                        <span style="color: #5C4D44; display: block; font-size: 0.7rem; text-transform: uppercase; font-weight: 700;">Divisas en Efectivo & Zelle:</span>
+                                        <span style="color: #3E312B;">Acepta Dólares USD en efectivo en caja de planta &bull; Zelle corporativo disponible previa coordinación.</span>
                                     </div>
                                 </div>
 
@@ -9369,10 +9369,10 @@
                     <div style="display: flex; flex-direction: column; gap: 18px;">
                         <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
                             <div>
-                                <h4 style="margin: 0; color: #f8fafc; font-size: 1rem; display: flex; align-items: center; gap: 8px;">
-                                    <i class="fa-solid fa-boxes-stacked" style="color: #38bdf8;"></i> Materias Primas e Insumos Suministrados (${insumosPrv.length})
+                                <h4 style="margin: 0; color: #2C1A12; font-size: 1rem; font-weight: 800; display: flex; align-items: center; gap: 8px;">
+                                    <i class="fa-solid fa-boxes-stacked" style="color: #8C5A32;"></i> Materias Primas e Insumos Suministrados (${insumosPrv.length})
                                 </h4>
-                                <p style="margin: 2px 0 0 0; font-size: 0.75rem; color: #94a3b8;">Catálogo homologado para Panadería Nueva Viasa sincronizado con el inventario central</p>
+                                <p style="margin: 2px 0 0 0; font-size: 0.75rem; color: #5C4D44;">Catálogo homologado para Panadería Nueva Viasa sincronizado con el inventario central</p>
                             </div>
                             <div style="display: flex; gap: 8px;">
                                 <button type="button" class="btn-gold ficha-no-print" onclick="ViasaApp.cerrarFichaTecnicaIntegralProveedor(); ViasaApp.abrirModalOrdenCompra('${prv.id}')" style="font-size: 0.78rem; padding: 6px 12px;">
@@ -9382,10 +9382,10 @@
                         </div>
 
                         <!-- Tabla de Insumos -->
-                        <div style="background: #1e293b; border: 1.5px solid #334155; border-radius: 12px; overflow-x: auto;">
+                        <div style="background: #FFFFFF; border: 1.5px solid #DDD2C0; border-radius: 12px; overflow-x: auto; box-shadow: 0 2px 8px rgba(44, 26, 18, 0.05);">
                             <table class="ficha-table" style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.8rem;">
                                 <thead>
-                                    <tr style="background: #0f172a; border-bottom: 2px solid #334155; color: #94a3b8; font-size: 0.72rem; text-transform: uppercase;">
+                                    <tr style="background: #F3EDE2; border-bottom: 2px solid #DDD2C0; color: #4A3B32; font-size: 0.72rem; text-transform: uppercase;">
                                         <th style="padding: 12px 14px;">Código</th>
                                         <th style="padding: 12px 14px;">Insumo / Materia Prima</th>
                                         <th style="padding: 12px 14px; text-align: center;">Unidad</th>
@@ -9405,37 +9405,37 @@
                                         const stockCritico = (mp.stockActual || 0) <= (mp.stockMinimo || 0);
 
                                         return `
-                                            <tr style="border-bottom: 1px solid #334155; transition: background 0.15s;" onmouseover="this.style.background='rgba(51, 65, 85, 0.4)'" onmouseout="this.style.background='transparent'">
-                                                <td style="padding: 10px 14px; font-family: monospace; font-weight: 700; color: #38bdf8;">${mp.id}</td>
+                                            <tr style="border-bottom: 1px solid #E2D6C3; color: #2C1A12; transition: background 0.15s;" onmouseover="this.style.background='rgba(200, 138, 43, 0.05)'" onmouseout="this.style.background='transparent'">
+                                                <td style="padding: 10px 14px; font-family: monospace; font-weight: 700; color: #8C5A32;">${mp.id}</td>
                                                 <td style="padding: 10px 14px;">
-                                                    <strong style="color: #f8fafc; font-size: 0.85rem;">${mp.nombre}</strong>
-                                                    <span style="display: block; font-size: 0.7rem; color: #94a3b8;">${mp.categoria || 'Insumo'}</span>
+                                                    <strong style="color: #2C1A12; font-size: 0.85rem;">${mp.nombre}</strong>
+                                                    <span style="display: block; font-size: 0.7rem; color: #5C4D44;">${mp.categoria || 'Insumo'}</span>
                                                 </td>
                                                 <td style="padding: 10px 14px; text-align: center;">
-                                                    <span style="background: rgba(255,255,255,0.06); padding: 3px 8px; border-radius: 4px; font-size: 0.72rem; color: #cbd5e1; font-weight: 600;">
+                                                    <span style="background: #F3EDE2; border: 1px solid #D6C7B2; padding: 3px 8px; border-radius: 4px; font-size: 0.72rem; color: #5C4D44; font-weight: 600;">
                                                         ${mp.unidad}
                                                     </span>
                                                 </td>
-                                                <td style="padding: 10px 14px; text-align: right; font-weight: 800; color: #34d399; font-size: 0.88rem;">
+                                                <td style="padding: 10px 14px; text-align: right; font-weight: 800; color: #065F46; font-size: 0.88rem;">
                                                     $${costoUSD.toFixed(2)}
                                                 </td>
-                                                <td style="padding: 10px 14px; text-align: right; color: #38bdf8; font-weight: 700; font-family: monospace;">
+                                                <td style="padding: 10px 14px; text-align: right; color: #8C5A32; font-weight: 700; font-family: monospace;">
                                                     Bs. ${costoBsBCV.toLocaleString('es-VE', {minimumFractionDigits: 2, maximumFractionDigits: 2})}
                                                 </td>
-                                                <td style="padding: 10px 14px; text-align: right; color: #fbbf24; font-family: monospace;">
+                                                <td style="padding: 10px 14px; text-align: right; color: #B45309; font-family: monospace;">
                                                     Bs. ${costoBsUSDT.toLocaleString('es-VE', {minimumFractionDigits: 2, maximumFractionDigits: 2})}
                                                 </td>
                                                 <td style="padding: 10px 14px; text-align: center;">
-                                                    <span style="font-weight: 700; color: ${stockCritico ? '#f87171' : '#f8fafc'}; font-size: 0.85rem;">${mp.stockActual}</span>
-                                                    <span style="display: block; font-size: 0.68rem; font-weight: 700; color: ${stockCritico ? '#ef4444' : '#10b981'};">
+                                                    <span style="font-weight: 700; color: ${stockCritico ? '#B91C1C' : '#2C1A12'}; font-size: 0.85rem;">${mp.stockActual}</span>
+                                                    <span style="display: block; font-size: 0.68rem; font-weight: 700; color: ${stockCritico ? '#B91C1C' : '#065F46'};">
                                                         ${stockCritico ? '⚠️ Bajo Mínimo' : '✓ Normal'}
                                                     </span>
                                                 </td>
-                                                <td style="padding: 10px 14px; text-align: center; font-family: monospace; font-size: 0.75rem; color: #cbd5e1;">
+                                                <td style="padding: 10px 14px; text-align: center; font-family: monospace; font-size: 0.75rem; color: #5C4D44;">
                                                     ${mp.lote || 'LOTE-ACTUAL'}
                                                 </td>
                                                 <td style="padding: 10px 14px; text-align: center;">
-                                                    <span style="background: rgba(16, 185, 129, 0.15); color: #34d399; padding: 2px 7px; border-radius: 4px; font-size: 0.72rem; font-weight: 700;">
+                                                    <span style="background: #ECFDF5; border: 1px solid #A7F3D0; color: #065F46; padding: 2px 7px; border-radius: 4px; font-size: 0.72rem; font-weight: 700;">
                                                         0.0% Estable
                                                     </span>
                                                 </td>
@@ -9443,8 +9443,8 @@
                                         `;
                                     }).join('') : `
                                         <tr>
-                                            <td colspan="9" style="text-align: center; padding: 30px; color: #94a3b8;">
-                                                <i class="fa-solid fa-box-open" style="font-size: 1.8rem; margin-bottom: 8px; display: block; color: #64748b;"></i>
+                                            <td colspan="9" style="text-align: center; padding: 30px; color: #5C4D44;">
+                                                <i class="fa-solid fa-box-open" style="font-size: 1.8rem; margin-bottom: 8px; display: block; color: #8C7B70;"></i>
                                                 No hay materias primas explícitamente vinculadas a este proveedor en el catálogo.
                                             </td>
                                         </tr>
@@ -9454,15 +9454,15 @@
                         </div>
 
                         <!-- Panel de Impacto en Fórmulas y Escandallos (Producción) -->
-                        <div class="ficha-section-card" style="background: #1e293b; border: 1.5px solid #334155; border-radius: 12px; padding: 18px;">
+                        <div class="ficha-section-card" style="background: #FAF7F2; border: 1.5px solid #DDD2C0; border-radius: 12px; padding: 18px;">
                             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
                                 <div>
-                                    <h4 style="margin: 0; color: #fbbf24; font-size: 0.95rem; display: flex; align-items: center; gap: 8px;">
+                                    <h4 style="margin: 0; color: #8C5A32; font-size: 0.95rem; font-weight: 800; display: flex; align-items: center; gap: 8px;">
                                         <i class="fa-solid fa-wheat-awn"></i> Impacto en Fórmulas y Escandallos de Producción
                                     </h4>
-                                    <p style="margin: 2px 0 0 0; font-size: 0.75rem; color: #94a3b8;">Recetas de panadería y pastelería que dependen directamente de los suministros de ${prv.nombreEmpresa}</p>
+                                    <p style="margin: 2px 0 0 0; font-size: 0.75rem; color: #5C4D44;">Recetas de panadería y pastelería que dependen directamente de los suministros de ${prv.nombreEmpresa}</p>
                                 </div>
-                                <span style="font-size: 0.72rem; background: rgba(245, 158, 11, 0.15); color: #fbbf24; padding: 3px 10px; border-radius: 6px; font-weight: 700;">
+                                <span style="font-size: 0.72rem; background: #F3EDE2; border: 1px solid #D6C7B2; color: #6F4322; padding: 3px 10px; border-radius: 6px; font-weight: 700;">
                                     ${recetasImpactadas.length} Recetas Afectadas
                                 </span>
                             </div>
@@ -9471,22 +9471,22 @@
                                 ${recetasImpactadas.length > 0 ? recetasImpactadas.map(rec => {
                                     const ingredienteVinculado = (rec.ingredientes || []).find(ing => insumosPrv.some(mp => mp.id === ing.materiaPrimaId));
                                     return `
-                                        <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid #334155; border-radius: 8px; padding: 12px;">
+                                        <div style="background: #FFFFFF; border: 1px solid #DDD2C0; border-radius: 8px; padding: 12px; box-shadow: 0 1px 4px rgba(44, 26, 18, 0.05);">
                                             <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px;">
-                                                <strong style="color: #f8fafc; font-size: 0.85rem;">${rec.nombre}</strong>
-                                                <span style="font-size: 0.7rem; color: #38bdf8; font-family: monospace;">${rec.productoResultante || rec.id}</span>
+                                                <strong style="color: #2C1A12; font-size: 0.85rem;">${rec.nombre}</strong>
+                                                <span style="font-size: 0.7rem; color: #8C5A32; font-family: monospace;">${rec.productoResultante || rec.id}</span>
                                             </div>
-                                            <p style="margin: 0 0 8px 0; font-size: 0.74rem; color: #94a3b8; font-style: italic;">
+                                            <p style="margin: 0 0 8px 0; font-size: 0.74rem; color: #5C4D44; font-style: italic;">
                                                 ${rec.descripcion || 'Fórmula estándar de panadería.'}
                                             </p>
-                                            <div style="font-size: 0.75rem; color: #cbd5e1; background: rgba(51, 65, 85, 0.4); padding: 6px 8px; border-radius: 5px;">
-                                                <div><strong style="color: #fbbf24;">Insumo Base:</strong> ${ingredienteVinculado ? ingredienteVinculado.nombre : 'Materia Prima'} (${ingredienteVinculado ? ingredienteVinculado.cantidad + ' ' + ingredienteVinculado.unidad : ''})</div>
-                                                <div style="margin-top: 3px;"><strong style="color: #34d399;">Rendimiento:</strong> ${rec.rendimientoEstimadoUnidades || 100} Unidades por bache</div>
+                                            <div style="font-size: 0.75rem; color: #3E312B; background: #FAF7F2; border: 1px solid #E2D6C3; padding: 6px 8px; border-radius: 5px;">
+                                                <div><strong style="color: #8C5A32;">Insumo Base:</strong> ${ingredienteVinculado ? ingredienteVinculado.nombre : 'Materia Prima'} (${ingredienteVinculado ? ingredienteVinculado.cantidad + ' ' + ingredienteVinculado.unidad : ''})</div>
+                                                <div style="margin-top: 3px;"><strong style="color: #065F46;">Rendimiento:</strong> ${rec.rendimientoEstimadoUnidades || 100} Unidades por bache</div>
                                             </div>
                                         </div>
                                     `;
                                 }).join('') : `
-                                    <div style="grid-column: 1 / -1; padding: 16px; background: rgba(15, 23, 42, 0.5); border-radius: 8px; text-align: center; color: #94a3b8; font-size: 0.8rem;">
+                                    <div style="grid-column: 1 / -1; padding: 16px; background: #FFFFFF; border: 1px dashed #DDD2C0; border-radius: 8px; text-align: center; color: #5C4D44; font-size: 0.8rem;">
                                         No se han configurado recetas de panadería que utilicen directamente las materias primas de este proveedor en el módulo de Producción.
                                     </div>
                                 `}
@@ -9504,20 +9504,20 @@
                     <div style="display: flex; flex-direction: column; gap: 16px;">
                         <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
                             <div>
-                                <h4 style="margin: 0; color: #f8fafc; font-size: 1rem; display: flex; align-items: center; gap: 8px;">
-                                    <i class="fa-solid fa-receipt" style="color: #38bdf8;"></i> Registro Cronológico de Compras y Facturas Recibidas (${ordenesPrv.length})
+                                <h4 style="margin: 0; color: #2C1A12; font-size: 1rem; font-weight: 800; display: flex; align-items: center; gap: 8px;">
+                                    <i class="fa-solid fa-receipt" style="color: #8C5A32;"></i> Registro Cronológico de Compras y Facturas Recibidas (${ordenesPrv.length})
                                 </h4>
-                                <p style="margin: 2px 0 0 0; font-size: 0.75rem; color: #94a3b8;">Órdenes emitidas, notas de entrega y facturas de ${prv.nombreEmpresa}</p>
+                                <p style="margin: 2px 0 0 0; font-size: 0.75rem; color: #5C4D44;">Órdenes emitidas, notas de entrega y facturas de ${prv.nombreEmpresa}</p>
                             </div>
                             <button type="button" class="btn-gold ficha-no-print" onclick="ViasaApp.cerrarFichaTecnicaIntegralProveedor(); ViasaApp.abrirModalOrdenCompra('${prv.id}')" style="font-size: 0.8rem; padding: 7px 14px;">
                                 <i class="fa-solid fa-cart-plus"></i> Nueva Orden de Compra
                             </button>
                         </div>
 
-                        <div style="background: #1e293b; border: 1.5px solid #334155; border-radius: 12px; overflow-x: auto;">
+                        <div style="background: #FFFFFF; border: 1.5px solid #DDD2C0; border-radius: 12px; overflow-x: auto; box-shadow: 0 2px 8px rgba(44, 26, 18, 0.05);">
                             <table class="ficha-table" style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.8rem;">
                                 <thead>
-                                    <tr style="background: #0f172a; border-bottom: 2px solid #334155; color: #94a3b8; font-size: 0.72rem; text-transform: uppercase;">
+                                    <tr style="background: #F3EDE2; border-bottom: 2px solid #DDD2C0; color: #4A3B32; font-size: 0.72rem; text-transform: uppercase;">
                                         <th style="padding: 12px 14px;">N° OC</th>
                                         <th style="padding: 12px 14px;">N° Factura</th>
                                         <th style="padding: 12px 14px; text-align: center;">Emisión</th>
@@ -9539,58 +9539,58 @@
                                         const statusPago = oc.estadoPago || (oc.pagada ? 'Pagada' : ((prv.diasCredito || 0) > 0 ? 'Pendiente' : 'Pagada'));
 
                                         return `
-                                            <tr style="border-bottom: 1px solid #334155;">
-                                                <td style="padding: 10px 14px; font-family: monospace; font-weight: 700; color: #38bdf8;">${oc.id}</td>
-                                                <td style="padding: 10px 14px; font-family: monospace; color: #cbd5e1;">${oc.numeroFactura || oc.facturaAsociada || 'FAC-' + oc.id.replace(/\D/g, '')}</td>
-                                                <td style="padding: 10px 14px; text-align: center; color: #94a3b8;">${oc.fechaEmision || oc.fecha || '2026-09-01'}</td>
-                                                <td style="padding: 10px 14px; text-align: center; color: #cbd5e1;">${oc.fechaEntrega || oc.fechaRecepcion || 'Recibida'}</td>
+                                            <tr style="border-bottom: 1px solid #E2D6C3; color: #2C1A12;">
+                                                <td style="padding: 10px 14px; font-family: monospace; font-weight: 700; color: #8C5A32;">${oc.id}</td>
+                                                <td style="padding: 10px 14px; font-family: monospace; color: #5C4D44;">${oc.numeroFactura || oc.facturaAsociada || 'FAC-' + oc.id.replace(/\D/g, '')}</td>
+                                                <td style="padding: 10px 14px; text-align: center; color: #5C4D44;">${oc.fechaEmision || oc.fecha || '2026-09-01'}</td>
+                                                <td style="padding: 10px 14px; text-align: center; color: #2C1A12;">${oc.fechaEntrega || oc.fechaRecepcion || 'Recibida'}</td>
                                                 <td style="padding: 10px 14px; text-align: center;">
-                                                    <span style="background: rgba(255,255,255,0.06); padding: 2px 7px; border-radius: 4px; font-size: 0.72rem;">
+                                                    <span style="background: #F3EDE2; border: 1px solid #D6C7B2; padding: 2px 7px; border-radius: 4px; font-size: 0.72rem; color: #5C4D44; font-weight: 600;">
                                                         ${oc.condicionPago || ((prv.diasCredito || 0) > 0 ? `${prv.diasCredito} Días Crédito` : 'Contado')}
                                                     </span>
                                                 </td>
-                                                <td style="padding: 10px 14px; text-align: right; font-weight: 800; color: #34d399;">
+                                                <td style="padding: 10px 14px; text-align: right; font-weight: 800; color: #2C1A12;">
                                                     $${montoUSD.toFixed(2)}
                                                 </td>
-                                                <td style="padding: 10px 14px; text-align: right; color: #38bdf8; font-family: monospace;">
+                                                <td style="padding: 10px 14px; text-align: right; color: #8C5A32; font-family: monospace; font-weight: 700;">
                                                     Bs. ${montoBs.toLocaleString('es-VE', {minimumFractionDigits: 2, maximumFractionDigits: 2})}
                                                 </td>
                                                 <td style="padding: 10px 14px; text-align: center;">
-                                                    <span style="background: rgba(16, 185, 129, 0.15); color: #34d399; padding: 2px 8px; border-radius: 4px; font-size: 0.72rem; font-weight: 700;">
+                                                    <span style="background: #ECFDF5; border: 1px solid #A7F3D0; color: #065F46; padding: 2px 8px; border-radius: 4px; font-size: 0.72rem; font-weight: 700;">
                                                         ${statusRecepcion}
                                                     </span>
                                                 </td>
                                                 <td style="padding: 10px 14px; text-align: center;">
-                                                    <span style="background: ${statusPago === 'Pagada' ? 'rgba(16, 185, 129, 0.2)' : 'rgba(239, 68, 68, 0.2)'}; color: ${statusPago === 'Pagada' ? '#86efac' : '#fca5a5'}; padding: 2px 8px; border-radius: 4px; font-size: 0.72rem; font-weight: 700;">
+                                                    <span style="background: ${statusPago === 'Pagada' ? '#ECFDF5' : '#FEF2F2'}; border: 1px solid ${statusPago === 'Pagada' ? '#A7F3D0' : '#FECACA'}; color: ${statusPago === 'Pagada' ? '#065F46' : '#991B1B'}; padding: 2px 8px; border-radius: 4px; font-size: 0.72rem; font-weight: 700;">
                                                         ${statusPago}
                                                     </span>
                                                 </td>
                                                 <td style="padding: 10px 14px; text-align: center;" class="ficha-no-print">
-                                                    <button type="button" class="btn-secondary" onclick="ViasaApp.toggleDetalleItemsOC('${oc.id}')" style="font-size: 0.72rem; padding: 4px 8px; color: #38bdf8; border-color: #0284c7;">
+                                                    <button type="button" class="btn-secondary" onclick="ViasaApp.toggleDetalleItemsOC('${oc.id}')" style="font-size: 0.72rem; padding: 4px 8px; color: #8C5A32; border-color: #DDD2C0; background: #FAF7F2;">
                                                         <i class="fa-solid fa-list-ul"></i> Ítems
                                                     </button>
                                                 </td>
                                             </tr>
-                                            <tr id="detalle-oc-${oc.id}" style="display: none; background: rgba(15, 23, 42, 0.75);">
-                                                <td colspan="10" style="padding: 12px 18px; border-bottom: 2px solid #334155;">
-                                                    <div style="font-size: 0.75rem; color: #94a3b8; margin-bottom: 6px; font-weight: 700;">
-                                                        <i class="fa-solid fa-cube"></i> Desglose de Insumos Recibidos en Orden ${oc.id}:
+                                            <tr id="detalle-oc-${oc.id}" style="display: none; background: #FAF7F2;">
+                                                <td colspan="10" style="padding: 12px 18px; border-bottom: 2px solid #DDD2C0;">
+                                                    <div style="font-size: 0.75rem; color: #5C4D44; margin-bottom: 6px; font-weight: 700;">
+                                                        <i class="fa-solid fa-cube" style="color: #8C5A32;"></i> Desglose de Insumos Recibidos en Orden ${oc.id}:
                                                     </div>
                                                     <div style="display: flex; flex-direction: column; gap: 4px;">
                                                         ${ocItems.length > 0 ? ocItems.map(it => `
-                                                            <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(30, 41, 59, 0.5); padding: 6px 12px; border-radius: 6px; font-size: 0.78rem;">
-                                                                <span style="color: #f8fafc;"><strong>${it.nombre || it.descripcion}</strong> (${it.cantidad} ${it.unidad || 'und'})</span>
-                                                                <span style="color: #34d399; font-weight: 700;">$${((it.cantidad || 1) * (it.precioUnitarioUSD || it.costoUSD || 0)).toFixed(2)} USD</span>
+                                                            <div style="display: flex; justify-content: space-between; align-items: center; background: #FFFFFF; border: 1px solid #E2D6C3; padding: 6px 12px; border-radius: 6px; font-size: 0.78rem;">
+                                                                <span style="color: #2C1A12;"><strong>${it.nombre || it.descripcion}</strong> (${it.cantidad} ${it.unidad || 'und'})</span>
+                                                                <span style="color: #065F46; font-weight: 700;">$${((it.cantidad || 1) * (it.precioUnitarioUSD || it.costoUSD || 0)).toFixed(2)} USD</span>
                                                             </div>
-                                                        `).join('') : '<span style="color: #64748b; font-size: 0.75rem;">Sin desglose detallado de ítems para esta orden histórica.</span>'}
+                                                        `).join('') : '<span style="color: #8C7B70; font-size: 0.75rem;">Sin desglose detallado de ítems para esta orden histórica.</span>'}
                                                     </div>
                                                 </td>
                                             </tr>
                                         `;
                                     }).join('') : `
                                         <tr>
-                                            <td colspan="10" style="text-align: center; padding: 32px; color: #94a3b8;">
-                                                <i class="fa-solid fa-clipboard-list" style="font-size: 2rem; margin-bottom: 8px; display: block; color: #64748b;"></i>
+                                            <td colspan="10" style="text-align: center; padding: 32px; color: #5C4D44;">
+                                                <i class="fa-solid fa-clipboard-list" style="font-size: 2rem; margin-bottom: 8px; display: block; color: #8C7B70;"></i>
                                                 No se registran compras u órdenes previas emitidas a ${prv.nombreEmpresa}.
                                                 <div style="margin-top: 10px;">
                                                     <button type="button" class="btn-gold ficha-no-print" onclick="ViasaApp.cerrarFichaTecnicaIntegralProveedor(); ViasaApp.abrirModalOrdenCompra('${prv.id}')" style="font-size: 0.78rem; padding: 6px 14px;">
@@ -9614,20 +9614,20 @@
                 tabHtml = `
                     <div style="display: flex; flex-direction: column; gap: 18px;">
                         <!-- Resumen Financiero Superior -->
-                        <div style="background: linear-gradient(135deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.95)); border: 1.5px solid ${totalDeudaUSD > 0 ? '#ef4444' : '#10b981'}; border-radius: 12px; padding: 18px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 16px;">
+                        <div style="background: #FFFFFF; border: 1.5px solid ${totalDeudaUSD > 0 ? '#991B1B' : '#059669'}; border-radius: 12px; padding: 18px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 16px; box-shadow: 0 2px 8px rgba(44, 26, 18, 0.05);">
                             <div>
-                                <div style="font-size: 0.78rem; text-transform: uppercase; color: #94a3b8; font-weight: 700;">
+                                <div style="font-size: 0.78rem; text-transform: uppercase; color: #5C4D44; font-weight: 700; letter-spacing: 0.3px;">
                                     Estado Financiero de Cuentas por Pagar (CxP)
                                 </div>
-                                <div style="font-size: 1.5rem; font-weight: 800; color: ${totalDeudaUSD > 0 ? '#f87171' : '#34d399'}; margin-top: 2px;">
+                                <div style="font-size: 1.5rem; font-weight: 900; color: ${totalDeudaUSD > 0 ? '#B91C1C' : '#065F46'}; margin-top: 2px;">
                                     Saldo Deudor Pendiente: $${totalDeudaUSD.toLocaleString('es-VE', {minimumFractionDigits: 2, maximumFractionDigits: 2})} USD
                                 </div>
-                                <div style="font-size: 0.8rem; color: #cbd5e1; margin-top: 4px;">
-                                    Equivalente BCV: <strong style="color: #38bdf8;">Bs. ${totalDeudaBsBCV.toLocaleString('es-VE', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</strong> &bull; USDT: <strong style="color: #fbbf24;">Bs. ${totalDeudaBsUSDT.toLocaleString('es-VE', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</strong>
+                                <div style="font-size: 0.8rem; color: #3E312B; margin-top: 4px;">
+                                    Equivalente BCV: <strong style="color: #2C1A12;">Bs. ${totalDeudaBsBCV.toLocaleString('es-VE', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</strong> &bull; USDT: <strong style="color: #B45309;">Bs. ${totalDeudaBsUSDT.toLocaleString('es-VE', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</strong>
                                 </div>
                             </div>
                             <div>
-                                <span style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 8px; font-size: 0.82rem; font-weight: 700; background: ${totalDeudaUSD > 0 ? 'rgba(239, 68, 68, 0.2)' : 'rgba(16, 185, 129, 0.2)'}; color: ${totalDeudaUSD > 0 ? '#fca5a5' : '#86efac'};">
+                                <span style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 8px; font-size: 0.82rem; font-weight: 700; background: ${totalDeudaUSD > 0 ? '#FEF2F2' : '#ECFDF5'}; border: 1px solid ${totalDeudaUSD > 0 ? '#FECACA' : '#A7F3D0'}; color: ${totalDeudaUSD > 0 ? '#991B1B' : '#065F46'};">
                                     <i class="fa-solid ${totalDeudaUSD > 0 ? 'fa-triangle-exclamation' : 'fa-circle-check'}"></i>
                                     ${totalDeudaUSD > 0 ? `${cxpPendientes.length} Factura(s) Pendiente(s)` : 'Solvente / Al Día'}
                                 </span>
@@ -9635,14 +9635,14 @@
                         </div>
 
                         <!-- SECCIÓN 1: Facturas Pendientes de Pago -->
-                        <div class="ficha-section-card" style="background: #1e293b; border: 1.5px solid #334155; border-radius: 12px; padding: 18px;">
-                            <h4 style="margin: 0 0 12px 0; font-size: 0.95rem; color: #f87171; display: flex; align-items: center; gap: 8px;">
+                        <div class="ficha-section-card" style="background: #FAF7F2; border: 1.5px solid #DDD2C0; border-radius: 12px; padding: 18px;">
+                            <h4 style="margin: 0 0 12px 0; font-size: 0.95rem; color: #B91C1C; font-weight: 800; display: flex; align-items: center; gap: 8px;">
                                 <i class="fa-solid fa-clock-rotate-left"></i> Facturas y Compromisos Pendientes de Pago
                             </h4>
                             <div style="overflow-x: auto;">
                                 <table class="ficha-table" style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.8rem;">
                                     <thead>
-                                        <tr style="background: #0f172a; border-bottom: 2px solid #334155; color: #94a3b8; font-size: 0.72rem; text-transform: uppercase;">
+                                        <tr style="background: #F3EDE2; border-bottom: 2px solid #DDD2C0; color: #4A3B32; font-size: 0.72rem; text-transform: uppercase;">
                                             <th style="padding: 10px 12px;">N° Factura</th>
                                             <th style="padding: 10px 12px; text-align: center;">Emisión</th>
                                             <th style="padding: 10px 12px; text-align: center;">Vencimiento</th>
@@ -9662,22 +9662,22 @@
                                             const vencida = cxp.fechaVencimiento && cxp.fechaVencimiento < hoyStr;
 
                                             return `
-                                                <tr style="border-bottom: 1px solid #334155;">
-                                                    <td style="padding: 10px 12px; font-family: monospace; font-weight: 700; color: #38bdf8;">
+                                                <tr style="border-bottom: 1px solid #E2D6C3; color: #2C1A12;">
+                                                    <td style="padding: 10px 12px; font-family: monospace; font-weight: 700; color: #8C5A32;">
                                                         ${cxp.numeroFacturaProveedor || cxp.id}
                                                     </td>
-                                                    <td style="padding: 10px 12px; text-align: center; color: #94a3b8;">${cxp.fechaEmision || 'N/A'}</td>
-                                                    <td style="padding: 10px 12px; text-align: center; font-weight: 700; color: ${vencida ? '#ef4444' : '#fbbf24'};">${cxp.fechaVencimiento || 'Inmediato'}</td>
+                                                    <td style="padding: 10px 12px; text-align: center; color: #5C4D44;">${cxp.fechaEmision || 'N/A'}</td>
+                                                    <td style="padding: 10px 12px; text-align: center; font-weight: 700; color: ${vencida ? '#B91C1C' : '#8C5A32'};">${cxp.fechaVencimiento || 'Inmediato'}</td>
                                                     <td style="padding: 10px 12px; text-align: center;">
-                                                        <span style="padding: 2px 8px; border-radius: 4px; font-size: 0.72rem; font-weight: 700; background: ${vencida ? 'rgba(239, 68, 68, 0.2)' : 'rgba(245, 158, 11, 0.2)'}; color: ${vencida ? '#fca5a5' : '#fde68a'};">
+                                                        <span style="padding: 2px 8px; border-radius: 4px; font-size: 0.72rem; font-weight: 700; background: ${vencida ? '#FEF2F2' : '#FEF3C7'}; border: 1px solid ${vencida ? '#FECACA' : '#FDE68A'}; color: ${vencida ? '#991B1B' : '#92400E'};">
                                                             ${vencida ? '⚠️ Vencida' : '⏳ Por Vencer'}
                                                         </span>
                                                     </td>
-                                                    <td style="padding: 10px 12px; text-align: right; color: #cbd5e1;">$${totalUSD.toFixed(2)}</td>
-                                                    <td style="padding: 10px 12px; text-align: right; color: #34d399;">$${abonadoUSD.toFixed(2)}</td>
+                                                    <td style="padding: 10px 12px; text-align: right; color: #2C1A12; font-weight: 600;">$${totalUSD.toFixed(2)}</td>
+                                                    <td style="padding: 10px 12px; text-align: right; color: #065F46; font-weight: 700;">$${abonadoUSD.toFixed(2)}</td>
                                                     <td style="padding: 10px 12px; text-align: right;">
-                                                        <strong style="color: #f87171; font-size: 0.88rem;">$${saldoUSD.toFixed(2)} USD</strong>
-                                                        <span style="display: block; font-size: 0.7rem; color: #38bdf8;">Bs. ${saldoBs.toLocaleString('es-VE', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
+                                                        <strong style="color: #B91C1C; font-size: 0.88rem;">$${saldoUSD.toFixed(2)} USD</strong>
+                                                        <span style="display: block; font-size: 0.7rem; color: #8C5A32; font-weight: 600;">Bs. ${saldoBs.toLocaleString('es-VE', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
                                                     </td>
                                                     <td style="padding: 10px 12px; text-align: center;" class="ficha-no-print">
                                                         <button type="button" class="btn-gold" onclick="ViasaApp.cerrarFichaTecnicaIntegralProveedor(); ViasaApp.abrirModalPagoCxP('${cxp.id}')" style="font-size: 0.75rem; padding: 5px 10px; white-space: nowrap; font-weight: 700;">
@@ -9688,7 +9688,7 @@
                                             `;
                                         }).join('') : `
                                             <tr>
-                                                <td colspan="8" style="text-align: center; padding: 24px; color: #34d399;">
+                                                <td colspan="8" style="text-align: center; padding: 24px; color: #065F46; font-weight: 700;">
                                                     <i class="fa-solid fa-circle-check" style="font-size: 1.8rem; margin-bottom: 6px; display: block;"></i>
                                                     No hay deudas pendientes. El proveedor se encuentra completamente al día.
                                                 </td>
@@ -9700,14 +9700,14 @@
                         </div>
 
                         <!-- SECCIÓN 2: Historial de Pagos y Abonos Realizados -->
-                        <div class="ficha-section-card" style="background: #1e293b; border: 1.5px solid #334155; border-radius: 12px; padding: 18px;">
-                            <h4 style="margin: 0 0 12px 0; font-size: 0.95rem; color: #34d399; display: flex; align-items: center; gap: 8px;">
+                        <div class="ficha-section-card" style="background: #FAF7F2; border: 1.5px solid #DDD2C0; border-radius: 12px; padding: 18px;">
+                            <h4 style="margin: 0 0 12px 0; font-size: 0.95rem; color: #065F46; font-weight: 800; display: flex; align-items: center; gap: 8px;">
                                 <i class="fa-solid fa-receipt"></i> Historial de Abonos y Pagos Realizados
                             </h4>
                             <div style="overflow-x: auto;">
                                 <table class="ficha-table" style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.8rem;">
                                     <thead>
-                                        <tr style="background: #0f172a; border-bottom: 2px solid #334155; color: #94a3b8; font-size: 0.72rem; text-transform: uppercase;">
+                                        <tr style="background: #F3EDE2; border-bottom: 2px solid #DDD2C0; color: #4A3B32; font-size: 0.72rem; text-transform: uppercase;">
                                             <th style="padding: 10px 12px;">Fecha Pago</th>
                                             <th style="padding: 10px 12px;">Factura / CxP</th>
                                             <th style="padding: 10px 12px; text-align: right;">Monto USD</th>
@@ -9729,8 +9729,8 @@
                                             if (todosLosPagos.length === 0) {
                                                 return `
                                                     <tr>
-                                                        <td colspan="7" style="text-align: center; padding: 24px; color: #94a3b8;">
-                                                            <i class="fa-solid fa-inbox" style="font-size: 1.6rem; margin-bottom: 6px; display: block; color: #64748b;"></i>
+                                                        <td colspan="7" style="text-align: center; padding: 24px; color: #5C4D44;">
+                                                            <i class="fa-solid fa-inbox" style="font-size: 1.6rem; margin-bottom: 6px; display: block; color: #8C7B70;"></i>
                                                             No se registran pagos previos procesados a este proveedor en el período actual.
                                                         </td>
                                                     </tr>
@@ -9738,14 +9738,14 @@
                                             }
 
                                             return todosLosPagos.map(pag => `
-                                                <tr style="border-bottom: 1px solid #334155;">
-                                                    <td style="padding: 10px 12px; color: #cbd5e1;">${pag.fecha || '2026-09-02'}</td>
-                                                    <td style="padding: 10px 12px; font-family: monospace; color: #38bdf8;">${pag.facturaNum}</td>
-                                                    <td style="padding: 10px 12px; text-align: right; font-weight: 700; color: #34d399;">$${(pag.montoUSD || 0).toFixed(2)}</td>
-                                                    <td style="padding: 10px 12px; text-align: center; font-family: monospace; color: #94a3b8;">Bs. ${(pag.tasaBCVAplicada || tasaBCV).toFixed(2)}</td>
-                                                    <td style="padding: 10px 12px; text-align: right; font-family: monospace; color: #38bdf8;">Bs. ${(pag.montoBs || (pag.montoUSD || 0) * (pag.tasaBCVAplicada || tasaBCV)).toLocaleString('es-VE', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+                                                <tr style="border-bottom: 1px solid #E2D6C3; color: #2C1A12;">
+                                                    <td style="padding: 10px 12px; color: #5C4D44;">${pag.fecha || '2026-09-02'}</td>
+                                                    <td style="padding: 10px 12px; font-family: monospace; color: #8C5A32; font-weight: 700;">${pag.facturaNum}</td>
+                                                    <td style="padding: 10px 12px; text-align: right; font-weight: 700; color: #065F46;">$${(pag.montoUSD || 0).toFixed(2)}</td>
+                                                    <td style="padding: 10px 12px; text-align: center; font-family: monospace; color: #5C4D44;">Bs. ${(pag.tasaBCVAplicada || tasaBCV).toFixed(2)}</td>
+                                                    <td style="padding: 10px 12px; text-align: right; font-family: monospace; color: #2C1A12; font-weight: 700;">Bs. ${(pag.montoBs || (pag.montoUSD || 0) * (pag.tasaBCVAplicada || tasaBCV)).toLocaleString('es-VE', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
                                                     <td style="padding: 10px 12px; text-transform: capitalize;">${(pag.metodoPago || 'Transferencia').replace(/_/g, ' ')}</td>
-                                                    <td style="padding: 10px 12px; font-family: monospace; color: #fbbf24;">${pag.referencia || pag.comprobante || 'REF-OK'}</td>
+                                                    <td style="padding: 10px 12px; font-family: monospace; color: #B45309; font-weight: 700;">${pag.referencia || pag.comprobante || 'REF-OK'}</td>
                                                 </tr>
                                             `).join('');
                                         })()}
@@ -9759,36 +9759,36 @@
 
             container.innerHTML = `
                 <!-- A. CABECERA EJECUTIVA -->
-                <div class="ficha-header-exec" style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); border-bottom: 2px solid #334155; padding: 18px 24px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 16px;">
+                <div class="ficha-header-exec" style="background: linear-gradient(135deg, #FFFFFF 0%, #FAF7F2 100%); border-bottom: 2px solid #DDD2C0; padding: 18px 24px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 16px;">
                     <div style="display: flex; align-items: center; gap: 16px; min-width: 320px; flex: 1;">
-                        <div style="width: 68px; height: 68px; min-width: 68px; border-radius: 12px; background: rgba(15, 23, 42, 0.9); border: 2px solid #f59e0b; display: flex; align-items: center; justify-content: center; overflow: hidden; box-shadow: 0 4px 14px rgba(0,0,0,0.5);">
+                        <div style="width: 68px; height: 68px; min-width: 68px; border-radius: 12px; background: #FAF7F2; border: 2px solid #C88A2B; display: flex; align-items: center; justify-content: center; overflow: hidden; box-shadow: 0 2px 8px rgba(44, 26, 18, 0.08);">
                             ${prv.logo ? `
                                 <img src="${prv.logo}" alt="Logo ${prv.nombreEmpresa}" style="width: 100%; height: 100%; object-fit: contain; background: #ffffff; padding: 3px;">
                             ` : `
-                                <i class="fa-solid fa-truck-field" style="font-size: 2rem; color: #f59e0b;"></i>
+                                <i class="fa-solid fa-truck-field" style="font-size: 2rem; color: #8C5A32;"></i>
                             `}
                         </div>
                         <div>
                             <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
-                                <h2 style="margin: 0; font-size: 1.35rem; color: #f8fafc; font-weight: 800; letter-spacing: -0.02em;">
+                                <h2 style="margin: 0; font-size: 1.35rem; color: #2C1A12; font-weight: 800; letter-spacing: -0.02em;">
                                     ${prv.nombreEmpresa}
                                 </h2>
-                                <span style="background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid #059669; padding: 2px 8px; border-radius: 6px; font-size: 0.72rem; font-weight: 700; display: inline-flex; align-items: center; gap: 4px;">
+                                <span style="background: #ECFDF5; border: 1px solid #A7F3D0; color: #065F46; padding: 2px 8px; border-radius: 6px; font-size: 0.72rem; font-weight: 700; display: inline-flex; align-items: center; gap: 4px;">
                                     <i class="fa-solid fa-circle-check"></i> Activo / Verificado
                                 </span>
                             </div>
-                            <div style="display: flex; align-items: center; gap: 12px; margin-top: 6px; flex-wrap: wrap; font-size: 0.8rem; color: #cbd5e1;">
-                                <span><strong>RIF:</strong> <span style="color: #38bdf8; font-family: monospace; font-weight: 700;">${prv.rif}</span></span>
+                            <div style="display: flex; align-items: center; gap: 12px; margin-top: 6px; flex-wrap: wrap; font-size: 0.8rem; color: #5C4D44;">
+                                <span><strong>RIF:</strong> <span style="color: #2C1A12; font-family: monospace; font-weight: 700;">${prv.rif}</span></span>
                                 <span>&bull;</span>
-                                <span><strong>Código:</strong> <span style="color: #94a3b8; font-family: monospace;">${prv.id}</span></span>
+                                <span><strong>Código:</strong> <span style="color: #8C5A32; font-family: monospace; font-weight: 700;">${prv.id}</span></span>
                                 <span>&bull;</span>
-                                <span style="background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid #d97706; padding: 2px 8px; border-radius: 5px; font-weight: 700; font-size: 0.72rem;">
+                                <span style="background: #F3EDE2; border: 1px solid #D6C7B2; color: #6F4322; padding: 2px 8px; border-radius: 5px; font-weight: 700; font-size: 0.72rem;">
                                     <i class="fa-solid fa-tag"></i> ${prv.categoria || 'Materia Prima'}
                                 </span>
-                                <span style="background: ${(prv.diasCredito || 0) > 0 ? 'rgba(56, 189, 248, 0.15)' : 'rgba(148, 163, 184, 0.15)'}; color: ${(prv.diasCredito || 0) > 0 ? '#38bdf8' : '#94a3b8'}; border: 1px solid ${(prv.diasCredito || 0) > 0 ? '#0284c7' : '#475569'}; padding: 2px 8px; border-radius: 5px; font-weight: 700; font-size: 0.72rem;">
+                                <span style="${(prv.diasCredito || 0) > 0 ? 'background: #FEF3C7; border: 1px solid #FDE68A; color: #92400E;' : 'background: #ECFDF5; border: 1px solid #A7F3D0; color: #065F46;'} padding: 2px 8px; border-radius: 5px; font-weight: 700; font-size: 0.72rem;">
                                     <i class="fa-solid fa-calendar-check"></i> ${(prv.diasCredito || 0) > 0 ? `${prv.diasCredito} Días Crédito` : 'Contado'}
                                 </span>
-                                <span style="color: #fbbf24; font-weight: 700; font-size: 0.78rem;">
+                                <span style="color: #92400E; font-weight: 700; font-size: 0.78rem;">
                                     <i class="fa-solid fa-star"></i> ${ratingNum.toFixed(1)} / 5.0
                                 </span>
                             </div>
@@ -9797,104 +9797,104 @@
 
                     <!-- Acciones Rápidas en Cabecera -->
                     <div class="ficha-no-print" style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
-                        <button type="button" class="btn-gold" onclick="ViasaApp.cerrarFichaTecnicaIntegralProveedor(); ViasaApp.abrirModalOrdenCompra('${prv.id}')" style="font-size: 0.8rem; padding: 8px 14px; box-shadow: 0 4px 12px rgba(245, 158, 11, 0.25);">
+                        <button type="button" class="btn-gold" onclick="ViasaApp.cerrarFichaTecnicaIntegralProveedor(); ViasaApp.abrirModalOrdenCompra('${prv.id}')" style="font-size: 0.8rem; padding: 8px 14px;">
                             <i class="fa-solid fa-cart-plus"></i> Generar OC
                         </button>
-                        <button type="button" class="btn-secondary" onclick="ViasaApp.cerrarFichaTecnicaIntegralProveedor(); ViasaApp.abrirModalProveedor('${prv.id}')" style="font-size: 0.8rem; padding: 8px 12px; color: #38bdf8; border-color: #0284c7;">
+                        <button type="button" class="btn-secondary" onclick="ViasaApp.cerrarFichaTecnicaIntegralProveedor(); ViasaApp.abrirModalProveedor('${prv.id}')" style="font-size: 0.8rem; padding: 8px 12px; color: #8C5A32; border-color: #DDD2C0; background: #FAF7F2;">
                             <i class="fa-solid fa-pen-to-square"></i> Editar Datos
                         </button>
-                        <button type="button" class="btn-secondary" onclick="ViasaApp.imprimirFichaTecnicaProveedor()" style="font-size: 0.8rem; padding: 8px 12px; color: #fbbf24; border-color: #d97706;">
+                        <button type="button" class="btn-secondary" onclick="ViasaApp.imprimirFichaTecnicaProveedor()" style="font-size: 0.8rem; padding: 8px 12px; color: #B45309; border-color: #DDD2C0; background: #FAF7F2;">
                             <i class="fa-solid fa-print"></i> Imprimir / PDF
                         </button>
-                        <button type="button" onclick="ViasaApp.cerrarFichaTecnicaIntegralProveedor()" style="background: none; border: none; color: #94a3b8; font-size: 1.8rem; cursor: pointer; line-height: 1; padding: 0 6px; margin-left: 6px; transition: color 0.2s;" title="Cerrar Ficha Técnica" onmouseover="this.style.color='#ef4444'" onmouseout="this.style.color='#94a3b8'">&times;</button>
+                        <button type="button" onclick="ViasaApp.cerrarFichaTecnicaIntegralProveedor()" style="background: none; border: none; color: #5C4D44; font-size: 1.8rem; cursor: pointer; line-height: 1; padding: 0 6px; margin-left: 6px; transition: color 0.2s;" title="Cerrar Ficha Técnica" onmouseover="this.style.color='#991B1B'" onmouseout="this.style.color='#5C4D44'">&times;</button>
                     </div>
                 </div>
 
                 <!-- B. CINTA DE INDICADORES FINANCIEROS Y OPERATIVOS (4 KPIs) -->
-                <div class="ficha-kpi-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; padding: 16px 24px; background: rgba(15, 23, 42, 0.6); border-bottom: 1.5px solid #334155;">
+                <div class="ficha-kpi-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; padding: 16px 24px; background: #F5EFE6; border-bottom: 1.5px solid #DDD2C0;">
                     <!-- KPI 1: Saldo Por Pagar (Deuda Actual) -->
-                    <div class="ficha-kpi-card" style="background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.9)); border: 1.5px solid ${totalDeudaUSD > 0 ? '#ef4444' : '#334155'}; border-radius: 12px; padding: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.3);">
+                    <div class="ficha-kpi-card" style="background: #FFFFFF; border: 1.5px solid ${totalDeudaUSD > 0 ? '#991B1B' : '#DDD2C0'}; border-radius: 12px; padding: 14px; box-shadow: 0 2px 8px rgba(44, 26, 18, 0.05);">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                            <span style="font-size: 0.74rem; text-transform: uppercase; color: #94a3b8; font-weight: 700; letter-spacing: 0.04em;">
-                                <i class="fa-solid fa-scale-unbalanced-flip" style="color: #ef4444; margin-right: 4px;"></i> Saldo Por Pagar (Deuda)
+                            <span style="font-size: 0.74rem; text-transform: uppercase; color: #5C4D44; font-weight: 700; letter-spacing: 0.04em;">
+                                <i class="fa-solid fa-scale-unbalanced-flip" style="color: ${totalDeudaUSD > 0 ? '#B91C1C' : '#065F46'}; margin-right: 4px;"></i> Saldo Por Pagar (Deuda)
                             </span>
-                            <span style="font-size: 0.68rem; padding: 2px 6px; border-radius: 4px; background: ${totalDeudaUSD > 0 ? 'rgba(239, 68, 68, 0.2)' : 'rgba(16, 185, 129, 0.2)'}; color: ${totalDeudaUSD > 0 ? '#fca5a5' : '#86efac'}; font-weight: 700;">
+                            <span style="font-size: 0.68rem; padding: 2px 6px; border-radius: 4px; background: ${totalDeudaUSD > 0 ? '#FEF2F2' : '#ECFDF5'}; border: 1px solid ${totalDeudaUSD > 0 ? '#FECACA' : '#A7F3D0'}; color: ${totalDeudaUSD > 0 ? '#991B1B' : '#065F46'}; font-weight: 700;">
                                 ${totalDeudaUSD > 0 ? `${cxpPendientes.length} Pendiente${cxpPendientes.length > 1 ? 's' : ''}` : 'Al Día'}
                             </span>
                         </div>
-                        <div style="font-size: 1.35rem; font-weight: 800; color: ${totalDeudaUSD > 0 ? '#f87171' : '#34d399'};">
+                        <div style="font-size: 1.35rem; font-weight: 900; color: ${totalDeudaUSD > 0 ? '#B91C1C' : '#065F46'};">
                             $${totalDeudaUSD.toLocaleString('es-VE', {minimumFractionDigits: 2, maximumFractionDigits: 2})} USD
                         </div>
-                        <div style="font-size: 0.74rem; color: #cbd5e1; margin-top: 4px; display: flex; flex-direction: column; gap: 2px;">
-                            <span><strong style="color: #38bdf8;">BCV:</strong> Bs. ${totalDeudaBsBCV.toLocaleString('es-VE', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
-                            <span style="color: #94a3b8;"><strong style="color: #fbbf24;">USDT:</strong> Bs. ${totalDeudaBsUSDT.toLocaleString('es-VE', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
+                        <div style="font-size: 0.74rem; color: #4A3B32; margin-top: 4px; display: flex; flex-direction: column; gap: 2px;">
+                            <span><strong style="color: #2C1A12;">BCV:</strong> Bs. ${totalDeudaBsBCV.toLocaleString('es-VE', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
+                            <span><strong style="color: #B45309;">USDT:</strong> Bs. ${totalDeudaBsUSDT.toLocaleString('es-VE', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
                         </div>
                         ${cxpVencidas > 0 ? `
-                            <div style="font-size: 0.68rem; color: #f87171; font-weight: 700; margin-top: 5px;">
+                            <div style="font-size: 0.68rem; color: #B91C1C; font-weight: 700; margin-top: 5px;">
                                 <i class="fa-solid fa-triangle-exclamation"></i> ${cxpVencidas} factura(s) en mora / vencida(s)
                             </div>
                         ` : ''}
                     </div>
 
                     <!-- KPI 2: Volumen Histórico de Compras -->
-                    <div class="ficha-kpi-card" style="background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.9)); border: 1.5px solid #334155; border-radius: 12px; padding: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.3);">
+                    <div class="ficha-kpi-card" style="background: #FFFFFF; border: 1.5px solid #DDD2C0; border-radius: 12px; padding: 14px; box-shadow: 0 2px 8px rgba(44, 26, 18, 0.05);">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                            <span style="font-size: 0.74rem; text-transform: uppercase; color: #94a3b8; font-weight: 700; letter-spacing: 0.04em;">
-                                <i class="fa-solid fa-boxes-stacked" style="color: #38bdf8; margin-right: 4px;"></i> Volumen Compras Total
+                            <span style="font-size: 0.74rem; text-transform: uppercase; color: #5C4D44; font-weight: 700; letter-spacing: 0.04em;">
+                                <i class="fa-solid fa-boxes-stacked" style="color: #8C5A32; margin-right: 4px;"></i> Volumen Compras Total
                             </span>
-                            <span style="font-size: 0.68rem; padding: 2px 6px; border-radius: 4px; background: rgba(56, 189, 248, 0.2); color: #7dd3fc; font-weight: 700;">
+                            <span style="font-size: 0.68rem; padding: 2px 6px; border-radius: 4px; background: #F3EDE2; border: 1px solid #D6C7B2; color: #6F4322; font-weight: 700;">
                                 ${numOrdenes} OCs
                             </span>
                         </div>
-                        <div style="font-size: 1.35rem; font-weight: 800; color: #38bdf8;">
+                        <div style="font-size: 1.35rem; font-weight: 900; color: #B45309;">
                             $${totalVolumenUSD.toLocaleString('es-VE', {minimumFractionDigits: 2, maximumFractionDigits: 2})} USD
                         </div>
-                        <div style="font-size: 0.74rem; color: #94a3b8; margin-top: 4px;">
+                        <div style="font-size: 0.74rem; color: #5C4D44; margin-top: 4px;">
                             Equivalente BCV: Bs. ${(totalVolumenUSD * tasaBCV).toLocaleString('es-VE', {minimumFractionDigits: 2, maximumFractionDigits: 2})}
                         </div>
-                        <div style="font-size: 0.68rem; color: #64748b; margin-top: 5px;">
+                        <div style="font-size: 0.68rem; color: #8C7B70; margin-top: 5px;">
                             Histórico acumulado en abastecimiento
                         </div>
                     </div>
 
                     <!-- KPI 3: Última Compra / Recepción -->
-                    <div class="ficha-kpi-card" style="background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.9)); border: 1.5px solid #334155; border-radius: 12px; padding: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.3);">
+                    <div class="ficha-kpi-card" style="background: #FFFFFF; border: 1.5px solid #DDD2C0; border-radius: 12px; padding: 14px; box-shadow: 0 2px 8px rgba(44, 26, 18, 0.05);">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                            <span style="font-size: 0.74rem; text-transform: uppercase; color: #94a3b8; font-weight: 700; letter-spacing: 0.04em;">
-                                <i class="fa-solid fa-truck-ramp-box" style="color: #10b981; margin-right: 4px;"></i> Última Compra / Recepción
+                            <span style="font-size: 0.74rem; text-transform: uppercase; color: #5C4D44; font-weight: 700; letter-spacing: 0.04em;">
+                                <i class="fa-solid fa-truck-ramp-box" style="color: #065F46; margin-right: 4px;"></i> Última Compra / Recepción
                             </span>
-                            <span style="font-size: 0.68rem; padding: 2px 6px; border-radius: 4px; background: rgba(16, 185, 129, 0.2); color: #86efac; font-weight: 700;">
+                            <span style="font-size: 0.68rem; padding: 2px 6px; border-radius: 4px; background: #ECFDF5; border: 1px solid #A7F3D0; color: #065F46; font-weight: 700;">
                                 ${ultimaFecha}
                             </span>
                         </div>
-                        <div style="font-size: 1.35rem; font-weight: 800; color: #34d399;">
+                        <div style="font-size: 1.35rem; font-weight: 900; color: #065F46;">
                             ${ultimoMontoUSD > 0 ? `$${ultimoMontoUSD.toLocaleString('es-VE', {minimumFractionDigits: 2, maximumFractionDigits: 2})} USD` : 'Sin Compras'}
                         </div>
-                        <div style="font-size: 0.74rem; color: #94a3b8; margin-top: 4px;">
+                        <div style="font-size: 0.74rem; color: #5C4D44; margin-top: 4px;">
                             ${ultimaOrden ? `Orden N°: ${ultimaOrden.id} (${ultimaOrden.estado || 'Recibida'})` : 'No registra recepciones'}
                         </div>
-                        <div style="font-size: 0.68rem; color: #64748b; margin-top: 5px;">
+                        <div style="font-size: 0.68rem; color: #8C7B70; margin-top: 5px;">
                             Ingreso verificado en almacén de planta
                         </div>
                     </div>
 
                     <!-- KPI 4: Cumplimiento y Desempeño -->
-                    <div class="ficha-kpi-card" style="background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.9)); border: 1.5px solid #334155; border-radius: 12px; padding: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.3);">
+                    <div class="ficha-kpi-card" style="background: #FFFFFF; border: 1.5px solid #DDD2C0; border-radius: 12px; padding: 14px; box-shadow: 0 2px 8px rgba(44, 26, 18, 0.05);">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                            <span style="font-size: 0.74rem; text-transform: uppercase; color: #94a3b8; font-weight: 700; letter-spacing: 0.04em;">
-                                <i class="fa-solid fa-award" style="color: #fbbf24; margin-right: 4px;"></i> Desempeño y Lead Time
+                            <span style="font-size: 0.74rem; text-transform: uppercase; color: #5C4D44; font-weight: 700; letter-spacing: 0.04em;">
+                                <i class="fa-solid fa-award" style="color: #C88A2B; margin-right: 4px;"></i> Desempeño y Lead Time
                             </span>
-                            <span style="font-size: 0.68rem; padding: 2px 6px; border-radius: 4px; background: rgba(245, 158, 11, 0.2); color: #fde68a; font-weight: 700;">
+                            <span style="font-size: 0.68rem; padding: 2px 6px; border-radius: 4px; background: #FEF3C7; border: 1px solid #F59E0B; color: #92400E; font-weight: 700;">
                                 ${ratingNum.toFixed(1)} / 5.0
                             </span>
                         </div>
-                        <div style="font-size: 1.15rem; font-weight: 800; color: #fbbf24;">
+                        <div style="font-size: 1.15rem; font-weight: 800; color: #8C5A32;">
                             ${leadTime}
                         </div>
-                        <div style="font-size: 0.74rem; color: #cbd5e1; margin-top: 4px;">
-                            Calidad de Insumos: <strong style="color: #34d399;">99.2% Aprobado</strong>
+                        <div style="font-size: 0.74rem; color: #4A3B32; margin-top: 4px;">
+                            Calidad de Insumos: <strong style="color: #065F46;">99.2% Aprobado</strong>
                         </div>
-                        <div style="font-size: 0.68rem; color: #10b981; font-weight: 700; margin-top: 5px;">
+                        <div style="font-size: 0.68rem; color: #065F46; font-weight: 700; margin-top: 5px;">
                             <i class="fa-solid fa-check-double"></i> Puntualidad en Despacho: 100%
                         </div>
                     </div>

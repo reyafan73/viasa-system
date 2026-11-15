@@ -2519,11 +2519,12 @@ body {
 .prv-tab-bar {
     display: flex;
     gap: 8px;
-    background: var(--bg-main);
-    padding: 4px;
-    border-radius: 10px;
-    border: 1px solid var(--border-color);
+    background: #F5EFE6;
+    padding: 6px;
+    border-radius: 12px;
+    border: 1.5px solid #DDD2C0;
     margin-bottom: 16px;
+    box-shadow: inset 0 1px 3px rgba(44, 26, 18, 0.05);
 }
 
 .prv-tab-btn {
@@ -2532,7 +2533,7 @@ body {
     background: transparent;
     border: none;
     border-radius: 8px;
-    color: var(--text-secondary);
+    color: #5C4D44;
     font-weight: 800;
     font-size: 0.85rem;
     cursor: pointer;
@@ -2544,14 +2545,14 @@ body {
 }
 
 .prv-tab-btn:hover {
-    color: #fff;
-    background: rgba(255, 255, 255, 0.05);
+    color: #2C1A12;
+    background: rgba(200, 138, 43, 0.1);
 }
 
 .prv-tab-btn.active {
-    background: var(--accent-gold);
-    color: #fff;
-    box-shadow: 0 4px 12px rgba(217, 119, 6, 0.35);
+    background: #C88A2B;
+    color: #FFFFFF;
+    box-shadow: 0 4px 12px rgba(200, 138, 43, 0.35);
 }
 
 /* Grilla de Tarjetas de Proveedores */
@@ -2562,20 +2563,21 @@ body {
 }
 
 .prv-card {
-    background: var(--bg-card);
-    border: 1.5px solid var(--border-color);
+    background: #FFFFFF;
+    border: 1.5px solid #DDD2C0;
     border-radius: 12px;
     padding: 16px;
     transition: all 0.25s ease;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    box-shadow: 0 2px 8px rgba(44, 26, 18, 0.06);
 }
 
 .prv-card:hover {
-    border-color: var(--accent-wheat);
+    border-color: #C88A2B;
     transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 8px 24px rgba(44, 26, 18, 0.12);
 }
 
 .prv-card-header {
@@ -2586,29 +2588,30 @@ body {
 }
 
 .prv-title {
-    font-size: 1.05rem;
+    font-size: 15.5px;
     font-weight: 800;
-    color: var(--accent-wheat);
-    line-height: 1.2;
+    color: #2C1A12;
+    line-height: 1.25;
 }
 
 .prv-rif {
     font-size: 0.75rem;
-    color: var(--text-secondary);
-    font-weight: 700;
+    color: #5C4D44;
+    font-weight: 600;
     font-family: monospace;
 }
 
 .prv-stars {
-    color: #fbbf24;
-    font-size: 0.85rem;
+    color: #92400E;
+    font-size: 0.78rem;
+    font-weight: 800;
     display: inline-flex;
     align-items: center;
-    gap: 3px;
-    background: rgba(251, 191, 36, 0.12);
-    padding: 3px 8px;
+    gap: 4px;
+    background: #FEF3C7;
+    padding: 2px 8px;
     border-radius: 6px;
-    border: 1px solid rgba(251, 191, 36, 0.25);
+    border: 1px solid #F59E0B;
 }
 
 .prv-info-list {
@@ -2616,7 +2619,7 @@ body {
     flex-direction: column;
     gap: 6px;
     font-size: 0.8rem;
-    color: var(--text-secondary);
+    color: #4A3B32;
     margin: 10px 0;
 }
 
@@ -2624,11 +2627,12 @@ body {
     display: flex;
     align-items: center;
     gap: 8px;
+    color: #3E312B;
 }
 
 .prv-info-item i {
     width: 16px;
-    color: var(--accent-wheat);
+    color: #8C5A32;
     text-align: center;
 }
 
@@ -2643,25 +2647,27 @@ body {
 }
 
 .prv-badge-credit.has-credit {
-    background: rgba(16, 185, 129, 0.15);
-    color: #34d399;
-    border: 1px solid rgba(16, 185, 129, 0.3);
+    background: #FEF3C7;
+    color: #92400E;
+    border: 1px solid #FDE68A;
 }
 
 .prv-badge-credit.no-credit {
-    background: rgba(148, 163, 184, 0.15);
-    color: #94a3b8;
-    border: 1px solid rgba(148, 163, 184, 0.3);
+    background: #ECFDF5;
+    color: #065F46;
+    border: 1px solid #A7F3D0;
 }
 
 .prv-tag-currency {
-    padding: 2px 6px;
-    background: rgba(255, 255, 255, 0.06);
+    padding: 2px 7px;
+    background: #F3EDE2;
+    border: 1px solid #C8B89E;
     border-radius: 4px;
-    font-size: 0.7rem;
+    font-size: 0.72rem;
     font-weight: 700;
-    color: #cbd5e1;
+    color: #2C1A12;
     margin-right: 4px;
+    font-family: monospace;
 }
 
 /* Banner Asistente de Reabastecimiento Crítico */
@@ -12090,30 +12096,30 @@ input, select, textarea {
 }
 
 .prv-card:hover {
-    border-color: #f59e0b !important;
+    border-color: #C88A2B !important;
     transform: translateY(-3px) !important;
-    box-shadow: 0 10px 25px -5px rgba(245, 158, 11, 0.22), 0 8px 10px -6px rgba(0, 0, 0, 0.5) !important;
+    box-shadow: 0 10px 25px -5px rgba(200, 138, 43, 0.25), 0 8px 10px -6px rgba(44, 26, 18, 0.12) !important;
 }
 
 .viasa-ficha-tecnica-card {
-    background: #0f172a !important;
-    border: 1.5px solid #334155 !important;
-    box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.95), 0 0 35px rgba(245, 158, 11, 0.15) !important;
+    background: #FFFFFF !important;
+    border: 1.5px solid #DDD2C0 !important;
+    box-shadow: 0 25px 60px -15px rgba(44, 26, 18, 0.25), 0 0 35px rgba(200, 138, 43, 0.12) !important;
     border-radius: 16px !important;
 }
 
 .ficha-tab-nav {
     display: flex;
     gap: 8px;
-    border-bottom: 1.5px solid #334155;
-    background: #1e293b;
+    border-bottom: 1.5px solid #DDD2C0;
+    background: #F5EFE6;
     padding: 8px 18px 0 18px;
     overflow-x: auto;
 }
 
 .ficha-tab-btn {
     background: transparent;
-    color: #94a3b8;
+    color: #5C4D44;
     border: none;
     border-bottom: 3px solid transparent;
     padding: 10px 16px;
@@ -12128,32 +12134,33 @@ input, select, textarea {
 }
 
 .ficha-tab-btn:hover {
-    color: #f8fafc;
-    background: rgba(255, 255, 255, 0.04);
+    color: #2C1A12;
+    background: rgba(200, 138, 43, 0.08);
 }
 
 .ficha-tab-btn.active {
-    color: #f59e0b;
-    border-bottom-color: #f59e0b;
-    background: rgba(245, 158, 11, 0.08);
+    color: #8C5A32;
+    border-bottom-color: #C88A2B;
+    background: #FFFFFF;
+    font-weight: 800;
 }
 
 .ficha-kpi-card {
-    background: #1e293b;
-    border: 1px solid #334155;
+    background: #FFFFFF;
+    border: 1.5px solid #DDD2C0;
     border-radius: 10px;
     padding: 12px 14px;
     transition: all 0.2s ease;
 }
 
 .ficha-kpi-card:hover {
-    border-color: #475569;
+    border-color: #C88A2B;
     transform: translateY(-2px);
 }
 
 .ficha-section-card {
-    background: #1e293b;
-    border: 1px solid #334155;
+    background: #FAF7F2;
+    border: 1.5px solid #E2D6C3;
     border-radius: 10px;
     padding: 16px;
 }
@@ -12166,11 +12173,11 @@ input, select, textarea {
 }
 
 .ficha-table th {
-    background: #0b0f19;
-    color: #94a3b8;
+    background: #F3EDE2;
+    color: #4A3B32;
     font-weight: 700;
     padding: 10px 12px;
-    border-bottom: 1.5px solid #334155;
+    border-bottom: 1.5px solid #DDD2C0;
     text-transform: uppercase;
     font-size: 0.72rem;
     letter-spacing: 0.5px;
@@ -12178,12 +12185,44 @@ input, select, textarea {
 
 .ficha-table td {
     padding: 10px 12px;
-    border-bottom: 1px solid #334155;
-    color: #e2e8f0;
+    border-bottom: 1px solid #E2D6C3;
+    color: #2C1A12;
 }
 
 .ficha-table tbody tr:hover {
-    background: rgba(255, 255, 255, 0.03);
+    background: rgba(200, 138, 43, 0.05);
+}
+
+/* ==============================================================================
+   REGLA DE ORO ERGONÓMICA Y CONTRASTE WCAG AAA (NUEVA VIASA PRESTIGE LIGHT)
+   Elimina fondos oscuros residuales, texto blanco sobre fondos claros y pasteles
+   ============================================================================== */
+.badge.ok, .pill.ok, .mp-badge-tag.ok, .tag.ok, .status-pill.ok, .oc-pill.recibida, .cxp-pill.pagada {
+    background: #ECFDF5 !important;
+    border: 1px solid #A7F3D0 !important;
+    color: #065F46 !important;
+    font-weight: 700 !important;
+}
+
+.badge.warning, .pill.warning, .mp-badge-tag.warning, .tag.warning, .status-pill.warning, .cxp-pill.urgente, .oc-pill.emitida {
+    background: #FEF3C7 !important;
+    border: 1px solid #FDE68A !important;
+    color: #92400E !important;
+    font-weight: 700 !important;
+}
+
+.badge.danger, .pill.danger, .mp-badge-tag.danger, .tag.danger, .status-pill.danger, .oc-pill.anulada, .cxp-pill.vencida {
+    background: #FEF2F2 !important;
+    border: 1px solid #FECACA !important;
+    color: #991B1B !important;
+    font-weight: 700 !important;
+}
+
+.cxp-pill.parcial, .oc-pill.pendiente {
+    background: #EFF6FF !important;
+    border: 1px solid #BFDBFE !important;
+    color: #1E40AF !important;
+    font-weight: 700 !important;
 }
 
 @media print {
