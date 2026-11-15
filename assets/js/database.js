@@ -5122,11 +5122,46 @@
             }
         }
 
+        // 3. Cargar Productos: Protocolo Estricto LOAD-FIRST, SEED-ONLY-IF-EMPTY
+        let prodsMaster = null;
+        try {
+            const rawMaster = localStorage.getItem('viasa_productos_master_v1');
+            if (rawMaster) {
+                const parsedMaster = JSON.parse(rawMaster);
+                if (Array.isArray(parsedMaster) && parsedMaster.length > 0) prodsMaster = parsedMaster;
+            }
+            if (!prodsMaster) {
+                const rawPNV = localStorage.getItem('viasa_productos_nueva_viasa_v1');
+                if (rawPNV) {
+                    const parsedPNV = JSON.parse(rawPNV);
+                    if (parsedPNV && Array.isArray(parsedPNV.productos) && parsedPNV.productos.length > 0) {
+                        prodsMaster = parsedPNV.productos;
+                    }
+                }
+            }
+        } catch (e) {
+            prodsMaster = null;
+        }
+
         const productosExistentes = await window.ViasaStorage.obtenerColeccion('productos');
-        if (!productosExistentes || productosExistentes.length === 0) {
-            console.log('[VIASA DB] Sembrando catálogo inicial de productos...');
+        const hayProductos = (prodsMaster && prodsMaster.length > 0) || (productosExistentes && productosExistentes.length > 0);
+
+        if (!hayProductos) {
+            console.log('[VIASA DB] Sembrando catálogo inicial de productos por primera vez absoluta...');
             for (const prd of VIASA_CATALOGO_INICIAL.productos) {
                 await window.ViasaStorage.guardarRegistro('productos', prd);
+            }
+            localStorage.setItem('viasa_productos_master_v1', JSON.stringify(VIASA_CATALOGO_INICIAL.productos));
+            localStorage.setItem('viasa_productos_nueva_viasa_v1', JSON.stringify({
+                version: 1,
+                actualizado: new Date().toISOString(),
+                productos: VIASA_CATALOGO_INICIAL.productos
+            }));
+        } else {
+            console.log('[VIASA DB] Catálogo de productos persistente detectado en disco. Protegiendo cambios del usuario (Cero sobrescritura).');
+            // Si prodsMaster tiene los datos más recientes, asegurar que IndexedDB los tenga
+            if (prodsMaster && prodsMaster.length > 0 && (!productosExistentes || productosExistentes.length === 0)) {
+                await window.ViasaStorage.guardarColeccion('productos', prodsMaster);
             }
         }
 

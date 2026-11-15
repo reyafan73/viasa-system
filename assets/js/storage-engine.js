@@ -424,6 +424,16 @@
                 backup.colecciones[store] = await this.obtenerColeccion(store);
             }
 
+            // Copia maestra de viasa_productos_master_v1
+            try {
+                const masterP = localStorage.getItem('viasa_productos_master_v1');
+                if (masterP) {
+                    backup.viasa_productos_master_v1 = JSON.parse(masterP);
+                } else if (backup.colecciones.productos) {
+                    backup.viasa_productos_master_v1 = backup.colecciones.productos;
+                }
+            } catch (e) {}
+
             // Configuraciones y claves sueltas
             backup.configuracionGlobal = {
                 tasaBCV: this.getItem('tasa_bcv', 36.85),
@@ -459,19 +469,33 @@
          * Restaurar copia de seguridad
          */
         async restaurarBackup(backupJSON) {
-            if (!backupJSON || !backupJSON.colecciones) {
+            if (!backupJSON || (!backupJSON.colecciones && !backupJSON.productos && !backupJSON.viasa_productos_master_v1)) {
                 throw new Error('Formato de archivo de respaldo no válido para VIASA System.');
             }
 
-            for (const storeName of Object.keys(backupJSON.colecciones)) {
-                if (storeName === 'casillero_respaldos_generales') continue;
-                const items = backupJSON.colecciones[storeName];
-                if (Array.isArray(items)) {
-                    if (storeName === 'usuarios') {
-                        this.setItem('usuarios', items);
+            if (backupJSON.colecciones) {
+                for (const storeName of Object.keys(backupJSON.colecciones)) {
+                    if (storeName === 'casillero_respaldos_generales') continue;
+                    const items = backupJSON.colecciones[storeName];
+                    if (Array.isArray(items)) {
+                        if (storeName === 'usuarios') {
+                            this.setItem('usuarios', items);
+                        }
+                        await this.guardarColeccion(storeName, items);
                     }
-                    await this.guardarColeccion(storeName, items);
                 }
+            }
+
+            // Restauración prioritaria del Catálogo Maestro de Productos
+            const prodsRestaurar = backupJSON.viasa_productos_master_v1 || (backupJSON.colecciones && backupJSON.colecciones.productos) || (Array.isArray(backupJSON) ? backupJSON : null);
+            if (Array.isArray(prodsRestaurar) && prodsRestaurar.length > 0) {
+                localStorage.setItem('viasa_productos_master_v1', JSON.stringify(prodsRestaurar));
+                localStorage.setItem('viasa_productos_nueva_viasa_v1', JSON.stringify({
+                    version: 1,
+                    actualizado: new Date().toISOString(),
+                    productos: prodsRestaurar
+                }));
+                await this.guardarColeccion('productos', prodsRestaurar);
             }
 
             if (backupJSON.configuracionGlobal) {

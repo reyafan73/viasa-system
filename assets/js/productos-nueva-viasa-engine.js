@@ -821,22 +821,63 @@
         studioCopias: 1,
 
         // --------------------------------------------------------------------
-        // PERSISTENCIA
+        // PERSISTENCIA (LOAD-FIRST, SEED-ONLY-IF-EMPTY & MASTER SYNC)
         // --------------------------------------------------------------------
         init() {
             if (this.initialized) return;
-            let saved = null;
+            let prodsCargados = null;
+
+            // 1. Cargar primero de la clave unificada viasa_productos_master_v1
             try {
-                saved = JSON.parse(localStorage.getItem(STORAGE_KEY_PNV) || 'null');
+                const masterRaw = localStorage.getItem('viasa_productos_master_v1');
+                if (masterRaw) {
+                    const parsed = JSON.parse(masterRaw);
+                    if (Array.isArray(parsed) && parsed.length > 0) {
+                        prodsCargados = parsed;
+                    } else if (parsed && Array.isArray(parsed.productos) && parsed.productos.length > 0) {
+                        prodsCargados = parsed.productos;
+                    }
+                }
             } catch (e) {
-                saved = null;
+                console.warn('[PNV Engine] Error al leer viasa_productos_master_v1:', e);
             }
-            if (saved && Array.isArray(saved.productos)) {
-                this.productos = saved.productos.map(p => this.normalizar(p));
+
+            // 2. Si no hay datos, intentar desde STORAGE_KEY_PNV (viasa_productos_nueva_viasa_v1)
+            if (!prodsCargados) {
+                try {
+                    const saved = JSON.parse(localStorage.getItem(STORAGE_KEY_PNV) || 'null');
+                    if (saved && Array.isArray(saved.productos) && saved.productos.length > 0) {
+                        prodsCargados = saved.productos;
+                    }
+                } catch (e) {}
+            }
+
+            // 3. Si no hay datos, consultar ViasaStorage colección 'productos'
+            if (!prodsCargados) {
+                try {
+                    const colRaw = localStorage.getItem('viasa_db_productos') || localStorage.getItem('productos');
+                    if (colRaw) {
+                        const parsedCol = JSON.parse(colRaw);
+                        if (Array.isArray(parsedCol) && parsedCol.length > 0) {
+                            prodsCargados = parsedCol;
+                        }
+                    }
+                } catch (e) {}
+            }
+
+            // 4. Si no hay datos, consultar ViasaApp.productos en memoria
+            if (!prodsCargados && window.ViasaApp && Array.isArray(window.ViasaApp.productos) && window.ViasaApp.productos.length > 0) {
+                prodsCargados = window.ViasaApp.productos;
+            }
+
+            // 5. Solo si está totalmente vacío en todas las fuentes, sembrar catálogo inicial
+            if (prodsCargados && prodsCargados.length > 0) {
+                this.productos = prodsCargados.map(p => this.normalizar(p));
             } else {
                 this.productos = JSON.parse(JSON.stringify(DEFAULT_CATALOG)).map(p => this.normalizar(p));
                 this.guardar();
             }
+
             this.productos.forEach(p => this.sincronizarContabilidad(p));
             this.sincronizarTodosConPOS();
             this.initialized = true;
@@ -861,11 +902,13 @@
                     // Programar guardado asíncrono completo en IndexedDB
                     window.ViasaMediaStorage.prepararProductosParaLocalStorage(this.productos).then(ligeros => {
                         try {
-                            localStorage.setItem(STORAGE_KEY_PNV, JSON.stringify({
+                            const payload = JSON.stringify({
                                 version: 1,
                                 actualizado: new Date().toISOString(),
                                 productos: ligeros
-                            }));
+                            });
+                            localStorage.setItem(STORAGE_KEY_PNV, payload);
+                            localStorage.setItem('viasa_productos_master_v1', payload);
                         } catch (err) {}
                     });
 
@@ -900,7 +943,28 @@
                         return copy;
                     });
                 }
-                localStorage.setItem(STORAGE_KEY_PNV, JSON.stringify({ version: 1, actualizado: new Date().toISOString(), productos: productosParaStorage }));
+
+                // Guardado atómico síncrono multi-tabla
+                const payloadFinal = JSON.stringify({ version: 1, actualizado: new Date().toISOString(), productos: productosParaStorage });
+                localStorage.setItem(STORAGE_KEY_PNV, payloadFinal);
+                localStorage.setItem('viasa_productos_master_v1', payloadFinal);
+
+                if (window.ViasaStorage && typeof window.ViasaStorage.guardarColeccion === 'function') {
+                    window.ViasaStorage.guardarColeccion('productos', productosParaStorage).catch(() => {});
+                }
+
+                // Sincronizar en memoria con ViasaApp
+                if (window.ViasaApp && Array.isArray(window.ViasaApp.productos)) {
+                    this.sincronizarTodosConPOS();
+                }
+
+                // Actualizar indicador superior SYNK OK
+                if (typeof window.ViasaActualizarSyncOK === 'function') {
+                    window.ViasaActualizarSyncOK();
+                } else if (window.ViasaApp && typeof window.ViasaApp.actualizarIndicadorSyncOK === 'function') {
+                    window.ViasaApp.actualizarIndicadorSyncOK();
+                }
+
                 return true;
             } catch (e) {
                 console.warn('[Productos Nueva Viasa] Cuota de almacenamiento alcanzada, aplicando purga y rescate:', e);
@@ -912,7 +976,15 @@
                             customBarcodeImage: (p.customBarcodeImage && p.customBarcodeImage.startsWith('data:')) ? null : p.customBarcodeImage,
                             customQrImage: (p.customQrImage && p.customQrImage.startsWith('data:')) ? null : p.customQrImage
                         }));
-                        localStorage.setItem(STORAGE_KEY_PNV, JSON.stringify({ version: 1, actualizado: new Date().toISOString(), productos: ultraLight }));
+                        const payloadRescue = JSON.stringify({ version: 1, actualizado: new Date().toISOString(), productos: ultraLight });
+                        localStorage.setItem(STORAGE_KEY_PNV, payloadRescue);
+                        localStorage.setItem('viasa_productos_master_v1', payloadRescue);
+                        if (window.ViasaStorage && typeof window.ViasaStorage.guardarColeccion === 'function') {
+                            window.ViasaStorage.guardarColeccion('productos', ultraLight).catch(() => {});
+                        }
+                        if (typeof window.ViasaActualizarSyncOK === 'function') {
+                            window.ViasaActualizarSyncOK();
+                        }
                         return true;
                     } catch (e2) {
                         console.error('[Productos Nueva Viasa] Error crítico al guardar:', e2);
@@ -2376,7 +2448,7 @@
                 if (!this.guardar()) { Object.assign(p, respaldo); return; }
                 this.sincronizarContabilidad(p);
                 this.sincronizarConPOS(p);
-                this.toast(`✅ Producto e imágenes guardados exitosamente.`);
+                this.toast(`✅ Producto guardado permanentemente en la base de datos de VIASA System`);
             } else {
                 const nuevo = this.normalizar(Object.assign({
                     id: uid('PNV'),
@@ -2393,7 +2465,7 @@
                 if (!this.guardar()) { this.productos.shift(); return; }
                 this.sincronizarContabilidad(nuevo);
                 this.sincronizarConPOS(nuevo);
-                this.toast(`✅ Producto e imágenes guardados exitosamente.`);
+                this.toast(`✅ Producto guardado permanentemente en la base de datos de VIASA System`);
             }
 
             // Re-hidratar en memoria e IndexedDB

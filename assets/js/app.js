@@ -303,7 +303,14 @@
                 this.actualizarWidgetAclasCR2050();
             }
 
-            // 3. Cargar colecciones desde IndexedDB / Sandbox
+            // 3. Cargar colecciones desde IndexedDB / Sandbox (Load-First & Seed-Only-If-Empty)
+            if (window.ViasaProductosExclusivosEngine && typeof window.ViasaProductosExclusivosEngine.init === 'function') {
+                try {
+                    window.ViasaProductosExclusivosEngine.init();
+                } catch (eInitPnv) {
+                    console.warn('[ViasaApp init] Advertencia al inicializar Productos Nueva Viasa Engine:', eInitPnv);
+                }
+            }
             await this.cargarCategorias();
             await this.cargarProductos();
             this.inicializarEscuchadorGlobalScanner();
@@ -817,8 +824,13 @@
             }
         },
 
-        cerrarSesion() {
+        async cerrarSesion() {
             if (confirm('¿Desea cerrar la sesión actual de VIASA System?')) {
+                try {
+                    await this.sincronizarEstadoGeneralEnStorage();
+                } catch (eFlush) {
+                    console.warn('[Cerrar Sesión] Advertencia en volcado de estado:', eFlush);
+                }
                 window.ViasaAuth.logout();
                 const appLayout = document.querySelector('.app-layout');
                 if (appLayout) appLayout.style.visibility = 'hidden';
@@ -1216,11 +1228,74 @@
         },
 
         async cargarProductos() {
-            this.productos = await window.ViasaStorage.obtenerColeccion('productos');
-            if (!this.productos || this.productos.length === 0) {
-                this.productos = window.ViasaDatabase.productos;
+            let prods = null;
+
+            // 1. Cargar primero desde la clave unificada viasa_productos_master_v1
+            try {
+                const masterRaw = localStorage.getItem('viasa_productos_master_v1');
+                if (masterRaw) {
+                    const parsed = JSON.parse(masterRaw);
+                    if (Array.isArray(parsed) && parsed.length > 0) {
+                        prods = parsed;
+                    } else if (parsed && Array.isArray(parsed.productos) && parsed.productos.length > 0) {
+                        prods = parsed.productos;
+                    }
+                }
+            } catch (e) {
+                console.warn('[ViasaApp] Error al leer viasa_productos_master_v1:', e);
             }
+
+            // 2. Si no hay datos, cargar de viasa_productos_nueva_viasa_v1
+            if (!prods || prods.length === 0) {
+                try {
+                    const pnvRaw = localStorage.getItem('viasa_productos_nueva_viasa_v1');
+                    if (pnvRaw) {
+                        const parsedPnv = JSON.parse(pnvRaw);
+                        if (parsedPnv && Array.isArray(parsedPnv.productos) && parsedPnv.productos.length > 0) {
+                            prods = parsedPnv.productos;
+                        }
+                    }
+                } catch (e) {}
+            }
+
+            // 3. Si no hay datos, consultar colección en ViasaStorage
+            if (!prods || prods.length === 0) {
+                prods = await window.ViasaStorage.obtenerColeccion('productos');
+            }
+
+            // 4. Si aún no hay datos y ViasaProductosExclusivosEngine tiene productos
+            if ((!prods || prods.length === 0) && window.ViasaProductosExclusivosEngine && Array.isArray(window.ViasaProductosExclusivosEngine.productos) && window.ViasaProductosExclusivosEngine.productos.length > 0) {
+                prods = window.ViasaProductosExclusivosEngine.productos;
+            }
+
+            // 5. Solo si está totalmente vacío en todas las fuentes, recurrir a los datos por defecto
+            if (!prods || prods.length === 0) {
+                prods = (window.ViasaDatabase && window.ViasaDatabase.productos) ? [...window.ViasaDatabase.productos] : [];
+            }
+
+            this.productos = prods || [];
             this.garantizarCodigosBarrasUniversal();
+
+            // Sincronizar hacia viasa_productos_master_v1 y storage para blindar la persistencia
+            if (this.productos.length > 0) {
+                try {
+                    const payload = JSON.stringify({
+                        version: 1,
+                        actualizado: new Date().toISOString(),
+                        productos: this.productos
+                    });
+                    if (!localStorage.getItem('viasa_productos_master_v1')) {
+                        localStorage.setItem('viasa_productos_master_v1', payload);
+                    }
+                } catch (e) {}
+            }
+
+            // Re-hidratar medios desde IndexedDB de forma reactiva
+            if (window.ViasaImageResolver && typeof window.ViasaImageResolver.hydrateProductsMedia === 'function') {
+                window.ViasaImageResolver.hydrateProductsMedia(this.productos).then(() => {
+                    if (this.currentView === 'pos') this.renderPOSProducts();
+                }).catch(() => {});
+            }
         },
 
         async cargarMateriaPrima() {
@@ -1946,6 +2021,36 @@
                     if (dashSyncText) dashSyncText.textContent = 'En Caché';
                 }
             }
+        },
+
+        actualizarIndicadorSyncOK(mensajeHora) {
+            const syncMainStatus = document.getElementById('dash-widget-sync-main');
+            const statusText = document.getElementById('viasa-network-status-text');
+            const statusIcon = document.getElementById('viasa-network-status-icon');
+            const statusPill = document.getElementById('viasa-network-status-pill');
+            const dashSyncBadge = document.getElementById('dash-rates-sync-badge');
+            const dashSyncText = document.getElementById('dash-rates-sync-text');
+            const dashSyncIcon = document.getElementById('dash-rates-sync-icon');
+
+            const hora = mensajeHora || new Date().toLocaleTimeString('es-VE', { hour: '2-digit', minute: '2-digit', hour12: true });
+
+            if (syncMainStatus) {
+                syncMainStatus.textContent = 'OK';
+                syncMainStatus.style.color = '#1E3A8A';
+            }
+            if (statusText) statusText.textContent = hora;
+            if (statusIcon) statusIcon.className = 'fa-solid fa-cloud-arrow-up';
+            if (statusPill) {
+                statusPill.classList.remove('offline', 'syncing', 'warning');
+                statusPill.classList.add('online');
+                statusPill.title = `Base de Datos y Catálogos Sincronizados Permanentemente (Última actualización: ${hora})`;
+            }
+            if (dashSyncBadge) {
+                dashSyncBadge.classList.remove('offline', 'syncing', 'warning');
+                dashSyncBadge.classList.add('online');
+            }
+            if (dashSyncIcon) dashSyncIcon.className = 'fa-solid fa-cloud-arrow-up';
+            if (dashSyncText) dashSyncText.textContent = `Sincronizado ${hora}`;
         },
 
         async sincronizarTasasEnTiempoReal(manual = false) {
@@ -3521,12 +3626,44 @@
                 this.productos.unshift(prodObj);
             }
 
-            // 1. Guardar en Storage permanente
+            // 1. Guardar en Storage permanente y memoria
             await window.ViasaStorage.guardarRegistro('productos', prodObj);
 
+            // 1b. Guardar sincrónicamente y de forma atómica en viasa_productos_master_v1 y viasa_productos_nueva_viasa_v1
+            try {
+                const masterPayload = JSON.stringify({
+                    version: 1,
+                    actualizado: new Date().toISOString(),
+                    productos: this.productos
+                });
+                localStorage.setItem('viasa_productos_master_v1', masterPayload);
+                localStorage.setItem('viasa_productos_nueva_viasa_v1', masterPayload);
+            } catch (eSyncLS) {
+                console.warn('[POS Master Sync] Advertencia en localStorage:', eSyncLS);
+            }
+
             // 2. Sincronizar con Productos Nueva Viasa Engine si existe
-            if (window.ViasaProductosExclusivosEngine && typeof window.ViasaProductosExclusivosEngine.sincronizarConPOS === 'function') {
-                window.ViasaProductosExclusivosEngine.sincronizarConPOS(prodObj);
+            if (window.ViasaProductosExclusivosEngine) {
+                if (typeof window.ViasaProductosExclusivosEngine.sincronizarConPOS === 'function') {
+                    window.ViasaProductosExclusivosEngine.sincronizarConPOS(prodObj);
+                }
+                if (typeof window.ViasaProductosExclusivosEngine.guardar === 'function') {
+                    window.ViasaProductosExclusivosEngine.guardar();
+                }
+            }
+
+            // 2b. Guardar medios en IndexedDB (VIASA_MEDIA_DB_v1) si hay imagen
+            if (window.ViasaMediaStorage && (prodObj.imagen || prodObj.fotoUrl)) {
+                window.ViasaMediaStorage.guardarArchivo({
+                    categoria: 'imagenes_productos',
+                    nombre: window.ViasaMediaStorage.generarNombreArchivo({
+                        categoria: 'imagenes_productos',
+                        sku: prodObj.sku,
+                        nombre: prodObj.nombre
+                    }),
+                    data: prodObj.imagen || prodObj.fotoUrl,
+                    tipo: 'image/png'
+                }).catch(() => {});
             }
 
             // 3. Si el destino incluye Cafetín Viasa o Todos, sincronizar con platosCafetin
@@ -3548,10 +3685,16 @@
                 }
             }
 
+            // 4. Actualizar de inmediato el indicador superior de SYNK OK
+            this.actualizarIndicadorSyncOK();
+            if (typeof window.ViasaActualizarSyncOK === 'function') {
+                window.ViasaActualizarSyncOK();
+            }
+
             this.cerrarModalPOSAgregarProductoRubro();
             this.renderPOSProducts();
             if (window.ViasaAudio) window.ViasaAudio.playCashChime();
-            this.mostrarNotificacionToast(`✅ Producto "${nombre}" guardado exitosamente en el Punto de Venta`, 'success');
+            this.mostrarNotificacionToast('✅ Producto guardado permanentemente en la base de datos de VIASA System', 'success');
         },
 
         async guardarNuevoRubroPOS(e) {
@@ -3622,6 +3765,17 @@
             this.productos = this.productos.filter(x => x.id !== productoId);
             await window.ViasaStorage.eliminarRegistro('productos', productoId);
 
+            // Sincronizar atómicamente en viasa_productos_master_v1 y viasa_productos_nueva_viasa_v1
+            try {
+                const masterPayload = JSON.stringify({
+                    version: 1,
+                    actualizado: new Date().toISOString(),
+                    productos: this.productos
+                });
+                localStorage.setItem('viasa_productos_master_v1', masterPayload);
+                localStorage.setItem('viasa_productos_nueva_viasa_v1', masterPayload);
+            } catch (eSyncLS) {}
+
             // Eliminar del carrito si estaba agregado
             if (Array.isArray(this.cart)) {
                 this.cart = this.cart.filter(item => item.id !== productoId);
@@ -3629,13 +3783,27 @@
             }
 
             // Sincronizar con Productos Nueva Viasa Engine
-            if (window.ViasaProductosExclusivosEngine && typeof window.ViasaProductosExclusivosEngine.sincronizarConPOS === 'function') {
-                window.ViasaProductosExclusivosEngine.sincronizarConPOS(p, true);
+            if (window.ViasaProductosExclusivosEngine) {
+                if (typeof window.ViasaProductosExclusivosEngine.sincronizarConPOS === 'function') {
+                    window.ViasaProductosExclusivosEngine.sincronizarConPOS(p, true);
+                }
+                if (Array.isArray(window.ViasaProductosExclusivosEngine.productos)) {
+                    window.ViasaProductosExclusivosEngine.productos = window.ViasaProductosExclusivosEngine.productos.filter(x => x.id !== productoId && x.sku !== p.sku);
+                    if (typeof window.ViasaProductosExclusivosEngine.guardar === 'function') {
+                        window.ViasaProductosExclusivosEngine.guardar();
+                    }
+                }
+            }
+
+            // Actualizar de inmediato el indicador superior de SYNK OK
+            this.actualizarIndicadorSyncOK();
+            if (typeof window.ViasaActualizarSyncOK === 'function') {
+                window.ViasaActualizarSyncOK();
             }
 
             this.renderPOSProducts();
             if (window.ViasaAudio) window.ViasaAudio.playClick();
-            this.mostrarNotificacionToast(`🗑️ Producto "${p.nombre}" eliminado del Punto de Venta.`, 'info');
+            this.mostrarNotificacionToast(`🗑️ Producto "${p.nombre}" eliminado permanentemente.`, 'info');
         },
 
         abrirModalPOSEditarRubro(rubroId = null) {
@@ -3768,11 +3936,35 @@
             const p = this.productos.find(x => x.id === prodId);
             if (!p) return;
             await window.ViasaStorage.guardarRegistro('productos', p);
-            if (window.ViasaProductosExclusivosEngine && typeof window.ViasaProductosExclusivosEngine.sincronizarConPOS === 'function') {
-                window.ViasaProductosExclusivosEngine.sincronizarConPOS(p);
+
+            // Sincronizar atómicamente en viasa_productos_master_v1 y viasa_productos_nueva_viasa_v1
+            try {
+                const masterPayload = JSON.stringify({
+                    version: 1,
+                    actualizado: new Date().toISOString(),
+                    productos: this.productos
+                });
+                localStorage.setItem('viasa_productos_master_v1', masterPayload);
+                localStorage.setItem('viasa_productos_nueva_viasa_v1', masterPayload);
+            } catch (eSyncLS) {}
+
+            if (window.ViasaProductosExclusivosEngine) {
+                if (typeof window.ViasaProductosExclusivosEngine.sincronizarConPOS === 'function') {
+                    window.ViasaProductosExclusivosEngine.sincronizarConPOS(p);
+                }
+                if (typeof window.ViasaProductosExclusivosEngine.guardar === 'function') {
+                    window.ViasaProductosExclusivosEngine.guardar();
+                }
             }
+
+            // Actualizar de inmediato el indicador superior de SYNK OK
+            this.actualizarIndicadorSyncOK();
+            if (typeof window.ViasaActualizarSyncOK === 'function') {
+                window.ViasaActualizarSyncOK();
+            }
+
             if (window.ViasaAudio) window.ViasaAudio.playCashChime();
-            this.mostrarNotificacionToast(`✅ Producto "${p.nombre}" actualizado correctamente.`, 'success');
+            this.mostrarNotificacionToast('✅ Producto guardado permanentemente en la base de datos de VIASA System', 'success');
         },
 
         async guardarCambiosRubroPOS() {
@@ -3814,10 +4006,32 @@
                 }
             }
 
+            // Sincronizar atómicamente en viasa_productos_master_v1 y viasa_productos_nueva_viasa_v1
+            try {
+                const masterPayload = JSON.stringify({
+                    version: 1,
+                    actualizado: new Date().toISOString(),
+                    productos: this.productos
+                });
+                localStorage.setItem('viasa_productos_master_v1', masterPayload);
+                localStorage.setItem('viasa_productos_nueva_viasa_v1', masterPayload);
+            } catch (eSyncLS) {}
+
+            if (window.ViasaProductosExclusivosEngine && typeof window.ViasaProductosExclusivosEngine.guardar === 'function') {
+                window.ViasaProductosExclusivosEngine.guardar();
+            }
+
+            // Actualizar de inmediato el indicador superior de SYNK OK
+            this.actualizarIndicadorSyncOK();
+            if (typeof window.ViasaActualizarSyncOK === 'function') {
+                window.ViasaActualizarSyncOK();
+            }
+
             this.cerrarModalPOSEditarRubro();
             this.renderPOSCategories();
             this.renderPOSProducts();
             if (window.ViasaAudio) window.ViasaAudio.playCashChime();
+            this.mostrarNotificacionToast('✅ Rubro y productos actualizados correctamente en el Punto de Venta', 'success');
             this.mostrarNotificacionToast('✅ Rubro y productos actualizados correctamente en el Punto de Venta', 'success');
         },
 
@@ -19444,7 +19658,12 @@
             }
         },
 
-        cerrarSesionDesdeBloqueo() {
+        async cerrarSesionDesdeBloqueo() {
+            try {
+                await this.sincronizarEstadoGeneralEnStorage();
+            } catch (eFlush) {
+                console.warn('[Cerrar Sesión Bloqueo] Advertencia en volcado de estado:', eFlush);
+            }
             const lockModal = document.getElementById('modal-lock-screen');
             if (lockModal) {
                 lockModal.classList.add('hidden');
@@ -19468,8 +19687,9 @@
         async sincronizarEstadoGeneralEnStorage() {
             const mapaColeccionesEnMemoria = [
                 ['productos', this.productos],
+                ['categorias', this.categorias],
                 ['materia_prima', this.materiaPrima],
-                ['recetas_formulas', this.recetas],
+                ['recetas_formulas', this.recetasFormulas || this.recetas],
                 ['ordenes_produccion', this.ordenesProduccion],
                 ['mermas', this.mermas],
                 ['proveedores', this.proveedores],
@@ -19505,7 +19725,9 @@
                 ['mensajes_correo_crm', this.mensajesCorreoCRM],
                 ['plantillas_correo', this.plantillasCorreo],
                 ['banco_memoria_contabilidad_nomina', this.bancoMemoriaContabilidadNomina],
-                ['calculos_nomina', this.historialCalculosNomina]
+                ['calculos_nomina', this.historialCalculosNomina],
+                ['guardias_turnos', this.guardiasTurnos || this.guardias],
+                ['agenda_operaciones', this.agendaOperaciones || this.agenda]
             ];
 
             for (const [storeName, arr] of mapaColeccionesEnMemoria) {
@@ -19514,9 +19736,35 @@
                 }
             }
 
+            // Volcado atómico a viasa_productos_master_v1 y motor exclusivo
+            if (Array.isArray(this.productos) && this.productos.length > 0) {
+                try {
+                    const masterPayload = JSON.stringify({
+                        version: 1,
+                        actualizado: new Date().toISOString(),
+                        productos: this.productos
+                    });
+                    localStorage.setItem('viasa_productos_master_v1', masterPayload);
+                    localStorage.setItem('viasa_productos_nueva_viasa_v1', masterPayload);
+                } catch (eSyncLS) {}
+            }
+
+            if (window.ViasaProductosExclusivosEngine && typeof window.ViasaProductosExclusivosEngine.guardar === 'function') {
+                try {
+                    window.ViasaProductosExclusivosEngine.guardar();
+                } catch (ePnvG) {}
+            }
+
             if (this.tasaBCV) window.ViasaStorage.setItem('tasa_bcv', this.tasaBCV);
             if (this.tasaParalelo) window.ViasaStorage.setItem('tasa_paralelo', this.tasaParalelo);
             if (this.tasaCOP) window.ViasaStorage.setItem('tasa_cop', this.tasaCOP);
+
+            // Actualizar indicador superior SYNK OK
+            this.actualizarIndicadorSyncOK();
+            if (typeof window.ViasaActualizarSyncOK === 'function') {
+                window.ViasaActualizarSyncOK();
+            }
+
             return true;
         },
 
@@ -19656,8 +19904,17 @@
                             <button type="button" class="btn-secondary" onclick="window.ViasaMediaStorage && window.ViasaMediaStorage.sincronizarConCarpetaLocal()" style="padding: 11px 16px; font-size: 0.82rem; font-weight: 800; display: flex; align-items: center; gap: 8px; border-color: #f59e0b; color: #fbbf24; cursor: pointer; margin: 0;" title="Sincronizar y respaldar todas las imágenes y códigos en las 4 carpetas locales de la laptop (/VIASA_System_Data/)">
                                 <i class="fa-solid fa-folder-tree"></i> 📂 Sincronizar Carpetas Laptop
                             </button>
+
+                            <button type="button" class="btn-secondary" onclick="ViasaApp.descargarCopiaSeguridadCompletaJSON()" style="padding: 11px 16px; font-size: 0.82rem; font-weight: 800; display: flex; align-items: center; gap: 8px; border-color: #10b981; color: #34d399; cursor: pointer; margin: 0;" title="Descargar un archivo JSON fechado y firmado con toda la base de datos completa">
+                                <i class="fa-solid fa-download"></i> ⬇️ Descargar Copia de Seguridad Completa (.JSON)
+                            </button>
+
+                            <label for="input-restaurar-copia-seguridad" class="btn-secondary" style="padding: 11px 16px; font-size: 0.82rem; font-weight: 800; display: flex; align-items: center; gap: 8px; border-color: #38bdf8; color: #7dd3fc; cursor: pointer; margin: 0;" title="Reconstruir el catálogo y la base de datos desde un archivo .JSON">
+                                <i class="fa-solid fa-upload"></i> ⬆️ Restaurar Copia de Seguridad
+                            </label>
+                            <input type="file" id="input-restaurar-copia-seguridad" accept=".json,application/json" style="display: none;" onchange="ViasaApp.restaurarCopiaSeguridadDesdeArchivo(event)">
                             
-                            <label for="input-importar-respaldo-casillero" class="btn-secondary" style="padding: 11px 16px; font-size: 0.82rem; font-weight: 800; display: flex; align-items: center; gap: 8px; border-color: #38bdf8; color: #7dd3fc; cursor: pointer; margin: 0;">
+                            <label for="input-importar-respaldo-casillero" class="btn-secondary" style="padding: 11px 16px; font-size: 0.82rem; font-weight: 800; display: flex; align-items: center; gap: 8px; border-color: #a855f7; color: #d8b4fe; cursor: pointer; margin: 0;">
                                 <i class="fa-solid fa-file-import"></i> Importar Archivo (.JSON) al Casillero
                             </label>
                             <input type="file" id="input-importar-respaldo-casillero" accept=".json,application/json" style="display: none;" onchange="ViasaApp.importarArchivoRespaldoExterno(event)">
@@ -20051,6 +20308,60 @@
                     this.mostrarNotificacionToast(`✅ Archivo ${nuevo.nombreArchivo} importado y guardado en el Casillero (${nuevo.id}).`, 'success');
                 } catch (err) {
                     alert('⚠️ Error al leer el archivo JSON de respaldo: ' + (err.message || err));
+                } finally {
+                    event.target.value = '';
+                }
+            };
+            reader.readAsText(file);
+        },
+
+        async descargarCopiaSeguridadCompletaJSON() {
+            if (!window.ViasaAuth.canManageBackups()) {
+                alert('⛔ Acción restringida: Exclusivo para Master Senior, Gerente General y Gerente Administrativa.');
+                return;
+            }
+            try {
+                await this.sincronizarEstadoGeneralEnStorage();
+                const backup = await window.ViasaStorage.exportarBackupCompleto();
+                const fecha = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+                const nombreArchivo = `VIASA_BACKUP_COMPLETO_${fecha}.json`;
+                await window.ViasaStorage.descargarBackupArchivo(backup, nombreArchivo);
+                if (window.ViasaAudio) window.ViasaAudio.playCashChime();
+                this.mostrarNotificacionToast(`⬇️ Copia de seguridad completa descargada (${nombreArchivo}).`, 'success');
+            } catch (err) {
+                console.error('[Backup Download Error]', err);
+                alert('⚠️ Error al descargar copia de seguridad: ' + (err.message || err));
+            }
+        },
+
+        async restaurarCopiaSeguridadDesdeArchivo(event) {
+            if (!window.ViasaAuth.canManageBackups()) {
+                alert('⛔ Acción restringida: Exclusivo para Master Senior, Gerente General y Gerente Administrativa.');
+                return;
+            }
+            const file = event?.target?.files?.[0];
+            if (!file) return;
+
+            const confirmar = confirm(`⚠️ CONFIRMACIÓN DE RESTAURACIÓN COMPLETA\n\n¿Desea restaurar la base de datos de VIASA System desde el archivo "${file.name}"?\n\nEsta acción reconstruirá todo el catálogo de productos y registros sin pérdidas.`);
+            if (!confirmar) {
+                event.target.value = '';
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = async (e) => {
+                try {
+                    const json = JSON.parse(e.target.result);
+                    if (!json || (!json.colecciones && !json.viasa_productos_master_v1 && !json.productos)) {
+                        alert('⚠️ El archivo seleccionado no contiene una copia de seguridad estructurada de VIASA System.');
+                        return;
+                    }
+                    await window.ViasaStorage.restaurarBackup(json);
+                    if (window.ViasaAudio) window.ViasaAudio.playCashChime();
+                    alert(`✅ ¡Copia de seguridad restaurada exitosamente desde "${file.name}"!\n\nEl sistema se recargará para reflejar todos los productos y datos actualizados.`);
+                    window.location.reload();
+                } catch (err) {
+                    alert('⚠️ Error al procesar el archivo de copia de seguridad: ' + (err.message || err));
                 } finally {
                     event.target.value = '';
                 }
@@ -30498,6 +30809,7 @@
     };
 
     window.ViasaApp = ViasaApp;
+    window.ViasaActualizarSyncOK = (hora) => window.ViasaApp && window.ViasaApp.actualizarIndicadorSyncOK(hora);
 
     document.addEventListener('DOMContentLoaded', () => {
         ViasaApp.init();
