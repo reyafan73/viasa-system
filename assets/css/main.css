@@ -13708,27 +13708,81 @@ p, span, label, div {
 
 /* --- 2. BARRA LATERAL IZQUIERDA (SIDEBAR ESPRESSO PRESTIGE) --- */
 .app-sidebar {
+    width: 275px !important;
+    min-width: 275px !important;
     background-color: var(--brand-espresso) !important;
     background: var(--brand-espresso) !important;
     border-right: 1px solid rgba(226, 217, 200, 0.16) !important;
     color: #D6C7B2 !important;
     box-shadow: 4px 0 20px rgba(44, 26, 18, 0.15) !important;
+    box-sizing: border-box !important;
 }
 
 .brand-header {
+    display: flex !important;
+    align-items: center !important;
+    gap: 14px !important;
+    padding: 14px 10px 18px 10px !important;
     border-bottom: 1px solid rgba(226, 217, 200, 0.16) !important;
 }
 
+.brand-logo-badge {
+    width: 72px !important;
+    height: 72px !important;
+    min-width: 72px !important;
+    min-height: 72px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 50% !important;
+}
+
+.brand-logo-badge img,
+.brand-logo-img-large {
+    width: 72px !important;
+    height: 72px !important;
+    min-width: 72px !important;
+    min-height: 72px !important;
+    object-fit: cover !important;
+    border-radius: 50% !important;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45) !important;
+    border: 2px solid rgba(229, 169, 60, 0.5) !important;
+    background: #1C1410 !important;
+    transition: transform 0.3s ease !important;
+}
+
+.brand-logo-badge img:hover,
+.brand-logo-img-large:hover {
+    transform: scale(1.05) !important;
+    border-color: #F59E0B !important;
+}
+
+.brand-info {
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    overflow: hidden !important;
+}
+
 .brand-title {
+    font-family: var(--font-heading) !important;
+    font-size: 1.42rem !important;
+    font-weight: 900 !important;
+    letter-spacing: 0.6px !important;
     color: #E5A93C !important;
-    font-weight: 800 !important;
-    letter-spacing: 0.5px !important;
+    line-height: 1.15 !important;
+    margin: 0 !important;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4) !important;
 }
 
 .brand-subtitle {
     color: #D6C7B2 !important;
-    font-size: 0.65rem !important;
-    font-weight: 600 !important;
+    font-size: 0.68rem !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.8px !important;
+    line-height: 1.25 !important;
+    text-transform: uppercase !important;
+    margin-top: 4px !important;
 }
 
 .nav-menu {
@@ -15177,209 +15231,562 @@ table tr:hover td,
     user-select: none;
 }
 
-/* Widget 1: Reloj Digital Operativo */
+/* ==============================================================
+   WIDGET 1: RELOJ EJECUTIVO MULTI-ESTILO (4 DISEÑOS SELECCIONABLES)
+   ============================================================== */
 .dash-widget-card.widget-clock {
-    width: 160px !important;
-    background: #1C1410 !important;
-    border: 1px solid rgba(200, 138, 43, 0.45) !important;
-    box-shadow: 0 2px 8px rgba(28, 20, 16, 0.25) !important;
-}
-
-.dash-clock-top {
+    width: 190px !important;
+    height: 78px !important;
+    position: relative !important;
+    overflow: hidden !important;
+    border-radius: 10px !important;
+    padding: 6px 10px !important;
     display: flex !important;
+    flex-direction: column !important;
     justify-content: space-between !important;
-    align-items: center !important;
-    font-size: 10px !important;
+    box-sizing: border-box !important;
+    transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease !important;
+}
+
+/* Botón Interactivo para Alternar Diseños */
+.clock-design-switcher-btn {
+    position: absolute !important;
+    top: 5px !important;
+    right: 6px !important;
+    z-index: 10 !important;
+    padding: 2px 6px !important;
+    font-size: 8px !important;
     font-weight: 800 !important;
-    color: #F59E0B !important;
+    border-radius: 4px !important;
+    cursor: pointer !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 3px !important;
+    line-height: 1.1 !important;
+    letter-spacing: 0.4px !important;
     text-transform: uppercase !important;
-    letter-spacing: 0.6px !important;
-}
-
-.dash-clock-day {
-    color: #F59E0B !important;
-}
-
-.dash-clock-ampm {
+    transition: all 0.2s ease !important;
+    border: 1px solid rgba(200, 138, 43, 0.4) !important;
+    background: rgba(0, 0, 0, 0.25) !important;
     color: #E5A93C !important;
 }
 
-.dash-clock-digits {
-    font-family: 'Courier New', monospace, 'Inter', sans-serif !important;
-    font-size: 1.32rem !important;
-    font-weight: 900 !important;
-    color: #F59E0B !important;
-    letter-spacing: 1.2px !important;
-    line-height: 1 !important;
-    text-shadow: 0 0 10px rgba(245, 158, 11, 0.4) !important;
-    text-align: center !important;
+.clock-design-switcher-btn:hover {
+    background: #C88A2B !important;
+    color: #FFFFFF !important;
+    border-color: #F59E0B !important;
+    transform: scale(1.05) !important;
 }
 
-.dash-clock-bottom {
+/* Vista Digital (Diseños 1, 2 y 3) */
+.clock-digital-view {
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    height: 100% !important;
+    width: 100% !important;
+}
+
+.clock-day-row {
     display: flex !important;
     align-items: center !important;
     justify-content: space-between !important;
-    font-size: 9px !important;
+    padding-right: 48px !important;
+    font-size: 9.5px !important;
     font-weight: 800 !important;
-    color: #D6C7B2 !important;
+    letter-spacing: 0.8px !important;
+    text-transform: uppercase !important;
+    line-height: 1.1 !important;
+}
+
+.clock-full-day {
+    font-weight: 900 !important;
+}
+
+.clock-shift-pill {
+    font-size: 7.5px !important;
+    font-weight: 800 !important;
+    padding: 1px 4px !important;
+    border-radius: 3px !important;
     letter-spacing: 0.4px !important;
 }
 
-.dash-clock-shift-tag {
-    font-size: 8.5px !important;
+.clock-time-display {
+    display: flex !important;
+    align-items: baseline !important;
+    justify-content: center !important;
+    gap: 5px !important;
+    margin: 1px 0 !important;
+}
+
+.clock-digits-main {
+    font-family: 'Courier New', monospace, 'Inter', sans-serif !important;
+    font-size: 1.32rem !important;
+    font-weight: 900 !important;
+    letter-spacing: 1px !important;
+    line-height: 1 !important;
+}
+
+.clock-ampm-tag {
+    font-size: 9px !important;
+    font-weight: 800 !important;
+    text-transform: uppercase !important;
+}
+
+.clock-date-row {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 4px !important;
+    font-size: 8.8px !important;
+    font-weight: 800 !important;
+    letter-spacing: 0.5px !important;
+    text-transform: uppercase !important;
+}
+
+.clock-date-ico {
+    font-size: 8px !important;
+    opacity: 0.85 !important;
+}
+
+/* --- TEMA 1: Espresso & Oro Clásico (Default) --- */
+.widget-clock.theme-design-1 {
+    background: #1C1410 !important;
+    border: 1px solid rgba(200, 138, 43, 0.45) !important;
+    box-shadow: 0 2px 8px rgba(28, 20, 16, 0.35) !important;
+}
+.widget-clock.theme-design-1 .clock-full-day {
+    color: #E5A93C !important;
+}
+.widget-clock.theme-design-1 .clock-shift-pill {
+    background: rgba(245, 158, 11, 0.15) !important;
+    color: #F59E0B !important;
+}
+.widget-clock.theme-design-1 .clock-digits-main {
+    color: #F59E0B !important;
+    text-shadow: 0 0 10px rgba(245, 158, 11, 0.4) !important;
+}
+.widget-clock.theme-design-1 .clock-ampm-tag {
+    color: #FCD34D !important;
+}
+.widget-clock.theme-design-1 .clock-date-row {
+    color: #D6C7B2 !important;
+}
+.widget-clock.theme-design-1 .clock-design-switcher-btn {
+    background: rgba(44, 26, 18, 0.8) !important;
+    border-color: rgba(200, 138, 43, 0.45) !important;
+    color: #E5A93C !important;
+}
+
+/* --- TEMA 2: Prestige Light (Gourmet / Corporativo Claro) --- */
+.widget-clock.theme-design-2 {
+    background: linear-gradient(180deg, #FFFFFF 0%, #F5EFE6 100%) !important;
+    border: 1px solid #C88A2B !important;
+    box-shadow: 0 2px 8px rgba(44, 26, 18, 0.08) !important;
+}
+.widget-clock.theme-design-2 .clock-full-day {
+    color: #8C5A32 !important;
+}
+.widget-clock.theme-design-2 .clock-shift-pill {
+    background: #EFE6D8 !important;
+    color: #8C5A32 !important;
+}
+.widget-clock.theme-design-2 .clock-digits-main {
+    color: #2C1A12 !important;
+    text-shadow: none !important;
+}
+.widget-clock.theme-design-2 .clock-ampm-tag {
+    color: #C88A2B !important;
+}
+.widget-clock.theme-design-2 .clock-date-row {
+    color: #5C3A21 !important;
+}
+.widget-clock.theme-design-2 .clock-date-ico {
+    color: #C88A2B !important;
+}
+.widget-clock.theme-design-2 .clock-design-switcher-btn {
+    background: #EFE6D8 !important;
+    border-color: #C88A2B !important;
+    color: #2C1A12 !important;
+}
+.widget-clock.theme-design-2 .clock-design-switcher-btn:hover {
+    background: #C88A2B !important;
+    color: #FFFFFF !important;
+}
+
+/* --- TEMA 3: Digital Moderno / Minimalista Tech --- */
+.widget-clock.theme-design-3 {
+    background: linear-gradient(135deg, #0B1120 0%, #0F172A 100%) !important;
+    border: 1px solid rgba(56, 189, 248, 0.45) !important;
+    box-shadow: 0 2px 10px rgba(15, 23, 42, 0.6), inset 0 0 12px rgba(56, 189, 248, 0.06) !important;
+}
+.widget-clock.theme-design-3 .clock-full-day {
+    color: #38BDF8 !important;
+}
+.widget-clock.theme-design-3 .clock-shift-pill {
+    background: rgba(56, 189, 248, 0.15) !important;
+    color: #38BDF8 !important;
+}
+.widget-clock.theme-design-3 .clock-digits-main {
+    color: #E0F2FE !important;
+    text-shadow: 0 0 10px rgba(56, 189, 248, 0.6) !important;
+}
+.widget-clock.theme-design-3 .clock-ampm-tag {
+    color: #38BDF8 !important;
+}
+.widget-clock.theme-design-3 .clock-date-row {
+    color: #94A3B8 !important;
+}
+.widget-clock.theme-design-3 .clock-date-ico {
+    color: #38BDF8 !important;
+}
+.widget-clock.theme-design-3 .clock-design-switcher-btn {
+    background: rgba(30, 41, 59, 0.8) !important;
+    border-color: rgba(56, 189, 248, 0.5) !important;
+    color: #38BDF8 !important;
+}
+.widget-clock.theme-design-3 .clock-design-switcher-btn:hover {
+    background: #38BDF8 !important;
+    color: #0F172A !important;
+}
+
+/* --- TEMA 4: Análogo Clásico Ejecutivo + Digital --- */
+.widget-clock.theme-design-4 {
+    background: linear-gradient(135deg, #1C1410 0%, #2A1D15 100%) !important;
+    border: 1px solid #C88A2B !important;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.35) !important;
+}
+.widget-clock.theme-design-4 .clock-digital-view {
+    display: none !important;
+}
+.widget-clock.theme-design-4 .clock-analog-view {
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    height: 100% !important;
+    width: 100% !important;
+}
+.widget-clock.theme-design-4 .clock-design-switcher-btn {
+    background: rgba(44, 26, 18, 0.85) !important;
+    border-color: #C88A2B !important;
+    color: #E5A93C !important;
+}
+.analog-dial-box {
+    width: 62px !important;
+    height: 62px !important;
+    flex-shrink: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+.analog-clock-svg {
+    width: 62px !important;
+    height: 62px !important;
+}
+.analog-clock-svg .dial-face {
+    fill: #140E0A;
+    stroke: #C88A2B;
+    stroke-width: 2.5;
+}
+.analog-clock-svg .dial-inner {
+    fill: #1F1610;
+    stroke: rgba(200, 138, 43, 0.25);
+    stroke-width: 1;
+}
+.analog-clock-svg .dial-mark {
+    stroke: #E5A93C;
+    stroke-width: 2;
+    stroke-linecap: round;
+}
+.analog-clock-svg .hand {
+    stroke-linecap: round;
+    transform-origin: 50px 50px;
+}
+.analog-clock-svg .hour-hand {
+    stroke: #F59E0B;
+    stroke-width: 3.5;
+}
+.analog-clock-svg .min-hand {
+    stroke: #E5A93C;
+    stroke-width: 2.5;
+}
+.analog-clock-svg .sec-hand {
+    stroke: #EF4444;
+    stroke-width: 1.5;
+}
+.analog-clock-svg .dial-center-pin {
+    fill: #EF4444;
+    stroke: #FFFFFF;
+    stroke-width: 1;
+}
+.analog-info-box {
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    gap: 2px !important;
+    overflow: hidden !important;
+}
+.analog-day-text {
+    font-size: 9px !important;
     font-weight: 800 !important;
     color: #E5A93C !important;
     letter-spacing: 0.6px !important;
+    text-transform: uppercase !important;
+}
+.analog-time-text {
+    font-family: monospace, sans-serif !important;
+    font-size: 11px !important;
+    font-weight: 800 !important;
+    color: #FFFFFF !important;
+    letter-spacing: 0.5px !important;
+}
+.analog-date-text {
+    font-size: 8.5px !important;
+    font-weight: 700 !important;
+    color: #D6C7B2 !important;
+    letter-spacing: 0.4px !important;
+    text-transform: uppercase !important;
 }
 
-/* Widget 2: Viasa Voice */
+/* ==============================================================
+   WIDGET 2: BOTÓN INTERACTIVO VIASA VOICE CON ARTE HOLOGRÁFICO
+   ============================================================== */
 .dash-widget-card.widget-voice {
-    width: 130px !important;
-    background: linear-gradient(135deg, #0B253A 0%, #064E3B 100%) !important;
-    border: 1px solid rgba(16, 185, 129, 0.4) !important;
-    box-shadow: 0 2px 8px rgba(6, 78, 59, 0.25) !important;
+    width: 135px !important;
+    height: 78px !important;
+    position: relative !important;
+    overflow: hidden !important;
+    border-radius: 10px !important;
+    border: 1px solid rgba(52, 211, 153, 0.45) !important;
+    box-shadow: 0 2px 8px rgba(6, 78, 59, 0.3) !important;
     cursor: pointer !important;
+    padding: 6px 10px !important;
     transition: all 0.25s ease !important;
+    background: #062820 !important;
+    box-sizing: border-box !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
 }
 
 .dash-widget-card.widget-voice:hover {
     border-color: #34D399 !important;
-    box-shadow: 0 3px 12px rgba(16, 185, 129, 0.4) !important;
+    box-shadow: 0 4px 14px rgba(16, 185, 129, 0.45) !important;
     transform: translateY(-1px) !important;
 }
 
-.voice-wave-anim-box {
+.voice-art-bg-img {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    object-position: center !important;
+    z-index: 1 !important;
+    pointer-events: none !important;
+    opacity: 0.88 !important;
+    transition: transform 0.4s ease, opacity 0.3s ease !important;
+}
+
+.dash-widget-card.widget-voice:hover .voice-art-bg-img {
+    transform: scale(1.04) !important;
+    opacity: 0.98 !important;
+}
+
+.voice-art-gradient-overlay {
+    position: absolute !important;
+    inset: 0 !important;
+    background: linear-gradient(180deg, rgba(11, 23, 39, 0.6) 0%, rgba(6, 78, 59, 0.65) 100%) !important;
+    z-index: 2 !important;
+    pointer-events: none !important;
+}
+
+.voice-card-top-header {
+    position: relative !important;
+    z-index: 3 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+}
+
+.voice-brand-title {
+    font-size: 11px !important;
+    font-weight: 900 !important;
+    color: #FFFFFF !important;
+    letter-spacing: 0.8px !important;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.85) !important;
+}
+
+.voice-hdr-mic-ico {
+    font-size: 11px !important;
+    color: #34D399 !important;
+    text-shadow: 0 0 6px rgba(52, 211, 153, 0.7) !important;
+}
+
+.voice-card-bottom-bar {
+    position: relative !important;
+    z-index: 3 !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    gap: 3px !important;
-    height: 18px !important;
 }
 
-.vwave-bar {
-    width: 3px !important;
-    height: 10px !important;
-    background: #34D399 !important;
-    border-radius: 2px !important;
-    transition: height 0.2s ease !important;
+.voice-status-salvia-pill {
+    background: rgba(6, 78, 59, 0.88) !important;
+    border: 1px solid rgba(52, 211, 153, 0.6) !important;
+    padding: 2px 10px !important;
+    border-radius: 12px !important;
+    font-size: 9.5px !important;
+    font-weight: 800 !important;
+    color: #A7F3D0 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 5px !important;
+    letter-spacing: 0.5px !important;
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.4) !important;
+    backdrop-filter: blur(2px) !important;
+    transition: all 0.25s ease !important;
 }
 
-.voice-icon-glow {
-    color: #34D399 !important;
-    font-size: 13px !important;
-    margin-left: 4px !important;
+.voice-status-dot {
+    width: 6px !important;
+    height: 6px !important;
+    border-radius: 50% !important;
+    background: #10B981 !important;
+    box-shadow: 0 0 6px #10B981 !important;
 }
 
 .widget-voice.listening {
     border-color: #10B981 !important;
-    box-shadow: 0 0 16px rgba(16, 185, 129, 0.5) !important;
+    box-shadow: 0 0 18px rgba(16, 185, 129, 0.6) !important;
     animation: voiceWidgetPulse 1.5s infinite alternate !important;
 }
 
-.widget-voice.listening .vwave-bar.b1 { animation: voiceBar1 0.4s infinite alternate; }
-.widget-voice.listening .vwave-bar.b2 { animation: voiceBar2 0.3s infinite alternate 0.1s; }
-.widget-voice.listening .vwave-bar.b3 { animation: voiceBar3 0.5s infinite alternate 0.2s; }
-.widget-voice.listening .vwave-bar.b4 { animation: voiceBar2 0.35s infinite alternate 0.15s; }
-.widget-voice.listening .vwave-bar.b5 { animation: voiceBar1 0.45s infinite alternate 0.05s; }
+.widget-voice.listening .voice-status-salvia-pill {
+    background: rgba(16, 185, 129, 0.95) !important;
+    color: #FFFFFF !important;
+    border-color: #6EE7B7 !important;
+    box-shadow: 0 0 10px rgba(52, 211, 153, 0.8) !important;
+}
 
-@keyframes voiceBar1 { 0% { height: 4px; } 100% { height: 16px; } }
-@keyframes voiceBar2 { 0% { height: 6px; } 100% { height: 18px; } }
-@keyframes voiceBar3 { 0% { height: 8px; } 100% { height: 20px; } }
+.widget-voice.listening .voice-status-dot {
+    background: #FFFFFF !important;
+    box-shadow: 0 0 8px #FFFFFF !important;
+    animation: voiceDotBlink 0.6s infinite alternate !important;
+}
+
+@keyframes voiceDotBlink {
+    0% { opacity: 0.4; }
+    100% { opacity: 1; }
+}
+
 @keyframes voiceWidgetPulse {
     0% { box-shadow: 0 0 8px rgba(16, 185, 129, 0.3); }
     100% { box-shadow: 0 0 20px rgba(52, 211, 153, 0.65); }
 }
 
-.voice-title-label {
-    font-size: 11px !important;
-    font-weight: 800 !important;
-    color: #FFFFFF !important;
-    text-align: center !important;
-    letter-spacing: 0.5px !important;
-}
-
-.voice-status-pill {
-    font-size: 9px !important;
-    font-weight: 700 !important;
-    color: #6EE7B7 !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    gap: 4px !important;
-}
-
-.voice-pulse-dot {
-    width: 6px !important;
-    height: 6px !important;
-    border-radius: 50% !important;
-    background: #10B981 !important;
-}
-
-.widget-voice.listening .voice-pulse-dot {
-    background: #34D399 !important;
-    box-shadow: 0 0 8px #34D399 !important;
-}
-
-/* Widget 3: Mini-Monitor de Divisas */
+/* ==============================================================
+   WIDGET 3: MONITOR DE DIVISAS CORPORATIVO (PRESTIGE LIGHT)
+   ============================================================== */
+.dash-widget-card.widget-rates-prestige,
 .dash-widget-card.widget-rates {
-    width: 175px !important;
-    background: #1C1410 !important;
-    border: 1px solid rgba(200, 138, 43, 0.45) !important;
-    box-shadow: 0 2px 8px rgba(28, 20, 16, 0.25) !important;
+    width: 180px !important;
+    height: 78px !important;
+    background: #FFFFFF !important;
+    border: 1px solid #E2D9C8 !important;
+    border-top: 3px solid #C88A2B !important;
+    border-radius: 10px !important;
+    box-shadow: 0 2px 8px rgba(44, 26, 18, 0.05) !important;
     cursor: pointer !important;
+    padding: 6px 11px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    box-sizing: border-box !important;
     transition: all 0.2s ease !important;
 }
 
+.dash-widget-card.widget-rates-prestige:hover,
 .dash-widget-card.widget-rates:hover {
-    border-color: #F59E0B !important;
+    border-color: #C88A2B !important;
+    box-shadow: 0 4px 14px rgba(200, 138, 43, 0.16) !important;
     transform: translateY(-1px) !important;
 }
 
+.rates-prestige-header,
 .rates-widget-header {
-    font-size: 9px !important;
-    font-weight: 800 !important;
-    color: #C88A2B !important;
     display: flex !important;
     justify-content: space-between !important;
     align-items: center !important;
-    letter-spacing: 0.5px !important;
+    font-size: 9.5px !important;
+    font-weight: 800 !important;
+    letter-spacing: 0.6px !important;
+    border-bottom: 1px solid rgba(226, 217, 200, 0.6) !important;
+    padding-bottom: 2px !important;
 }
 
+.rates-prestige-title {
+    color: #8C5A32 !important;
+    font-weight: 800 !important;
+    text-transform: uppercase !important;
+}
+
+.rates-prestige-ico {
+    color: #C88A2B !important;
+    font-size: 9.5px !important;
+}
+
+.rates-prestige-row,
 .rates-widget-row {
     display: flex !important;
     justify-content: space-between !important;
     align-items: center !important;
     font-size: 11px !important;
     line-height: 1.2 !important;
+    margin-top: 1px !important;
 }
 
-.rate-currency-tag.bcv {
-    color: #93C5FD !important;
+.rate-corp-badge {
+    font-size: 9.5px !important;
     font-weight: 800 !important;
-    font-size: 10.5px !important;
+    padding: 1px 5px !important;
+    border-radius: 4px !important;
+    letter-spacing: 0.4px !important;
+    line-height: 1.2 !important;
 }
 
-.rate-currency-tag.usdt {
-    color: #FCD34D !important;
-    font-weight: 800 !important;
-    font-size: 10.5px !important;
+.rate-corp-badge.bcv {
+    background: #EFF6FF !important;
+    color: #1D4ED8 !important;
+    border: 1px solid #BFDBFE !important;
 }
 
-.rate-val-text {
-    color: #FFFFFF !important;
-    font-weight: 800 !important;
+.rate-corp-badge.usdt {
+    background: #FEF3C7 !important;
+    color: #B45309 !important;
+    border: 1px solid #FDE68A !important;
+}
+
+.rate-corp-val {
+    font-family: monospace, 'Courier New', sans-serif !important;
     font-size: 11.5px !important;
-    font-family: monospace !important;
+    font-weight: 900 !important;
+    color: #2C1A12 !important;
+    letter-spacing: 0.3px !important;
 }
 
-.rate-trend-arrow.up {
+.rate-trend-arrow-clean {
+    font-size: 8.5px !important;
+    margin-left: 2px !important;
+}
+
+.rate-trend-arrow-clean.up {
     color: #10B981 !important;
-    font-size: 9px !important;
 }
 
-.rate-trend-arrow.down {
+.rate-trend-arrow-clean.down {
     color: #EF4444 !important;
-    font-size: 9px !important;
 }
 
 /* Widget 4: Indicador de Sincronización */

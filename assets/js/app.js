@@ -1708,24 +1708,92 @@
             const dayEl = document.getElementById('dash-widget-clock-day');
             const ampmEl = document.getElementById('dash-widget-clock-ampm');
             const digitsEl = document.getElementById('dash-widget-clock-digits');
-            const dias = ['DOM', 'LUN', 'MAR', 'MIÉ', 'JUE', 'VIE', 'SÁB'];
+            const dateEl = document.getElementById('dash-widget-clock-date');
+
+            // Elementos de la vista analógica clásica (Diseño 4)
+            const analogSec = document.getElementById('analog-sec-hand');
+            const analogMin = document.getElementById('analog-min-hand');
+            const analogHour = document.getElementById('analog-hour-hand');
+            const analogTimeEl = document.getElementById('analog-clock-time');
+            const analogDayEl = document.getElementById('analog-clock-day');
+            const analogDateEl = document.getElementById('analog-clock-date');
+
+            const diasCompletos = ['DOMINGO', 'LUNES', 'MARTES', 'MIÉRCOLES', 'JUEVES', 'VIERNES', 'SÁBADO'];
+            const mesesCompletos = ['ENERO', 'FEBRERO', 'MARZO', 'ABRIL', 'MAYO', 'JUNIO', 'JULIO', 'AGOSTO', 'SEPTIEMBRE', 'OCTUBRE', 'NOVIEMBRE', 'DICIEMBRE'];
+            const mesesCortos = ['ENE', 'FEB', 'MAR', 'ABR', 'MAY', 'JUN', 'JUL', 'AGO', 'SEP', 'OCT', 'NOV', 'DIC'];
+
+            // Cargar y aplicar tema guardado de reloj (1, 2, 3 o 4)
+            const temaGuardado = parseInt(localStorage.getItem('viasa_clock_theme') || '1', 10);
+            this.aplicarDisenoReloj(temaGuardado);
 
             const update = () => {
                 const now = new Date();
+                const hours = now.getHours();
+                const minutes = now.getMinutes();
+                const seconds = now.getSeconds();
+
+                // Hora en tiempo real con segundero
                 const timeStr = now.toLocaleTimeString('es-VE', { hour12: true, hour: '2-digit', minute: '2-digit', second: '2-digit' });
                 if (clockEl) clockEl.textContent = timeStr;
+
+                const diaNombre = diasCompletos[now.getDay()];
+                const fechaCompleta = `${now.getDate()} DE ${mesesCompletos[now.getMonth()]} DE ${now.getFullYear()}`;
+                const fechaCorta = `${now.getDate()} ${mesesCortos[now.getMonth()]} ${now.getFullYear()}`;
 
                 if (digitsEl) {
                     const timeParts = timeStr.split(' ');
                     digitsEl.textContent = timeParts[0];
-                    if (ampmEl) ampmEl.textContent = (timeParts[1] || (now.getHours() >= 12 ? 'P. M.' : 'A. M.')).toUpperCase();
+                    if (ampmEl) ampmEl.textContent = (timeParts[1] || (hours >= 12 ? 'P. M.' : 'A. M.')).toUpperCase();
                 }
                 if (dayEl) {
-                    dayEl.textContent = dias[now.getDay()];
+                    dayEl.textContent = diaNombre;
                 }
+                if (dateEl) {
+                    dateEl.textContent = fechaCompleta;
+                }
+
+                // Actualizar manecillas analógicas si la vista analógica está activa
+                if (analogSec) {
+                    const secDeg = (seconds / 60) * 360;
+                    const minDeg = (minutes / 60) * 360 + (seconds / 60) * 6;
+                    const hrDeg = ((hours % 12) / 12) * 360 + (minutes / 60) * 30;
+                    analogSec.setAttribute('transform', `rotate(${secDeg} 50 50)`);
+                    analogMin.setAttribute('transform', `rotate(${minDeg} 50 50)`);
+                    analogHour.setAttribute('transform', `rotate(${hrDeg} 50 50)`);
+                }
+                if (analogTimeEl) analogTimeEl.textContent = timeStr;
+                if (analogDayEl) analogDayEl.textContent = diaNombre;
+                if (analogDateEl) analogDateEl.textContent = fechaCorta;
             };
             update();
             setInterval(update, 1000);
+        },
+
+        cambiarDisenoReloj() {
+            let actual = parseInt(localStorage.getItem('viasa_clock_theme') || '1', 10);
+            let siguiente = (actual % 4) + 1;
+            this.aplicarDisenoReloj(siguiente);
+            if (window.ViasaAudio) window.ViasaAudio.playClick();
+        },
+
+        aplicarDisenoReloj(disenoId) {
+            const widget = document.getElementById('dash-multi-clock-widget');
+            const digitalView = document.getElementById('clock-digital-view');
+            const analogView = document.getElementById('clock-analog-view');
+            if (!widget) return;
+
+            widget.classList.remove('theme-design-1', 'theme-design-2', 'theme-design-3', 'theme-design-4');
+            const num = (disenoId >= 1 && disenoId <= 4) ? disenoId : 1;
+            widget.classList.add(`theme-design-${num}`);
+            localStorage.setItem('viasa_clock_theme', num);
+
+            if (num === 4) {
+                if (digitalView) digitalView.style.display = 'none';
+                if (analogView) analogView.style.display = 'flex';
+            } else {
+                if (digitalView) digitalView.style.display = 'flex';
+                if (analogView) analogView.style.display = 'none';
+            }
         },
 
         actualizarWidgetsTasas() {
@@ -1735,8 +1803,13 @@
             const statusIcon = document.getElementById('viasa-network-status-icon');
             const statusText = document.getElementById('viasa-network-status-text');
 
-            if (bcvEl) bcvEl.textContent = `Bs. ${this.tasaBCV.toFixed(2)}`;
-            if (parEl) parEl.textContent = `Bs. ${this.tasaParalelo.toFixed(2)}`;
+            const formatearMontoVE = (val) => {
+                if (typeof val !== 'number' || isNaN(val)) return '0,00';
+                return val.toLocaleString('es-VE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            };
+
+            if (bcvEl) bcvEl.textContent = `Bs. ${formatearMontoVE(this.tasaBCV)}`;
+            if (parEl) parEl.textContent = `Bs. ${formatearMontoVE(this.tasaParalelo)}`;
 
             // 1. Monitor de Divisas del Dashboard
             const dashBCV = document.getElementById('dash-rate-bcv-val');

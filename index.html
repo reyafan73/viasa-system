@@ -155,12 +155,12 @@
         <aside class="app-sidebar">
             <div>
                 <div class="brand-header">
-                    <div class="brand-logo-badge" style="background: none; border: none; box-shadow: none;">
-                        <img src="assets/img/viasa_isotipo.png" alt="Logo" style="width: 44px; height: 44px; object-fit: contain;">
+                    <div class="brand-logo-badge" style="background: none; border: none; box-shadow: none; padding: 0;">
+                        <img src="assets/img/viasa_isotipo.png" alt="Logo VIASA" id="sidebar-brand-logo-img" style="width: 72px; height: 72px; object-fit: contain; filter: drop-shadow(0 3px 10px rgba(200, 138, 43, 0.38)); transition: transform 0.3s ease;">
                     </div>
-                    <div>
+                    <div class="brand-text-block">
                         <div class="brand-title">VIASA System</div>
-                        <div class="brand-subtitle" style="font-size: 0.65rem;">Gestión Administrativa y Operativa</div>
+                        <div class="brand-subtitle">GESTIÓN ADMINISTRATIVA Y OPERATIVA</div>
                     </div>
                 </div>
 
@@ -366,53 +366,85 @@
                     <div class="dash-exec-row-widgets-welcome">
                         <!-- 4 WIDGETS EJECUTIVOS A LA IZQUIERDA -->
                         <div class="dash-exec-left-widgets">
-                            <!-- Widget 1: Reloj Digital Operativo (8:00 / Hora en Vivo) -->
-                            <div class="dash-widget-card widget-clock" title="Reloj Operativo en Tiempo Real">
-                                <div class="dash-clock-top">
-                                    <span class="dash-clock-day" id="dash-widget-clock-day">DOM</span>
-                                    <span class="dash-clock-ampm" id="dash-widget-clock-ampm">A. M.</span>
+                            <!-- Widget 1: Reloj Digital Multi-Estilo (Hora, Día y Fecha en un solo cuadro con Selector de Diseño) -->
+                            <div class="dash-widget-card widget-clock theme-design-1" id="dash-multi-clock-widget" title="Reloj Ejecutivo Multi-Estilo (Clic en Diseño para Alternar Estilos)">
+                                <!-- Botón Selector de Diseño -->
+                                <button type="button" class="clock-design-switcher-btn" onclick="ViasaApp.cambiarDisenoReloj()" title="Cambiar diseño visual del reloj (Alternar entre 4 estilos)">
+                                    <span>Diseño</span> <i class="fa-solid fa-arrows-rotate"></i>
+                                </button>
+
+                                <!-- Vista Digital Completa (Diseños 1, 2 y 3) -->
+                                <div class="clock-digital-view" id="clock-digital-view">
+                                    <div class="clock-day-row">
+                                        <span class="clock-full-day" id="dash-widget-clock-day">DOMINGO</span>
+                                        <span class="clock-shift-pill" id="dash-widget-clock-shift">TURNO ACTIVO</span>
+                                    </div>
+                                    <div class="clock-time-display">
+                                        <span class="clock-digits-main" id="dash-widget-clock-digits">01:01:56</span>
+                                        <span class="clock-ampm-tag" id="dash-widget-clock-ampm">A. M.</span>
+                                        <span id="live-clock" style="display: none;">01:01:56 AM</span>
+                                    </div>
+                                    <div class="clock-date-row">
+                                        <i class="fa-regular fa-calendar-days clock-date-ico"></i>
+                                        <span class="clock-full-date" id="dash-widget-clock-date">15 DE NOVIEMBRE DE 2026</span>
+                                    </div>
                                 </div>
-                                <div class="dash-clock-digits" id="dash-widget-clock-digits">08:00:00</div>
-                                <div id="live-clock" style="display: none;">08:00:00 AM</div>
-                                <div class="dash-clock-bottom">
-                                    <i class="fa-solid fa-bell" style="color: #F59E0B; font-size: 10px;"></i>
-                                    <span class="dash-clock-shift-tag">TURNO ACTIVO</span>
-                                    <i class="fa-solid fa-business-time" style="color: #10B981; font-size: 10px;"></i>
+
+                                <!-- Vista Analógica Clásica (Diseño 4) -->
+                                <div class="clock-analog-view" id="clock-analog-view" style="display: none;">
+                                    <div class="analog-dial-box">
+                                        <svg viewBox="0 0 100 100" class="analog-clock-svg">
+                                            <circle cx="50" cy="50" r="46" class="dial-face" />
+                                            <circle cx="50" cy="50" r="44" class="dial-inner" />
+                                            <line x1="50" y1="8" x2="50" y2="15" class="dial-mark hour-mark" />
+                                            <line x1="50" y1="85" x2="50" y2="92" class="dial-mark hour-mark" />
+                                            <line x1="8" y1="50" x2="15" y2="50" class="dial-mark hour-mark" />
+                                            <line x1="85" y1="50" x2="92" y2="50" class="dial-mark hour-mark" />
+                                            <line id="analog-hour-hand" x1="50" y1="50" x2="50" y2="25" class="hand hour-hand" />
+                                            <line id="analog-min-hand" x1="50" y1="50" x2="50" y2="16" class="hand min-hand" />
+                                            <line id="analog-sec-hand" x1="50" y1="50" x2="50" y2="12" class="hand sec-hand" />
+                                            <circle cx="50" cy="50" r="3.5" class="dial-center-pin" />
+                                        </svg>
+                                    </div>
+                                    <div class="analog-info-box">
+                                        <div class="analog-day-text" id="analog-clock-day">DOMINGO</div>
+                                        <div class="analog-time-text" id="analog-clock-time">01:01:56 a. m.</div>
+                                        <div class="analog-date-text" id="analog-clock-date">15 NOV 2026</div>
+                                    </div>
                                 </div>
                             </div>
 
-                            <!-- Widget 2: Botón Interactivo VIASA VOICE -->
+                            <!-- Widget 2: Botón Interactivo VIASA VOICE con Arte Exclusivo Holográfico -->
                             <div class="dash-widget-card widget-voice" id="widget-viasa-voice" onclick="ViasaApp.toggleViasaVoice()" title="Viasa Voice: Asistente Operativo Manos Libres (Clic para Activar/Desactivar)">
-                                <div class="voice-wave-anim-box">
-                                    <span class="vwave-bar b1"></span>
-                                    <span class="vwave-bar b2"></span>
-                                    <span class="vwave-bar b3"></span>
-                                    <span class="vwave-bar b4"></span>
-                                    <span class="vwave-bar b5"></span>
-                                    <i class="fa-solid fa-microphone-lines voice-icon-glow"></i>
+                                <img src="assets/img/viasa_voice_art.png" alt="Viasa Voice Arte" class="voice-art-bg-img" />
+                                <div class="voice-art-gradient-overlay"></div>
+                                <div class="voice-card-top-header">
+                                    <span class="voice-brand-title">VIASA VOICE</span>
+                                    <i class="fa-solid fa-microphone-lines voice-hdr-mic-ico"></i>
                                 </div>
-                                <div class="voice-title-label">VIASA VOICE</div>
-                                <div class="voice-status-pill" id="widget-voice-status-pill">
-                                    <span class="voice-pulse-dot"></span>
-                                    <span id="widget-voice-status-text">LISTO</span>
+                                <div class="voice-card-bottom-bar">
+                                    <div class="voice-status-salvia-pill" id="widget-voice-status-pill">
+                                        <span class="voice-status-dot"></span>
+                                        <span id="widget-voice-status-text">• LISTO</span>
+                                    </div>
                                 </div>
                             </div>
 
-                            <!-- Widget 3: Mini-Monitor de Divisas (BCV Y USDT) -->
-                            <div class="dash-widget-card widget-rates" onclick="ViasaApp.sincronizarTasasEnTiempoReal(true)" title="Monitor de Divisas (Clic para Sincronizar en Tiempo Real)">
-                                <div class="rates-widget-header">
-                                    <span>MONITOR DE DIVISAS</span>
-                                    <i class="fa-solid fa-chart-line" style="color: #C88A2B; font-size: 11px;"></i>
+                            <!-- Widget 3: Monitor de Divisas Corporativo de Alta Gama (Prestige Light) -->
+                            <div class="dash-widget-card widget-rates-prestige" onclick="ViasaApp.sincronizarTasasEnTiempoReal(true)" title="Monitor de Divisas (Clic para Sincronizar en Tiempo Real)">
+                                <div class="rates-prestige-header">
+                                    <span class="rates-prestige-title">MONITOR DE DIVISAS</span>
+                                    <i class="fa-solid fa-chart-line rates-prestige-ico"></i>
                                 </div>
-                                <div class="rates-widget-row">
-                                    <span class="rate-currency-tag bcv">BCV:</span>
-                                    <strong class="rate-val-text" id="rate-bcv-val">Bs. 911.62</strong>
-                                    <span class="rate-trend-arrow up">▲</span>
+                                <div class="rates-prestige-row">
+                                    <span class="rate-corp-badge bcv">BCV:</span>
+                                    <strong class="rate-corp-val" id="rate-bcv-val">Bs. 911,62</strong>
+                                    <span class="rate-trend-arrow-clean up">▲</span>
                                 </div>
-                                <div class="rates-widget-row">
-                                    <span class="rate-currency-tag usdt">USDT:</span>
-                                    <strong class="rate-val-text" id="rate-paralelo-val">Bs. 1074.35</strong>
-                                    <span class="rate-trend-arrow up">▲</span>
+                                <div class="rates-prestige-row">
+                                    <span class="rate-corp-badge usdt">USDT:</span>
+                                    <strong class="rate-corp-val" id="rate-paralelo-val">Bs. 1.074,09</strong>
+                                    <span class="rate-trend-arrow-clean up">▲</span>
                                 </div>
                             </div>
 
