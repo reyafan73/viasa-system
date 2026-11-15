@@ -22,3 +22,8 @@ desktop.ini
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# Respaldos empaquetados locales (almacenados en carpetas locales de backups)
+backups/
+*.zip
+
