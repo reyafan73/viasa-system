@@ -1561,17 +1561,17 @@
                             ` : ''}
                         </div>
 
-                        <div class="agenda-modal-footer">
+                        <div class="agenda-modal-footer viasa-modal-footer" style="position: relative; display: flex; flex-direction: row; align-items: center; justify-content: flex-end; gap: 16px; width: 100%; padding: 16px 24px; background-color: #FAF7F2; border-top: 1px solid #E2D9C8; flex-shrink: 0; box-sizing: border-box;">
                             ${esEdicion ? `
-                                <button type="button" class="btn-agenda-danger" onclick="window.ViasaAgendaEngine.eliminarCompromiso('${ev.id}')">
+                                <button type="button" class="btn-agenda-danger" onclick="window.ViasaAgendaEngine.eliminarCompromiso('${ev.id}')" style="position: static !important; display: inline-flex !important; align-items: center; justify-content: center; gap: 8px; padding: 10px 18px; margin: 0 !important; background-color: #DC2626; color: #FFFFFF; border: none; border-radius: 8px; font-size: 13.5px; font-weight: 700; white-space: nowrap; cursor: pointer;">
                                     <i class="fa-solid fa-trash-can"></i> Eliminar
                                 </button>
                             ` : ''}
-                            <button type="button" class="btn-agenda-cancel" onclick="window.ViasaAgendaEngine.cerrarModalCompromiso()">
+                            <button type="button" class="btn-agenda-cancel" onclick="window.ViasaAgendaEngine.cerrarModalCompromiso()" style="position: static !important; display: inline-flex !important; align-items: center; justify-content: center; gap: 8px; padding: 10px 22px; margin: 0 !important; background-color: #F3EDE2; color: #2C1A12; border: 1px solid #C8B89E; border-radius: 8px; font-size: 13.5px; font-weight: 700; white-space: nowrap; cursor: pointer;">
                                 Cancelar
                             </button>
-                            <button type="submit" class="btn-agenda-action gold">
-                                <i class="fa-solid fa-floppy-disk"></i> Guardar Compromiso
+                            <button type="submit" class="btn-agenda-action gold" style="position: static !important; display: inline-flex !important; align-items: center; justify-content: center; gap: 8px; padding: 10px 24px; margin: 0 !important; background-color: #C88A2B; color: #FFFFFF; border: none; border-radius: 8px; font-size: 13.5px; font-weight: 800; white-space: nowrap; cursor: pointer;">
+                                <i class="fa-solid fa-floppy-disk"></i> 💾 Guardar Compromiso
                             </button>
                         </div>
                     </form>
@@ -1787,21 +1787,21 @@
                         </div>
                     </div>
 
-                    <div class="agenda-modal-footer">
-                        <button type="button" class="btn-agenda-cancel" onclick="window.ViasaAgendaEngine.cerrarCentroEmails()">
-                            Cerrar
+                    <div class="agenda-modal-footer viasa-modal-footer" style="position: relative; display: flex; flex-direction: row; align-items: center; justify-content: flex-end; gap: 16px; width: 100%; padding: 16px 24px; background-color: #FAF7F2; border-top: 1px solid #E2D9C8; flex-shrink: 0; box-sizing: border-box;">
+                        <button type="button" class="btn-agenda-cancel" onclick="window.ViasaAgendaEngine.cerrarCentroEmails()" style="position: static !important; display: inline-flex !important; align-items: center; justify-content: center; gap: 8px; padding: 10px 22px; margin: 0 !important; background-color: #F3EDE2; color: #2C1A12; border: 1px solid #C8B89E; border-radius: 8px; font-size: 13.5px; font-weight: 700; white-space: nowrap; cursor: pointer;">
+                            Cancelar
                         </button>
 
-                        <button type="button" class="btn-agenda-action green" onclick="window.ViasaAgendaEngine.dispararWhatsApp('${ev ? ev.id : ''}')">
+                        <button type="button" class="btn-agenda-action green" onclick="window.ViasaAgendaEngine.dispararWhatsApp('${ev ? ev.id : ''}')" style="position: static !important; display: inline-flex !important; align-items: center; justify-content: center; gap: 8px; padding: 10px 20px; margin: 0 !important; background-color: #059669; color: #FFFFFF; border: none; border-radius: 8px; font-size: 13.5px; font-weight: 800; white-space: nowrap; cursor: pointer;">
                             <i class="fa-brands fa-whatsapp"></i> Enviar por WhatsApp
                         </button>
 
-                        <button type="button" class="btn-agenda-action cyan" onclick="window.ViasaAgendaEngine.dispararMailto('${ev ? ev.id : ''}')">
+                        <button type="button" class="btn-agenda-action cyan" onclick="window.ViasaAgendaEngine.dispararMailto('${ev ? ev.id : ''}')" style="position: static !important; display: inline-flex !important; align-items: center; justify-content: center; gap: 8px; padding: 10px 20px; margin: 0 !important; background-color: #0284C7; color: #FFFFFF; border: none; border-radius: 8px; font-size: 13.5px; font-weight: 800; white-space: nowrap; cursor: pointer;">
                             <i class="fa-solid fa-envelope-open-text"></i> Abrir en Cliente (mailto:)
                         </button>
 
-                        <button type="button" class="btn-agenda-action gold" onclick="window.ViasaAgendaEngine.ejecutarEnvioDirecto('${ev ? ev.id : ''}')">
-                            <i class="fa-solid fa-paper-plane"></i> Enviar Directo (Simulación SMTP/API)
+                        <button type="button" class="btn-agenda-action gold" onclick="window.ViasaAgendaEngine.ejecutarEnvioDirecto('${ev ? ev.id : ''}')" style="position: static !important; display: inline-flex !important; align-items: center; justify-content: center; gap: 8px; padding: 10px 24px; margin: 0 !important; background-color: #C88A2B; color: #FFFFFF; border: none; border-radius: 8px; font-size: 13.5px; font-weight: 800; white-space: nowrap; cursor: pointer;">
+                            <i class="fa-solid fa-paper-plane"></i> Enviar Directo
                         </button>
                     </div>
                 </div>

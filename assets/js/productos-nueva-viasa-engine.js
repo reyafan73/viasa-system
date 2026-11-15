@@ -1900,9 +1900,9 @@
                             <div id="pnv-form-calc" class="pnv-calc-box" style="grid-column:span 2;"></div>
                         </div>
                     </div>
-                    <div class="pnv-modal-actions">
-                        <button type="button" class="pnv-btn pnv-btn-ghost" onclick="ViasaProductosExclusivosEngine.cerrarModal('pnv-form-overlay')">Cancelar</button>
-                        <button type="submit" class="pnv-btn pnv-btn-gold"><i class="fa-solid fa-floppy-disk"></i> ${p ? 'Guardar Cambios' : 'Registrar Producto'}</button>
+                    <div class="pnv-modal-actions viasa-modal-footer" style="position: relative; display: flex; flex-direction: row; align-items: center; justify-content: flex-end; gap: 16px; width: 100%; padding: 16px 24px; background-color: #FAF7F2; border-top: 1px solid #E2D9C8; flex-shrink: 0; box-sizing: border-box;">
+                        <button type="button" class="pnv-btn pnv-btn-ghost" onclick="ViasaProductosExclusivosEngine.cerrarModal('pnv-form-overlay')" style="position: static !important; display: inline-flex !important; align-items: center; justify-content: center; gap: 8px; padding: 10px 22px; margin: 0 !important; background-color: #F3EDE2; color: #2C1A12; border: 1px solid #C8B89E; border-radius: 8px; font-size: 13.5px; font-weight: 700; white-space: nowrap; cursor: pointer;">Cancelar</button>
+                        <button type="submit" class="pnv-btn pnv-btn-gold" style="position: static !important; display: inline-flex !important; align-items: center; justify-content: center; gap: 8px; padding: 10px 24px; margin: 0 !important; background-color: #C88A2B; color: #FFFFFF; border: none; border-radius: 8px; font-size: 13.5px; font-weight: 800; white-space: nowrap; cursor: pointer;"><i class="fa-solid fa-floppy-disk"></i> ${p ? '💾 Guardar Cambios' : '💾 Registrar Producto'}</button>
                     </div>
                 </form>`;
             this.abrirModal('pnv-form-overlay', html, 1040);
@@ -2502,10 +2502,10 @@
                     <div style="margin-top:12px;font-size:0.82rem;color:#CBD5E1;">Si solo desea retirarlo de la venta conservando su historial, use <b>Dar de Baja</b>.</div>
                     <label class="pnv-label" style="margin-top:14px;">Para eliminar definitivamente escriba el SKU <b style="color:#FBBF24;">${esc(p.sku)}</b>:</label>
                     <input id="pnv-del-confirm" class="pnv-input" autocomplete="off" placeholder="${esc(p.sku)}">
-                    <div class="pnv-modal-actions">
-                        <button type="button" class="pnv-btn pnv-btn-ghost" onclick="ViasaProductosExclusivosEngine.cerrarModal('pnv-del-overlay')">Cancelar</button>
-                        <button type="button" class="pnv-btn pnv-btn-ghost" onclick="ViasaProductosExclusivosEngine.darDeBaja('${esc(p.id)}')"><i class="fa-solid fa-box-archive"></i> Dar de Baja (conservar historial)</button>
-                        <button type="button" class="pnv-btn pnv-btn-danger" onclick="ViasaProductosExclusivosEngine.eliminarProducto('${esc(p.id)}')"><i class="fa-solid fa-trash"></i> Eliminar Definitivamente</button>
+                    <div class="pnv-modal-actions viasa-modal-footer" style="position: relative; display: flex; flex-direction: row; align-items: center; justify-content: flex-end; gap: 16px; width: 100%; padding: 16px 24px; background-color: #FAF7F2; border-top: 1px solid #E2D9C8; flex-shrink: 0; box-sizing: border-box; flex-wrap: wrap;">
+                        <button type="button" class="pnv-btn pnv-btn-ghost" onclick="ViasaProductosExclusivosEngine.cerrarModal('pnv-del-overlay')" style="position: static !important; display: inline-flex !important; align-items: center; justify-content: center; gap: 8px; padding: 10px 22px; margin: 0 !important; background-color: #F3EDE2; color: #2C1A12; border: 1px solid #C8B89E; border-radius: 8px; font-size: 13.5px; font-weight: 700; white-space: nowrap; cursor: pointer;">Cancelar</button>
+                        <button type="button" class="pnv-btn pnv-btn-ghost" onclick="ViasaProductosExclusivosEngine.darDeBaja('${esc(p.id)}')" style="position: static !important; display: inline-flex !important; align-items: center; justify-content: center; gap: 8px; padding: 10px 20px; margin: 0 !important; background-color: #F3EDE2; color: #7C4D2B; border: 1px solid #C88A2B; border-radius: 8px; font-size: 13.5px; font-weight: 700; white-space: nowrap; cursor: pointer;"><i class="fa-solid fa-box-archive"></i> Dar de Baja</button>
+                        <button type="button" class="pnv-btn pnv-btn-danger" onclick="ViasaProductosExclusivosEngine.eliminarProducto('${esc(p.id)}')" style="position: static !important; display: inline-flex !important; align-items: center; justify-content: center; gap: 8px; padding: 10px 22px; margin: 0 !important; background-color: #DC2626; color: #FFFFFF; border: none; border-radius: 8px; font-size: 13.5px; font-weight: 800; white-space: nowrap; cursor: pointer;"><i class="fa-solid fa-trash"></i> Eliminar Definitivamente</button>
                     </div>
                 </div>`;
             this.abrirModal('pnv-del-overlay', html, 620);

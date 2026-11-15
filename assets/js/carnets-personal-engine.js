@@ -1346,10 +1346,10 @@
                     </div>
                 </div>
 
-                <div class="pnv-modal-footer">
-                    <button type="button" class="btn btn-outline" onclick="window.ViasaCarnetsEngine.cerrarModalTrabajador()">Cancelar</button>
-                    <button type="button" class="btn btn-primary" onclick="window.ViasaCarnetsEngine.guardarTrabajadorDesdeModal()" style="background: #4B371C; border-color: #d97706;">
-                        <i class="fa-solid fa-floppy-disk"></i> Guardar Expediente y Credencial
+                <div class="pnv-modal-footer viasa-modal-footer" style="position: relative; display: flex; flex-direction: row; align-items: center; justify-content: flex-end; gap: 16px; width: 100%; padding: 16px 24px; background-color: #FAF7F2; border-top: 1px solid #E2D9C8; flex-shrink: 0; box-sizing: border-box;">
+                    <button type="button" class="btn btn-outline" onclick="window.ViasaCarnetsEngine.cerrarModalTrabajador()" style="position: static !important; display: inline-flex !important; align-items: center; justify-content: center; gap: 8px; padding: 10px 22px; margin: 0 !important; background-color: #F3EDE2; color: #2C1A12; border: 1px solid #C8B89E; border-radius: 8px; font-size: 13.5px; font-weight: 700; white-space: nowrap; cursor: pointer;">Cancelar</button>
+                    <button type="button" class="btn btn-primary" onclick="window.ViasaCarnetsEngine.guardarTrabajadorDesdeModal()" style="position: static !important; display: inline-flex !important; align-items: center; justify-content: center; gap: 8px; padding: 10px 24px; margin: 0 !important; background-color: #C88A2B; color: #FFFFFF; border: none; border-radius: 8px; font-size: 13.5px; font-weight: 800; white-space: nowrap; cursor: pointer;">
+                        <i class="fa-solid fa-floppy-disk"></i> 💾 Guardar Expediente y Credencial
                     </button>
                 </div>
             </div>

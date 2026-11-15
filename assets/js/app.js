@@ -22330,9 +22330,9 @@
                         </div>
                     </div>
 
-                    <div style="display: flex; gap: 10px;">
-                        <button type="button" class="btn-secondary" onclick="ViasaApp.cerrarModalArqueoCiego()" style="flex: 1;">Cancelar</button>
-                        <button type="button" class="btn-gold" onclick="ViasaApp.confirmarCierreDesdeArqueoCiego(${totalTeoricoUSD}, ${fisicoUSD}, ${diffUSD})" style="flex: 2; background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
+                    <div class="viasa-modal-footer" style="position: relative; display: flex; flex-direction: row; align-items: center; justify-content: flex-end; gap: 16px; width: 100%; padding: 16px 24px; background-color: #FAF7F2; border-top: 1px solid #E2D9C8; flex-shrink: 0; box-sizing: border-box;">
+                        <button type="button" class="btn-secondary" onclick="ViasaApp.cerrarModalArqueoCiego()" style="position: static !important; display: inline-flex !important; align-items: center; justify-content: center; gap: 8px; padding: 10px 22px; margin: 0 !important; background-color: #F3EDE2; color: #2C1A12; border: 1px solid #C8B89E; border-radius: 8px; font-size: 13.5px; font-weight: 700; white-space: nowrap; cursor: pointer;">Cancelar</button>
+                        <button type="button" class="btn-gold" onclick="ViasaApp.confirmarCierreDesdeArqueoCiego(${totalTeoricoUSD}, ${fisicoUSD}, ${diffUSD})" style="position: static !important; display: inline-flex !important; align-items: center; justify-content: center; gap: 8px; padding: 10px 24px; margin: 0 !important; background: linear-gradient(135deg, #10b981 0%, #059669 100%); border: none; color: #FFFFFF; border-radius: 8px; font-size: 13.5px; font-weight: 800; white-space: nowrap; cursor: pointer;">
                             <i class="fa-solid fa-file-signature"></i> Confirmar y Registrar Cierre Z
                         </button>
                     </div>

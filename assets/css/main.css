@@ -16237,18 +16237,20 @@ form.viasa-modal-form {
 .modal-footer,
 .agenda-modal-footer,
 .cnt-crud-modal-footer,
-.pnv-modal-footer {
-    flex-shrink: 0 !important;
-    padding: 14px 24px !important;
-    background: #FAF7F2 !important;
-    border-top: 1px solid #E2D9C8 !important;
+.pnv-modal-footer,
+.pnv-modal-actions {
+    position: relative !important;
     display: flex !important;
+    flex-direction: row !important;
     align-items: center !important;
     justify-content: flex-end !important;
-    gap: 14px !important;
-    flex-wrap: wrap !important;
+    gap: 16px !important;
+    width: 100% !important;
+    padding: 16px 24px !important;
+    background-color: #FAF7F2 !important;
+    border-top: 1px solid #E2D9C8 !important;
+    flex-shrink: 0 !important;
     box-sizing: border-box !important;
-    position: relative !important;
     z-index: 10 !important;
 }
 
@@ -16258,6 +16260,7 @@ form.viasa-modal-form {
 .agenda-modal-footer button,
 .pnv-modal-footer button,
 .cnt-crud-modal-footer button,
+.pnv-modal-actions button,
 .viasa-modal-body form > div:last-child button,
 .viasa-modal-body > div:last-child button {
     position: static !important;
@@ -16269,10 +16272,16 @@ form.viasa-modal-form {
     justify-content: center !important;
     gap: 8px !important;
     min-height: 38px !important;
-    padding: 8px 18px !important;
-    font-size: 0.85rem !important;
+    padding: 10px 22px !important;
+    font-size: 13.5px !important;
     font-weight: 700 !important;
     border-radius: 8px !important;
+    float: none !important;
+    left: auto !important;
+    right: auto !important;
+    top: auto !important;
+    bottom: auto !important;
+    transform: none !important;
 }
 
 .viasa-modal-body form > div:last-child,
@@ -16280,10 +16289,10 @@ form.viasa-modal-form {
     display: flex !important;
     align-items: center !important;
     justify-content: flex-end !important;
-    gap: 14px !important;
+    gap: 16px !important;
     flex-wrap: wrap !important;
     margin-top: auto !important;
-    padding-top: 14px !important;
+    padding-top: 16px !important;
     border-top: 1px solid #E2D9C8 !important;
     box-sizing: border-box !important;
 }
