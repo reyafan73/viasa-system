@@ -541,177 +541,137 @@
         // ==============================================================
         // 1. INTRO / SPLASH SCREEN (VIDEO ANIMADO Y AUDIO HD)
         // ==============================================================
+        reproducirWebAudio() {
+            try {
+                const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                if (!AudioCtx) return;
+                if (!this._viasaAudioCtx) {
+                    this._viasaAudioCtx = new AudioCtx();
+                }
+                const ctx = this._viasaAudioCtx;
+                if (ctx.state === 'suspended') {
+                    ctx.resume();
+                }
+
+                if (!this._viasaMasterGain) {
+                    const now = ctx.currentTime;
+                    const masterGain = ctx.createGain();
+                    masterGain.gain.setValueAtTime(0.01, now);
+                    masterGain.gain.exponentialRampToValueAtTime(1.0, now + 0.6); // 100% Volumen
+                    masterGain.gain.setValueAtTime(1.0, now + 6.0);
+                    masterGain.gain.exponentialRampToValueAtTime(0.001, now + 8.8);
+                    masterGain.connect(ctx.destination);
+                    this._viasaMasterGain = masterGain;
+
+                    // Cuerdas armónicas y pad orquestal
+                    const chordFreqs = [146.83, 220.0, 293.66, 370.0, 440.0, 554.37, 659.25, 880.0];
+                    chordFreqs.forEach((freq, idx) => {
+                        const osc = ctx.createOscillator();
+                        const g = ctx.createGain();
+                        osc.type = idx % 2 === 0 ? 'sine' : 'triangle';
+                        osc.frequency.setValueAtTime(freq, now);
+                        osc.detune.setValueAtTime((idx - 3) * 4, now);
+                        g.gain.setValueAtTime(0.001, now);
+                        g.gain.exponentialRampToValueAtTime(0.16 / (chordFreqs.length * 0.35), now + 1.0 + (idx * 0.08));
+                        g.gain.setValueAtTime(0.16 / (chordFreqs.length * 0.35), now + 6.2);
+                        g.gain.exponentialRampToValueAtTime(0.0001, now + 8.5);
+                        osc.connect(g);
+                        g.connect(masterGain);
+                        osc.start(now);
+                        osc.stop(now + 8.8);
+                    });
+
+                    // Arpegio de Campanas Doradas de Bienvenida
+                    const chimeNotes = [587.33, 739.99, 880.0, 1108.73, 1318.51, 1479.98, 1760.0];
+                    chimeNotes.forEach((freq, idx) => {
+                        const noteTime = now + 1.2 + (idx * 0.28);
+                        const osc = ctx.createOscillator();
+                        const g = ctx.createGain();
+                        osc.type = 'sine';
+                        osc.frequency.setValueAtTime(freq, noteTime);
+                        g.gain.setValueAtTime(0.001, noteTime);
+                        g.gain.exponentialRampToValueAtTime(0.20, noteTime + 0.04);
+                        g.gain.exponentialRampToValueAtTime(0.0001, noteTime + 2.0);
+                        osc.connect(g);
+                        g.connect(masterGain);
+                        osc.start(noteTime);
+                        osc.stop(noteTime + 2.2);
+                    });
+                }
+            } catch (err) {
+                console.warn('[VIASA Audio] Error en Web Audio synth:', err);
+            }
+        },
+
+        iniciarAudioTotal() {
+            if (this._audioIniciado) return;
+            this._audioIniciado = true;
+
+            const soundIcon = document.getElementById('sound-icon');
+            if (soundIcon) soundIcon.className = 'fa-solid fa-volume-high';
+
+            const audioEl = document.getElementById('viasa-intro-audio');
+            if (audioEl) {
+                audioEl.removeAttribute('muted');
+                audioEl.muted = false;
+                audioEl.volume = 1.0;
+                audioEl.currentTime = 0;
+                const audioPromise = audioEl.play();
+                if (audioPromise !== undefined) {
+                    audioPromise.catch(() => {
+                        this.reproducirWebAudio();
+                    });
+                }
+            }
+            this.reproducirWebAudio();
+        },
+
         runSplashScreen() {
             const splashEl = document.getElementById('viasa-splash');
             const welcomeGate = document.getElementById('viasa-welcome-gate');
             const videoWrapper = document.getElementById('viasa-video-wrapper');
             const videoEl = document.getElementById('viasa-intro-video');
             const audioEl = document.getElementById('viasa-intro-audio');
-            const soundIcon = document.getElementById('sound-icon');
 
             if (!splashEl || !videoEl) {
                 this.checkAuthenticationFlow();
                 return;
             }
 
-            // Eliminación absoluta de silencio (Unmuted) y volumen al 100%
-            videoEl.removeAttribute('muted');
-            videoEl.muted = false;
-            videoEl.volume = 1.0;
+            // Configuración inicial de video y audio con preload
+            videoEl.setAttribute('playsinline', '');
+            videoEl.setAttribute('preload', 'auto');
+            videoEl.style.width = '100%';
+            videoEl.style.height = '100%';
+            videoEl.style.objectFit = 'contain';
 
-            if (audioEl) {
-                audioEl.removeAttribute('muted');
-                audioEl.muted = false;
-                audioEl.volume = 1.0;
+            videoEl.onended = () => this.finalizarIntroVideo();
+            videoEl.onerror = (err) => {
+                console.warn('[VIASA Video] Error en carga o reproducción de video:', err);
+                this.finalizarIntroVideo();
+            };
+
+            // Asegurar que la pantalla de bienvenida esté visible para interacción del usuario
+            if (welcomeGate) {
+                welcomeGate.classList.remove('hidden');
+                welcomeGate.style.display = 'flex';
+            }
+            if (videoWrapper) {
+                videoWrapper.classList.add('hidden');
+                videoWrapper.style.display = 'none';
             }
 
-            let introFinished = false;
-            let audioIniciado = false;
+            // Precarga anticipada de medios
+            try { videoEl.load(); } catch (e) {}
+            try { if (audioEl) audioEl.load(); } catch (e) {}
 
-            // Motor de Audio Web Audio API para asegurar fanfarria cinematográfica al 100%
-            const reproducirWebAudio = () => {
-                try {
-                    const AudioCtx = window.AudioContext || window.webkitAudioContext;
-                    if (!AudioCtx) return;
-                    if (!this._viasaAudioCtx) {
-                        this._viasaAudioCtx = new AudioCtx();
-                    }
-                    const ctx = this._viasaAudioCtx;
-                    if (ctx.state === 'suspended') {
-                        ctx.resume();
-                    }
-
-                    if (!this._viasaMasterGain) {
-                        const now = ctx.currentTime;
-                        const masterGain = ctx.createGain();
-                        masterGain.gain.setValueAtTime(0.01, now);
-                        masterGain.gain.exponentialRampToValueAtTime(1.0, now + 0.6); // 100% Volumen
-                        masterGain.gain.setValueAtTime(1.0, now + 6.0);
-                        masterGain.gain.exponentialRampToValueAtTime(0.001, now + 8.8);
-                        masterGain.connect(ctx.destination);
-                        this._viasaMasterGain = masterGain;
-
-                        // Cuerdas armónicas y pad orquestal
-                        const chordFreqs = [146.83, 220.0, 293.66, 370.0, 440.0, 554.37, 659.25, 880.0];
-                        chordFreqs.forEach((freq, idx) => {
-                            const osc = ctx.createOscillator();
-                            const g = ctx.createGain();
-                            osc.type = idx % 2 === 0 ? 'sine' : 'triangle';
-                            osc.frequency.setValueAtTime(freq, now);
-                            osc.detune.setValueAtTime((idx - 3) * 4, now);
-                            g.gain.setValueAtTime(0.001, now);
-                            g.gain.exponentialRampToValueAtTime(0.16 / (chordFreqs.length * 0.35), now + 1.0 + (idx * 0.08));
-                            g.gain.setValueAtTime(0.16 / (chordFreqs.length * 0.35), now + 6.2);
-                            g.gain.exponentialRampToValueAtTime(0.0001, now + 8.5);
-                            osc.connect(g);
-                            g.connect(masterGain);
-                            osc.start(now);
-                            osc.stop(now + 8.8);
-                        });
-
-                        // Arpegio de Campanas Doradas de Bienvenida
-                        const chimeNotes = [587.33, 739.99, 880.0, 1108.73, 1318.51, 1479.98, 1760.0];
-                        chimeNotes.forEach((freq, idx) => {
-                            const noteTime = now + 1.2 + (idx * 0.28);
-                            const osc = ctx.createOscillator();
-                            const g = ctx.createGain();
-                            osc.type = 'sine';
-                            osc.frequency.setValueAtTime(freq, noteTime);
-                            g.gain.setValueAtTime(0.001, noteTime);
-                            g.gain.exponentialRampToValueAtTime(0.20, noteTime + 0.04);
-                            g.gain.exponentialRampToValueAtTime(0.0001, noteTime + 2.0);
-                            osc.connect(g);
-                            g.connect(masterGain);
-                            osc.start(noteTime);
-                            osc.stop(noteTime + 2.2);
-                        });
-                    }
-                } catch (err) {
-                    console.warn('[VIASA Audio] Error en Web Audio synth:', err);
-                }
-            };
-
-            const iniciarAudioTotal = () => {
-                if (audioIniciado) return;
-                audioIniciado = true;
-
-                if (soundIcon) soundIcon.className = 'fa-solid fa-volume-high';
-
-                // 1. Reproducir audio WAV nativo a 100% de volumen
-                if (audioEl) {
-                    audioEl.muted = false;
-                    audioEl.volume = 1.0;
-                    audioEl.currentTime = 0;
-                    const audioPromise = audioEl.play();
-                    if (audioPromise !== undefined) {
-                        audioPromise.catch(() => {
-                            reproducirWebAudio();
-                        });
-                    }
-                }
-
-                // 2. Ejecutar sintetizador Web Audio HD
-                reproducirWebAudio();
-            };
-
-            const finishIntro = () => {
-                if (introFinished) return;
-                introFinished = true;
-
-                if (splashEl) {
-                    splashEl.classList.add('hidden');
-                    splashEl.style.display = 'none';
-                    splashEl.style.visibility = 'hidden';
-                }
-                
-                try {
-                    if (videoEl) videoEl.pause();
-                } catch (e) {}
-                try {
-                    if (audioEl) audioEl.pause();
-                } catch (e) {}
-
-                this.checkAuthenticationFlow();
-            };
-
-            this.finalizarIntroVideo = finishIntro;
-
-            videoEl.addEventListener('ended', finishIntro);
-            videoEl.addEventListener('error', (err) => {
-                console.warn('[VIASA Intro] Aviso de reproducción de video, continuando:', err);
-                finishIntro();
-            });
-
-            // Sondeo de Autoplay no silenciado:
-            // Si el navegador permite autoplay con audio de inmediato, arranca directo.
-            // Si el navegador restringe el audio (Chrome file:///), muestra la pantalla con el botón "INICIAR VIASA SYSTEM".
-            const testPlay = videoEl.play();
-            if (testPlay !== undefined) {
-                testPlay.then(() => {
-                    // Autoplay con audio permitido
-                    if (welcomeGate) welcomeGate.classList.add('hidden');
-                    if (videoWrapper) videoWrapper.classList.remove('hidden');
-                }).catch(() => {
-                    // Autoplay bloqueado: mostrar pantalla de bienvenida con botón hero para desbloquear con 1 clic
-                    try { videoEl.pause(); videoEl.currentTime = 0; } catch (e) {}
-                    if (welcomeGate) welcomeGate.classList.remove('hidden');
-                    if (videoWrapper) videoWrapper.classList.add('hidden');
-                });
-            } else {
-                if (welcomeGate) welcomeGate.classList.remove('hidden');
-                if (videoWrapper) videoWrapper.classList.add('hidden');
-            }
-
-            // Timeout de seguridad en caso de que no haya interacción o el video se detenga
-            setTimeout(() => {
-                if (!introFinished && videoWrapper && !videoWrapper.classList.contains('hidden')) {
-                    finishIntro();
-                }
-            }, 8000);
-
-            // Listener global de teclado (ESC para cerrar Visor de Fotografía y modales)
+            // Listener de teclado (ESC para omitir video o cerrar modales)
             document.addEventListener('keydown', (e) => {
                 if (e.key === 'Escape' || e.keyCode === 27) {
+                    if (this.showIntroVideo) {
+                        this.finalizarIntroVideo();
+                        return;
+                    }
                     const visorFoto = document.getElementById('modal-visor-fotografia-empleado');
                     if (visorFoto && visorFoto.classList.contains('active')) {
                         e.preventDefault();
@@ -724,69 +684,204 @@
 
         // Handler directo y permanente para el botón "INICIAR VIASA SYSTEM"
         iniciarIntroConAudio() {
-            console.log('🚀 [VIASA Start] Botón INICIAR VIASA SYSTEM presionado...');
-            try {
-                // 1. Ocultar inmediatamente pantalla splash, gate y contenedores de video
-                const splashEl = document.getElementById('viasa-splash');
-                const welcomeGate = document.getElementById('viasa-welcome-gate');
-                const videoWrapper = document.getElementById('viasa-video-wrapper');
-                const videoEl = document.getElementById('viasa-intro-video');
-                const audioEl = document.getElementById('viasa-intro-audio');
+            console.log('🚀 [VIASA Start] Botón INICIAR VIASA SYSTEM presionado: Iniciando Video Intro...');
+            this.showIntroVideo = true;
+            this._introFinished = false;
 
-                if (welcomeGate) welcomeGate.classList.add('hidden');
-                if (videoWrapper) videoWrapper.classList.add('hidden');
-                if (splashEl) {
-                    splashEl.classList.add('hidden');
-                    splashEl.style.display = 'none';
-                    splashEl.style.visibility = 'hidden';
-                }
+            const splashEl = document.getElementById('viasa-splash');
+            const welcomeGate = document.getElementById('viasa-welcome-gate');
+            const videoWrapper = document.getElementById('viasa-video-wrapper');
+            const videoEl = document.getElementById('viasa-intro-video');
+            const audioEl = document.getElementById('viasa-intro-audio');
+            const loginScreen = document.getElementById('viasa-login');
+            const btnToggleSound = document.getElementById('btn-toggle-sound');
+            const soundIcon = document.getElementById('sound-icon');
+            const lblSound = document.getElementById('lbl-sound-status');
 
-                if (videoEl) {
-                    try { videoEl.pause(); } catch (e) {}
-                }
-                if (audioEl) {
-                    try { audioEl.pause(); } catch (e) {}
-                }
-            } catch (errSplash) {
-                console.warn('[Splash] Error al ocultar splash screen:', errSplash);
+            // 1. Ocultar pantalla previa de bienvenida y login
+            if (welcomeGate) {
+                welcomeGate.classList.add('hidden');
+                welcomeGate.style.display = 'none';
+            }
+            if (loginScreen) {
+                loginScreen.classList.add('hidden');
+                loginScreen.style.display = 'none';
             }
 
-            // 2. Chime de inicio de audio agradable
+            // 2. Montar contenedor a pantalla completa garantizado
+            if (splashEl) {
+                splashEl.classList.remove('hidden');
+                splashEl.style.display = 'flex';
+                splashEl.style.visibility = 'visible';
+                splashEl.style.opacity = '1';
+                splashEl.style.position = 'fixed';
+                splashEl.style.inset = '0';
+                splashEl.style.zIndex = '9999';
+                splashEl.style.background = '#000000';
+            }
+            if (videoWrapper) {
+                videoWrapper.classList.remove('hidden');
+                videoWrapper.style.display = 'flex';
+                videoWrapper.style.position = 'fixed';
+                videoWrapper.style.inset = '0';
+                videoWrapper.style.zIndex = '9999';
+                videoWrapper.style.background = '#000000';
+                videoWrapper.style.alignItems = 'center';
+                videoWrapper.style.justifyContent = 'center';
+            }
+
+            if (!videoEl) {
+                console.warn('[VIASA Video] Elemento de video no encontrado, procediendo a Panel Principal.');
+                this.finalizarIntroVideo();
+                return;
+            }
+
+            // 3. Temporizador máximo de respaldo para evitar cualquier congelamiento
+            if (this._introSafetyTimer) clearTimeout(this._introSafetyTimer);
+            this._introSafetyTimer = setTimeout(() => {
+                if (this.showIntroVideo && !this._introFinished) {
+                    console.warn('[VIASA Video] Temporizador de respaldo alcanzado (18s), avanzando al Panel Principal.');
+                    this.finalizarIntroVideo();
+                }
+            }, 18000);
+
+            // 4. Configurar video y ejecutar play() inmediatamente en el contexto del click
+            videoEl.setAttribute('playsinline', '');
+            videoEl.setAttribute('preload', 'auto');
+            videoEl.style.width = '100%';
+            videoEl.style.height = '100%';
+            videoEl.style.objectFit = 'contain';
+            videoEl.currentTime = 0;
+
+            // Intentar reproducir con audio unmuted aprovechando el clic activo
+            videoEl.removeAttribute('muted');
+            videoEl.muted = false;
+            videoEl.volume = 1.0;
+            this._introMuted = false;
+
+            const playPromise = videoEl.play();
+            if (playPromise !== undefined) {
+                playPromise.then(() => {
+                    console.log('🎬 [VIASA Video] Reproducción iniciada con audio HD.');
+                    if (audioEl) {
+                        audioEl.removeAttribute('muted');
+                        audioEl.muted = false;
+                        audioEl.volume = 1.0;
+                        audioEl.currentTime = 0;
+                        audioEl.play().catch(() => {});
+                    }
+                    this.iniciarAudioTotal();
+                    if (btnToggleSound) {
+                        btnToggleSound.style.display = 'flex';
+                        if (lblSound) lblSound.textContent = '🔊 Silenciar';
+                        if (soundIcon) soundIcon.className = 'fa-solid fa-volume-high';
+                    }
+                }).catch((err) => {
+                    console.warn('[VIASA Video] Audio restringido por política del navegador. Iniciando fallback silenciado:', err);
+                    videoEl.muted = true;
+                    this._introMuted = true;
+                    if (audioEl) audioEl.muted = true;
+                    videoEl.play().then(() => {
+                        console.log('🎬 [VIASA Video] Reproducción silenciada activa con éxito.');
+                        // Mostrar botón discreto "🔊 Activar Sonido"
+                        if (btnToggleSound) {
+                            btnToggleSound.style.display = 'flex';
+                            if (lblSound) lblSound.textContent = '🔊 Activar Sonido';
+                            if (soundIcon) soundIcon.className = 'fa-solid fa-volume-xmark';
+                        }
+                    }).catch((playErr) => {
+                        console.error('[VIASA Video] Falló reproducción de video incluso silenciado:', playErr);
+                        this.finalizarIntroVideo();
+                    });
+                });
+            }
+        },
+
+        // Transición automática al finalizar o al pulsar "Saltar Intro"
+        finalizarIntroVideo() {
+            if (this._introFinished) return;
+            this._introFinished = true;
+            this.showIntroVideo = false;
+
+            console.log('🎬 [VIASA Video] Finalizando Intro Video y abriendo Panel Principal...');
+
+            if (this._introSafetyTimer) {
+                clearTimeout(this._introSafetyTimer);
+                this._introSafetyTimer = null;
+            }
+
+            const splashEl = document.getElementById('viasa-splash');
+            const videoWrapper = document.getElementById('viasa-video-wrapper');
+            const videoEl = document.getElementById('viasa-intro-video');
+            const audioEl = document.getElementById('viasa-intro-audio');
+
+            try { if (videoEl) videoEl.pause(); } catch (e) {}
+            try { if (audioEl) audioEl.pause(); } catch (e) {}
+            try {
+                if (this._viasaMasterGain && this._viasaAudioCtx) {
+                    this._viasaMasterGain.gain.setValueAtTime(0.0001, this._viasaAudioCtx.currentTime);
+                }
+            } catch (e) {}
+
+            // Transición suave de salida (fade out de 600ms)
+            if (splashEl) {
+                splashEl.style.transition = 'opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.6s cubic-bezier(0.4, 0, 0.2, 1)';
+                splashEl.style.opacity = '0';
+                splashEl.classList.add('hidden');
+                setTimeout(() => {
+                    splashEl.style.display = 'none';
+                    splashEl.style.visibility = 'hidden';
+                }, 650);
+            }
+            if (videoWrapper) {
+                videoWrapper.classList.add('hidden');
+                videoWrapper.style.display = 'none';
+            }
+
+            // Chime agradable al pasar al Panel Principal
             try {
                 if (window.ViasaAudio && typeof window.ViasaAudio.playCashChime === 'function') {
                     window.ViasaAudio.playCashChime();
                 }
             } catch (eAudio) {}
 
-            // 3. Abrir de inmediato el Panel Principal (Dashboard)
+            // Abrir Panel Principal
             try {
                 this.checkAuthenticationFlow();
             } catch (errAuth) {
-                console.error('[Iniciar VIASA] Error en checkAuthenticationFlow:', errAuth);
+                console.error('[finalizarIntroVideo] Error en checkAuthenticationFlow:', errAuth);
                 this.forzarAperturaDashboard();
             }
-        },
-
-        finalizarIntroVideo() {
-            this.iniciarIntroConAudio();
         },
 
         toggleVideoSound() {
             const videoEl = document.getElementById('viasa-intro-video');
             const audioEl = document.getElementById('viasa-intro-audio');
             const icon = document.getElementById('sound-icon');
-            const estaMuteado = audioEl ? audioEl.muted : (this._introMuted || false);
+            const lblSound = document.getElementById('lbl-sound-status');
+            const estaMuteado = videoEl ? videoEl.muted : (this._introMuted || false);
 
             if (estaMuteado) {
                 if (videoEl) { videoEl.muted = false; videoEl.volume = 1.0; }
                 if (audioEl) { audioEl.muted = false; audioEl.volume = 1.0; audioEl.play().catch(() => {}); }
+                if (this._viasaAudioCtx && this._viasaAudioCtx.state === 'suspended') {
+                    this._viasaAudioCtx.resume();
+                }
+                if (this._viasaMasterGain && this._viasaAudioCtx) {
+                    this._viasaMasterGain.gain.setValueAtTime(1.0, this._viasaAudioCtx.currentTime);
+                }
                 this._introMuted = false;
                 if (icon) icon.className = 'fa-solid fa-volume-high';
+                if (lblSound) lblSound.textContent = '🔊 Silenciar';
             } else {
                 if (videoEl) videoEl.muted = true;
                 if (audioEl) audioEl.muted = true;
+                if (this._viasaMasterGain && this._viasaAudioCtx) {
+                    this._viasaMasterGain.gain.setValueAtTime(0.0001, this._viasaAudioCtx.currentTime);
+                }
                 this._introMuted = true;
                 if (icon) icon.className = 'fa-solid fa-volume-xmark';
+                if (lblSound) lblSound.textContent = '🔊 Activar Sonido';
             }
         },
 
