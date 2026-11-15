@@ -80,26 +80,47 @@
         }
 
         _openIndexedDB() {
-            return new Promise((resolve, reject) => {
+            return new Promise((resolve) => {
                 if (!window.indexedDB) {
                     console.warn('[ViasaMediaStorage] IndexedDB no soportado en este entorno.');
                     return resolve(null);
                 }
-                const req = window.indexedDB.open(this.dbName, this.dbVersion);
-                req.onupgradeneeded = (e) => {
-                    const db = e.target.result;
-                    if (!db.objectStoreNames.contains(STORE_MEDIA)) {
-                        const store = db.createObjectStore(STORE_MEDIA, { keyPath: 'uri' });
-                        store.createIndex('categoria', 'categoria', { unique: false });
-                        store.createIndex('nombreArchivo', 'nombreArchivo', { unique: false });
-                        store.createIndex('fechaActualizacion', 'fechaActualizacion', { unique: false });
-                    }
-                    if (!db.objectStoreNames.contains(STORE_CONFIG)) {
-                        db.createObjectStore(STORE_CONFIG, { keyPath: 'clave' });
-                    }
-                };
-                req.onsuccess = () => resolve(req.result);
-                req.onerror = () => reject(req.error);
+                const safetyTimer = setTimeout(() => {
+                    console.warn('[ViasaMediaStorage] Timeout de 800ms alcanzado al abrir IndexedDB.');
+                    resolve(null);
+                }, 800);
+
+                try {
+                    const req = window.indexedDB.open(this.dbName, this.dbVersion);
+                    req.onupgradeneeded = (e) => {
+                        const db = e.target.result;
+                        if (!db.objectStoreNames.contains(STORE_MEDIA)) {
+                            const store = db.createObjectStore(STORE_MEDIA, { keyPath: 'uri' });
+                            store.createIndex('categoria', 'categoria', { unique: false });
+                            store.createIndex('nombreArchivo', 'nombreArchivo', { unique: false });
+                            store.createIndex('fechaActualizacion', 'fechaActualizacion', { unique: false });
+                        }
+                        if (!db.objectStoreNames.contains(STORE_CONFIG)) {
+                            db.createObjectStore(STORE_CONFIG, { keyPath: 'clave' });
+                        }
+                    };
+                    req.onsuccess = () => {
+                        clearTimeout(safetyTimer);
+                        resolve(req.result);
+                    };
+                    req.onerror = () => {
+                        clearTimeout(safetyTimer);
+                        resolve(null);
+                    };
+                    req.onblocked = () => {
+                        clearTimeout(safetyTimer);
+                        console.warn('[ViasaMediaStorage] Base de datos IndexedDB bloqueada por otra pestaña.');
+                        resolve(null);
+                    };
+                } catch (e) {
+                    clearTimeout(safetyTimer);
+                    resolve(null);
+                }
             });
         }
 
@@ -1264,8 +1285,14 @@
             let allMedia = [];
             if (window.ViasaMediaStorage && typeof window.ViasaMediaStorage.obtenerTodosLosMedios === 'function') {
                 try {
-                    allMedia = await window.ViasaMediaStorage.obtenerTodosLosMedios();
-                } catch (e) {}
+                    const timeoutMedia = new Promise(resolve => setTimeout(() => resolve([]), 800));
+                    allMedia = await Promise.race([
+                        window.ViasaMediaStorage.obtenerTodosLosMedios(),
+                        timeoutMedia
+                    ]);
+                } catch (e) {
+                    allMedia = [];
+                }
             }
             const mediaMap = new Map();
             allMedia.forEach(m => {

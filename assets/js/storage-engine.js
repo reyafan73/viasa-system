@@ -90,42 +90,66 @@
         }
 
         /**
-         * Inicializa la base de datos local IndexedDB
+         * Inicializa la base de datos local IndexedDB (con timeout de seguridad de 800ms)
          */
         initIndexedDB() {
-            return new Promise((resolve, reject) => {
+            return new Promise((resolve) => {
                 if (!window.indexedDB) {
                     console.warn('[VIASA Storage] IndexedDB no soportado en este navegador. Usando LocalStorage Sandbox.');
                     this.isReady = true;
                     return resolve(null);
                 }
 
-                const request = window.indexedDB.open(this.dbName, this.dbVersion);
+                // Timeout de seguridad de máximo 800ms para evitar promesas colgadas
+                const timerSafety = setTimeout(() => {
+                    if (!this.isReady) {
+                        console.warn('[VIASA Storage] Timeout de seguridad de 800ms alcanzado para IndexedDB. Continuando con LocalStorage Sandbox.');
+                        this.isReady = true;
+                        resolve(null);
+                    }
+                }, 800);
 
-                request.onupgradeneeded = (event) => {
-                    const db = event.target.result;
-                    STORES.forEach(storeName => {
-                        if (!db.objectStoreNames.contains(storeName)) {
-                            let keyPath = 'id';
-                            if (storeName === 'configuracion') keyPath = 'clave';
-                            db.createObjectStore(storeName, { keyPath: keyPath });
-                        }
-                    });
-                    console.log('[VIASA Storage] Estructura de Base de Datos IndexedDB creada exitosamente.');
-                };
+                try {
+                    const request = window.indexedDB.open(this.dbName, this.dbVersion);
 
-                request.onsuccess = (event) => {
-                    this.db = event.target.result;
-                    this.isReady = true;
-                    console.log(`[VIASA Storage] Conectado a IndexedDB: ${this.dbName} (Aislamiento Activo)`);
-                    resolve(this.db);
-                };
+                    request.onupgradeneeded = (event) => {
+                        const db = event.target.result;
+                        STORES.forEach(storeName => {
+                            if (!db.objectStoreNames.contains(storeName)) {
+                                let keyPath = 'id';
+                                if (storeName === 'configuracion') keyPath = 'clave';
+                                db.createObjectStore(storeName, { keyPath: keyPath });
+                            }
+                        });
+                        console.log('[VIASA Storage] Estructura de Base de Datos IndexedDB creada exitosamente.');
+                    };
 
-                request.onerror = (event) => {
-                    console.error('[VIASA Storage] Error abriendo IndexedDB:', event.target.error);
+                    request.onsuccess = (event) => {
+                        clearTimeout(timerSafety);
+                        this.db = event.target.result;
+                        this.isReady = true;
+                        console.log(`[VIASA Storage] Conectado a IndexedDB: ${this.dbName} (Aislamiento Activo)`);
+                        resolve(this.db);
+                    };
+
+                    request.onerror = (event) => {
+                        clearTimeout(timerSafety);
+                        console.error('[VIASA Storage] Error abriendo IndexedDB:', event.target.error);
+                        this.isReady = true;
+                        resolve(null);
+                    };
+
+                    request.onblocked = () => {
+                        clearTimeout(timerSafety);
+                        console.warn('[VIASA Storage] Conexión IndexedDB bloqueada por otra pestaña. Continuando en modo seguro.');
+                        this.isReady = true;
+                        resolve(null);
+                    };
+                } catch (eInit) {
+                    clearTimeout(timerSafety);
                     this.isReady = true;
                     resolve(null);
-                };
+                }
             });
         }
 
@@ -307,20 +331,25 @@
         }
 
         /**
-         * Obtener todos los registros de una colección
+         * Obtener todos los registros de una colección (con timeout de seguridad de 800ms)
          */
         async obtenerColeccion(storeName) {
-            await this.initPromise;
+            try {
+                const timeoutInit = new Promise(r => setTimeout(r, 800));
+                await Promise.race([this.initPromise, timeoutInit]);
+            } catch (e) {}
             
-            if (this.db && this.db.objectStoreNames.contains(storeName)) {
+            if (this.db && this.db.objectStoreNames && this.db.objectStoreNames.contains(storeName)) {
                 try {
-                    const registros = await new Promise((resolve, reject) => {
+                    const timeoutQuery = new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout 800ms')), 800));
+                    const queryPromise = new Promise((resolve, reject) => {
                         const tx = this.db.transaction(storeName, 'readonly');
                         const store = tx.objectStore(storeName);
                         const req = store.getAll();
                         req.onsuccess = () => resolve(req.result || []);
                         req.onerror = () => reject(req.error);
                     });
+                    const registros = await Promise.race([queryPromise, timeoutQuery]);
                     if (registros && registros.length > 0) {
                         return this.sanitizarTexto(registros);
                     }

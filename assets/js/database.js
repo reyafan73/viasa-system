@@ -5126,20 +5126,27 @@
         let prodsMaster = null;
         try {
             const rawMaster = localStorage.getItem('viasa_productos_master_v1');
-            if (rawMaster) {
+            if (rawMaster && rawMaster.trim() !== '') {
                 const parsedMaster = JSON.parse(rawMaster);
-                if (Array.isArray(parsedMaster) && parsedMaster.length > 0) prodsMaster = parsedMaster;
+                if (Array.isArray(parsedMaster) && parsedMaster.length > 0) {
+                    prodsMaster = parsedMaster;
+                } else if (parsedMaster && Array.isArray(parsedMaster.productos) && parsedMaster.productos.length > 0) {
+                    prodsMaster = parsedMaster.productos;
+                }
             }
             if (!prodsMaster) {
                 const rawPNV = localStorage.getItem('viasa_productos_nueva_viasa_v1');
-                if (rawPNV) {
+                if (rawPNV && rawPNV.trim() !== '') {
                     const parsedPNV = JSON.parse(rawPNV);
                     if (parsedPNV && Array.isArray(parsedPNV.productos) && parsedPNV.productos.length > 0) {
                         prodsMaster = parsedPNV.productos;
+                    } else if (Array.isArray(parsedPNV) && parsedPNV.length > 0) {
+                        prodsMaster = parsedPNV;
                     }
                 }
             }
         } catch (e) {
+            console.warn('[VIASA DB] Parseo protegido de productos:', e);
             prodsMaster = null;
         }
 

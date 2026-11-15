@@ -508,7 +508,9 @@
                     stored = await window.ViasaStorage.obtenerColeccion('agenda_operaciones');
                 } else {
                     const raw = localStorage.getItem('viasa_agenda_operaciones');
-                    if (raw) stored = JSON.parse(raw);
+                    if (raw && raw.trim() !== '') {
+                        try { stored = JSON.parse(raw); } catch (e) { stored = null; }
+                    }
                 }
 
                 if (Array.isArray(stored) && stored.length > 0) {
@@ -525,7 +527,9 @@
                     storedEmails = await window.ViasaStorage.obtenerColeccion('agenda_bitacora_emails');
                 } else {
                     const rawE = localStorage.getItem('viasa_agenda_bitacora_emails');
-                    if (rawE) storedEmails = JSON.parse(rawE);
+                    if (rawE && rawE.trim() !== '') {
+                        try { storedEmails = JSON.parse(rawE); } catch (e) { storedEmails = null; }
+                    }
                 }
                 if (Array.isArray(storedEmails)) {
                     this.bitacoraEmails = storedEmails;

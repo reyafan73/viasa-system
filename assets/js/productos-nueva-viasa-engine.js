@@ -888,8 +888,14 @@
 
         async hydrateProductsMedia() {
             if (window.ViasaImageResolver && typeof window.ViasaImageResolver.hydrateProductsMedia === 'function') {
-                await window.ViasaImageResolver.hydrateProductsMedia(this.productos);
-                this.sincronizarTodosConPOS();
+                try {
+                    const timeoutHydrate = new Promise(r => setTimeout(r, 800));
+                    await Promise.race([
+                        window.ViasaImageResolver.hydrateProductsMedia(this.productos),
+                        timeoutHydrate
+                    ]);
+                    this.sincronizarTodosConPOS();
+                } catch (e) {}
             }
             return this.productos;
         },
