@@ -392,6 +392,7 @@
                 try {
                     this.tasaBCV = parseFloat(window.ViasaStorage.getItem('tasa_bcv', 36.85)) || 36.85;
                     this.tasaParalelo = parseFloat(window.ViasaStorage.getItem('tasa_paralelo', 39.50)) || 39.50;
+                    this.tasaUSDT = this.tasaParalelo;
                     this.tasaCOP = parseFloat(window.ViasaStorage.getItem('tasa_cop', 3900.00)) || 3900.00;
                     const metaSaved = window.ViasaStorage.getItem('tasa_sync_meta');
                     if (metaSaved) this.tasaSyncMeta = typeof metaSaved === 'string' ? JSON.parse(metaSaved) : metaSaved;
@@ -2524,6 +2525,34 @@
                 const kpiTasaUsdt = document.getElementById('kpi-tasa-usdt');
                 if (kpiTasaUsdt) kpiTasaUsdt.textContent = `Bs. ${parNum.toFixed(2)}`;
 
+                // Actualizar píldoras de Agenda Maestra en tiempo real
+                if (window.ViasaAgendaEngine && typeof window.ViasaAgendaEngine.actualizarTasas === 'function') {
+                    window.ViasaAgendaEngine.actualizarTasas(bcvNum, parNum);
+                } else {
+                    const agendaBcv = document.getElementById('agenda-rate-val-bcv');
+                    if (agendaBcv) agendaBcv.textContent = `Bs. ${bcvNum.toFixed(2)}`;
+                    const agendaUsdt = document.getElementById('agenda-rate-val-usdt');
+                    if (agendaUsdt) agendaUsdt.textContent = `Bs. ${parNum.toFixed(2)}`;
+                }
+
+                // Actualizar píldoras de Contabilidad SENIAT en tiempo real
+                const cntBcv = document.querySelector('.cnt-rate-pill.bcv .cnt-rate-val');
+                if (cntBcv) cntBcv.textContent = `Bs. ${formatearMontoVE(bcvNum)}`;
+                const cntUsdt = document.querySelector('.cnt-rate-pill.usdt .cnt-rate-val');
+                if (cntUsdt) cntUsdt.textContent = `Bs. ${formatearMontoVE(parNum)}`;
+
+                // Actualizar barra de tasas en Anales de Guardias
+                const analesBcv = document.getElementById('anales-tasa-bcv-val');
+                if (analesBcv) analesBcv.textContent = `Bs. ${bcvNum.toFixed(2)}`;
+                const analesUsdt = document.getElementById('anales-tasa-usdt-val');
+                if (analesUsdt) analesUsdt.textContent = `Bs. ${parNum.toFixed(2)}`;
+
+                // Actualizar etiquetas en modal POS
+                const posBcv = document.getElementById('pos-modal-tasa-bcv-lbl');
+                if (posBcv) posBcv.textContent = `Bs. ${bcvNum.toFixed(2)}`;
+                const posUsdt = document.getElementById('pos-modal-tasa-usdt-lbl');
+                if (posUsdt) posUsdt.textContent = `Bs. ${parNum.toFixed(2)}`;
+
                 // 3. Modal Historial Resumen
                 const histBCV = document.getElementById('hist-tasa-bcv-actual');
                 const histUSDT = document.getElementById('hist-tasa-usdt-actual');
@@ -2862,6 +2891,7 @@
 
             this.tasaBCV = parseFloat(nuevaBCV);
             this.tasaParalelo = parseFloat(nuevoParalelo);
+            this.tasaUSDT = this.tasaParalelo;
             
             this.tasaSyncMeta = {
                 fechaBCV: metadata.fechaBCV || new Date().toISOString(),

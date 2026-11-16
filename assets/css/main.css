@@ -9357,30 +9357,56 @@ input, select, textarea {
 }
 
 .cnt-rate-pill {
-    background: #F8FAFC;
-    border: 1px solid #CBD5E1;
-    border-radius: 10px;
-    padding: 6px 12px;
-    display: flex;
-    flex-direction: column;
-    min-width: 128px;
+    background: #F3EDE2 !important;
+    border: 1.5px solid #8C5A32 !important;
+    border-radius: 10px !important;
+    padding: 6px 14px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    min-width: 130px !important;
+    box-shadow: 0 1px 3px rgba(44, 26, 18, 0.08) !important;
+    transition: all 0.2s ease !important;
 }
 
 .cnt-rate-pill.bcv {
-    background: #EFF6FF;
-    border-color: #93C5FD;
+    background: #FEF3C7 !important;
+    border-color: #C88A2B !important;
+}
+
+.cnt-rate-pill.bcv .cnt-rate-lbl {
+    color: #78350F !important;
+    font-size: 11.5px !important;
+    font-weight: 700 !important;
+}
+
+.cnt-rate-pill.bcv .cnt-rate-val {
+    color: #2C1A12 !important;
+    font-size: 14px !important;
+    font-weight: 900 !important;
 }
 
 .cnt-rate-pill.usdt {
-    background: #ECFDF5;
-    border-color: #6EE7B7;
+    background: #F3EDE2 !important;
+    border-color: #8C5A32 !important;
+}
+
+.cnt-rate-pill.usdt .cnt-rate-lbl {
+    color: #5C4D44 !important;
+    font-size: 11.5px !important;
+    font-weight: 700 !important;
+}
+
+.cnt-rate-pill.usdt .cnt-rate-val {
+    color: #2C1A12 !important;
+    font-size: 14px !important;
+    font-weight: 900 !important;
 }
 
 .cnt-rate-lbl {
-    font-size: 0.65rem;
+    font-size: 0.68rem;
     font-weight: 800;
     text-transform: uppercase;
-    color: #475569;
+    color: #5C4D44;
     letter-spacing: 0.4px;
 }
 
@@ -9389,7 +9415,7 @@ input, select, textarea {
     font-variant-numeric: tabular-nums;
     font-size: 0.94rem;
     font-weight: 900;
-    color: #0F172A;
+    color: #2C1A12;
 }
 
 /* Cinta de KPIs Financieros */
@@ -10402,7 +10428,7 @@ input, select, textarea {
     z-index: 3;
     background: rgba(15, 23, 42, 0.85);
     backdrop-filter: blur(4px);
-    color: #FDE68A;
+    color: #78350F !important;
     border: 1px solid rgba(251, 191, 36, 0.45);
     border-radius: 8px;
     padding: 4px 9px;
@@ -12353,34 +12379,132 @@ input, select, textarea {
     flex-wrap: wrap;
 }
 
-.agenda-rate-pills {
-    display: flex;
-    gap: 8px;
+.agenda-rate-pills,
+.viasa-rate-pills {
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    flex-wrap: wrap !important;
 }
 
-.agenda-rate-pill {
-    padding: 6px 12px;
-    border-radius: 8px;
-    font-size: 0.75rem;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-weight: 600;
-    border: 1px solid #334155;
-    background: #1E293B;
-    color: #E2E8F0;
+.agenda-rate-pill,
+.viasa-rate-pill {
+    padding: 6px 14px !important;
+    border-radius: 8px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    font-size: 12.5px !important;
+    font-weight: 700 !important;
+    line-height: 1.2 !important;
+    white-space: nowrap !important;
+    box-shadow: 0 1px 3px rgba(44, 26, 18, 0.08) !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+    box-sizing: border-box !important;
 }
 
-.agenda-rate-pill.bcv {
-    border-color: rgba(245, 158, 11, 0.4);
-    background: rgba(245, 158, 11, 0.08);
-    color: #FDE68A;
+.agenda-rate-pill:hover,
+.viasa-rate-pill:hover {
+    transform: translateY(-1px) !important;
+    box-shadow: 0 3px 8px rgba(44, 26, 18, 0.12) !important;
 }
 
-.agenda-rate-pill.usdt {
-    border-color: rgba(16, 185, 129, 0.4);
-    background: rgba(16, 185, 129, 0.08);
-    color: #A7F3D0;
+/* --- A. PÍLDORA OFICIAL BCV (CONTRASTE EJECUTIVO ALTO WCAG AAA) --- */
+.agenda-rate-pill.bcv,
+.viasa-rate-pill.bcv {
+    background: #FEF3C7 !important;
+    border: 1.5px solid #C88A2B !important;
+    color: #78350F !important;
+}
+
+.agenda-rate-pill.bcv i,
+.viasa-rate-pill.bcv i {
+    color: #78350F !important;
+    font-size: 13px !important;
+}
+
+.agenda-rate-pill.bcv span,
+.agenda-rate-pill.bcv .rate-lbl,
+.viasa-rate-pill.bcv span {
+    color: #78350F !important;
+    font-weight: 700 !important;
+    font-size: 12.5px !important;
+}
+
+.agenda-rate-pill.bcv b,
+.agenda-rate-pill.bcv strong,
+.agenda-rate-pill.bcv .rate-val,
+.viasa-rate-pill.bcv b,
+.viasa-rate-pill.bcv strong {
+    color: #2C1A12 !important;
+    font-weight: 900 !important;
+    font-size: 13.5px !important;
+    font-family: inherit !important;
+    margin-left: 2px !important;
+}
+
+/* --- B. PÍLDORA OFICIAL USDT (CONTRASTE SÓLIDO NÍTIDO WCAG AAA) --- */
+.agenda-rate-pill.usdt,
+.viasa-rate-pill.usdt {
+    background: #F3EDE2 !important;
+    border: 1.5px solid #8C5A32 !important;
+    color: #5C4D44 !important;
+}
+
+.agenda-rate-pill.usdt i,
+.viasa-rate-pill.usdt i {
+    color: #8C5A32 !important;
+    font-size: 13px !important;
+}
+
+.agenda-rate-pill.usdt span,
+.agenda-rate-pill.usdt .rate-lbl,
+.viasa-rate-pill.usdt span {
+    color: #5C4D44 !important;
+    font-weight: 700 !important;
+    font-size: 12.5px !important;
+}
+
+.agenda-rate-pill.usdt b,
+.agenda-rate-pill.usdt strong,
+.agenda-rate-pill.usdt .rate-val,
+.viasa-rate-pill.usdt b,
+.viasa-rate-pill.usdt strong {
+    color: #2C1A12 !important;
+    font-weight: 900 !important;
+    font-size: 13.5px !important;
+    font-family: inherit !important;
+    margin-left: 2px !important;
+}
+
+/* Variante Oscura Elegante para USDT */
+.agenda-rate-pill.usdt.dark,
+.viasa-rate-pill.usdt.dark {
+    background: #2C1A12 !important;
+    border: 1.5px solid #8C5A32 !important;
+}
+
+.agenda-rate-pill.usdt.dark i,
+.viasa-rate-pill.usdt.dark i {
+    color: #E5D5C0 !important;
+}
+
+.agenda-rate-pill.usdt.dark span,
+.agenda-rate-pill.usdt.dark .rate-lbl,
+.viasa-rate-pill.usdt.dark span {
+    color: #E5D5C0 !important;
+    font-weight: 700 !important;
+}
+
+.agenda-rate-pill.usdt.dark b,
+.agenda-rate-pill.usdt.dark strong,
+.agenda-rate-pill.usdt.dark .rate-val,
+.viasa-rate-pill.usdt.dark b,
+.viasa-rate-pill.usdt.dark strong {
+    color: #F59E0B !important;
+    font-weight: 900 !important;
+    font-size: 13.5px !important;
 }
 
 .btn-agenda-action {
@@ -12589,7 +12713,7 @@ input, select, textarea {
 
 .agenda-view-btn.active {
     background: #1E293B;
-    color: #FDE68A;
+    color: #78350F !important;
     border: 1px solid #F59E0B;
     box-shadow: 0 2px 8px rgba(245, 158, 11, 0.2);
 }
@@ -12686,7 +12810,7 @@ input, select, textarea {
 }
 
 .agenda-btn-mini-nav.today {
-    color: #FDE68A;
+    color: #78350F !important;
     background: rgba(245, 158, 11, 0.12);
     border: 1px solid rgba(245, 158, 11, 0.3);
 }
@@ -12748,9 +12872,9 @@ input, select, textarea {
     gap: 5px;
 }
 
-.agenda-chip-stat.produccion { border-color: rgba(245, 158, 11, 0.35); color: #FDE68A; }
-.agenda-chip-stat.entrega { border-color: rgba(16, 185, 129, 0.35); color: #A7F3D0; }
-.agenda-chip-stat.pago { border-color: rgba(239, 68, 68, 0.35); color: #FCA5A5; }
+.agenda-chip-stat.produccion { background: #FEF3C7 !important; border-color: #C88A2B !important; color: #78350F !important; font-weight: 800 !important; }
+.agenda-chip-stat.entrega { background: #DCFCE7 !important; border-color: #16A34A !important; color: #14532D !important; font-weight: 800 !important; }
+.agenda-chip-stat.pago { background: #FEE2E2 !important; border-color: #DC2626 !important; color: #991B1B !important; font-weight: 800 !important; }
 
 /* CUADRÍCULA DE 7 COLUMNAS DEL CALENDARIO */
 .agenda-calendar-grid {
@@ -12913,21 +13037,24 @@ input, select, textarea {
 }
 
 .agenda-capsule-status.en_curso {
-    background: rgba(245, 158, 11, 0.25);
-    color: #FDE68A;
-    border: 1px solid #F59E0B;
+    background: #FEF3C7 !important;
+    color: #78350F !important;
+    border: 1px solid #C88A2B !important;
+    font-weight: 800 !important;
 }
 
 .agenda-capsule-status.completado {
-    background: rgba(16, 185, 129, 0.25);
-    color: #A7F3D0;
-    border: 1px solid #10B981;
+    background: #DCFCE7 !important;
+    color: #14532D !important;
+    border: 1px solid #16A34A !important;
+    font-weight: 800 !important;
 }
 
 .agenda-capsule-status.postergado {
-    background: rgba(168, 85, 247, 0.25);
-    color: #E9D5FF;
-    border: 1px solid #A855F7;
+    background: #F3E8FF !important;
+    color: #581C87 !important;
+    border: 1px solid #9333EA !important;
+    font-weight: 800 !important;
 }
 
 .agenda-capsule-title {
@@ -12969,7 +13096,7 @@ input, select, textarea {
     font-size: 0.75rem;
     font-weight: 800;
     letter-spacing: 0.5px;
-    color: #FDE68A;
+    color: #78350F !important;
     display: flex;
     align-items: center;
     gap: 8px;
@@ -12999,7 +13126,7 @@ input, select, textarea {
 
 .btn-agenda-more-months:hover {
     border-color: #F59E0B;
-    color: #FDE68A;
+    color: #78350F !important;
     background: rgba(245, 158, 11, 0.05);
 }
 
@@ -13065,7 +13192,7 @@ input, select, textarea {
     background: #0B0F19;
     border: 1px solid #334155;
     border-radius: 6px;
-    color: #FDE68A;
+    color: #78350F !important;
     padding: 6px 10px;
     font-size: 0.82rem;
     font-weight: 800;
@@ -13151,7 +13278,7 @@ input, select, textarea {
 .agenda-timeline-card-time {
     font-size: 0.75rem;
     font-weight: 800;
-    color: #FDE68A;
+    color: #78350F !important;
     white-space: nowrap;
 }
 
@@ -13344,9 +13471,9 @@ input, select, textarea {
     color: #FFFFFF;
 }
 
-.btn-kanban-step.amber { border-color: rgba(245, 158, 11, 0.4); color: #FDE68A; }
-.btn-kanban-step.green { border-color: rgba(16, 185, 129, 0.4); color: #A7F3D0; }
-.btn-kanban-step.purple { border-color: rgba(168, 85, 247, 0.4); color: #E9D5FF; }
+.btn-kanban-step.amber { background: #FEF3C7 !important; border-color: #C88A2B !important; color: #78350F !important; font-weight: 800 !important; }
+.btn-kanban-step.green { background: #DCFCE7 !important; border-color: #16A34A !important; color: #14532D !important; font-weight: 800 !important; }
+.btn-kanban-step.purple { background: #F3E8FF !important; border-color: #9333EA !important; color: #581C87 !important; font-weight: 800 !important; }
 
 /* --- 8. MODALES CORPORATIVOS --- */
 .agenda-modal-overlay {
@@ -13516,7 +13643,7 @@ input, select, textarea {
     font-weight: 800;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    color: #FDE68A;
+    color: #78350F !important;
     margin-bottom: 10px;
     padding-bottom: 6px;
     border-bottom: 1px solid #1F2937;
@@ -16583,6 +16710,116 @@ button[onclick*="CerrarModal"]:hover {
     .viasa-modal-footer button {
         flex: 1 1 auto !important;
     }
+}
+
+/* ==============================================================================
+   ESTÁNDAR ERGONÓMICO WCAG AAA: SUITE UNIVERSAL DE PÍLDORAS Y BOTONES DE COTIZACIÓN
+   (BCV Y USDT - ALTA LEGIBILIDAD, CONTRASTE EJECUTIVO Y ANTI-FATIGA VISUAL)
+   ============================================================================== */
+
+/* PÍLDORA OFICIAL BCV */
+.agenda-rate-pill.bcv,
+.viasa-rate-pill.bcv,
+.rate-badge.bcv,
+.cnt-rate-pill.bcv,
+.viasa-badge-bcv {
+    background: #FEF3C7 !important;
+    border: 1.5px solid #C88A2B !important;
+    color: #78350F !important;
+    box-shadow: 0 1px 3px rgba(44, 26, 18, 0.08) !important;
+}
+
+.agenda-rate-pill.bcv i,
+.viasa-rate-pill.bcv i,
+.rate-badge.bcv i,
+.cnt-rate-pill.bcv i,
+.viasa-badge-bcv i {
+    color: #78350F !important;
+}
+
+.agenda-rate-pill.bcv span,
+.agenda-rate-pill.bcv .rate-lbl,
+.viasa-rate-pill.bcv span,
+.rate-badge.bcv span,
+.cnt-rate-pill.bcv .cnt-rate-lbl,
+.viasa-badge-bcv span {
+    color: #78350F !important;
+    font-weight: 700 !important;
+    font-size: 12.5px !important;
+}
+
+.agenda-rate-pill.bcv b,
+.agenda-rate-pill.bcv strong,
+.agenda-rate-pill.bcv .rate-val,
+.viasa-rate-pill.bcv b,
+.viasa-rate-pill.bcv strong,
+.rate-badge.bcv strong,
+.cnt-rate-pill.bcv .cnt-rate-val,
+.viasa-badge-bcv strong {
+    color: #2C1A12 !important;
+    font-weight: 900 !important;
+    font-size: 13.5px !important;
+}
+
+/* PÍLDORA OFICIAL USDT */
+.agenda-rate-pill.usdt,
+.viasa-rate-pill.usdt,
+.rate-badge.paralelo,
+.rate-badge.usdt,
+.cnt-rate-pill.usdt,
+.viasa-badge-usdt {
+    background: #F3EDE2 !important;
+    border: 1.5px solid #8C5A32 !important;
+    color: #5C4D44 !important;
+    box-shadow: 0 1px 3px rgba(44, 26, 18, 0.08) !important;
+}
+
+.agenda-rate-pill.usdt i,
+.viasa-rate-pill.usdt i,
+.rate-badge.paralelo i,
+.rate-badge.usdt i,
+.cnt-rate-pill.usdt i,
+.viasa-badge-usdt i {
+    color: #8C5A32 !important;
+}
+
+.agenda-rate-pill.usdt span,
+.agenda-rate-pill.usdt .rate-lbl,
+.viasa-rate-pill.usdt span,
+.rate-badge.paralelo span,
+.rate-badge.usdt span,
+.cnt-rate-pill.usdt .cnt-rate-lbl,
+.viasa-badge-usdt span {
+    color: #5C4D44 !important;
+    font-weight: 700 !important;
+    font-size: 12.5px !important;
+}
+
+.agenda-rate-pill.usdt b,
+.agenda-rate-pill.usdt strong,
+.agenda-rate-pill.usdt .rate-val,
+.viasa-rate-pill.usdt b,
+.viasa-rate-pill.usdt strong,
+.rate-badge.paralelo strong,
+.rate-badge.usdt strong,
+.cnt-rate-pill.usdt .cnt-rate-val,
+.viasa-badge-usdt strong {
+    color: #2C1A12 !important;
+    font-weight: 900 !important;
+    font-size: 13.5px !important;
+}
+
+/* Prohibición de texto claro sobre fondos claros/pasteles */
+.rate-badge.bcv strong,
+.rate-badge.paralelo strong,
+.rate-badge.usdt strong,
+#rate-bcv-val,
+#rate-paralelo-val,
+#dash-rate-bcv-val,
+#dash-rate-usdt-val,
+#hist-tasa-bcv-actual,
+#hist-tasa-usdt-actual {
+    color: #2C1A12 !important;
 }
 
 

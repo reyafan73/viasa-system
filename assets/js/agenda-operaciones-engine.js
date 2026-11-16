@@ -582,13 +582,32 @@
             if (window.ViasaApp && parseFloat(window.ViasaApp.tasaBCV) > 0) return parseFloat(window.ViasaApp.tasaBCV);
             if (window.ViasaContabilidadEngine && parseFloat(window.ViasaContabilidadEngine.tasaBCV) > 0) return parseFloat(window.ViasaContabilidadEngine.tasaBCV);
             if (window.ViasaDatabase && window.ViasaDatabase.tasaBCV > 0) return parseFloat(window.ViasaDatabase.tasaBCV);
+            try {
+                const cached = parseFloat(window.ViasaStorage?.getItem('tasa_bcv', 0));
+                if (cached > 0) return cached;
+            } catch (e) {}
             return 36.85;
         },
 
         getTasaUSDT() {
             if (window.ViasaApp && parseFloat(window.ViasaApp.tasaUSDT) > 0) return parseFloat(window.ViasaApp.tasaUSDT);
+            if (window.ViasaApp && parseFloat(window.ViasaApp.tasaParalelo) > 0) return parseFloat(window.ViasaApp.tasaParalelo);
+            if (window.ViasaContabilidadEngine && parseFloat(window.ViasaContabilidadEngine.tasaUSDT) > 0) return parseFloat(window.ViasaContabilidadEngine.tasaUSDT);
             if (window.ViasaDatabase && window.ViasaDatabase.tasaParalelo > 0) return parseFloat(window.ViasaDatabase.tasaParalelo);
-            return 37.50;
+            try {
+                const cached = parseFloat(window.ViasaStorage?.getItem('tasa_paralelo', 0));
+                if (cached > 0) return cached;
+            } catch (e) {}
+            return 39.50;
+        },
+
+        actualizarTasas(bcv, usdt) {
+            const bcvVal = parseFloat(bcv) || this.getTasaBCV();
+            const usdtVal = parseFloat(usdt) || this.getTasaUSDT();
+            const bcvEl = document.getElementById('agenda-rate-val-bcv');
+            const usdtEl = document.getElementById('agenda-rate-val-usdt');
+            if (bcvEl) bcvEl.textContent = `Bs. ${bcvVal.toFixed(2)}`;
+            if (usdtEl) usdtEl.textContent = `Bs. ${usdtVal.toFixed(2)}`;
         },
 
         actualizarBadgeSidebar() {
@@ -642,13 +661,15 @@
                         <!-- TASAS ACTIVAS Y BOTONES DE ACCIÓN PRINCIPALES -->
                         <div class="agenda-header-actions">
                             <div class="agenda-rate-pills">
-                                <div class="agenda-rate-pill bcv" title="Tasa Oficial Banco Central de Venezuela">
+                                <div class="agenda-rate-pill bcv" id="agenda-rate-pill-bcv" onclick="if(window.ViasaApp) window.ViasaApp.sincronizarTasasEnTiempoReal(true);" title="Tasa Oficial Banco Central de Venezuela (Clic para sincronizar en tiempo real)">
                                     <i class="fa-solid fa-building-columns"></i>
-                                    <span>BCV: <b>Bs. ${tasa.toFixed(2)}</b></span>
+                                    <span class="rate-lbl">BCV:</span>
+                                    <b class="rate-val" id="agenda-rate-val-bcv">Bs. ${tasa.toFixed(2)}</b>
                                 </div>
-                                <div class="agenda-rate-pill usdt" title="Tasa Cripto / Libre">
+                                <div class="agenda-rate-pill usdt" id="agenda-rate-pill-usdt" onclick="if(window.ViasaApp) window.ViasaApp.sincronizarTasasEnTiempoReal(true);" title="Tasa Referencial USDT / Cripto (Clic para sincronizar en tiempo real)">
                                     <i class="fa-solid fa-coins"></i>
-                                    <span>USDT: <b>Bs. ${tasaUsdt.toFixed(2)}</b></span>
+                                    <span class="rate-lbl">USDT:</span>
+                                    <b class="rate-val" id="agenda-rate-val-usdt">Bs. ${tasaUsdt.toFixed(2)}</b>
                                 </div>
                             </div>
 
