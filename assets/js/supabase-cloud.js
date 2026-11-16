@@ -152,7 +152,120 @@
             }
             return { success: true, enviados };
         }
+
+        /**
+         * Adaptador Local-First + Cloud Sync: transmite cambios individuales al backend
+         */
+        async pushChange(collection, record, action = 'upsert') {
+            if (!this.isConnected || !navigator.onLine) {
+                return { synced: false, mode: 'local' };
+            }
+            try {
+                const user = window.ViasaAuth?.getCurrentUser();
+                const payload = {
+                    collection: collection,
+                    action: action,
+                    record: record,
+                    updated_by: user ? `${user.username} (${user.cargo})` : 'system',
+                    updated_at: new Date().toISOString()
+                };
+                const res = await fetch(`${this.supabaseUrl}/rest/v1/viasa_cloud_mutations`, {
+                    method: 'POST',
+                    headers: this.getHeaders(),
+                    body: JSON.stringify(payload)
+                });
+                return { synced: res.ok, mode: res.ok ? 'cloud' : 'local' };
+            } catch (e) {
+                console.warn(`[Cloud Sync] Error no bloqueante enviando cambio de ${collection}:`, e);
+                return { synced: false, mode: 'local' };
+            }
+        }
+
+        /**
+         * Probar conexión con Supabase / Cloud backend
+         */
+        async probarConexion() {
+            if (!this.supabaseUrl || !this.supabaseAnonKey) {
+                return {
+                    ok: false,
+                    statusText: 'Credenciales incompletas',
+                    message: 'Debes ingresar la URL del proyecto y el Anon Key.'
+                };
+            }
+            if (!navigator.onLine) {
+                return {
+                    ok: false,
+                    statusText: 'Sin conexión a Internet',
+                    message: 'El equipo se encuentra offline.'
+                };
+            }
+            try {
+                const res = await fetch(`${this.supabaseUrl}/rest/v1/`, {
+                    method: 'GET',
+                    headers: {
+                        'apikey': this.supabaseAnonKey,
+                        'Authorization': `Bearer ${this.supabaseAnonKey}`
+                    }
+                });
+                if (res.ok || res.status === 200 || res.status === 404 || res.status === 401) {
+                    if (res.status === 401) {
+                        return {
+                            ok: false,
+                            statusText: 'API Key No Válida',
+                            message: 'La URL respondió pero el API Key fue rechazado por Supabase.'
+                        };
+                    }
+                    this.isConnected = true;
+                    return {
+                        ok: true,
+                        statusText: 'Nube Conectada en Tiempo Real',
+                        message: '¡Conexión exitosa con el proyecto Cloud de VIASA System!'
+                    };
+                }
+                return {
+                    ok: false,
+                    statusText: `Error HTTP ${res.status}`,
+                    message: `El servidor respondió con código ${res.status}.`
+                };
+            } catch (err) {
+                return {
+                    ok: false,
+                    statusText: 'Fallo de Red / Conexión',
+                    message: err.message || 'No se pudo contactar con el endpoint de Supabase.'
+                };
+            }
+        }
+
+        /**
+         * Obtener estado descriptivo de la conexión cloud
+         */
+        obtenerEstadoConexion() {
+            if (!this.supabaseUrl || !this.supabaseAnonKey || this.supabaseUrl.includes('tu-proyecto-id')) {
+                return {
+                    conectado: false,
+                    badge: 'Modo Local Blindado (100% Offline)',
+                    clase: 'offline',
+                    color: '#10b981'
+                };
+            }
+            if (!navigator.onLine) {
+                return {
+                    conectado: false,
+                    badge: 'Sin Conexión a Internet (Trabajando en Local)',
+                    clase: 'offline',
+                    color: '#f59e0b'
+                };
+            }
+            return {
+                conectado: true,
+                badge: 'Nube Conectada en Tiempo Real (Multi-Laptop Activo)',
+                clase: 'online',
+                color: '#3b82f6'
+            };
+        }
     }
 
     window.ViasaCloud = new ViasaSupabaseCloudEngine();
+    window.cloudSyncService = window.ViasaCloud;
+    window.ViasaCloudSync = window.ViasaCloud;
 })(window);

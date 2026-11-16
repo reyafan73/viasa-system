@@ -1,8 +1,8 @@
 {
   "id": "/?source=pwa",
-  "name": "VIASA SYSTEM",
-  "short_name": "VIASA",
-  "description": "Sistema Integral de Gestión Administrativa, Operativa, Producción, RRHH LOTTT y Punto de Venta Multidivisa para Panadería y Pastelería Nueva Viasa, C.A.",
+  "name": "VIASA SYSTEM V1.5 (Edición Corporativa Multi-Sede)",
+  "short_name": "VIASA V1.5",
+  "description": "VIASA System V1.5 (Edición Corporativa Multi-Sede) - Sistema Integral de Gestión Administrativa, Operativa, Producción, RRHH LOTTT y Punto de Venta Multidivisa para Panadería y Pastelería Nueva Viasa, C.A.",
   "lang": "es-VE",
   "dir": "ltr",
   "start_url": "./index.html?source=pwa",

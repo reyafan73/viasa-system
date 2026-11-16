@@ -50,7 +50,28 @@
                     <img src="assets/img/viasa_isotipo.png" alt="VIASA System Logo">
                 </div>
                 <h1 class="viasa-welcome-title">PANADERÍA Y PASTELERÍA NUEVA VIASA</h1>
-                <p class="viasa-welcome-subtitle">SISTEMA DE GESTIÓN Y DESARROLLO ADMINISTRATIVO Y OPERATIVO</p>
+                <p class="viasa-welcome-subtitle">VIASA System V1.5 &bull; Edición Corporativa Multi-Sede</p>
+
+                <!-- Selector de Operador Activo en Estación de Trabajo -->
+                <div class="viasa-welcome-operator-card" id="viasa-welcome-operator-card" style="margin: 16px 0 20px 0; padding: 12px 18px; background: rgba(255,255,255,0.06); border: 1.5px solid rgba(245,158,11,0.4); border-radius: 12px; display: flex; align-items: center; gap: 14px; text-align: left;">
+                    <div class="viasa-avatar-circle" id="welcome-op-avatar" style="width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, #c88a2b, #7c4d2b); display: flex; align-items: center; justify-content: center; border: 2px solid #f59e0b; box-shadow: 0 4px 10px rgba(0,0,0,0.3); flex-shrink: 0;">
+                        <i class="fa-solid fa-crown" style="color: #ffffff; font-size: 1.25rem;"></i>
+                    </div>
+                    <div style="flex: 1; min-width: 0;">
+                        <div style="font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.5px; color: #f59e0b; font-weight: 800;">Operador Activo en Esta Laptop:</div>
+                        <div id="welcome-op-name" style="font-size: 0.96rem; font-weight: 900; color: #ffffff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">DESARROLLADOR (Master Senior)</div>
+                        <div id="welcome-op-role" style="font-size: 0.74rem; color: #d1d5db; font-weight: 600;">👑 Master Senior &bull; Acceso Total 100%</div>
+                    </div>
+                    <div>
+                        <select id="welcome-op-select" onchange="ViasaApp.cambiarOperadorEnWelcome(this.value)" style="background: #1e1a17; color: #fbbf24; border: 1px solid #c88a2b; border-radius: 8px; padding: 6px 10px; font-size: 0.78rem; font-weight: 800; cursor: pointer; outline: none;">
+                            <option value="USR-001" selected>👑 Master Senior</option>
+                            <option value="USR-002">📊 Valentina Mendoza (Gerente General)</option>
+                            <option value="USR-007">📊 Carmen Bastardo (Gerente Planta)</option>
+                            <option value="USR-004">🏪 María Contreras (Cajera / POS)</option>
+                            <option value="USR-003">🌾 Carlos Rodríguez (Supervisor)</option>
+                        </select>
+                    </div>
+                </div>
                 
                 <button type="button" class="btn-iniciar-viasa-hero" id="btn-iniciar-viasa" onclick="ViasaApp.iniciarIntroConAudio()">
                     <i class="fa-solid fa-play"></i>
@@ -59,7 +80,7 @@
                 </button>
                 
                 <div class="viasa-welcome-badge">
-                    <i class="fa-solid fa-bolt"></i> Carga Ultra-Rápida Offline &bull; Audio HD 100%
+                    <i class="fa-solid fa-shield-halved"></i> Edición Corporativa V1.5 &bull; Multi-Sede Offline-First
                 </div>
             </div>
         </div>
@@ -97,7 +118,7 @@
                 <img src="assets/img/viasa_isotipo.png" alt="VIASA System" style="width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 6px 14px rgba(0,0,0,0.6));">
             </div>
             <div class="login-desc">
-                SISTEMA DE GESTIÓN Y DESARROLLO ADMINISTRATIVO Y OPERATIVO
+                VIASA System V1.5 (Edición Corporativa Multi-Sede) &bull; Gestión Administrativa y Operativa
             </div>
 
             <!-- Selector de Roles Rápidos (5 Niveles Jerárquicos) -->
@@ -144,7 +165,7 @@
             </form>
 
             <div style="margin-top: 18px; font-size: 0.72rem; color: var(--text-muted);">
-                <i class="fa-solid fa-lock"></i> Almacenamiento Aislado Sandbox &bull; VIASA v1.0
+                <i class="fa-solid fa-lock"></i> Almacenamiento Aislado Sandbox &bull; VIASA System V1.5 (Edición Corporativa Multi-Sede)
             </div>
         </div>
     </div>
@@ -160,8 +181,8 @@
                         <img src="assets/img/viasa_isotipo.png" alt="Logo VIASA" id="sidebar-brand-logo-img" class="brand-logo-circular">
                     </div>
                     <div class="brand-text-block">
-                        <div class="brand-title">VIASA System</div>
-                        <div class="brand-subtitle">GESTIÓN ADMINISTRATIVA Y OPERATIVA</div>
+                        <div class="brand-title">VIASA System V1.5</div>
+                        <div class="brand-subtitle">Edición Corporativa Multi-Sede</div>
                     </div>
                 </div>
 
@@ -288,7 +309,7 @@
                 </button>
                 <div style="padding: 10px 8px; background: rgba(0,0,0,0.3); border-radius: 8px; border: 1px solid var(--border-color); font-size: 0.72rem; color: var(--text-muted);">
                     <div style="display: flex; align-items: center; gap: 6px; color: var(--success); font-weight: 800; margin-bottom: 2px;">
-                        <i class="fa-solid fa-shield-halved"></i> PWA Offline-First v2.6
+                        <i class="fa-solid fa-shield-halved"></i> VIASA System V1.5 Multi-Sede
                     </div>
                     <div>Sandbox: <code>viasa_sys_*</code></div>
                 </div>

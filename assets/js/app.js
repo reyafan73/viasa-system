@@ -1189,6 +1189,88 @@
             }
         },
 
+        /**
+         * Selector de Operador Activo en Pantalla de Bienvenida / Acceso (V1.5)
+         */
+        cambiarOperadorEnWelcome(userId) {
+            const usuarios = (window.ViasaAuth && typeof window.ViasaAuth.obtenerUsuarios === 'function')
+                ? window.ViasaAuth.obtenerUsuarios()
+                : (window.ViasaDatabase?.usuarios || []);
+            
+            const user = usuarios.find(u => u.id === userId) || {
+                id: 'USR-001',
+                username: 'admin',
+                nombreCompleto: 'DESARROLLADOR (Master Senior)',
+                rol: 'master_senior',
+                cargo: 'Director General / Master Senior',
+                avatar: 'fa-crown'
+            };
+
+            const nameEl = document.getElementById('welcome-op-name');
+            const roleEl = document.getElementById('welcome-op-role');
+            const avatarEl = document.getElementById('welcome-op-avatar');
+            const selectEl = document.getElementById('welcome-op-select');
+
+            if (nameEl) nameEl.textContent = user.nombreCompleto || user.username;
+            if (roleEl) {
+                let badgeText = user.cargo || user.rol;
+                if (user.rol === 'master_senior') badgeText = '👑 Master Senior • Acceso Total 100%';
+                else if (user.rol === 'omega') badgeText = '📊 Administrador / Gerente de Planta';
+                else if (user.rol === 'kappa') badgeText = '🏪 Cajera Principal y Operador POS';
+                else if (user.rol === 'sigma') badgeText = '🌾 Supervisor de Producción';
+                else if (user.rol === 'alfa') badgeText = '🚚 Operador de Logística y Salón';
+                roleEl.textContent = badgeText;
+            }
+
+            if (avatarEl) {
+                let iconClass = 'fa-user-tie';
+                let iconColor = '#ffffff';
+                let bgGradient = 'linear-gradient(135deg, #c88a2b, #7c4d2b)';
+                let borderCol = '#f59e0b';
+
+                if (user.rol === 'master_senior') {
+                    iconClass = 'fa-crown';
+                    borderCol = '#f59e0b';
+                    bgGradient = 'linear-gradient(135deg, #c88a2b, #7c4d2b)';
+                } else if (user.rol === 'omega') {
+                    iconClass = 'fa-user-gear';
+                    borderCol = '#3b82f6';
+                    bgGradient = 'linear-gradient(135deg, #2563eb, #1e3a8a)';
+                } else if (user.rol === 'kappa') {
+                    iconClass = 'fa-cash-register';
+                    borderCol = '#10b981';
+                    bgGradient = 'linear-gradient(135deg, #059669, #064e3b)';
+                } else if (user.rol === 'sigma') {
+                    iconClass = 'fa-wheat-awn';
+                    borderCol = '#a855f7';
+                    bgGradient = 'linear-gradient(135deg, #7c3aed, #4c1d95)';
+                } else if (user.rol === 'alfa') {
+                    iconClass = 'fa-truck-fast';
+                    borderCol = '#06b6d4';
+                    bgGradient = 'linear-gradient(135deg, #0891b2, #164e63)';
+                }
+
+                avatarEl.style.background = bgGradient;
+                avatarEl.style.border = `2px solid ${borderCol}`;
+                avatarEl.innerHTML = `<i class="fa-solid ${iconClass}" style="color: ${iconColor}; font-size: 1.25rem;"></i>`;
+            }
+
+            if (selectEl && selectEl.value !== userId) {
+                selectEl.value = userId;
+            }
+
+            // Fijar usuario activo en sesión y estado
+            this.currentUser = user;
+            if (window.ViasaAuth) {
+                window.ViasaAuth.currentUser = user;
+                window.ViasaAuth.isAuthenticated = true;
+            }
+
+            // Sincronizar campos del formulario de login
+            const roleForLogin = (user.rol === 'omega' && user.id === 'USR-007') ? 'omega_admin' : user.rol;
+            this.seleccionarRolEnLogin(roleForLogin);
+        },
+
         seleccionarRolEnLogin(rolId) {
             document.querySelectorAll('.role-pill-btn').forEach(btn => {
                 btn.classList.toggle('active', btn.getAttribute('data-role') === rolId);
@@ -20519,12 +20601,12 @@
                                 <i class="fa-solid fa-folder-tree"></i> 📂 Sincronizar Carpetas Laptop
                             </button>
 
-                            <button type="button" class="btn-secondary" onclick="ViasaApp.descargarCopiaSeguridadCompletaJSON()" style="padding: 11px 16px; font-size: 0.82rem; font-weight: 800; display: flex; align-items: center; gap: 8px; border-color: #10b981; color: #34d399; cursor: pointer; margin: 0;" title="Descargar un archivo JSON fechado y firmado con toda la base de datos completa">
-                                <i class="fa-solid fa-download"></i> ⬇️ Descargar Copia de Seguridad Completa (.JSON)
+                            <button type="button" class="btn-secondary" onclick="ViasaApp.descargarCopiaSeguridadCompletaJSON()" style="padding: 11px 16px; font-size: 0.82rem; font-weight: 800; display: flex; align-items: center; gap: 8px; border-color: #10b981; color: #34d399; cursor: pointer; margin: 0;" title="Descargar un archivo JSON estructurado con toda la base de datos completa V1.5 e imágenes">
+                                <i class="fa-solid fa-download"></i> ⬇️ Exportar Base de Datos Completa V1.5 (.JSON)
                             </button>
 
-                            <label for="input-restaurar-copia-seguridad" class="btn-secondary" style="padding: 11px 16px; font-size: 0.82rem; font-weight: 800; display: flex; align-items: center; gap: 8px; border-color: #38bdf8; color: #7dd3fc; cursor: pointer; margin: 0;" title="Reconstruir el catálogo y la base de datos desde un archivo .JSON">
-                                <i class="fa-solid fa-upload"></i> ⬆️ Restaurar Copia de Seguridad
+                            <label for="input-restaurar-copia-seguridad" class="btn-secondary" style="padding: 11px 16px; font-size: 0.82rem; font-weight: 800; display: flex; align-items: center; gap: 8px; border-color: #38bdf8; color: #7dd3fc; cursor: pointer; margin: 0;" title="Reconstruir el catálogo y la base de datos desde un archivo .JSON en cualquier laptop">
+                                <i class="fa-solid fa-upload"></i> ⬆️ Restaurar / Migrar Respaldo (.JSON)
                             </label>
                             <input type="file" id="input-restaurar-copia-seguridad" accept=".json,application/json" style="display: none;" onchange="ViasaApp.restaurarCopiaSeguridadDesdeArchivo(event)">
                             
@@ -20582,6 +20664,43 @@
                             </label>
                             <button type="button" class="btn-gold" onclick="ViasaApp.ejecutarGuardadoGeneralYRespaldo(true)" style="padding: 10px 20px; font-size: 0.84rem; font-weight: 800; display: flex; align-items: center; gap: 8px; cursor: pointer;">
                                 <i class="fa-solid fa-floppy-disk"></i> Crear Respaldo en Casillero Ahora
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- SECCIÓN: SINCRONIZACIÓN MULTI-LAPTOP EN TIEMPO REAL (CLOUD SYNC READY ADAPTER) -->
+                    <div style="background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%); border: 1.5px solid #3b82f6; border-radius: 12px; padding: 18px 22px; margin-bottom: 20px; box-shadow: 0 4px 20px rgba(59, 130, 246, 0.15);">
+                        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 12px;">
+                            <div style="font-size: 0.9rem; font-weight: 900; color: #93c5fd; display: flex; align-items: center; gap: 8px;">
+                                <i class="fa-solid fa-cloud-arrow-up" style="color: #60a5fa;"></i>
+                                ☁️ Sincronización Multi-Laptop en Tiempo Real (Cloud Sync Ready Adapter)
+                            </div>
+                            <div id="cloud-sync-status-badge" style="padding: 4px 12px; border-radius: 20px; font-size: 0.72rem; font-weight: 800; display: inline-flex; align-items: center; gap: 6px; background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid #10b981;">
+                                <i class="fa-solid fa-shield-halved"></i> Modo Local Blindado (100% Offline)
+                            </div>
+                        </div>
+                        <p style="color: #cbd5e1; font-size: 0.78rem; margin: 0 0 14px 0; line-height: 1.4;">
+                            Conectividad opcional de alta velocidad con Supabase / PostgreSQL Cloud. En modo desconectado, VIASA System opera con velocidad instantánea 100% offline. Al conectar credenciales, las modificaciones se replican automáticamente entre laptops.
+                        </p>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; margin-bottom: 14px;">
+                            <div>
+                                <label style="display: block; font-size: 0.74rem; font-weight: 800; color: #93c5fd; margin-bottom: 4px;">URL del Proyecto Cloud (Supabase):</label>
+                                <input type="text" id="cloud-project-url" class="pos-search-input" placeholder="https://tu-proyecto.supabase.co" value="${window.ViasaCloud?.supabaseUrl || ''}" style="width: 100%; font-size: 0.82rem; padding: 9px 12px; background: #0b1120; border: 1px solid #334155; color: #fff; border-radius: 8px;">
+                            </div>
+                            <div>
+                                <label style="display: block; font-size: 0.74rem; font-weight: 800; color: #93c5fd; margin-bottom: 4px;">API Key / Anon Public Key:</label>
+                                <input type="password" id="cloud-anon-key" class="pos-search-input" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6..." value="${window.ViasaCloud?.supabaseAnonKey || ''}" style="width: 100%; font-size: 0.82rem; padding: 9px 12px; background: #0b1120; border: 1px solid #334155; color: #fff; border-radius: 8px;">
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                            <button type="button" class="btn-secondary" onclick="ViasaApp.probarConexionCloud()" style="padding: 9px 16px; font-size: 0.8rem; font-weight: 800; display: inline-flex; align-items: center; gap: 7px; border-color: #60a5fa; color: #93c5fd; cursor: pointer; margin: 0;">
+                                <i class="fa-solid fa-flask"></i> 🧪 Probar Conexión Cloud
+                            </button>
+                            <button type="button" class="btn-secondary" onclick="ViasaApp.guardarCredencialesCloud()" style="padding: 9px 16px; font-size: 0.8rem; font-weight: 800; display: inline-flex; align-items: center; gap: 7px; border-color: #34d399; color: #6ee7b7; cursor: pointer; margin: 0;">
+                                <i class="fa-solid fa-floppy-disk"></i> 💾 Guardar Credenciales
+                            </button>
+                            <button type="button" class="btn-gold" onclick="ViasaApp.sincronizarCloudAhora()" style="padding: 9px 18px; font-size: 0.8rem; font-weight: 900; display: inline-flex; align-items: center; gap: 7px; background: linear-gradient(135deg, #2563eb, #1d4ed8); border: 1px solid #60a5fa; color: #fff; cursor: pointer; margin: 0;">
+                                <i class="fa-solid fa-rotate"></i> 🔄 Sincronizar Todo Ahora
                             </button>
                         </div>
                     </div>
@@ -20937,11 +21056,14 @@
             try {
                 await this.sincronizarEstadoGeneralEnStorage();
                 const backup = await window.ViasaStorage.exportarBackupCompleto();
-                const fecha = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
-                const nombreArchivo = `VIASA_BACKUP_COMPLETO_${fecha}.json`;
+                const ahora = new Date();
+                const fechaStr = ahora.toISOString().slice(0, 10);
+                const horas = String(ahora.getHours()).padStart(2, '0');
+                const minutos = String(ahora.getMinutes()).padStart(2, '0');
+                const nombreArchivo = `VIASA_Backup_V1.5_${fechaStr}_${horas}${minutos}.json`;
                 await window.ViasaStorage.descargarBackupArchivo(backup, nombreArchivo);
                 if (window.ViasaAudio) window.ViasaAudio.playCashChime();
-                this.mostrarNotificacionToast(`⬇️ Copia de seguridad completa descargada (${nombreArchivo}).`, 'success');
+                this.mostrarNotificacionToast(`⬇️ Copia de seguridad completa V1.5 descargada con éxito (${nombreArchivo}). Incluye catálogo e imágenes IndexedDB.`, 'success');
             } catch (err) {
                 console.error('[Backup Download Error]', err);
                 alert('⚠️ Error al descargar copia de seguridad: ' + (err.message || err));
@@ -20956,7 +21078,7 @@
             const file = event?.target?.files?.[0];
             if (!file) return;
 
-            const confirmar = confirm(`⚠️ CONFIRMACIÓN DE RESTAURACIÓN COMPLETA\n\n¿Desea restaurar la base de datos de VIASA System desde el archivo "${file.name}"?\n\nEsta acción reconstruirá todo el catálogo de productos y registros sin pérdidas.`);
+            const confirmar = confirm(`⚠️ CONFIRMACIÓN DE RESTAURACIÓN SEGURA V1.5\n\n¿Desea restaurar la base de datos de VIASA System desde el archivo "${file.name}"?\n\nEsta acción reconstruirá todo el catálogo de productos, proveedores, imágenes de IndexedDB y configuraciones sin pérdidas.`);
             if (!confirmar) {
                 event.target.value = '';
                 return;
@@ -20970,9 +21092,16 @@
                         alert('⚠️ El archivo seleccionado no contiene una copia de seguridad estructurada de VIASA System.');
                         return;
                     }
-                    await window.ViasaStorage.restaurarBackup(json);
+                    const res = await window.ViasaStorage.restaurarBackup(json);
                     if (window.ViasaAudio) window.ViasaAudio.playCashChime();
-                    alert(`✅ ¡Copia de seguridad restaurada exitosamente desde "${file.name}"!\n\nEl sistema se recargará para reflejar todos los productos y datos actualizados.`);
+                    const resumenTexto = `✅ ¡RESTAURACIÓN OFICIAL V1.5 COMPLETADA!\n\n` +
+                        `📦 Resumen de la Operación:\n` +
+                        `• Productos Nueva Viasa: ${res.productos || 0}\n` +
+                        `• Proveedores y Contactos: ${res.proveedores || 0}\n` +
+                        `• Archivos e Imágenes en IndexedDB: ${res.medios || 0}\n` +
+                        `• Colecciones Administrativas: ${res.colecciones || 0}\n\n` +
+                        `El sistema se recargará ahora para activar los datos restaurados.`;
+                    alert(resumenTexto);
                     window.location.reload();
                 } catch (err) {
                     alert('⚠️ Error al procesar el archivo de copia de seguridad: ' + (err.message || err));
@@ -20981,6 +21110,61 @@
                 }
             };
             reader.readAsText(file);
+        },
+
+        async probarConexionCloud() {
+            const urlInput = (document.getElementById('cloud-project-url')?.value || '').trim();
+            const keyInput = (document.getElementById('cloud-anon-key')?.value || '').trim();
+            if (!urlInput || !keyInput) {
+                alert('⚠️ Ingrese la URL del Proyecto y el API Key de Supabase para realizar la prueba.');
+                return;
+            }
+            if (window.ViasaCloud) {
+                window.ViasaCloud.configurarCredenciales(urlInput, keyInput);
+                const test = await window.ViasaCloud.probarConexion();
+                if (test.ok) {
+                    if (window.ViasaAudio) window.ViasaAudio.playSuccess();
+                    alert(`✅ CONEXIÓN EXITOSA CON LA NUBE:\n\n${test.statusText}\n${test.message}`);
+                } else {
+                    alert(`⚠️ AVISO DE CONEXIÓN CLOUD:\n\n${test.statusText}\n${test.message}`);
+                }
+                this.renderCasilleroRespaldos();
+            }
+        },
+
+        async guardarCredencialesCloud() {
+            const urlInput = (document.getElementById('cloud-project-url')?.value || '').trim();
+            const keyInput = (document.getElementById('cloud-anon-key')?.value || '').trim();
+            if (window.ViasaCloud) {
+                window.ViasaCloud.configurarCredenciales(urlInput, keyInput);
+                if (window.ViasaAudio) window.ViasaAudio.playCashChime();
+                this.mostrarNotificacionToast('💾 Credenciales de Cloud Sync guardadas correctamente.', 'success');
+                this.renderCasilleroRespaldos();
+            }
+        },
+
+        async sincronizarCloudAhora() {
+            if (!window.ViasaCloud || !window.ViasaCloud.isConnected) {
+                alert('⚠️ Primero configure y pruebe las credenciales de Supabase Cloud.');
+                return;
+            }
+            if (!navigator.onLine) {
+                alert('⚠️ Equipo sin conexión a internet. Los datos se mantendrán protegidos en modo local.');
+                return;
+            }
+            try {
+                this.mostrarNotificacionToast('🔄 Sincronizando datos con Supabase Cloud...', 'info');
+                await this.sincronizarEstadoGeneralEnStorage();
+                const res = await window.ViasaCloud.sincronizarTodoHaciaNube();
+                if (res.success) {
+                    if (window.ViasaAudio) window.ViasaAudio.playCashChime();
+                    this.mostrarNotificacionToast(`☁️ Sincronización completa: ${res.enviados} colecciones enviadas a la nube.`, 'success');
+                } else {
+                    alert('⚠️ Error en sincronización cloud: ' + (res.reason || res.error || 'Desconocido'));
+                }
+            } catch (e) {
+                alert('⚠️ Error sincronizando con la nube: ' + e.message);
+            }
         },
 
         guardarTasasConfig() {

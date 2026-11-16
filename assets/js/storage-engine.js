@@ -13,6 +13,7 @@
     const VIASA_STORAGE_PREFIX = 'viasa_sys_';
     const DB_NAME = 'VIASA_SYSTEM_DB_v1';
     const DB_VERSION = 11;
+    const VIASA_DB_SCHEMA_VERSION = '1.5.0';
 
     const STORES = [
         'categorias',
@@ -84,9 +85,95 @@
             this.prefix = VIASA_STORAGE_PREFIX;
             this.dbName = DB_NAME;
             this.dbVersion = DB_VERSION;
+            this.schemaVersion = VIASA_DB_SCHEMA_VERSION;
             this.db = null;
             this.isReady = false;
-            this.initPromise = this.initIndexedDB();
+            this.initPromise = this.initIndexedDB().then(() => {
+                this.ejecutarMigracionEsquemaV15();
+            });
+        }
+
+        /**
+         * Motor de Migración Automática de Esquemas (V1.5.0 Schema Versioning)
+         * Enriquecimiento no destructivo: preserva el 100% de los datos existentes.
+         */
+        async ejecutarMigracionEsquemaV15() {
+            try {
+                const currentSchema = localStorage.getItem('viasa_db_schema_version');
+                if (currentSchema === VIASA_DB_SCHEMA_VERSION) {
+                    return { yaMigrado: true, version: VIASA_DB_SCHEMA_VERSION };
+                }
+
+                console.log(`[VIASA Schema] Ejecutando migración no destructiva a V1.5.0 (Edición Corporativa Multi-Sede)...`);
+                
+                const enriquecerRegistro = (item, prefix = 'REC') => {
+                    if (!item || typeof item !== 'object') return item;
+                    if (!item.id && !item.codigo && !item.sku && !item.clave) {
+                        item.id = `${prefix}-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
+                    }
+                    if (!item.sucursalId) {
+                        item.sucursalId = 'SEDE-PRINCIPAL';
+                    }
+                    if (!item.updatedAt) {
+                        item.updatedAt = item.fechaActualizacion || item.fecha || new Date().toISOString();
+                    }
+                    if (!item.syncStatus) {
+                        item.syncStatus = 'synced';
+                    }
+                    return item;
+                };
+
+                // 1. Enriquecer productos en localStorage (viasa_productos_master_v1 y viasa_productos_nueva_viasa_v1)
+                try {
+                    const masterRaw = localStorage.getItem('viasa_productos_master_v1');
+                    if (masterRaw) {
+                        const prods = JSON.parse(masterRaw);
+                        if (Array.isArray(prods)) {
+                            let modificado = false;
+                            prods.forEach(p => {
+                                if (!p.sucursalId || !p.syncStatus || !p.updatedAt) {
+                                    enriquecerRegistro(p, 'PROD');
+                                    modificado = true;
+                                }
+                            });
+                            if (modificado) {
+                                localStorage.setItem('viasa_productos_master_v1', JSON.stringify(prods));
+                            }
+                        }
+                    }
+                } catch (eP) {
+                    console.warn('[VIASA Schema] Nota en migración de productos master:', eP);
+                }
+
+                // 2. Enriquecer colecciones en LocalStorage Sandbox
+                for (const store of STORES) {
+                    if (store === 'casillero_respaldos_generales') continue;
+                    try {
+                        const key = `col_${store}`;
+                        const raw = this.getItem(key, null);
+                        if (Array.isArray(raw) && raw.length > 0) {
+                            let mod = false;
+                            raw.forEach(r => {
+                                if (r && typeof r === 'object' && (!r.sucursalId || !r.syncStatus || !r.updatedAt)) {
+                                    enriquecerRegistro(r, store.slice(0, 4).toUpperCase());
+                                    mod = true;
+                                }
+                            });
+                            if (mod) {
+                                this.setItem(key, raw);
+                                this.setItem(store, raw);
+                            }
+                        }
+                    } catch (eCol) {}
+                }
+
+                localStorage.setItem('viasa_db_schema_version', VIASA_DB_SCHEMA_VERSION);
+                console.log(`[VIASA Schema] Migración a V1.5.0 completada exitosamente sin alterar registros previos.`);
+                return { yaMigrado: false, version: VIASA_DB_SCHEMA_VERSION };
+            } catch (err) {
+                console.error('[VIASA Schema] Error no fatal en migración V1.5.0:', err);
+                return { error: err.message };
+            }
         }
 
         /**
@@ -433,15 +520,19 @@
         }
 
         /**
-         * Exportar copia de seguridad completa del sistema en JSON
+         * Exportar copia de seguridad completa del sistema en JSON (V1.5.0)
+         * Empaqueta todas las colecciones y extrae los medios de IndexedDB en Base64.
          */
         async exportarBackupCompleto() {
             const backup = {
                 sistema: 'VIASA_SYSTEM_PANADERIA_NUEVA_VIASA',
                 rif: 'J-31163165-8',
-                version: '2.5.0',
+                version: '1.5.0',
+                edicion: 'Edicion Corporativa Multi-Sede',
+                sucursalId: 'SEDE-PRINCIPAL',
                 fecha: new Date().toISOString(),
-                colecciones: {}
+                colecciones: {},
+                medios_indexeddb: []
             };
 
             for (const store of STORES) {
@@ -463,20 +554,54 @@
                 }
             } catch (e) {}
 
+            // Exportar imágenes y medios de IndexedDB (ViasaMediaStorage) en Base64 para portabilidad total
+            try {
+                if (window.ViasaMediaStorage && typeof window.ViasaMediaStorage.obtenerTodosLosMedios === 'function') {
+                    const todosMedios = await window.ViasaMediaStorage.obtenerTodosLosMedios();
+                    if (Array.isArray(todosMedios)) {
+                        for (const m of todosMedios) {
+                            if (!m || !m.uri) continue;
+                            let dataUrl = m.dataUrl || '';
+                            if (!dataUrl && m.blob) {
+                                try {
+                                    dataUrl = await new Promise((resolve) => {
+                                        const reader = new FileReader();
+                                        reader.onloadend = () => resolve(reader.result || '');
+                                        reader.onerror = () => resolve('');
+                                        reader.readAsDataURL(m.blob);
+                                    });
+                                } catch (eBlob) {}
+                            }
+                            backup.medios_indexeddb.push({
+                                uri: m.uri,
+                                categoria: m.categoria || 'imagenes_productos',
+                                nombreArchivo: m.nombreArchivo || (m.uri.split('/').pop()),
+                                sku: m.sku || '',
+                                dataUrl: dataUrl,
+                                fechaActualizacion: m.fechaActualizacion || new Date().toISOString()
+                            });
+                        }
+                    }
+                }
+            } catch (eMedios) {
+                console.warn('[VIASA Storage] Advertencia exportando medios de IndexedDB:', eMedios);
+            }
+
             // Configuraciones y claves sueltas
             backup.configuracionGlobal = {
                 tasaBCV: this.getItem('tasa_bcv', 36.85),
                 tasaParalelo: this.getItem('tasa_paralelo', 39.50),
                 tasaCOP: this.getItem('tasa_cop', 3900),
                 monedaPrincipal: this.getItem('moneda_principal', 'USD'),
-                nombreNegocio: 'Panadería y Pastelería Nueva Viasa, C.A.'
+                nombreNegocio: 'Panadería y Pastelería Nueva Viasa, C.A.',
+                schemaVersion: VIASA_DB_SCHEMA_VERSION
             };
 
             return backup;
         }
 
         /**
-         * Descargar backup JSON directamente al disco
+         * Descargar backup JSON directamente al disco (Nomenclatura Oficial V1.5)
          */
         async descargarBackupArchivo(customData = null, customFilename = null) {
             const data = customData || await this.exportarBackupCompleto();
@@ -485,9 +610,11 @@
             const a = document.createElement('a');
             const ahora = new Date();
             const fechaStr = ahora.toISOString().slice(0, 10);
-            const horaStr = ahora.toTimeString().slice(0, 8).replace(/:/g, '');
+            const horas = String(ahora.getHours()).padStart(2, '0');
+            const minutos = String(ahora.getMinutes()).padStart(2, '0');
+            const horaStr = `${horas}${minutos}`;
             a.href = url;
-            a.download = customFilename || `VIASA_RESPALDO_GENERAL_${fechaStr}_${horaStr}.json`;
+            a.download = customFilename || `VIASA_Backup_V1.5_${fechaStr}_${horaStr}.json`;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
@@ -495,20 +622,29 @@
         }
 
         /**
-         * Restaurar copia de seguridad
+         * Restaurar copia de seguridad con validación e inserción en IndexedDB
          */
         async restaurarBackup(backupJSON) {
             if (!backupJSON || (!backupJSON.colecciones && !backupJSON.productos && !backupJSON.viasa_productos_master_v1)) {
                 throw new Error('Formato de archivo de respaldo no válido para VIASA System.');
             }
 
+            let prodsRestaurados = 0;
+            let provsRestaurados = 0;
+            let mediosRestaurados = 0;
+            let totalColecciones = 0;
+
             if (backupJSON.colecciones) {
                 for (const storeName of Object.keys(backupJSON.colecciones)) {
                     if (storeName === 'casillero_respaldos_generales') continue;
                     const items = backupJSON.colecciones[storeName];
                     if (Array.isArray(items)) {
+                        totalColecciones++;
                         if (storeName === 'usuarios') {
                             this.setItem('usuarios', items);
+                        }
+                        if (storeName === 'proveedores') {
+                            provsRestaurados = items.length;
                         }
                         await this.guardarColeccion(storeName, items);
                     }
@@ -518,6 +654,7 @@
             // Restauración prioritaria del Catálogo Maestro de Productos
             const prodsRestaurar = backupJSON.viasa_productos_master_v1 || (backupJSON.colecciones && backupJSON.colecciones.productos) || (Array.isArray(backupJSON) ? backupJSON : null);
             if (Array.isArray(prodsRestaurar) && prodsRestaurar.length > 0) {
+                prodsRestaurados = prodsRestaurar.length;
                 localStorage.setItem('viasa_productos_master_v1', JSON.stringify(prodsRestaurar));
                 localStorage.setItem('viasa_productos_nueva_viasa_v1', JSON.stringify({
                     version: 1,
@@ -527,13 +664,66 @@
                 await this.guardarColeccion('productos', prodsRestaurar);
             }
 
+            // Restauración integral de Medios e Imágenes en IndexedDB
+            if (Array.isArray(backupJSON.medios_indexeddb) && backupJSON.medios_indexeddb.length > 0) {
+                try {
+                    if (window.ViasaMediaStorage) {
+                        await window.ViasaMediaStorage.initPromise;
+                        if (window.ViasaMediaStorage.db) {
+                            const tx = window.ViasaMediaStorage.db.transaction('media_files', 'readwrite');
+                            const store = tx.objectStore('media_files');
+                            for (const m of backupJSON.medios_indexeddb) {
+                                if (!m || !m.uri) continue;
+                                let blob = null;
+                                if (m.dataUrl && m.dataUrl.startsWith('data:')) {
+                                    try {
+                                        const arr = m.dataUrl.split(',');
+                                        const mime = arr[0].match(/:(.*?);/)?.[1] || 'image/png';
+                                        const bstr = atob(arr[1]);
+                                        let n = bstr.length;
+                                        const u8arr = new Uint8Array(n);
+                                        while (n--) { u8arr[n] = bstr.charCodeAt(n); }
+                                        blob = new Blob([u8arr], { type: mime });
+                                    } catch (eBlobConv) {}
+                                }
+                                store.put({
+                                    uri: m.uri,
+                                    categoria: m.categoria || 'imagenes_productos',
+                                    nombreArchivo: m.nombreArchivo || (m.uri.split('/').pop()),
+                                    sku: m.sku || '',
+                                    blob: blob,
+                                    dataUrl: m.dataUrl || '',
+                                    fechaActualizacion: m.fechaActualizacion || new Date().toISOString()
+                                });
+                                if (m.dataUrl) {
+                                    window.ViasaMediaStorage.cacheUrl(m.uri, m.dataUrl);
+                                }
+                                mediosRestaurados++;
+                            }
+                            await new Promise(r => { tx.oncomplete = r; tx.onerror = r; });
+                        }
+                    }
+                } catch (eMedRest) {
+                    console.warn('[VIASA Storage] Error restaurando medios a IndexedDB:', eMedRest);
+                }
+            }
+
             if (backupJSON.configuracionGlobal) {
                 if (backupJSON.configuracionGlobal.tasaBCV) this.setItem('tasa_bcv', backupJSON.configuracionGlobal.tasaBCV);
                 if (backupJSON.configuracionGlobal.tasaParalelo) this.setItem('tasa_paralelo', backupJSON.configuracionGlobal.tasaParalelo);
                 if (backupJSON.configuracionGlobal.tasaCOP) this.setItem('tasa_cop', backupJSON.configuracionGlobal.tasaCOP);
             }
 
-            return true;
+            // Ejecutar migración no destructiva sobre los datos recién importados
+            await this.ejecutarMigracionEsquemaV15();
+
+            return {
+                success: true,
+                productos: prodsRestaurados,
+                proveedores: provsRestaurados,
+                medios: mediosRestaurados,
+                colecciones: totalColecciones
+            };
         }
 
         /**

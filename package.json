@@ -1,8 +1,8 @@
 {
   "name": "viasa-system-pwa",
-  "version": "1.0.0",
+  "version": "1.5.0",
   "private": true,
-  "description": "VIASA SYSTEM V1.0 - Progressive Web App (PWA) de Gestión Administrativa, Producción, RRHH LOTTT, Carnets QR y Punto de Venta Multidivisa para Panadería y Pastelería Nueva Viasa, C.A.",
+  "description": "VIASA SYSTEM V1.5 (Edición Corporativa Multi-Sede) - Progressive Web App (PWA) de Gestión Administrativa, Producción, RRHH LOTTT, Carnets QR y Punto de Venta Multidivisa para Panadería y Pastelería Nueva Viasa, C.A.",
   "main": "index.html",
   "dependencies": {
     "xlsx": "0.20.3"
